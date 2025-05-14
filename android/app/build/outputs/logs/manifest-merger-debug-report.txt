@@ -1,0 +1,285 @@
+-- Merging decision tree log ---
+application
+INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:13:5-44:19
+INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml
+MERGED from [:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:7:5-12:19
+MERGED from [:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:7:5-12:19
+MERGED from [androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:22:5-29:19
+MERGED from [androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:22:5-29:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:28:5-89
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\cosmi\.gradle\caches\transforms-3\a257cbfc28e727a2560a36e8811b42de\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\cosmi\.gradle\caches\transforms-3\a257cbfc28e727a2560a36e8811b42de\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\cosmi\.gradle\caches\transforms-3\51f81da232852af364727efd4149932d\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\cosmi\.gradle\caches\transforms-3\51f81da232852af364727efd4149932d\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+	android:extractNativeLibs
+		INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+	android:name
+		INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml
+manifest
+ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:1:1-64:12
+MERGED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:1:1-64:12
+INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml:1:1-7:12
+INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml:1:1-7:12
+INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml:1:1-7:12
+MERGED from [:phone_state] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\phone_state-2.1.1\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-7:12
+MERGED from [:shared_preferences_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\shared_preferences_android-2.3.2\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.datastore:datastore-preferences:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\800fee1509573d5dea125ba554bf0a1c\transformed\jetified-datastore-preferences-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.datastore:datastore:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\cb89af333f7466d53985c0a985ad97fe\transformed\jetified-datastore-1.0.0\AndroidManifest.xml:17:1-24:12
+MERGED from [:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-14:12
+MERGED from [:permission_handler_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\permission_handler_android-12.0.13\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.browser:browser:1.8.0] C:\Users\cosmi\.gradle\caches\transforms-3\be291010144bc435943ef3a7340e9fc1\transformed\browser-1.8.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:17:1-31:12
+MERGED from [androidx.window:window-java:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\9a0c3f9c0fc00cad987002726a7986a2\transformed\jetified-window-java-1.2.0\AndroidManifest.xml:17:1-21:12
+MERGED from [androidx.fragment:fragment:1.7.1] C:\Users\cosmi\.gradle\caches\transforms-3\debecc6f46a7b38c0c51302dfffc8cb2\transformed\fragment-1.7.1\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.activity:activity:1.8.1] C:\Users\cosmi\.gradle\caches\transforms-3\8b5cd696d04d06f0f4ebcfd4f41929c5\transformed\jetified-activity-1.8.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\f86006af36fc9a6826ec5978b72b4847\transformed\loader-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\f2b0509785be605d5749c573ad9845b3\transformed\viewpager-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\7441ac9b00ba19fcdd2f75f625235e51\transformed\jetified-lifecycle-livedata-core-ktx-2.7.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\d9bedb04ee66a716961a3b3ab07378e2\transformed\lifecycle-livedata-2.7.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\9462c2b070cc23a6de17c6f5aefc7287\transformed\lifecycle-viewmodel-2.7.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\4a099e9081a0511d3e071f4fdb1b1533\transformed\lifecycle-livedata-core-2.7.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.savedstate:savedstate:1.2.1] C:\Users\cosmi\.gradle\caches\transforms-3\6e5646daa06830897eba6febc7f845c1\transformed\jetified-savedstate-1.2.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\3832d1fc6e6b0ccfd12a2622bd3150d0\transformed\lifecycle-runtime-2.7.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\536fe18bd244e258e963758c319945b5\transformed\jetified-lifecycle-viewmodel-savedstate-2.7.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core-ktx:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\71e04e31bf41d23109d939bbd58cd131\transformed\jetified-core-ktx-1.13.1\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\b8397aa89727ad897ec574d8455a2c34\transformed\customview-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\cosmi\.gradle\caches\transforms-3\8add9f4a0c92b3e2c888950c76e0bdf7\transformed\jetified-annotation-experimental-1.4.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\cosmi\.gradle\caches\transforms-3\a257cbfc28e727a2560a36e8811b42de\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\2c33ff3ef44e0ba4922cc10f8fb2b900\transformed\jetified-tracing-1.2.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\ff414f62e3b34fc55c38c144ae91eeda\transformed\interpolator-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\cosmi\.gradle\caches\transforms-3\51f81da232852af364727efd4149932d\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\be959212b8d0fe1c6ee5342a41c1c033\transformed\core-runtime-2.2.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.window.extensions.core:core:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\699d833e38629e912e761647ac439a24\transformed\jetified-core-1.0.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.getkeepsafe.relinker:relinker:1.4.5] C:\Users\cosmi\.gradle\caches\transforms-3\04b047fda6b1b9d2b6754dcb9c86f317\transformed\jetified-relinker-1.4.5\AndroidManifest.xml:2:1-7:12
+	package
+		INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml
+	android:versionName
+		INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml
+	android:versionCode
+		INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:1:11-69
+uses-permission#android.permission.CALL_PHONE
+ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:2:5-68
+	android:name
+		ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:2:22-66
+uses-permission#android.permission.INTERNET
+ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:4:1-63
+MERGED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:4:1-63
+MERGED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:4:1-63
+	android:name
+		ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:4:18-60
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:5:5-79
+	android:name
+		ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:5:22-76
+uses-permission#android.permission.READ_PHONE_STATE
+ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:6:1-71
+	android:name
+		ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:6:18-68
+uses-permission#android.permission.READ_CALL_LOG
+ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:7:1-68
+	android:name
+		ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:7:18-65
+uses-permission#android.permission.PROCESS_OUTGOING_CALLS
+ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:9:1-77
+	android:name
+		ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:9:18-74
+queries
+ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:51:5-56:15
+intent#action:name:android.intent.action.VIEW+data:scheme:tel
+ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:52:9-55:18
+action#android.intent.action.VIEW
+ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:53:13-65
+	android:name
+		ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:53:21-62
+data
+ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:54:13-42
+	android:scheme
+		ADDED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:54:19-39
+uses-sdk
+INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml
+INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml
+MERGED from [:phone_state] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\phone_state-2.1.1\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-44
+MERGED from [:phone_state] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\phone_state-2.1.1\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-44
+MERGED from [:shared_preferences_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\shared_preferences_android-2.3.2\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-44
+MERGED from [:shared_preferences_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\shared_preferences_android-2.3.2\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-44
+MERGED from [androidx.datastore:datastore-preferences:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\800fee1509573d5dea125ba554bf0a1c\transformed\jetified-datastore-preferences-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.datastore:datastore-preferences:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\800fee1509573d5dea125ba554bf0a1c\transformed\jetified-datastore-preferences-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.datastore:datastore:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\cb89af333f7466d53985c0a985ad97fe\transformed\jetified-datastore-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.datastore:datastore:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\cb89af333f7466d53985c0a985ad97fe\transformed\jetified-datastore-1.0.0\AndroidManifest.xml:20:5-22:41
+MERGED from [:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-44
+MERGED from [:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-44
+MERGED from [:permission_handler_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\permission_handler_android-12.0.13\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-44
+MERGED from [:permission_handler_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\permission_handler_android-12.0.13\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:5:5-44
+MERGED from [androidx.browser:browser:1.8.0] C:\Users\cosmi\.gradle\caches\transforms-3\be291010144bc435943ef3a7340e9fc1\transformed\browser-1.8.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.browser:browser:1.8.0] C:\Users\cosmi\.gradle\caches\transforms-3\be291010144bc435943ef3a7340e9fc1\transformed\browser-1.8.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.window:window-java:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\9a0c3f9c0fc00cad987002726a7986a2\transformed\jetified-window-java-1.2.0\AndroidManifest.xml:19:5-44
+MERGED from [androidx.window:window-java:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\9a0c3f9c0fc00cad987002726a7986a2\transformed\jetified-window-java-1.2.0\AndroidManifest.xml:19:5-44
+MERGED from [androidx.fragment:fragment:1.7.1] C:\Users\cosmi\.gradle\caches\transforms-3\debecc6f46a7b38c0c51302dfffc8cb2\transformed\fragment-1.7.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.fragment:fragment:1.7.1] C:\Users\cosmi\.gradle\caches\transforms-3\debecc6f46a7b38c0c51302dfffc8cb2\transformed\fragment-1.7.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity:1.8.1] C:\Users\cosmi\.gradle\caches\transforms-3\8b5cd696d04d06f0f4ebcfd4f41929c5\transformed\jetified-activity-1.8.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.8.1] C:\Users\cosmi\.gradle\caches\transforms-3\8b5cd696d04d06f0f4ebcfd4f41929c5\transformed\jetified-activity-1.8.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\f86006af36fc9a6826ec5978b72b4847\transformed\loader-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\f86006af36fc9a6826ec5978b72b4847\transformed\loader-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\f2b0509785be605d5749c573ad9845b3\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\f2b0509785be605d5749c573ad9845b3\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\7441ac9b00ba19fcdd2f75f625235e51\transformed\jetified-lifecycle-livedata-core-ktx-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\7441ac9b00ba19fcdd2f75f625235e51\transformed\jetified-lifecycle-livedata-core-ktx-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\d9bedb04ee66a716961a3b3ab07378e2\transformed\lifecycle-livedata-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\d9bedb04ee66a716961a3b3ab07378e2\transformed\lifecycle-livedata-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\9462c2b070cc23a6de17c6f5aefc7287\transformed\lifecycle-viewmodel-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\9462c2b070cc23a6de17c6f5aefc7287\transformed\lifecycle-viewmodel-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\4a099e9081a0511d3e071f4fdb1b1533\transformed\lifecycle-livedata-core-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\4a099e9081a0511d3e071f4fdb1b1533\transformed\lifecycle-livedata-core-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] C:\Users\cosmi\.gradle\caches\transforms-3\6e5646daa06830897eba6febc7f845c1\transformed\jetified-savedstate-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] C:\Users\cosmi\.gradle\caches\transforms-3\6e5646daa06830897eba6febc7f845c1\transformed\jetified-savedstate-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\3832d1fc6e6b0ccfd12a2622bd3150d0\transformed\lifecycle-runtime-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\3832d1fc6e6b0ccfd12a2622bd3150d0\transformed\lifecycle-runtime-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\536fe18bd244e258e963758c319945b5\transformed\jetified-lifecycle-viewmodel-savedstate-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\536fe18bd244e258e963758c319945b5\transformed\jetified-lifecycle-viewmodel-savedstate-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core-ktx:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\71e04e31bf41d23109d939bbd58cd131\transformed\jetified-core-ktx-1.13.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\71e04e31bf41d23109d939bbd58cd131\transformed\jetified-core-ktx-1.13.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\b8397aa89727ad897ec574d8455a2c34\transformed\customview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\b8397aa89727ad897ec574d8455a2c34\transformed\customview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\cosmi\.gradle\caches\transforms-3\8add9f4a0c92b3e2c888950c76e0bdf7\transformed\jetified-annotation-experimental-1.4.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] C:\Users\cosmi\.gradle\caches\transforms-3\8add9f4a0c92b3e2c888950c76e0bdf7\transformed\jetified-annotation-experimental-1.4.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\cosmi\.gradle\caches\transforms-3\a257cbfc28e727a2560a36e8811b42de\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\cosmi\.gradle\caches\transforms-3\a257cbfc28e727a2560a36e8811b42de\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\2c33ff3ef44e0ba4922cc10f8fb2b900\transformed\jetified-tracing-1.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\2c33ff3ef44e0ba4922cc10f8fb2b900\transformed\jetified-tracing-1.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\ff414f62e3b34fc55c38c144ae91eeda\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\ff414f62e3b34fc55c38c144ae91eeda\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\cosmi\.gradle\caches\transforms-3\51f81da232852af364727efd4149932d\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\cosmi\.gradle\caches\transforms-3\51f81da232852af364727efd4149932d\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\be959212b8d0fe1c6ee5342a41c1c033\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\be959212b8d0fe1c6ee5342a41c1c033\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.window.extensions.core:core:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\699d833e38629e912e761647ac439a24\transformed\jetified-core-1.0.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.window.extensions.core:core:1.0.0] C:\Users\cosmi\.gradle\caches\transforms-3\699d833e38629e912e761647ac439a24\transformed\jetified-core-1.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.getkeepsafe.relinker:relinker:1.4.5] C:\Users\cosmi\.gradle\caches\transforms-3\04b047fda6b1b9d2b6754dcb9c86f317\transformed\jetified-relinker-1.4.5\AndroidManifest.xml:5:5-43
+MERGED from [com.getkeepsafe.relinker:relinker:1.4.5] C:\Users\cosmi\.gradle\caches\transforms-3\04b047fda6b1b9d2b6754dcb9c86f317\transformed\jetified-relinker-1.4.5\AndroidManifest.xml:5:5-43
+	android:targetSdkVersion
+		INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\AndroidManifest.xml
+activity#io.flutter.plugins.urllauncher.WebViewActivity
+ADDED from [:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:8:9-11:74
+	android:exported
+		ADDED from [:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:10:13-37
+	android:theme
+		ADDED from [:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-71
+	android:name
+		ADDED from [:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:9:13-74
+uses-library#androidx.window.extensions
+ADDED from [androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:23:9-25:40
+	android:required
+		ADDED from [androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:25:13-37
+	android:name
+		ADDED from [androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:24:13-54
+uses-library#androidx.window.sidecar
+ADDED from [androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:26:9-28:40
+	android:required
+		ADDED from [androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:28:13-37
+	android:name
+		ADDED from [androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:27:13-51
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\cosmi\.gradle\caches\transforms-3\a257cbfc28e727a2560a36e8811b42de\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\cosmi\.gradle\caches\transforms-3\a257cbfc28e727a2560a36e8811b42de\transformed\jetified-startup-runtime-1.1.1\AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:28:13-31
+	android:authorities
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:26:13-68
+	android:exported
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:25:13-67
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+permission#com.example.smart_solutions.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+uses-permission#com.example.smart_solutions.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:25-92

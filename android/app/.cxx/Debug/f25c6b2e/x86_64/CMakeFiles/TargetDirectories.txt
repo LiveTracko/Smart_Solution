@@ -1,0 +1,2 @@
+C:/Users/cosmi/OneDrive/Pictures/Screenshots/Smart-Solutions-main (1)/Smart-Solutions-main/android/app/.cxx/Debug/f25c6b2e/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/cosmi/OneDrive/Pictures/Screenshots/Smart-Solutions-main (1)/Smart-Solutions-main/android/app/.cxx/Debug/f25c6b2e/x86_64/CMakeFiles/rebuild_cache.dir

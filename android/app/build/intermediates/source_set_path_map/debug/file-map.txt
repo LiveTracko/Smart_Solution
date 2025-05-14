@@ -1,0 +1,34 @@
+com.example.smart_solutions.app-core-1.13.1-0 C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\res
+com.example.smart_solutions.app-jetified-lifecycle-process-2.7.0-1 C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\res
+com.example.smart_solutions.app-jetified-tracing-1.2.0-2 C:\Users\cosmi\.gradle\caches\transforms-3\2c33ff3ef44e0ba4922cc10f8fb2b900\transformed\jetified-tracing-1.2.0\res
+com.example.smart_solutions.app-lifecycle-runtime-2.7.0-3 C:\Users\cosmi\.gradle\caches\transforms-3\3832d1fc6e6b0ccfd12a2622bd3150d0\transformed\lifecycle-runtime-2.7.0\res
+com.example.smart_solutions.app-lifecycle-livedata-core-2.7.0-4 C:\Users\cosmi\.gradle\caches\transforms-3\4a099e9081a0511d3e071f4fdb1b1533\transformed\lifecycle-livedata-core-2.7.0\res
+com.example.smart_solutions.app-jetified-profileinstaller-1.3.1-5 C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\res
+com.example.smart_solutions.app-jetified-lifecycle-viewmodel-savedstate-2.7.0-6 C:\Users\cosmi\.gradle\caches\transforms-3\536fe18bd244e258e963758c319945b5\transformed\jetified-lifecycle-viewmodel-savedstate-2.7.0\res
+com.example.smart_solutions.app-jetified-core-1.0.0-7 C:\Users\cosmi\.gradle\caches\transforms-3\699d833e38629e912e761647ac439a24\transformed\jetified-core-1.0.0\res
+com.example.smart_solutions.app-jetified-savedstate-1.2.1-8 C:\Users\cosmi\.gradle\caches\transforms-3\6e5646daa06830897eba6febc7f845c1\transformed\jetified-savedstate-1.2.1\res
+com.example.smart_solutions.app-jetified-core-ktx-1.13.1-9 C:\Users\cosmi\.gradle\caches\transforms-3\71e04e31bf41d23109d939bbd58cd131\transformed\jetified-core-ktx-1.13.1\res
+com.example.smart_solutions.app-jetified-lifecycle-livedata-core-ktx-2.7.0-10 C:\Users\cosmi\.gradle\caches\transforms-3\7441ac9b00ba19fcdd2f75f625235e51\transformed\jetified-lifecycle-livedata-core-ktx-2.7.0\res
+com.example.smart_solutions.app-jetified-datastore-preferences-1.0.0-11 C:\Users\cosmi\.gradle\caches\transforms-3\800fee1509573d5dea125ba554bf0a1c\transformed\jetified-datastore-preferences-1.0.0\res
+com.example.smart_solutions.app-jetified-annotation-experimental-1.4.0-12 C:\Users\cosmi\.gradle\caches\transforms-3\8add9f4a0c92b3e2c888950c76e0bdf7\transformed\jetified-annotation-experimental-1.4.0\res
+com.example.smart_solutions.app-jetified-activity-1.8.1-13 C:\Users\cosmi\.gradle\caches\transforms-3\8b5cd696d04d06f0f4ebcfd4f41929c5\transformed\jetified-activity-1.8.1\res
+com.example.smart_solutions.app-lifecycle-viewmodel-2.7.0-14 C:\Users\cosmi\.gradle\caches\transforms-3\9462c2b070cc23a6de17c6f5aefc7287\transformed\lifecycle-viewmodel-2.7.0\res
+com.example.smart_solutions.app-jetified-window-java-1.2.0-15 C:\Users\cosmi\.gradle\caches\transforms-3\9a0c3f9c0fc00cad987002726a7986a2\transformed\jetified-window-java-1.2.0\res
+com.example.smart_solutions.app-jetified-startup-runtime-1.1.1-16 C:\Users\cosmi\.gradle\caches\transforms-3\a257cbfc28e727a2560a36e8811b42de\transformed\jetified-startup-runtime-1.1.1\res
+com.example.smart_solutions.app-browser-1.8.0-17 C:\Users\cosmi\.gradle\caches\transforms-3\be291010144bc435943ef3a7340e9fc1\transformed\browser-1.8.0\res
+com.example.smart_solutions.app-core-runtime-2.2.0-18 C:\Users\cosmi\.gradle\caches\transforms-3\be959212b8d0fe1c6ee5342a41c1c033\transformed\core-runtime-2.2.0\res
+com.example.smart_solutions.app-jetified-datastore-1.0.0-19 C:\Users\cosmi\.gradle\caches\transforms-3\cb89af333f7466d53985c0a985ad97fe\transformed\jetified-datastore-1.0.0\res
+com.example.smart_solutions.app-jetified-window-1.2.0-20 C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\res
+com.example.smart_solutions.app-lifecycle-livedata-2.7.0-21 C:\Users\cosmi\.gradle\caches\transforms-3\d9bedb04ee66a716961a3b3ab07378e2\transformed\lifecycle-livedata-2.7.0\res
+com.example.smart_solutions.app-fragment-1.7.1-22 C:\Users\cosmi\.gradle\caches\transforms-3\debecc6f46a7b38c0c51302dfffc8cb2\transformed\fragment-1.7.1\res
+com.example.smart_solutions.app-packaged_res-23 C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\permission_handler_android-12.0.13\android\build\intermediates\packaged_res\debug
+com.example.smart_solutions.app-packaged_res-24 C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\phone_state-2.1.1\android\build\intermediates\packaged_res\debug
+com.example.smart_solutions.app-packaged_res-25 C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\shared_preferences_android-2.3.2\android\build\intermediates\packaged_res\debug
+com.example.smart_solutions.app-packaged_res-26 C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\packaged_res\debug
+com.example.smart_solutions.app-pngs-27 C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\build\generated\res\pngs\debug
+com.example.smart_solutions.app-resValues-28 C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\build\generated\res\resValues\debug
+com.example.smart_solutions.app-packageDebugResources-29 C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.example.smart_solutions.app-packageDebugResources-30 C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.example.smart_solutions.app-merged_res-31 C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\build\intermediates\merged_res\debug
+com.example.smart_solutions.app-debug-32 C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\debug\res
+com.example.smart_solutions.app-main-33 C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\res

@@ -1,0 +1,2 @@
+C:/Users/cosmi/OneDrive/Desktop/2-april/Smart-Solutions-main (1)/Smart-Solutions-main/android/app/.cxx/RelWithDebInfo/442n275v/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/cosmi/OneDrive/Desktop/2-april/Smart-Solutions-main (1)/Smart-Solutions-main/android/app/.cxx/RelWithDebInfo/442n275v/armeabi-v7a/CMakeFiles/rebuild_cache.dir

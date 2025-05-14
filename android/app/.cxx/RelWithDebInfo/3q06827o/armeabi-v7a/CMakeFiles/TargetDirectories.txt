@@ -1,0 +1,2 @@
+C:/Users/cosmi/FlutterProjects/Smart-Solutions-main (1)/Smart-Solutions-main/android/app/.cxx/RelWithDebInfo/3q06827o/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/cosmi/FlutterProjects/Smart-Solutions-main (1)/Smart-Solutions-main/android/app/.cxx/RelWithDebInfo/3q06827o/armeabi-v7a/CMakeFiles/rebuild_cache.dir

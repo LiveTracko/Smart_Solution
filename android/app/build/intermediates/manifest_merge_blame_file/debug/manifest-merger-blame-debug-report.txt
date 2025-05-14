@@ -1,0 +1,202 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.smart_solutions"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+9        android:targetSdkVersion="35" />
+10    <!--
+11         The INTERNET permission is required for development. Specifically,
+12         the Flutter tool needs it to communicate with the running application
+13         to allow setting breakpoints, to provide hot reload, etc.
+14    -->
+15    <uses-permission android:name="android.permission.INTERNET" />
+15-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:4:1-63
+15-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:4:18-60
+16    <uses-permission android:name="android.permission.CALL_PHONE" />
+16-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:2:5-68
+16-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:2:22-66
+17    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+17-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:5:5-79
+17-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:5:22-76
+18    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+18-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:6:1-71
+18-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:6:18-68
+19    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+19-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:7:1-68
+19-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:7:18-65
+20    <uses-permission android:name="android.permission.CALL_PHONE" />
+20-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:2:5-68
+20-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:2:22-66
+21    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+21-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:9:1-77
+21-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:9:18-74
+22    <!--
+23 Required to query activities that can process text, see:
+24         https://developer.android.com/training/package-visibility and
+25         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+26
+27         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin.
+28    -->
+29    <queries>
+29-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:51:5-56:15
+30        <intent>
+30-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:52:9-55:18
+31            <action android:name="android.intent.action.VIEW" />
+31-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:53:13-65
+31-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:53:21-62
+32
+33            <data android:scheme="tel" />
+33-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:54:13-42
+33-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:54:19-39
+34        </intent>
+35    </queries>
+36    <queries>
+36-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:51:5-56:15
+37        <intent>
+38            <action android:name="android.intent.action.PROCESS_TEXT" />
+39
+40            <data android:mimeType="text/plain" />
+40-->C:\Users\cosmi\FlutterProjects\Smart-Solutions-main (1)\Smart-Solutions-main\android\app\src\main\AndroidManifest.xml:54:13-42
+41        </intent>
+42    </queries>
+43
+44    <permission
+44-->[androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+45        android:name="com.example.smart_solutions.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+45-->[androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+46        android:protectionLevel="signature" />
+46-->[androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+47
+48    <uses-permission android:name="com.example.smart_solutions.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+48-->[androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+48-->[androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+49
+50    <application
+51        android:name="android.app.Application"
+52        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+52-->[androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+53        android:debuggable="true"
+54        android:extractNativeLibs="true"
+55        android:icon="@mipmap/ic_launcher"
+56        android:label="smart_solutions" >
+57        <activity
+58            android:name="com.example.smart_solutions.MainActivity"
+59            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+60            android:exported="true"
+61            android:hardwareAccelerated="true"
+62            android:launchMode="singleInstance"
+63            android:taskAffinity=""
+64            android:theme="@style/LaunchTheme"
+65            android:windowSoftInputMode="adjustResize" >
+66
+67            <!--
+68                 Specifies an Android theme to apply to this Activity as soon as
+69                 the Android process has started. This theme is visible to the user
+70                 while the Flutter UI initializes. After that, this theme continues
+71                 to determine the Window background behind the Flutter UI.
+72            -->
+73            <meta-data
+74                android:name="io.flutter.embedding.android.NormalTheme"
+75                android:resource="@style/NormalTheme" />
+76
+77            <intent-filter>
+78                <action android:name="android.intent.action.MAIN" />
+79
+80                <category android:name="android.intent.category.LAUNCHER" />
+81            </intent-filter>
+82        </activity>
+83        <!--
+84             Don't delete the meta-data below.
+85             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
+86        -->
+87        <meta-data
+88            android:name="flutterEmbedding"
+89            android:value="2" />
+90
+91        <activity
+91-->[:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:8:9-11:74
+92            android:name="io.flutter.plugins.urllauncher.WebViewActivity"
+92-->[:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:9:13-74
+93            android:exported="false"
+93-->[:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:10:13-37
+94            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+94-->[:url_launcher_android] C:\Users\cosmi\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.9\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-71
+95
+96        <uses-library
+96-->[androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:23:9-25:40
+97            android:name="androidx.window.extensions"
+97-->[androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:24:13-54
+98            android:required="false" />
+98-->[androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:25:13-37
+99        <uses-library
+99-->[androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:26:9-28:40
+100            android:name="androidx.window.sidecar"
+100-->[androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:27:13-51
+101            android:required="false" />
+101-->[androidx.window:window:1.2.0] C:\Users\cosmi\.gradle\caches\transforms-3\d149392b21ab15cb9e8ddc2ef8d62be8\transformed\jetified-window-1.2.0\AndroidManifest.xml:28:13-37
+102
+103        <provider
+103-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:24:9-32:20
+104            android:name="androidx.startup.InitializationProvider"
+104-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:25:13-67
+105            android:authorities="com.example.smart_solutions.androidx-startup"
+105-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:26:13-68
+106            android:exported="false" >
+106-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:27:13-37
+107            <meta-data
+107-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+108                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+108-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+109                android:value="androidx.startup" />
+109-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+110            <meta-data
+110-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+111                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+111-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+112                android:value="androidx.startup" />
+112-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+113        </provider>
+114
+115        <receiver
+115-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+116            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+116-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+117            android:directBootAware="false"
+117-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+118            android:enabled="true"
+118-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+119            android:exported="true"
+119-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+120            android:permission="android.permission.DUMP" >
+120-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+121            <intent-filter>
+121-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+122                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+122-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+122-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+123            </intent-filter>
+124            <intent-filter>
+124-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+125                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+125-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+125-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+126            </intent-filter>
+127            <intent-filter>
+127-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+128                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+128-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+128-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+129            </intent-filter>
+130            <intent-filter>
+130-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+131                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+131-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+131-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\cosmi\.gradle\caches\transforms-3\4c8731eacc24185caffddf76df9f34a6\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+132            </intent-filter>
+133        </receiver>
+134    </application>
+135
+136</manifest>

@@ -159,16 +159,24 @@ class ApiService {
 
   Future<dynamic> checkUserStillLoggedIn() async {
     SharedPreferences shared = await SharedPreferences.getInstance();
-    final tellecallerid = shared.getString("telecaller_id");
+    final companyName = shared.get("companyname");
+    
+
+    // final tellecallerid = shared.getString("telecaller_id");
+
     var uri = Uri.parse(
-        "https://smartdial.co.in/misadmin/api/index.php/Auth/useractivecheck");
+        "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}$companyName/api/index.php/"}${APIUrls.logoutCheck}");
+
+    //  "https://smartdial.co.in/misadmin/api/index.php/Auth/useractivecheck"
+    // );
 
     var request = http.MultipartRequest('POST', uri)
       ..headers.addAll({
         "X-API-KEY": "ftc_apikey@",
         "Content-Type": "application/json",
       })
-      ..fields['telecaller_id'] = '54';
+      ..fields['telecaller_id'] = StaticStoredData.userId.toString();
+    //StaticStoredData.userId;
 
     var response = await request.send();
 

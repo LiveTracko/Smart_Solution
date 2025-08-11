@@ -4,12 +4,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
-import 'package:smart_solutions/views/data_entry_screen.dart';
+import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
 import 'package:smart_solutions/views/reset_password.dart';
 
 class CustomDrawer extends StatefulWidget {
-  CustomDrawer({super.key});
+  const CustomDrawer({super.key});
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
@@ -45,9 +45,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
               UserAccountsDrawerHeader(
                 accountName: Text(
                   _userName.toUpperCase(),
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                accountEmail: Text(''),
+                accountEmail: const Text(''),
                 currentAccountPicture: CircleAvatar(
                     backgroundColor: Colors.white, // Set a background color
                     child: Text(
@@ -84,14 +85,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 // Add navigation logic here
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.list_alt_rounded),
-              title: const Text('Data entry list'),
-              onTap: () {
-                Get.to(() => DataEntryViewScreen()); // Close the drawer
-                // Add navigation logic here
-              },
-            ),
+            // ListTile(
+            //   leading: const Icon(Icons.list_alt_rounded),
+            //   title: const Text('Data Entry'),
+            //   onTap: () {
+            //     Get.to(() => DataEntryViewScreen()); // Close the drawer
+            //     // Add navigation logic here
+            //   },
+            // ),
             ListTile(
               leading: const Icon(Icons.info),
               title: const Text('About Us'),
@@ -100,12 +101,21 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 // Add navigation logic here
               },
             ),
+            StaticStoredData.roleName == 'telecaller'
+                ? ListTile(
+                    leading: const Icon(Icons.list),
+                    title: const Text('Listing'),
+                    onTap: () {
+                      Get.to(() => const ListingScreen());
+                    },
+                  )
+                : const SizedBox.shrink(),
+
             ListTile(
               leading: const Icon(Icons.lock),
               title: const Text('Reset Password'),
               onTap: () {
-                Get.to(() => ChangePasswordScreen()); // Close the drawer
-                // Add navigation logic here
+                Get.to(() => ChangePasswordScreen());
               },
             ),
             const Divider(), // Divider for separation

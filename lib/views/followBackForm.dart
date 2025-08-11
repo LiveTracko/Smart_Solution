@@ -6,7 +6,6 @@ import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/controllers/remark_status_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
-
 import '../constants/services.dart';
 
 // ignore: must_be_immutable
@@ -87,17 +86,20 @@ class FollowBackForm extends StatelessWidget {
                 Obx(
                   () => _buildTextField(
                     label: 'Customer Name',
-                    value: _dialerController.customerName.value,
+                    value: _formController.customerName.value,
                     onChanged: (value) =>
-                        _dialerController.customerName.value = value,
+                        _formController.customerName.value = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter customer name';
-                      } else if (_dialerController
-                          .customerName.value.isNotEmpty) {
-                        _formController.customerName.value =
-                            _dialerController.customerName.value;
                       }
+                      // else if (_dialerController
+                      //     .customerName.value.isNotEmpty) {
+                      //   _dialerController.customerName.value =
+                      //       _formController.customerName.value;
+                      //   // _formController.customerName.value =
+                      //   //     _dialerController.customerName.value;
+                      // }
                       return null;
                     },
                   ),
@@ -358,8 +360,8 @@ class FollowBackForm extends StatelessWidget {
                   value: 'Yes',
                   groupValue: _formController.contacted.value,
                   onChanged: (value) {
-                    _formController.contacted.value = value!;
-                    _remarkController.fetchRemarkStatus('1');
+                    // _formController.contacted.value = value!;
+                    // _remarkController.fetchRemarkStatus('1');
                   },
                   activeColor: AppColors.primaryColor,
                 ),
@@ -374,8 +376,8 @@ class FollowBackForm extends StatelessWidget {
                   value: 'No',
                   groupValue: _formController.contacted.value,
                   onChanged: (value) {
-                    _formController.contacted.value = value!;
-                    _remarkController.fetchRemarkStatus('2');
+                    // _formController.contacted.value = value!;
+                    // _remarkController.fetchRemarkStatus('2');
                   },
                   activeColor: AppColors.primaryColor,
                 ),

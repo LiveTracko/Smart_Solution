@@ -49,10 +49,10 @@ class LoginRequest {
       commonRemark: json['common_remark'] as String,
       remark: json['remark'] as String,
       created: DateTime.parse(json['created']),
-      title: json['title'], // Nullable field
-      bankName: json['bank_name'], // Nullable field
-      sourcing: json['sourcing'] as String,
-      sourcingTitle: json['sourcing_title'] as String,
+      title: json['title'] ?? '', // Nullable field
+      bankName: json['bank_name'] ?? '', // Nullable field
+      sourcing: (json['sourcing'] ?? '') as String,
+      sourcingTitle: (json['sourcing_title'] ?? '') as String,
     );
   }
 

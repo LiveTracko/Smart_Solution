@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "168535849850",
+    "project_id": "smart-solution-ceda3",
+    "storage_bucket": "smart-solution-ceda3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:168535849850:android:ceb655d50c45530e0e74c3",
+        "android_client_info": {
+          "package_name": "com.example.smart_solutions"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9Ck3cbb26FXOQiJxVqfGc47dP9RXjiP4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

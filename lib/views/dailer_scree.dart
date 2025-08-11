@@ -1,37 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/components/widgets/DailerScreenWidget/KeypadRowWidget.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
-
 import 'package:smart_solutions/views/followBackForm.dart';
 
 class DialerScreen extends StatefulWidget {
-  const DialerScreen({Key? key}) : super(key: key);
+  DialerScreen({Key? key}) : super(key: key);
 
   @override
   State<DialerScreen> createState() => _DialerScreenState();
 }
 
 class _DialerScreenState extends State<DialerScreen> {
-  final DialerController dialerController = Get.put(DialerController());
+  // final DialerController dialerController = Get.put(DialerController());
+
+  final DialerController dialerController = Get.find<DialerController>();
   final FollowBackFormController _formController =
       Get.put(FollowBackFormController());
 
   int callsToBeHeld = 5;
 
   @override
+  void dispose() {
+    dialerController.setPhoneNumberOnce('');
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print(dialerController.phoneNumber);
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        // centerTitle: true,
-        title: Text(
+        centerTitle: true,
+        title: const Text(
           'Dialer',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
@@ -58,7 +65,6 @@ class _DialerScreenState extends State<DialerScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize
                       .min, // Ensures the row only takes the necessary width
-
                   children: [
                     Text(
                       isActive
@@ -183,12 +189,8 @@ class _DialerScreenState extends State<DialerScreen> {
                         // ),
 
                         Text(
-                      dialerController.phoneNumber.isEmpty
-                          ?
-                          // ? dialerController.dialNumber.isEmpty
-                          //     ?
-                          'Enter number'
-                          // : dialerController.dialNumber.value
+                      dialerController.phoneNumber.value.isEmpty
+                          ? 'Enter number'
                           : dialerController.phoneNumber.value,
                       style: TextStyle(
                         fontSize: 20.sp,
@@ -208,7 +210,7 @@ class _DialerScreenState extends State<DialerScreen> {
                 children: [
                   KeypadRowWidget(
                     numbers: const ['1', '2', '3'],
-                    subTexts: const ['ABC', 'DEF'],
+                    subTexts: const ['', 'ABC', 'DEF'],
                     onDialButtonPressed: _addNumber,
                   ),
                   KeypadRowWidget(
@@ -257,6 +259,7 @@ class _DialerScreenState extends State<DialerScreen> {
                                     dialerController.phoneNumber.value);
                                 _formController.mobile.value =
                                     dialerController.phoneNumber.value;
+                                print(dialerController.customerLoan.value);
                               }
                             : null,
                       )),

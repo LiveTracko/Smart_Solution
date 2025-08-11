@@ -1,12 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
-import 'package:smart_solutions/constants/api_urls.dart';
-import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/reset_password_controller.dart';
-import 'package:smart_solutions/services/api_service.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   @override

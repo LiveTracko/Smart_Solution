@@ -47,10 +47,14 @@ class LoginRequestForm extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Login Request Form'),
+          centerTitle: true,
+          title: const Text(
+            'Login Request Form',
+            style: TextStyle(fontSize: 20),
+          ),
           actions: [
             Obx(() => controller.isNew.value
-                ? SizedBox.shrink()
+                ? const SizedBox.shrink()
                 : IconButton(
                     onPressed: () {
                       controller.isEdit.value = !controller.isEdit.value;
@@ -121,12 +125,12 @@ class LoginRequestForm extends StatelessWidget {
                   _buildSourcingDropdown(),
                   const SizedBox(height: 10),
 
-                  _buildTextField(
-                    label: 'Common remark',
-                    content: controller.commonRemark.value,
-                    onChanged: (value) => controller.commonRemark.value = value,
-                    // validator: _validateNotEmpty,
-                  ),
+                  // _buildTextField(
+                  //   label: 'Common remark',
+                  //   content: controller.commonRemark.value,
+                  //   onChanged: (value) => controller.commonRemark.value = value,
+                  //   // validator: _validateNotEmpty,
+                  // ),
                   const SizedBox(height: 10),
                   // Dynamic Remarks Section
                   _buildRemarksSection(),
@@ -261,7 +265,8 @@ class LoginRequestForm extends StatelessWidget {
     if (value == null || value.isEmpty) {
       return 'This field cannot be empty';
     }
-    if (double.tryParse(value) == null) {
+    final numeric = value.replaceAll(',', '');
+    if (double.tryParse(numeric) == null) {
       return 'Please enter a valid number';
     }
     return null;

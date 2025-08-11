@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:smart_solutions/services/firbase_notifications.dart';
 // import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import '../components/button_component.dart';
@@ -19,6 +20,18 @@ class LoginViewState extends State<LoginView> {
 
   final _formKey = GlobalKey<FormState>(); // Form key for validation
   bool _isObscured = true; // State for password visibility
+  String? token;
+
+  @override
+  void initState() {
+    getDeviceToken();
+    super.initState();
+  }
+
+  getDeviceToken() async {
+    await FireBaseNotificatinService().getDeviceToken();
+    token = FireBaseNotificatinService.token;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +89,7 @@ class LoginViewState extends State<LoginView> {
                       padding: EdgeInsets.only(
                           bottom: 10.h, left: 15.w, right: 15.w, top: 15.h),
                       child: TextFormField(
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.visiblePassword,
                         style: const TextStyle(color: Colors.black),
                         controller: controller.passwordController,
                         decoration: InputDecoration(
@@ -187,7 +200,7 @@ class LoginViewState extends State<LoginView> {
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
                                   // Call the login method from the controller
-                                  controller.login();
+                                  controller.login(token!);
 
                                   // Close the dialog
                                   controller.usernameController.clear();

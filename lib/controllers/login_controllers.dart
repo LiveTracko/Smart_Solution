@@ -8,7 +8,6 @@ import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/services/api_service.dart';
 import 'package:smart_solutions/views/navigationbar.dart';
-
 import '../constants/services.dart'; // Direct navigation to MainScreen
 
 class LoginViewModel extends GetxController {
@@ -19,9 +18,9 @@ class LoginViewModel extends GetxController {
   var isLoading = false.obs;
   final ApiService _apiService = ApiService(); // ApiService instance
   final DashboardController dashboardController =
-      Get.put(DashboardController());
+      Get.put(DashboardController(), permanent: true);
 
-  void login() async {
+  void login(String tokenData) async {
     isLoading.value = true;
 
     Map<String, dynamic> loginData = {
@@ -29,6 +28,10 @@ class LoginViewModel extends GetxController {
       'password': passwordController.text.trim(),
       'data_type': "${secureType.value}"
     };
+
+    if (tokenData.isNotEmpty) {
+      loginData['mobilefcm_token'] = tokenData;
+    }
     logOutput(loginData.toString());
     try {
       final response = await _apiService
@@ -45,13 +48,17 @@ class LoginViewModel extends GetxController {
               ['id']; // Adjust according to your API response structure
           String userName = responseData['profile']['data']['profile']
               ['name']; //  API returns name 1st change
+          String roleName =
+              responseData['profile']['data']['profile']['role_name'];
 
           StaticStoredData.userId = userId;
+          StaticStoredData.roleName = roleName;
           // Store the user ID locally using Shared Preferences
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('userId', userId);
           await prefs.setString(
               'userName', userName); // Store username 2nd chnge
+          await prefs.setString('roleName', roleName);
           // Secure Type
           if (secureType.value != null) {
             await prefs.setInt('secureType', secureType.value!);
@@ -63,7 +70,7 @@ class LoginViewModel extends GetxController {
           // Navigate to the MainScreen on successful login
           dashboardController.fetchDashboardData(false);
           dashboardController.fetchDashboardData(true);
-          Get.off(() => const MainScreen());
+          Get.off(() => MainScreen());
           showDialog(
               context: (Get.context!),
               builder: (context) => AlertDialog(

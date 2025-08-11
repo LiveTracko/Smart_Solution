@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
+import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/models/remark_status_model.dart';
 import '../constants/services.dart';
 import '../services/api_service.dart';
@@ -13,12 +14,16 @@ class RemarkStatusController extends GetxController {
   var isLoading = false.obs;
   var isCallback = false.obs;
 
+  final FollowBackFormController _followBackFormController =
+      Get.find<FollowBackFormController>();
+
   @override
   void onInit() {
     super.onInit();
-    fetchRemarkStatus('2');
+
     DialerController dialerController = Get.find();
     dialerController.fetchNextPhoneNumber();
+    fetchRemarkStatus(_followBackFormController.contactStatus);
   }
 
   Future<void> fetchRemarkStatus(String status) async {

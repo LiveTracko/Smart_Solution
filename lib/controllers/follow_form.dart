@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -10,7 +9,6 @@ import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/models/FollowUpSubmittedList.dart';
 import 'package:smart_solutions/models/all_bank_names_model.dart';
 import 'package:smart_solutions/models/followUpDetails.dart';
-
 import '../constants/services.dart';
 import '../services/api_service.dart';
 import '../constants/api_urls.dart';
@@ -23,17 +21,24 @@ class FollowBackFormController extends GetxController {
       Get.put(DashboardController());
   var allBankNamesList = <AllBankNamesData>[].obs;
   var followBackList = <Data>[].obs;
+  var callbackData = <Data>[].obs;
+  var dailycallbackData = <Data>[].obs;
+  var dailyfollowBackList = <Data>[].obs;
+  var monthlyfollowBackList = <Data>[].obs;
   var filteredFollowBackList = <Data>[].obs;
   var dateRangeList = <DateTime?>[].obs;
 
   @override
   void onInit() {
     getAllBanks();
-    fetchFollowBackList();
+    
+
+    //   fetchFollowBackList();
     super.onInit();
   }
 
   // Form fields
+  var loanAmount = ''.obs;
   var customerName = ''.obs;
   var mobile = ''.obs;
   var bankName = ''.obs;
@@ -41,8 +46,7 @@ class FollowBackFormController extends GetxController {
   var contacted = 'No'.obs;
   var remarkStatus = ''.obs;
   var remark = ''.obs;
-  var telecallerId =
-      StaticStoredData.userId.obs; // Default value as shown in API
+  var telecallerId = StaticStoredData.userId.obs;
 
   // var followupDate = DateTime.now().obs;
   // Change followupDate to accept null
@@ -62,9 +66,9 @@ class FollowBackFormController extends GetxController {
     dateRangeList.clear();
   }
 
-  void fetchFollowBackList() async {
+  Future<void> fetchFollowBackList() async {
     isLoading.value = true;
-    // TODO: To get secure type from shared preferences
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final int? secureType = prefs.getInt('secureType');
     final String dateRage = dateRangeList.isNotEmpty &&
@@ -104,6 +108,43 @@ class FollowBackFormController extends GetxController {
     }
   }
 
+  Future<void> getDailyMonthlyCallbackData(String dateRange) async {
+    isLoading.value = true;
+
+    try {
+      final response = await _apiService.postRequest(
+        APIUrls.callBackdData,
+        {
+          "telecaller_id": StaticStoredData.userId,
+          "daterange": dateRange, // 0 = daily, 1 = monthly
+        },
+      );
+
+      debugPrint(
+          "FollowUp callback Response => ${response.statusCode}: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final followBackData = FollowUpSubmitedList.fromJson(responseData);
+
+        // Assign to observable list
+        if (dateRange == "1") {
+          dailycallbackData.value = followBackData.data ?? [];
+        } else {
+          callbackData.value = followBackData.data ?? [];
+        }
+      } else if (response.statusCode == 204) {
+        callbackData.clear(); // No data
+      } else {
+        logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      logOutput("Exception while fetching follow-back list: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> submitFollowUp() async {
     try {
       isLoading(true);
@@ -126,7 +167,7 @@ class FollowBackFormController extends GetxController {
         'remark': remark.value,
         'telecaller_id': telecallerId.value,
         'call_duration': _dialerController
-            .formatElapsedTime(_dialerController.callDuration.value),
+            .formatElapsedTime(_dialerController.elapsedTimeInSeconds.value),
         'excel_id': _dialerController.excel_id.value,
         'followup_id': _dialerController.followup_id.value,
       };
@@ -210,7 +251,7 @@ class FollowBackFormController extends GetxController {
     // followupDate.value = DateTime.now();
     // followupDate.value = null;
 
-    _dialerController.callDuration.value = 0;
+    _dialerController.elapsedTimeInSeconds.value = 0;
     // _dialerController.excel_id.value = '';
     _dialerController.followup_id.value = '';
   }

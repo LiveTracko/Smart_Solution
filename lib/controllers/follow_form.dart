@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -235,7 +234,7 @@ class FollowBackFormController extends GetxController {
 
     try {
       if (toDate.isNotEmpty && fromDate.isNotEmpty) {
-        debugPrint(" date range --> ${toDate},${fromDate}");
+        debugPrint(" date range --> $toDate,$fromDate");
 
         var response = await _apiService.postRequest(
           APIUrls.followUpSubmitedData,

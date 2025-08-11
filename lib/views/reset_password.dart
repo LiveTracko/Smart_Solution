@@ -1,14 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
-import 'package:smart_solutions/constants/api_urls.dart';
-import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/reset_password_controller.dart';
-import 'package:smart_solutions/services/api_service.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
+  const ChangePasswordScreen({super.key});
+
   @override
   _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
 }
@@ -61,7 +58,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Change Password")),
+      appBar: AppBar(title: const Text("Change Password")),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -81,14 +78,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             const SizedBox(height: 20),
             Text(
               'Hii👋  ${_userName.toUpperCase()}',
-              style: TextStyle(color: Colors.black, fontSize: 20),
+              style: const TextStyle(color: Colors.black, fontSize: 20),
             ),
             const SizedBox(height: 20),
             TextField(
               keyboardType: TextInputType.number,
               maxLength: 6,
               controller: controller.passwordController,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black,
               ),
               obscureText: isobsucred,
@@ -106,20 +103,20 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     );
                   },
                   icon: isobsucred
-                      ? Icon(Icons.visibility_off)
-                      : Icon(Icons.visibility),
+                      ? const Icon(Icons.visibility_off)
+                      : const Icon(Icons.visibility),
                 ),
               ),
             ),
             const SizedBox(height: 15),
             Obx(() => controller.isLoading.value
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     onPressed: () => controller.resetPassword(),
-                    child: Text(
+                    child: const Text(
                       "Submit",
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),

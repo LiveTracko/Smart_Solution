@@ -1,13 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUtil
 import 'package:get/get.dart';
 import 'package:smart_solutions/components/dashboardgrid.dart';
-import 'package:smart_solutions/constants/services.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/models/dashBoardToday_model.dart';
-import 'package:smart_solutions/services/api_service.dart';
 import 'package:smart_solutions/views/drawer.dart';
 
 // Main Dashboard Screen
@@ -66,7 +62,7 @@ class DashboardScreen extends StatelessWidget {
         ],
       ),
       drawerEnableOpenDragGesture: false,
-      drawer: CustomDrawer(),
+      drawer: const CustomDrawer(),
       body: RefreshIndicator(
         onRefresh: () async {
           await controller.fetchDashboardData(true); // Refresh monthly data
@@ -82,7 +78,6 @@ class DashboardScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    
                     // Today Section
                     DashboardSection(
                       title: "Today",

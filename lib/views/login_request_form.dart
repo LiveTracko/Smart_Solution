@@ -50,7 +50,7 @@ class LoginRequestForm extends StatelessWidget {
           title: const Text('Login Request Form'),
           actions: [
             Obx(() => controller.isNew.value
-                ? SizedBox.shrink()
+                ? const SizedBox.shrink()
                 : IconButton(
                     onPressed: () {
                       controller.isEdit.value = !controller.isEdit.value;

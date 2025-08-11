@@ -8,7 +8,6 @@ import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_solutions/views/monthly_dropdown.dart';
 
 class FollowBackListScreen extends StatelessWidget {
   final FollowBackFormController controller =
@@ -176,7 +175,7 @@ class FollowBackListScreen extends StatelessWidget {
                         ),
                         borderRadius: BorderRadius.circular(12.0),
                       ),
-                      child: Row(
+                      child: const Row(
                         children: [
                           Text(
                             'Filter',
@@ -423,7 +422,7 @@ class FollowBackListScreen extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Row(
@@ -441,9 +440,7 @@ class FollowBackListScreen extends StatelessWidget {
                                         child: FollowBackListWidget(
                                           icon: Icons.access_time,
                                           text: entryDate != null
-                                              ? DateFormat('hh:mm ')
-                                                      .format(entryDate) +
-                                                  "o'clock"
+                                              ? "${DateFormat('hh:mm ').format(entryDate)}o'clock"
                                               : 'No Time',
                                         ),
                                       ),

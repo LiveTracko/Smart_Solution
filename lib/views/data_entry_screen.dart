@@ -180,9 +180,9 @@ class DataEntryViewScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        Text(
+        const Text(
           ':', // Add colon here
-          style: const TextStyle(fontSize: 12, color: Colors.grey),
+          style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
         const SizedBox(width: 4),
         Expanded(
@@ -217,9 +217,9 @@ class DataEntryViewScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        Text(
+        const Text(
           ':', // Add colon here
-          style: const TextStyle(fontSize: 12, color: Colors.grey),
+          style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
         const SizedBox(width: 4),
         Expanded(

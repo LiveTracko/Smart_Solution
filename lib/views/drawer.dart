@@ -9,7 +9,7 @@ import 'package:smart_solutions/views/login_screen.dart';
 import 'package:smart_solutions/views/reset_password.dart';
 
 class CustomDrawer extends StatefulWidget {
-  CustomDrawer({super.key});
+  const CustomDrawer({super.key});
 
   @override
   State<CustomDrawer> createState() => _CustomDrawerState();
@@ -45,9 +45,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
               UserAccountsDrawerHeader(
                 accountName: Text(
                   _userName.toUpperCase(),
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                accountEmail: Text(''),
+                accountEmail: const Text(''),
                 currentAccountPicture: CircleAvatar(
                     backgroundColor: Colors.white, // Set a background color
                     child: Text(
@@ -104,7 +105,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               leading: const Icon(Icons.lock),
               title: const Text('Reset Password'),
               onTap: () {
-                Get.to(() => ChangePasswordScreen()); // Close the drawer
+                Get.to(() => const ChangePasswordScreen()); // Close the drawer
                 // Add navigation logic here
               },
             ),

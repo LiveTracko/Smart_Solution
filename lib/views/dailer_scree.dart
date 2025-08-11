@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/components/widgets/DailerScreenWidget/KeypadRowWidget.dart';
@@ -29,7 +28,7 @@ class _DialerScreenState extends State<DialerScreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         // centerTitle: true,
-        title: Text(
+        title: const Text(
           'Dialer',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
@@ -370,8 +369,9 @@ class _DialerScreenState extends State<DialerScreen> {
         dialerController.dialNumber.value = dialerController.dialNumber.value
             .substring(0, dialerController.dialNumber.value.length - 1);
       });
-    } else
+    } else {
       dialerController.customerLoan.value = '';
+    }
     dialerController.customerName.value = '';
 
     if (dialerController.phoneNumber.isNotEmpty) {

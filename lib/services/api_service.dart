@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/services.dart';
-import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/models/user_logoutcheck_model.dart';
 
 class ApiService {
@@ -18,7 +17,7 @@ class ApiService {
     final companyName = shared.get("companyname");
     final response = await http.get(
       Uri.parse(
-          "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}${companyName}/api/index.php/"}$endpoint"),
+          "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}$companyName/api/index.php/"}$endpoint"),
       headers: {
         "x-api-key": APIUrls.apiKey,
       },
@@ -60,7 +59,7 @@ class ApiService {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(
-            "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}${companyName}/api/index.php/"}$endpoint"));
+            "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}$companyName/api/index.php/"}$endpoint"));
     request.headers.addAll(header);
 
     // Add fields
@@ -89,7 +88,7 @@ class ApiService {
     final companyName = shared.get("companyname");
     final response = await http.put(
       Uri.parse(
-          "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}${companyName}/api/index.php/"}$endpoint"),
+          "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}$companyName/api/index.php/"}$endpoint"),
       headers: {
         "Content-Type": "application/json",
         "x-api-key": "Surplus_apikey@",
@@ -105,7 +104,7 @@ class ApiService {
     final companyName = shared.get("companyname");
     final response = await http.delete(
       Uri.parse(
-          "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}${companyName}/api/index.php/"}$endpoint"),
+          "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}$companyName/api/index.php/"}$endpoint"),
     );
     return _handleResponse(response);
   }

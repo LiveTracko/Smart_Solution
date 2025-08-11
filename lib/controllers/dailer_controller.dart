@@ -10,7 +10,6 @@ import 'package:smart_solutions/core/widgets/custom_snackbars.dart';
 import 'package:smart_solutions/models/mobile_number_fetching.dart';
 import 'package:smart_solutions/services/api_service.dart';
 import 'package:smart_solutions/views/followBackForm.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../constants/services.dart';
 import '../services/CallHelper.dart';

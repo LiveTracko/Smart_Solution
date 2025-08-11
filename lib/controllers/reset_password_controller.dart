@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'dart:convert';
@@ -17,7 +16,7 @@ class ResetPasswordController extends GetxController {
 
   Future<void> resetPassword() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String tellercaller_id = prefs.getString('t') ?? "User";
+    String tellercallerId = prefs.getString('t') ?? "User";
     String password = passwordController.text.trim();
 
     if (password.isEmpty) {

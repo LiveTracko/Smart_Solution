@@ -41,5 +41,5 @@ class APIUrls {
   static const String statuslist = 'Auth/getleaddatastatus';
   static const String dataentrySave = 'Auth/savedataentry';
   static const String mobileByCustomeData = 'Auth/getmobilebycustomerdata';
-  static const String teamLeadByTeamId = 'Auth/getteamleaderbyid';
+  static const String teamLeadByTeamId = 'Auth/gettelecallerbyteamid';
 }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
@@ -32,7 +31,7 @@ class RemarkStatusController extends GetxController {
       final response = await _apiService.postRequest(
         APIUrls.remarkStatusCode,
         {'status': status},
-      );
+      ).timeout(const Duration(seconds: 20)); // 10-second timeout;
 
       if (response.statusCode == 200) {
         final remarkStatus = RemarkStatus.fromJson(json.decode(response.body));

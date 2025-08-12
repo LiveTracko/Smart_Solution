@@ -457,11 +457,12 @@ class DataController extends GetxController {
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
 
-        final List<dynamic> dataList = responseData['data'];
+        // final List<dynamic> dataList = responseData['data'];
 
-        final Map<String, dynamic> firstItem = dataList[0];
+        // final Map<String, dynamic> firstItem = dataList[0];
 
-        teamleader.value = firstItem['name'];
+        teamleader.value = responseData['data']['name'];
+        date.value = DateFormat('dd-MM-yy HH:mm:ss').format(DateTime.now());
       }
     } catch (e) {
       logOutput('An error occurred while fetching source list: $e');

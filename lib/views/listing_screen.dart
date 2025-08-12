@@ -1,9 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/button_controller.dart';
 import 'package:smart_solutions/controllers/pin_code_controller.dart';
+import 'package:smart_solutions/theme/app_theme.dart';
+import 'package:smart_solutions/utils/customAppbar.dart';
 
 class ListingScreen extends StatefulWidget {
   const ListingScreen({super.key});
@@ -75,16 +79,27 @@ class _ListingScreenState extends State<ListingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF356EFF), // your blue color
-          centerTitle: true,
-          title: const Text('Listing Page'),
-          actions: const [],
-        ),
-        body: Obx(() => Column(children: [
+        // appBar: AppBar(
+        //   backgroundColor: const Color(0xFF356EFF), // your blue color
+        //   centerTitle: true,
+        //   title: const Text('Listing Page'),
+        //   actions: const [],
+        // ),
+        body: Obx(
+      () => Stack(children: [
+        const SizedBox(height: 130, child: CurvedAppBar(title: 'Listing Page')),
+        Padding(
+          padding: const EdgeInsets.only(top: 100),
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(35), topRight: Radius.circular(35)),
+            ),
+            child: Column(children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 child: TextField(
                   style: const TextStyle(color: Colors.black),
                   keyboardType: TextInputType.text,
@@ -173,7 +188,7 @@ class _ListingScreenState extends State<ListingScreen> {
                       Text(
                         'Company Listing',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.w500,
                           color: toggleController.selectedIndex.value == 0
                               ? Colors.white
@@ -229,11 +244,10 @@ class _ListingScreenState extends State<ListingScreen> {
                             ? Colors.white
                             : Colors.black,
                       ),
-                      const SizedBox(width: 8),
                       Text(
                         'Pin Code Listing',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.w500,
                           color: toggleController.selectedIndex.value == 1
                               ? Colors.white
@@ -258,7 +272,11 @@ class _ListingScreenState extends State<ListingScreen> {
                   }
                 }),
               ),
-            ])));
+            ]),
+          ),
+        ),
+      ]),
+    ));
   }
 
   /// Dummy company table

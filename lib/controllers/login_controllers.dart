@@ -63,7 +63,7 @@ class LoginViewModel extends GetxController {
           // Navigate to the MainScreen on successful login
           dashboardController.fetchDashboardData(false);
           dashboardController.fetchDashboardData(true);
-          Get.off(() => const MainScreen());
+          Get.off(() => MainScreen());
           showDialog(
               context: (Get.context!),
               builder: (context) => AlertDialog(

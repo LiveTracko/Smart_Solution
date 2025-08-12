@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class RemarkList {
   final String id;
   final String loginRequestId;
@@ -15,12 +17,21 @@ class RemarkList {
 
   // Factory constructor to create a RemarkList object from a JSON map
   factory RemarkList.fromJson(Map<String, dynamic> json) {
+    final rawDate = json['date'] as String;
+    DateTime? parsedDate;
+
+    try {
+      parsedDate = DateFormat('yyyy-MM-dd hh:mm a').parse(rawDate);
+    } catch (e) {
+      print('Date parsing failed: $e');
+      parsedDate = DateTime.now(); // or handle as needed
+    }
     return RemarkList(
       id: json['id'],
       loginRequestId: json['login_request_id'],
       userId: json['user_id'],
       remark: json['remark'] ?? '', // Default to an empty string if null
-      date: DateTime.parse(json['date']),
+      date: parsedDate,
     );
   }
 
@@ -31,7 +42,8 @@ class RemarkList {
       'login_request_id': loginRequestId,
       'user_id': userId,
       'remark': remark,
-      'date': date.toIso8601String(), // Convert DateTime to String
+      'date': DateFormat('yyyy-MM-dd hh:mm a')
+          .format(date), // Convert DateTime to String
     };
   }
 }

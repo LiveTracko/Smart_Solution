@@ -29,7 +29,7 @@ class Data {
   String? mobileNo;
   String? customerName;
   String? customerId;
-  int? income; // Changed to int for calculation purposes
+  String? income; // Changed to int for calculation purposes
   String? companyName;
   String? caseType;
   String? caseStudy;
@@ -45,6 +45,8 @@ class Data {
   String? teleCallerName;
   String? teleCallerId;
   String? teamLeader;
+  String? productType;
+  String? sourcing;
   String? status;
   String? comments;
   String? invoiceId;
@@ -83,6 +85,8 @@ class Data {
     this.teleCallerName,
     this.teleCallerId,
     this.teamLeader,
+    this.productType,
+    this.sourcing,
     this.status,
     this.comments,
     this.invoiceId,
@@ -107,7 +111,7 @@ class Data {
       mobileNo: json['mobile_no'],
       customerName: json['customer_name'],
       customerId: json['customer_id'],
-      income: int.tryParse(json['income'] ?? '0'), // Safely parse income
+      income: json['income'] ?? '0', // Safely parse income
       companyName: json['company_name'],
       caseType: json['caseType'],
       caseStudy: json['case_study'],
@@ -124,6 +128,8 @@ class Data {
       teleCallerName: json['teleCallerName'],
       teleCallerId: json['teleCallerid'],
       teamLeader: json['teamLeader'],
+      productType: json['product_type'],
+      sourcing: json['sourcing'],
       status: json['status'],
       comments: json['comment_data'],
       invoiceId: json['invoice_id'],
@@ -166,6 +172,8 @@ class Data {
       'teleCallerName': teleCallerName,
       'teleCallerid': teleCallerId,
       'teamLeader': teamLeader,
+      'product_type':productType,
+      'sourcing':sourcing,
       'status': status,
       'comment_data': comments,
       'invoice_id': invoiceId,

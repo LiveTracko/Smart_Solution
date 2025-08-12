@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUtil
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/routes/app_routes.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Import Shared Preferences
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -24,17 +24,21 @@ class _SplashScreenState extends State<SplashScreen> {
   // Check if user is already logged in
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId =
-        prefs.getString('userId'); // Retrieve user ID from Shared Preferences
+    String? userId = prefs.getString(
+      'userId',
+    ); // Retrieve user ID from Shared Preferences
+    String? roleName = prefs.getString('roleName');
 
     // Navigate to the appropriate screen after a delay
     Future.delayed(const Duration(seconds: 3), () {
       if (userId != null) {
         StaticStoredData.userId = userId;
+        StaticStoredData.roleName = roleName ?? '';
 
         Get.offAllNamed(AppRoutes.navigationscreen);
       } else {
         StaticStoredData.userId = '';
+        StaticStoredData.roleName = '';
         Get.offAllNamed(AppRoutes.login);
       }
     });
@@ -50,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             // Replace this with your app's logo image
             Image.asset(
-              'assets/images/sd_logo.png', // Make sure the path matches your image location
+              'assets/images/splash_logo.png', // Make sure the path matches your image location
               height: 100.h, // Use responsive height
               width: 250.w, // Use responsive width
             ),

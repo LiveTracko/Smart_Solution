@@ -4,8 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
-import 'package:smart_solutions/views/data_entry_screen.dart';
+import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
+import 'package:smart_solutions/views/report_page.dart';
 import 'package:smart_solutions/views/reset_password.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -39,94 +40,116 @@ class _CustomDrawerState extends State<CustomDrawer> {
     return SafeArea(
       child: Drawer(
         width: MediaQuery.of(context).size.width * 0.6,
-        child: Column(
-          children: <Widget>[
-            Stack(children: [
-              UserAccountsDrawerHeader(
-                accountName: Text(
-                  _userName.toUpperCase(),
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                accountEmail: const Text(''),
-                currentAccountPicture: CircleAvatar(
-                    backgroundColor: Colors.white, // Set a background color
-                    child: Text(
-                        _userName.isNotEmpty
-                            ? _userName[0].toUpperCase()
-                            : "A", // Get the first letter
-                        style: const TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black, // Text color
-                        ))),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [Color(0xFFFFFFFF), Color(0xFF356EFF)],
+              stops: [0.7788, 1.0],
+            ),
+          ),
+          child: Stack(
+            children: [
+              Column(
+                children: <Widget>[
+                  // Header Section
+                  Container(
+                    height: 150,
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 30, // Reduced circle size
+                          backgroundColor: Colors.white,
+                          child: Text(
+                            _userName.isNotEmpty
+                                ? _userName[0].toUpperCase()
+                                : "A",
+                            style: const TextStyle(
+                              fontSize:
+                                  25, // Adjust font size for the smaller circle
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16), // Spacer
+                        Text(
+                          _userName.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 15, // Reduced font size for the name
+                            fontWeight: FontWeight.bold,
+                            color: Colors
+                                .white, // Changed text color to white for visibility
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  ListTile(
+                    leading: const Icon(Icons.list_alt),
+                    title: const Text('Listing'),
+                    onTap: () {
+                      Get.to(() => const ListingScreen());
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.list),
+                    title: const Text('Reports'),
+                    onTap: () {
+                      Get.to(() => const ReportPage());
+                    },
+                  ),
+                  if (StaticStoredData.roleName == 'telecaller')
+                    ListTile(
+                      leading: const Icon(Icons.supervisor_account_rounded),
+                      title: const Text('Customer'),
+                      onTap: () {},
+                    ),
+                  ListTile(
+                    leading: const Icon(Icons.lock),
+                    title: const Text('Reset Password'),
+                    onTap: () {
+                      Get.to(() => const ChangePasswordScreen());
+                    },
+                  ),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.logout),
+                    title: const Text('Logout'),
+                    onTap: () async {
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      prefs.clear();
+                      StaticStoredData.userId = '';
+                      Get.put(LoginViewModel());
+                      Get.offAll(() => const LoginView());
+                      // ignore: unused_local_variable
+                      final LoginViewModel controller = Get.find();
+                    },
+                  ),
+                ],
+              ),
+              // Close button
+              Positioned(
+                top: 10,
+                right: 10,
+                child: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  child: IconButton(
+                    onPressed: () {
+                      _dashboardController.toggleDrawer();
+                      Get.back();
+                    },
+                    icon: const Icon(Icons.close),
+                  ),
                 ),
               ),
-              Positioned(
-                  top: 10,
-                  right: 10,
-                  child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: IconButton(
-                        onPressed: () {
-                          _dashboardController.toggleDrawer();
-                          Get.back();
-                        },
-                        icon: const Icon(Icons.close),
-                      )))
-            ]),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home'),
-              onTap: () {
-                Navigator.pop(context); // Close the drawer
-                // Add navigation logic here
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.list_alt_rounded),
-              title: const Text('Data entry list'),
-              onTap: () {
-                Get.to(() => DataEntryViewScreen()); // Close the drawer
-                // Add navigation logic here
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('About Us'),
-              onTap: () {
-                Navigator.pop(context); // Close the drawer
-                // Add navigation logic here
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.lock),
-              title: const Text('Reset Password'),
-              onTap: () {
-                Get.to(() => const ChangePasswordScreen()); // Close the drawer
-                // Add navigation logic here
-              },
-            ),
-            const Divider(), // Divider for separation
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
-              onTap: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.clear();
-                StaticStoredData.userId = '';
-
-                Get.put(LoginViewModel());
-
-                Get.offAll(() => const LoginView());
-
-                // ignore: unused_local_variable
-                final LoginViewModel controller = Get.find();
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

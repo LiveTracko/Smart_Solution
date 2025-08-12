@@ -43,7 +43,7 @@ class LoginRequestController extends GetxController {
   void onInit() {
     super.onInit();
     getLoginRequestList();
-    fetchLoanStatuses(); // Fetch data on initialization
+    fetchLoanStatuses();
     getLoginRequestBanks();
     getSourcingList();
   }
@@ -66,9 +66,11 @@ class LoginRequestController extends GetxController {
               .map((json) => LoginRequest.fromJson(json))
               .toList();
 
-              // log('raw -->>> ${resData['data'] }');
+          // log('raw -->>> ${resData['data'] }');
 
           loginRequestList.value = loginData; // Update observable list
+          currentId.value = loginRequestList[0].id;
+          await getRemarks();
 
           // log('pppp -->>> ${loginRequestList.map((e) => e.toJson()).toList()}');
 
@@ -138,7 +140,7 @@ class LoginRequestController extends GetxController {
     try {
       // Prepare the fields map
       var fields = {
-        'login_request_date': DateFormat('dd-MM-yyyy HH:mm')
+        'login_request_date': DateFormat('yyyy-MM-dd HH:mm')
             .format(DateTime.parse(loginRequestDate.value.toString())),
         'telecaller_id': telecallerId.value.toString(),
         'customer_name': customerName.value.toString(),

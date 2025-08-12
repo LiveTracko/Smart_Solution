@@ -275,23 +275,35 @@ class _ListingScreenState extends State<ListingScreen> {
               columnSpacing: 32,
               headingRowHeight: 50,
               dataRowHeight: 70,
+              headingRowColor: MaterialStateProperty.resolveWith<Color?>(
+                (Set<MaterialState> states) {
+                  return Colors.grey[200]; // light grey background for header
+                },
+              ),
               columns: const [
-                //  DataColumn(label: Text('DSA Name')),
                 DataColumn(
-                    columnWidth: IntrinsicColumnWidth(), label: Text('Bank')),
+                  label: Text(
+                    'Bank',
+                    style: TextStyle(color: Colors.indigo),
+                  ),
+                ),
                 DataColumn(
-                    columnWidth: IntrinsicColumnWidth(),
-                    label: Text('Company Category')),
+                  label: Text(
+                    'Company Category',
+                    style: TextStyle(color: Colors.indigo),
+                  ),
+                ),
                 DataColumn(
-                    columnWidth: IntrinsicColumnWidth(),
-                    label: Text('Category')),
+                  label: Text(
+                    'Category',
+                    style: TextStyle(color: Colors.indigo),
+                  ),
+                ),
               ],
               rows: list
-                  .map((pin) => DataRow(cells: [
-                        // DataCell(Text(
-                        //   pin.dsaName.toString(),
-                        //   style: const TextStyle(color: Colors.black),
-                        // )),
+                  .map(
+                    (pin) => DataRow(
+                      cells: [
                         DataCell(Text(
                           pin.bankName.toString(),
                           style: const TextStyle(color: Colors.black),
@@ -300,9 +312,13 @@ class _ListingScreenState extends State<ListingScreen> {
                           pin.companyName.toString(),
                           style: const TextStyle(color: Colors.black),
                         )),
-                        DataCell(Text(pin.category.toString(),
-                            style: const TextStyle(color: Colors.black))),
-                      ]))
+                        DataCell(Text(
+                          pin.category.toString(),
+                          style: const TextStyle(color: Colors.black),
+                        )),
+                      ],
+                    ),
+                  )
                   .toList(),
             ),
             if (pincodeController.iscompanyLoading.value)

@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
+import 'package:smart_solutions/models/dashBoardToday_model.dart';
+import 'package:smart_solutions/views/dashboard_screen.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
 import 'package:smart_solutions/views/report_page.dart';
@@ -38,6 +40,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: true,
+      bottom: false,
       child: Drawer(
         width: MediaQuery.of(context).size.width * 0.6,
         child: Container(
@@ -52,8 +56,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
           child: Stack(
             children: [
               Column(
-                children: <Widget>[
-                  // Header Section
+                children: [
+                  // ===== HEADER =====
                   Container(
                     height: 150,
                     padding: const EdgeInsets.all(16.0),
@@ -61,47 +65,42 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         CircleAvatar(
-                          radius: 30, // Reduced circle size
-                          backgroundColor: Colors.white,
+                          radius: 20,
+                          backgroundColor: Colors.indigo.shade700,
                           child: Text(
                             _userName.isNotEmpty
                                 ? _userName[0].toUpperCase()
                                 : "A",
                             style: const TextStyle(
-                              fontSize:
-                                  25, // Adjust font size for the smaller circle
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: Colors.white,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 16), // Spacer
+                        const SizedBox(width: 16),
                         Text(
                           _userName.toUpperCase(),
                           style: const TextStyle(
-                            fontSize: 15, // Reduced font size for the name
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: Colors
-                                .white, // Changed text color to white for visibility
+                            color: Colors.white,
                           ),
                         ),
                       ],
                     ),
                   ),
 
+                  // ===== TOP GROUP =====
                   ListTile(
                     leading: const Icon(Icons.list_alt),
                     title: const Text('Listing'),
-                    onTap: () {
-                      Get.to(() => const ListingScreen());
-                    },
+                    onTap: () => Get.to(() => const ListingScreen()),
                   ),
                   ListTile(
                     leading: const Icon(Icons.list),
                     title: const Text('Reports'),
-                    onTap: () {
-                      Get.to(() => const ReportPage());
-                    },
+                    onTap: () => Get.to(() => const ReportPage()),
                   ),
                   if (StaticStoredData.roleName == 'telecaller')
                     ListTile(
@@ -109,30 +108,32 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       title: const Text('Customer'),
                       onTap: () {},
                     ),
-                  ListTile(
-                    leading: const Icon(Icons.lock),
-                    title: const Text('Reset Password'),
-                    onTap: () {
-                      Get.to(() => const ChangePasswordScreen());
-                    },
-                  ),
+
+                  const Spacer(), // pushes the next section to the bottom
+
+                  // ===== BOTTOM GROUP =====
                   const Divider(),
-                  ListTile(
-                    leading: const Icon(Icons.logout),
-                    title: const Text('Logout'),
-                    onTap: () async {
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      prefs.clear();
-                      StaticStoredData.userId = '';
-                      Get.put(LoginViewModel());
-                      Get.offAll(() => const LoginView());
-                      // ignore: unused_local_variable
-                      final LoginViewModel controller = Get.find();
-                    },
-                  ),
+                  _drawerTile(Icons.home, 'Home', () async {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.clear();
+                    StaticStoredData.userId = '';
+                    Get.put(DashboardTodayModel());
+                    Get.offAll(() => const DashboardScreen());
+                  }),
+                  _drawerTile(Icons.info_rounded, 'About us', () {}),
+                  _drawerTile(Icons.lock, 'Reset Password', () {}),
+                  _drawerTile(Icons.logout, 'Logout', () async {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.clear();
+                    StaticStoredData.userId = '';
+                    Get.put(LoginViewModel());
+                    Get.offAll(() => const LoginView());
+                  }),
                 ],
               ),
+
               // Close button
               Positioned(
                 top: 10,
@@ -152,6 +153,17 @@ class _CustomDrawerState extends State<CustomDrawer> {
           ),
         ),
       ),
+    );
+  }
+
+// Reusable ListTile with compact spacing
+  Widget _drawerTile(IconData icon, String title, VoidCallback onTap) {
+    return ListTile(
+      dense: true,
+      visualDensity: const VisualDensity(vertical: -4),
+      leading: Icon(icon),
+      title: Text(title),
+      onTap: onTap,
     );
   }
 }

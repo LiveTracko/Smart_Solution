@@ -47,23 +47,30 @@ class LoginRequestForm extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: const Color(0xFF356EFF), // Blue color
           centerTitle: true,
           title: const Text(
             'Login Request Form',
-            style: TextStyle(fontSize: 20),
+            style: TextStyle(
+              fontSize: 20,
+              color: Colors.white, // Make title text white for contrast
+            ),
           ),
           actions: [
-            Obx(() => controller.isNew.value
-                ? const SizedBox.shrink()
-                : IconButton(
-                    onPressed: () {
-                      controller.isEdit.value = !controller.isEdit.value;
-                    },
-                    icon: Icon(
-                      Icons.edit,
-                      color:
-                          controller.isEdit.value ? Colors.red : Colors.white,
-                    )))
+            Obx(
+              () => controller.isNew.value
+                  ? const SizedBox.shrink()
+                  : IconButton(
+                      onPressed: () {
+                        controller.isEdit.value = !controller.isEdit.value;
+                      },
+                      icon: Icon(
+                        Icons.edit,
+                        color:
+                            controller.isEdit.value ? Colors.red : Colors.white,
+                      ),
+                    ),
+            )
           ],
         ),
         body: Padding(
@@ -80,7 +87,10 @@ class LoginRequestForm extends StatelessWidget {
                     content: controller.customerName.value,
                     onChanged: (value) => controller.customerName.value = value,
                     validator: _validateNotEmpty,
+                    prefixIcon: const Icon(Icons.person_outline_rounded,
+                        color: AppColors.primaryColor),
                   ),
+
                   const SizedBox(height: 10),
                   _buildTextField(
                     label: 'Contact Number',
@@ -89,7 +99,10 @@ class LoginRequestForm extends StatelessWidget {
                         controller.contactNumber.value = value,
                     inputType: TextInputType.phone,
                     validator: _validatePhone,
+                    prefixIcon: const Icon(Icons.phone_outlined,
+                        color: AppColors.primaryColor),
                   ),
+
                   const SizedBox(height: 10),
                   _buildTextField(
                     label: 'Loan Amount',
@@ -113,6 +126,8 @@ class LoginRequestForm extends StatelessWidget {
                     },
                     inputType: TextInputType.number,
                     validator: _validateNumber,
+                    prefixIcon: const Icon(Icons.currency_rupee,
+                        color: AppColors.primaryColor),
                   ),
 
                   const SizedBox(height: 10),
@@ -137,7 +152,20 @@ class LoginRequestForm extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   Center(
-                    child: Obx(() => ElevatedButton(
+                    child: Obx(
+                      () => SizedBox(
+                        width: double.infinity, // Full width
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color(0xFF356EFF), // Blue color
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16), // Taller button
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(8), // Rounded corners
+                            ),
+                          ),
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
                               controller.saveLoginRequest(); // Call save method
@@ -148,16 +176,18 @@ class LoginRequestForm extends StatelessWidget {
                               ? const CircularProgressIndicator(
                                   color: Colors.white,
                                 )
-                              : const Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 24.0),
-                                  child: Text(
-                                    'Save Request',
-                                    style: TextStyle(color: Colors.white),
+                              : const Text(
+                                  'Save Request',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16, // Slightly bigger text
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                        )),
-                  ),
+                        ),
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
@@ -174,7 +204,35 @@ class LoginRequestForm extends StatelessWidget {
     TextInputType inputType = TextInputType.text,
     int maxLines = 1,
     String? Function(String?)? validator,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
   }) {
+    Widget? decoratedPrefixIcon;
+    if (prefixIcon != null) {
+      decoratedPrefixIcon = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0, right: 8.0),
+            child: prefixIcon,
+          ),
+          Container(
+            height: 50,
+            width: 5,
+            child: const VerticalDivider(
+              width: 1,
+              // width: 1,
+              thickness: 1,
+              color: Colors.black,
+              indent: 12,
+              endIndent: 12,
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+      );
+    }
+
     return Obx(() => Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
@@ -186,19 +244,20 @@ class LoginRequestForm extends StatelessWidget {
               labelText: label,
               labelStyle: const TextStyle(color: AppColors.secondaryColor),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
+                borderRadius: BorderRadius.circular(8.0),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
-                borderSide: const BorderSide(color: AppColors.primaryColor),
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: const BorderSide(color: Colors.black),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
-                borderSide:
-                    const BorderSide(color: AppColors.primaryColor, width: 2),
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: const BorderSide(color: Colors.black, width: 2),
               ),
               filled: true,
               fillColor: AppColors.backgroundColor,
+              prefixIcon: decoratedPrefixIcon,
+              suffixIcon: suffixIcon,
             ),
             style: const TextStyle(color: AppColors.primaryColor),
             onChanged: onChanged,
@@ -293,28 +352,38 @@ class LoginRequestForm extends StatelessWidget {
                 decoration: InputDecoration(
                   labelStyle: const TextStyle(color: AppColors.secondaryColor),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
+                    borderRadius: BorderRadius.circular(8.0.r),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
-                    borderSide: const BorderSide(color: AppColors.primaryColor),
+                    borderRadius: BorderRadius.circular(8.0.r),
+                    borderSide: const BorderSide(color: Colors.black),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
-                    borderSide: const BorderSide(
-                      color: AppColors.primaryColor,
-                      width: 2,
-                    ),
+                    borderRadius: BorderRadius.circular(8.0.r),
+                    borderSide: const BorderSide(color: Colors.black, width: 2),
                   ),
                   filled: true,
                   fillColor: AppColors.backgroundColor,
+                  prefixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(width: 12), // spacing from left
+                      const Icon(Icons.account_balance,
+                          color: AppColors.primaryColor),
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        height: 24,
+                        width: 1,
+                        color: Colors.black.withOpacity(0.5),
+                      ),
+                    ],
+                  ),
                 ),
                 value: _getInitialBankValue(),
                 hint: const Text(
                   'Select bank',
                   style: TextStyle(color: Colors.grey),
                 ),
-                // isExpanded: true, // Ensures the dropdown takes full width
                 items: _buildBankDropdownItems(),
                 onChanged: !controller.isEdit.value
                     ? null
@@ -370,21 +439,32 @@ class LoginRequestForm extends StatelessWidget {
                   labelText: 'Select Source',
                   labelStyle: const TextStyle(color: AppColors.secondaryColor),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
+                    borderRadius: BorderRadius.circular(8.0.r),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
-                    borderSide: const BorderSide(color: AppColors.primaryColor),
+                    borderRadius: BorderRadius.circular(8.0.r),
+                    borderSide: const BorderSide(color: Colors.black),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
-                    borderSide: const BorderSide(
-                      color: AppColors.primaryColor,
-                      width: 2,
-                    ),
+                    borderRadius: BorderRadius.circular(8.0.r),
+                    borderSide: const BorderSide(color: Colors.black, width: 2),
                   ),
                   filled: true,
                   fillColor: AppColors.backgroundColor,
+                  prefixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(width: 12), // padding from left edge
+                      const Icon(Icons.filter_alt,
+                          color: AppColors.primaryColor),
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        height: 24,
+                        width: 1,
+                        color: Colors.black.withOpacity(0.5),
+                      ),
+                    ],
+                  ),
                 ),
                 value: _getInitialSourceValue(),
                 hint: const Text(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/button_controller.dart';
 import 'package:smart_solutions/controllers/pin_code_controller.dart';
+import 'package:smart_solutions/utils/customAppbar.dart';
 
 class ListingScreen extends StatefulWidget {
   const ListingScreen({super.key});
@@ -75,16 +76,27 @@ class _ListingScreenState extends State<ListingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF356EFF), // your blue color
-          centerTitle: true,
-          title: const Text('Listing Page'),
-          actions: const [],
-        ),
-        body: Obx(() => Column(children: [
+        // appBar: AppBar(
+        //   backgroundColor: const Color(0xFF356EFF), // your blue color
+        //   centerTitle: true,
+        //   title: const Text('Listing Page'),
+        //   actions: const [],
+        // ),
+        body: Obx(
+      () => Stack(children: [
+        const SizedBox(height: 110, child: CurvedAppBar(title: 'Listing Page')),
+        Padding(
+          padding: const EdgeInsets.only(top: 80),
+          child: Container(
+            padding: const EdgeInsets.all(15),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(35), topRight: Radius.circular(35)),
+            ),
+            child: Column(children: [
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 child: TextField(
                   style: const TextStyle(color: Colors.black),
                   keyboardType: TextInputType.text,
@@ -120,127 +132,133 @@ class _ListingScreenState extends State<ListingScreen> {
                   ),
                 ),
               ),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                ElevatedButton(
-                  onPressed: () {
-                    toggleController.select(0);
-                    searchController.clear();
-                    pincodeController.companyPage.value = 1;
-                    pincodeController.companyhasMore.value = true;
-                    pincodeController.fetchCompany();
-                  },
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.resolveWith<Color>((states) {
-                      if (toggleController.selectedIndex.value == 0) {
-                        return const Color(0xFF356EFF); // selected blue
-                      }
-                      return Colors.white; // unselected white
-                    }),
-                    foregroundColor:
-                        MaterialStateProperty.resolveWith<Color>((states) {
-                      if (toggleController.selectedIndex.value == 0) {
-                        return Colors.white; // selected text/icon white
-                      }
-                      return Colors.black; // unselected text/icon black
-                    }),
-                    padding: MaterialStateProperty.all(
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: toggleController.selectedIndex.value == 0
-                            ? BorderSide.none // no border when selected
-                            : const BorderSide(
-                                color: Colors.black,
-                                width: 1), // black border unselected
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      toggleController.select(0);
+                      searchController.clear();
+                      pincodeController.companyPage.value = 1;
+                      pincodeController.companyhasMore.value = true;
+                      pincodeController.fetchCompany();
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.resolveWith<Color>((states) {
+                        if (toggleController.selectedIndex.value == 0) {
+                          return const Color(0xFF356EFF); // selected blue
+                        }
+                        return Colors.white; // unselected white
+                      }),
+                      foregroundColor:
+                          MaterialStateProperty.resolveWith<Color>((states) {
+                        if (toggleController.selectedIndex.value == 0) {
+                          return Colors.white; // selected text/icon white
+                        }
+                        return Colors.black; // unselected text/icon black
+                      }),
+                      padding: MaterialStateProperty.all(
+                        const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                       ),
-                    ),
-                    elevation: MaterialStateProperty.all(4),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.list_alt_outlined,
-                        size: 20,
-                        color: toggleController.selectedIndex.value == 0
-                            ? Colors.white
-                            : Colors.black,
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: toggleController.selectedIndex.value == 0
+                              ? BorderSide.none // no border when selected
+                              : const BorderSide(
+                                  color: Colors.black,
+                                  width: 1), // black border unselected
+                        ),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Company Listing',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                      elevation: MaterialStateProperty.all(4),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.list_alt_outlined,
+                          size: 20,
                           color: toggleController.selectedIndex.value == 0
                               ? Colors.white
                               : Colors.black,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Text(
+                          'Company Listing',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: toggleController.selectedIndex.value == 0
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    toggleController.select(1);
-                    searchController.clear();
-                    pincodeController.page.value = 1;
-                    pincodeController.hasMore.value = true;
-                    pincodeController.fetchPincodes();
-                  },
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.resolveWith<Color>((states) {
-                      return toggleController.selectedIndex.value == 1
-                          ? const Color(0xFF356EFF) // selected blue
-                          : Colors.white; // unselected white
-                    }),
-                    foregroundColor:
-                        MaterialStateProperty.resolveWith<Color>((states) {
-                      return toggleController.selectedIndex.value == 1
-                          ? Colors.white // selected white text/icon
-                          : Colors.black; // unselected black text/icon
-                    }),
-                    padding: MaterialStateProperty.all(
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: toggleController.selectedIndex.value == 1
-                            ? BorderSide.none // no border when selected
-                            : const BorderSide(
-                                color: Colors.black,
-                                width: 1), // black border unselected
+                SizedBox(width: MediaQuery.of(context).size.width * 0.04),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      toggleController.select(1);
+                      searchController.clear();
+                      pincodeController.page.value = 1;
+                      pincodeController.hasMore.value = true;
+                      pincodeController.fetchPincodes();
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.resolveWith<Color>((states) {
+                        return toggleController.selectedIndex.value == 1
+                            ? const Color(0xFF356EFF) // selected blue
+                            : Colors.white; // unselected white
+                      }),
+                      foregroundColor:
+                          MaterialStateProperty.resolveWith<Color>((states) {
+                        return toggleController.selectedIndex.value == 1
+                            ? Colors.white // selected white text/icon
+                            : Colors.black; // unselected black text/icon
+                      }),
+                      padding: MaterialStateProperty.all(
+                        const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
                       ),
-                    ),
-                    elevation: MaterialStateProperty.all(4),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.location_on,
-                        size: 20,
-                        color: toggleController.selectedIndex.value == 1
-                            ? Colors.white
-                            : Colors.black,
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: toggleController.selectedIndex.value == 1
+                              ? BorderSide.none // no border when selected
+                              : const BorderSide(
+                                  color: Colors.black,
+                                  width: 1), // black border unselected
+                        ),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Pin Code Listing',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                      elevation: MaterialStateProperty.all(4),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          size: 20,
                           color: toggleController.selectedIndex.value == 1
                               ? Colors.white
                               : Colors.black,
                         ),
-                      ),
-                    ],
+                        Text(
+                          'Pin Code Listing',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: toggleController.selectedIndex.value == 1
+                                ? Colors.white
+                                : Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ]),
@@ -258,7 +276,11 @@ class _ListingScreenState extends State<ListingScreen> {
                   }
                 }),
               ),
-            ])));
+            ]),
+          ),
+        ),
+      ]),
+    ));
   }
 
   /// Dummy company table
@@ -343,9 +365,9 @@ class _ListingScreenState extends State<ListingScreen> {
         child: Column(
           children: [
             DataTable(
-              columnSpacing: 32,
+              columnSpacing: 30,
               headingRowHeight: 50,
-              dataRowHeight: 50,
+              dataRowHeight: 60,
               headingRowColor: MaterialStateProperty.resolveWith<Color?>(
                 (Set<MaterialState> states) {
                   return Colors

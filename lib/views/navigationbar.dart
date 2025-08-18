@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
@@ -120,19 +121,23 @@ class _MainScreenState extends State<MainScreen> {
               color: AppColors.secondayColor,
             ),
             selectedIcon: Icon(
-              Icons.dashboard,
+              Icons.dashboard_outlined,
               color: AppColors.primaryColor,
             ),
             label: 'Dashboard',
           ),
-          const NavigationDestination(
-            icon: Icon(
-              Icons.person_2_outlined,
-              color: AppColors.secondayColor,
+          NavigationDestination(
+            icon: SvgPicture.asset(
+              'assets/images/bottom_bar_leads.svg',
+              width: 24,
+              height: 24,
+              color: AppColors.secondayColor, // unselected color
             ),
-            selectedIcon: Icon(
-              Icons.person_2_outlined,
-              color: AppColors.primaryColor,
+            selectedIcon: SvgPicture.asset(
+              'assets/images/bottom_bar_leads.svg',
+              width: 24,
+              height: 24,
+              color: AppColors.primaryColor, // selected color
             ),
             label: 'Leads',
           ),
@@ -164,14 +169,18 @@ class _MainScreenState extends State<MainScreen> {
             label:
                 StaticStoredData.roleName == 'telecaller' ? 'List' : 'Listing',
           ),
-          const NavigationDestination(
-            icon: Icon(
-              Icons.co_present_rounded,
-              color: AppColors.secondayColor,
+          NavigationDestination(
+            icon: SvgPicture.asset(
+              'assets/images/bottom_bar_request.svg',
+              width: 24,
+              height: 24,
+              color: AppColors.secondayColor, // unselected color
             ),
-            selectedIcon: Icon(
-              Icons.co_present_rounded,
-              color: AppColors.primaryColor,
+            selectedIcon: SvgPicture.asset(
+              'assets/images/bottom_bar_request.svg', // use the same SVG here
+              width: 24,
+              height: 24,
+              color: AppColors.primaryColor, // selected color
             ),
             label: 'Request',
           ),

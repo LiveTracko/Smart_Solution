@@ -9,6 +9,7 @@ import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/controllers/notification_controller.dart';
 import 'package:smart_solutions/models/dashBoardToday_model.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
+import 'package:smart_solutions/utils/customAppbar.dart';
 import 'package:smart_solutions/views/drawer.dart';
 import 'package:smart_solutions/views/notification_screen.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -68,642 +69,601 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       key: _scaffoldKey,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: const Color.fromRGBO(25, 118, 210, 1),
-        centerTitle: true,
-        title: const Text(
-          "Dashboard",
-          style: TextStyle(color: Colors.white),
-        ),
-        leading: IconButton(
-            onPressed: () async {
-              controller.toggleDrawer();
-              controller.isDrawerOpen.value
-                  ? _scaffoldKey.currentState!.openDrawer()
-                  : _scaffoldKey.currentState!.closeDrawer();
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   backgroundColor: const Color.fromRGBO(25, 118, 210, 1),
+      //   centerTitle: true,
+      //   title: const Text(
+      //     "Dashboard",
+      //     style: TextStyle(color: Colors.white),
+      //   ),
+      //   leading: IconButton(
+      //       onPressed: () async {
+      //         controller.toggleDrawer();
+      //         controller.isDrawerOpen.value
+      //             ? _scaffoldKey.currentState!.openDrawer()
+      //             : _scaffoldKey.currentState!.closeDrawer();
 
-              // if (controller.isDrawerOpen.value) {
-              //   logOutput("opening drawer");
-              //   _scaffoldKey.currentState!.openDrawer();
-              // } else {
-              //   _scaffoldKey.currentState!.closeDrawer();
+      //         // if (controller.isDrawerOpen.value) {
+      //         //   logOutput("opening drawer");
+      //         //   _scaffoldKey.currentState!.openDrawer();
+      //         // } else {
+      //         //   _scaffoldKey.currentState!.closeDrawer();
 
-              //   logOutput('closing drawer');
-              //   Get.back();
-              // }
-            },
-            icon: const Icon(
-              Icons.menu,
-              color: Colors.white,
-            )),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: IconButton(
-              onPressed: () async {
-                Get.to(() => const NotificationSCreen());
-                //     controller.onInit();
-                //    refreshDashboard();
-                // await controller
-                //     .fetchDashboardData(true); // Refresh monthly data
-                // await controller.fetchDashboardData(false);
-              },
-              icon: Obx(
-                () => Stack(
-                  children: [
-                    const Icon(Icons.notifications),
-                    notificationController.unreadCount.value != 0
-                        ? Positioned(
-                            right: 0,
-                            top: 0,
-                            bottom: 5,
-                            child: Container(
-                              padding: const EdgeInsets.all(0),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              constraints: const BoxConstraints(
-                                minWidth: 15,
-                                minHeight: 12,
-                              ),
-                              child: Text(
-                                notificationController.unreadCount.toString(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
+      //         //   logOutput('closing drawer');
+      //         //   Get.back();
+      //         // }
+      //       },
+      //       icon: const Icon(
+      //         Icons.menu,
+      //         color: Colors.white,
+      //       )),
+      //   actions: [
+      //     Padding(
+      //       padding: const EdgeInsets.all(10.0),
+      //       child: IconButton(
+      //         onPressed: () async {
+      //           Get.to(() => const NotificationSCreen());
+      //           //     controller.onInit();
+      //           //    refreshDashboard();
+      //           // await controller
+      //           //     .fetchDashboardData(true); // Refresh monthly data
+      //           // await controller.fetchDashboardData(false);
+      //         },
+      //         icon: Obx(
+      //           () => Stack(
+      //             children: [
+      //               const Icon(Icons.notifications),
+      //               notificationController.unreadCount.value != 0
+      //                   ? Positioned(
+      //                       right: 0,
+      //                       top: 0,
+      //                       bottom: 5,
+      //                       child: Container(
+      //                         padding: const EdgeInsets.all(0),
+      //                         decoration: BoxDecoration(
+      //                           color: Colors.red,
+      //                           borderRadius: BorderRadius.circular(10),
+      //                         ),
+      //                         constraints: const BoxConstraints(
+      //                           minWidth: 15,
+      //                           minHeight: 12,
+      //                         ),
+      //                         child: Text(
+      //                           notificationController.unreadCount.toString(),
+      //                           style: const TextStyle(
+      //                             color: Colors.white,
+      //                             fontSize: 10,
+      //                           ),
+      //                           textAlign: TextAlign.center,
+      //                         ),
+      //                       ))
+      //                   : const SizedBox(),
+      //             ],
+      //           ),
+      //         ),
+      //         // const Icon(Icons.refresh_rounded),
+      //       ),
+      //     ),
+      //   ],
+      // ),
+      drawerEnableOpenDragGesture: false,
+      drawer: const CustomDrawer(),
+      body: Stack(
+        children: [
+          SizedBox(
+            height: 110.h,
+            child: CurvedAppBar(
+              title: 'Dashboard',
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    Get.to(() => const NotificationSCreen());
+                  },
+                  icon: Obx(
+                    () => Stack(
+                      children: [
+                        const Icon(Icons.notifications, color: Colors.white),
+                        notificationController.unreadCount.value != 0
+                            ? Positioned(
+                                right: 0,
+                                top: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.all(1),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  constraints: const BoxConstraints(
+                                    minWidth: 15,
+                                    minHeight: 12,
+                                  ),
+                                  child: Text(
+                                    notificationController.unreadCount
+                                        .toString(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ))
-                        : const SizedBox(),
-                  ],
+                              )
+                            : const SizedBox(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              leading: IconButton(
+                onPressed: () async {
+                  controller.toggleDrawer();
+                  if (controller.isDrawerOpen.value) {
+                    _scaffoldKey.currentState!.openDrawer();
+                  } else {
+                    _scaffoldKey.currentState!.closeDrawer();
+                  }
+                },
+                icon: const Icon(Icons.menu, color: Colors.white),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 80),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(35),
+                  topRight: Radius.circular(35),
                 ),
               ),
-              // const Icon(Icons.refresh_rounded),
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  controller.onInit();
+                  await controller
+                      .fetchDashboardData(true); // Refresh monthly data
+                  await controller
+                      .fetchDashboardData(false); // Refresh today's data
+                },
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else {
+                    return SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  dashboardStatCard(
+                                    iconPath:
+                                        'assets/images/dashboard_attempted.svg',
+                                    value:
+                                        "${controller.callTimeModel.callTimeModel?.totalAttempt ?? '0'}",
+                                    label: "Attempted",
+                                  ),
+                                  SizedBox(width: 5.w),
+                                  dashboardStatCard(
+                                    iconPath:
+                                        'assets/images/dashboard_connected.svg',
+                                    value: "30",
+                                    label: "Connected",
+                                  ),
+                                  SizedBox(width: 5.w),
+                                  dashboardStatCard(
+                                    iconPath:
+                                        'assets/images/dashboard_not_connected.svg',
+                                    value: "80",
+                                    label: "Not Connected",
+                                    iconColor: Colors.red,
+                                  ),
+                                  SizedBox(width: 5.w),
+                                  dashboardStatCard(
+                                    iconPath:
+                                        'assets/images/dashboard_attempted.svg',
+                                    value:
+                                        "${controller.callTimeModel.callTimeModel?.totalAttempt ?? '0'}",
+                                    label: "Duration",
+                                  ),
+                                ],
+                              ),
+
+                              SizedBox(
+                                height: 15.h,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () async {
+                                      var results =
+                                          await showCalendarDatePicker2Dialog(
+                                        context: context,
+                                        config:
+                                            CalendarDatePicker2WithActionButtonsConfig(
+                                          calendarType:
+                                              CalendarDatePicker2Type.range,
+                                        ),
+                                        dialogSize: const Size(325, 400),
+                                        value: controller.dateRangeList,
+                                        borderRadius: BorderRadius.circular(15),
+                                      );
+
+                                      if (results != null) {
+                                        if (results.first == results.last) {
+                                          controller.dateRangeList.clear();
+                                          controller.dateRangeList
+                                              .add(results.first);
+                                        } else {
+                                          controller.dateRangeList.value =
+                                              results;
+                                        }
+                                        controller.formateDate();
+
+                                        if (controller.dateRangeList.length !=
+                                            1) {
+                                          DateTime? date =
+                                              controller.dateRangeList.first;
+                                          DateTime? lDate =
+                                              controller.dateRangeList.last;
+                                          // if(date!=null){
+                                          controller.dateRange.value =
+                                              "${date?.day}-${date?.month}-${lDate?.year},${lDate?.day}-${lDate?.month}-${date?.year}";
+                                          print(controller.dateRange.value);
+                                        } else {
+                                          DateTime? date =
+                                              controller.dateRangeList.first;
+                                          if (date != null) {
+                                            controller.dateRange.value =
+                                                "${date.day}-${date.month}-${date.year},${date.day}-${date.month}-${date.year}";
+                                            print(controller.dateRange.value);
+                                          }
+                                        }
+                                        controller.getTimeGraph();
+                                      }
+                                      // controller.fetchFollowBackList();
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 10),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue,
+                                              border: Border.all(
+                                                color: AppColors.primaryColor,
+                                                width: 0,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
+                                            child: const Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Select Date',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                // Optional: spacing & icon
+                                                // SizedBox(width: 10),
+                                                // Icon(
+                                                //   Icons.filter_alt,
+                                                //   color: Colors.white,
+                                                // )
+                                              ],
+                                            )),
+                                      ],
+                                    ),
+                                  ),
+                                  // MonthDropdown(
+                                  //   onChanged: (value) {
+                                  //     print("val: $value");
+                                  //     controller.getDataOnMonth(
+                                  //       value,
+                                  //       DateTime.now().toString(),
+                                  //     );
+                                  //   },
+                                  // ),
+                                  if (controller.dateRangeList.isNotEmpty) ...[
+                                    const Spacer(),
+                                    Text(
+                                      controller.formattedDate.value,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        controller.dateRangeList.clear();
+                                        controller.totalContact.clear();
+                                        controller.totalNoContact.clear();
+                                        controller.totalAttempt.clear();
+                                        controller.activeCallMap.clear();
+                                        controller.activeNoCallMap.clear();
+                                        controller.activeAttemptMap.clear();
+                                        controller.finalActiveNoCallList
+                                            .clear();
+                                        controller.finalActiveCallList.clear();
+                                        controller.finalTotalAttemptCallList
+                                            .clear();
+                                        DateTime now = DateTime.now();
+                                        controller.dateRange.value =
+                                            "${now.day}-${now.month}-${now.year},${now.day}-${now.month}-${now.year}";
+                                        controller.getTimeGraph();
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(5.0.w),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              AppColors.grid1.withOpacity(0.3),
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                        ),
+                                        child: Icon(
+                                          Icons.close,
+                                          size: 20.sp,
+                                        ),
+                                      ),
+                                    ),
+                                  ]
+                                ],
+                              ),
+
+                              SizedBox(
+                                height: 300,
+                                child: SfCartesianChart(
+                                  primaryXAxis: const CategoryAxis(),
+                                  tooltipBehavior:
+                                      TooltipBehavior(enable: true),
+                                  legend: const Legend(isVisible: true),
+                                  series: <CartesianSeries<CallGraphModel,
+                                      String>>[
+                                    LineSeries<CallGraphModel, String>(
+                                      color: AppColors.primaryColor,
+                                      dataSource:
+                                          controller.finalTotalAttemptCallList,
+                                      xValueMapper: (CallGraphModel data, _) =>
+                                          data.time,
+                                      yValueMapper: (CallGraphModel data, _) =>
+                                          data.data ?? 0,
+                                      name: 'Attempted',
+                                      dataLabelSettings:
+                                          const DataLabelSettings(
+                                              isVisible: true),
+                                    ),
+                                    LineSeries<CallGraphModel, String>(
+                                      color: Colors.green,
+                                      dataSource:
+                                          controller.finalActiveCallList,
+                                      xValueMapper: (CallGraphModel data, _) =>
+                                          data.time,
+                                      yValueMapper: (CallGraphModel data, _) =>
+                                          data.data ?? 0,
+                                      name: 'Connected',
+                                      dataLabelSettings:
+                                          const DataLabelSettings(
+                                              isVisible: true),
+                                    ),
+                                    LineSeries<CallGraphModel, String>(
+                                      color: Colors.red,
+                                      dataSource:
+                                          controller.finalActiveNoCallList,
+                                      xValueMapper: (CallGraphModel data, _) =>
+                                          data.time,
+                                      yValueMapper: (CallGraphModel data, _) =>
+                                          data.data ?? 0,
+                                      name: 'Not Connected',
+                                      dataLabelSettings:
+                                          const DataLabelSettings(
+                                              isVisible: true),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 34),
+
+                              if (controller.activeList.isNotEmpty) ...[
+                                DashboardSection(
+                                  graphLabel: 'Active cases',
+                                  amount: controller.priceFormatter(
+                                      controller.totalValActive.value),
+                                  title: "Active Cases",
+                                  data: controller.todayData.value.data,
+                                  controller: controller,
+                                  list: controller.activeList,
+                                ),
+                                const SizedBox(height: 34),
+                              ],
+                              // Monthly Section
+                              if (controller.inActiveList.isNotEmpty) ...[
+                                DashboardSection(
+                                  graphLabel: "Inactive Cases",
+                                  amount: controller.priceFormatter(
+                                      controller.totalNoValActive.value),
+                                  title: "Inactive Cases",
+                                  data: controller.monthlyData.value.data,
+                                  controller: controller,
+                                  list: controller.inActiveList,
+                                ),
+                                SizedBox(height: 10.h),
+                              ],
+                              SizedBox(
+                                height: 6.h,
+                              ),
+
+                              const SizedBox(height: 15),
+                              if (StaticStoredData.roleName ==
+                                  'telecaller') ...[
+                                Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(color: Colors.black)),
+                                  child: const Text(
+                                    "Today Call back list",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                FutureBuilder<List<followuplist.Data>>(
+                                  future: getDailyFollowList(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    } else if (snapshot.hasError) {
+                                      return Center(
+                                          child: Text(
+                                        'Error: ${snapshot.error}',
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                      ));
+                                    } else if (!snapshot.hasData ||
+                                        snapshot.data!.isEmpty) {
+                                      return const Center(
+                                          child: Text(
+                                        'No follow-ups for today',
+                                        style: TextStyle(color: Colors.black),
+                                      ));
+                                    }
+
+                                    final todayUsers = snapshot.data!;
+
+                                    return ListView.builder(
+                                      itemCount: todayUsers.length,
+                                      shrinkWrap:
+                                          true, // ✅ Important: wrap content height
+                                      physics:
+                                          const NeverScrollableScrollPhysics(), // ✅ Prevent internal scrolling
+                                      itemBuilder: (context, index) {
+                                        final user = todayUsers[index];
+                                        return ListTile(
+                                          contentPadding:
+                                              const EdgeInsets.all(0),
+                                          title: Text(
+                                            user.customerName ?? 'No Name',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16),
+                                          ),
+                                          subtitle: Text(maskFirst6Digits(
+                                              user.contactNumber ?? '')),
+                                          leading: IconButton(
+                                            onPressed: () {
+                                              // your logic...
+                                            },
+                                            icon: const Icon(Icons.call),
+                                          ),
+                                          trailing: Text(
+                                            DateFormat('dd-MM-yy hh:mm:ss a')
+                                                .format(DateTime.parse(
+                                                    user.entryDate.toString())),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                                Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(color: Colors.black)),
+                                  child: const Text(
+                                    "Monthly Call back list",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                FutureBuilder<List<followuplist.Data>>(
+                                  future: getMonthlyFollowList(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    } else if (snapshot.hasError) {
+                                      return Center(
+                                          child:
+                                              Text('Error: ${snapshot.error}'));
+                                    } else if (!snapshot.hasData ||
+                                        snapshot.data!.isEmpty) {
+                                      return const Center(
+                                          child:
+                                              Text('No follow-ups for today'));
+                                    }
+
+                                    final todayUsers = snapshot.data!;
+
+                                    return ListView.builder(
+                                      itemCount: todayUsers.length,
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemBuilder: (context, index) {
+                                        final user = todayUsers[index];
+                                        return ListTile(
+                                          contentPadding:
+                                              const EdgeInsets.all(0),
+                                          title: Text(
+                                            user.customerName ?? 'No Name',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16),
+                                          ),
+                                          subtitle: Text(maskFirst6Digits(
+                                              user.contactNumber ?? '')),
+                                          leading: IconButton(
+                                            onPressed: () {},
+                                            icon: const Icon(Icons.call),
+                                          ),
+                                          trailing: Text(
+                                            DateFormat('dd-MM-yy hh:mm:ss a')
+                                                .format(DateTime.parse(
+                                                    user.entryDate.toString())),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                )
+                              ],
+                            ]),
+                      ),
+                    );
+                  }
+                }),
+              ),
             ),
           ),
         ],
-      ),
-      drawerEnableOpenDragGesture: false,
-      drawer: const CustomDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          controller.onInit();
-          await controller.fetchDashboardData(true); // Refresh monthly data
-          await controller.fetchDashboardData(false); // Refresh today's data
-        },
-        child: Obx(() {
-          if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          // Attempted
-                          Expanded(
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 10.h, horizontal: 8.w),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                    color: Colors.grey.shade300, width: 1),
-                                borderRadius:
-                                    BorderRadius.circular(6.r), // boxy look
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  // Icon + Value
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        height: 28.h,
-                                        width: 28.w,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(4.r),
-                                        ),
-                                        child: Center(
-                                          child: SvgPicture.asset(
-                                            'assets/images/dashboard_attempted.svg',
-                                            height: 30.h,
-                                            width: 30.w,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 6.w),
-                                      Text(
-                                        "${controller.callTimeModel.callTimeModel?.totalAttempt ?? '0'}",
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 6.h),
-                                  // Label
-                                  Text(
-                                    "Attempted",
-                                    style: TextStyle(
-                                      fontSize: 12.sp,
-                                      color: Colors.black54,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          SizedBox(width: 8.w),
-
-                          // Connected
-                          Expanded(
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 10.h, horizontal: 8.w),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                    color: Colors.grey.shade300, width: 1),
-                                borderRadius: BorderRadius.circular(6.r),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        height: 28.h,
-                                        width: 28.w,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(4.r),
-                                        ),
-                                        child: Center(
-                                          child: SvgPicture.asset(
-                                            'assets/images/dashboard_connected.svg',
-                                            height: 50.h,
-                                            width: 50.w,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 6.w),
-                                      Text(
-                                        "30",
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 6.h),
-                                  Text(
-                                    "Connected",
-                                    style: TextStyle(
-                                      fontSize: 13.sp,
-                                      color: Colors.black54,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          SizedBox(width: 8.w),
-
-                          // Not Connected
-                          Expanded(
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 10.h, horizontal: 8.w),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                    color: Colors.grey.shade300, width: 1),
-                                borderRadius: BorderRadius.circular(6.r),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        height: 28.h,
-                                        width: 28.w,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(4.r),
-                                        ),
-                                        child: Center(
-                                          child: SvgPicture.asset(
-                                            'assets/images/dashboard_not_connected.svg',
-                                            color: Colors.red,
-                                            height: 30.h,
-                                            width: 30.w,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 6.w),
-                                      Text(
-                                        "80",
-                                        style: TextStyle(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 6.h),
-                                  Text(
-                                    "Not Connected",
-                                    style: TextStyle(
-                                      fontSize: 12.sp,
-                                      color: Colors.black54,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(
-                        height: 15.h,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          GestureDetector(
-                            onTap: () async {
-                              var results = await showCalendarDatePicker2Dialog(
-                                context: context,
-                                config:
-                                    CalendarDatePicker2WithActionButtonsConfig(
-                                  calendarType: CalendarDatePicker2Type.range,
-                                ),
-                                dialogSize: const Size(325, 400),
-                                value: controller.dateRangeList,
-                                borderRadius: BorderRadius.circular(15),
-                              );
-
-                              if (results != null) {
-                                if (results.first == results.last) {
-                                  controller.dateRangeList.clear();
-                                  controller.dateRangeList.add(results.first);
-                                } else {
-                                  controller.dateRangeList.value = results;
-                                }
-                                controller.formateDate();
-
-                                if (controller.dateRangeList.length != 1) {
-                                  DateTime? date =
-                                      controller.dateRangeList.first;
-                                  DateTime? lDate =
-                                      controller.dateRangeList.last;
-                                  // if(date!=null){
-                                  controller.dateRange.value =
-                                      "${date?.day}-${date?.month}-${lDate?.year},${lDate?.day}-${lDate?.month}-${date?.year}";
-                                  print(controller.dateRange.value);
-                                } else {
-                                  DateTime? date =
-                                      controller.dateRangeList.first;
-                                  if (date != null) {
-                                    controller.dateRange.value =
-                                        "${date.day}-${date.month}-${date.year},${date.day}-${date.month}-${date.year}";
-                                    print(controller.dateRange.value);
-                                  }
-                                }
-                                controller.getTimeGraph();
-                              }
-                              // controller.fetchFollowBackList();
-                            },
-                            child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue,
-                                  border: Border.all(
-                                    color: AppColors.primaryColor,
-                                    width: 1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Select Date',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    // Optional: spacing & icon
-                                    // SizedBox(width: 10),
-                                    // Icon(
-                                    //   Icons.filter_alt,
-                                    //   color: Colors.white,
-                                    // )
-                                  ],
-                                )),
-                          ),
-                          // MonthDropdown(
-                          //   onChanged: (value) {
-                          //     print("val: $value");
-                          //     controller.getDataOnMonth(
-                          //       value,
-                          //       DateTime.now().toString(),
-                          //     );
-                          //   },
-                          // ),
-                          if (controller.dateRangeList.isNotEmpty) ...[
-                            const Spacer(),
-                            Text(
-                              controller.formattedDate.value,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                controller.dateRangeList.clear();
-                                controller.totalContact.clear();
-                                controller.totalNoContact.clear();
-                                controller.totalAttempt.clear();
-                                controller.activeCallMap.clear();
-                                controller.activeNoCallMap.clear();
-                                controller.activeAttemptMap.clear();
-                                controller.finalActiveNoCallList.clear();
-                                controller.finalActiveCallList.clear();
-                                controller.finalTotalAttemptCallList.clear();
-                                DateTime now = DateTime.now();
-                                controller.dateRange.value =
-                                    "${now.day}-${now.month}-${now.year},${now.day}-${now.month}-${now.year}";
-                                controller.getTimeGraph();
-                              },
-                              child: Container(
-                                padding: EdgeInsets.all(5.0.w),
-                                decoration: BoxDecoration(
-                                  color: AppColors.grid1.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                child: Icon(
-                                  Icons.close,
-                                  size: 20.sp,
-                                ),
-                              ),
-                            ),
-                          ]
-                        ],
-                      ),
-
-                      SizedBox(
-                        height: 300,
-                        child: SfCartesianChart(
-                          primaryXAxis: const CategoryAxis(),
-                          tooltipBehavior: TooltipBehavior(enable: true),
-                          legend: const Legend(isVisible: true),
-                          series: <CartesianSeries<CallGraphModel, String>>[
-                            LineSeries<CallGraphModel, String>(
-                              color: AppColors.primaryColor,
-                              dataSource: controller.finalTotalAttemptCallList,
-                              xValueMapper: (CallGraphModel data, _) =>
-                                  data.time,
-                              yValueMapper: (CallGraphModel data, _) =>
-                                  data.data ?? 0,
-                              name: 'Attempted',
-                              dataLabelSettings:
-                                  const DataLabelSettings(isVisible: true),
-                            ),
-                            LineSeries<CallGraphModel, String>(
-                              color: Colors.green,
-                              dataSource: controller.finalActiveCallList,
-                              xValueMapper: (CallGraphModel data, _) =>
-                                  data.time,
-                              yValueMapper: (CallGraphModel data, _) =>
-                                  data.data ?? 0,
-                              name: 'Connected',
-                              dataLabelSettings:
-                                  const DataLabelSettings(isVisible: true),
-                            ),
-                            LineSeries<CallGraphModel, String>(
-                              color: Colors.red,
-                              dataSource: controller.finalActiveNoCallList,
-                              xValueMapper: (CallGraphModel data, _) =>
-                                  data.time,
-                              yValueMapper: (CallGraphModel data, _) =>
-                                  data.data ?? 0,
-                              name: 'Not Connected',
-                              dataLabelSettings:
-                                  const DataLabelSettings(isVisible: true),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 34),
-
-                      if (controller.activeList.isNotEmpty) ...[
-                        DashboardSection(
-                          graphLabel: 'Active cases',
-                          amount: controller
-                              .priceFormatter(controller.totalValActive.value),
-                          title: "Active Cases",
-                          data: controller.todayData.value.data,
-                          controller: controller,
-                          list: controller.activeList,
-                        ),
-                        const SizedBox(height: 34),
-                      ],
-                      // Monthly Section
-                      if (controller.inActiveList.isNotEmpty) ...[
-                        DashboardSection(
-                          graphLabel: "Inactive Cases",
-                          amount: controller.priceFormatter(
-                              controller.totalNoValActive.value),
-                          title: "Inactive Cases",
-                          data: controller.monthlyData.value.data,
-                          controller: controller,
-                          list: controller.inActiveList,
-                        ),
-                        SizedBox(height: 10.h),
-                      ],
-                      SizedBox(
-                        height: 6.h,
-                      ),
-
-                      const SizedBox(height: 15),
-                      if (StaticStoredData.roleName == 'telecaller') ...[
-                        Container(
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.black)),
-                          child: const Text(
-                            "Today Call back list",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        FutureBuilder<List<followuplist.Data>>(
-                          future: getDailyFollowList(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text(
-                                'Error: ${snapshot.error}',
-                                style: const TextStyle(color: Colors.black),
-                              ));
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return const Center(
-                                  child: Text(
-                                'No follow-ups for today',
-                                style: TextStyle(color: Colors.black),
-                              ));
-                            }
-
-                            final todayUsers = snapshot.data!;
-
-                            return ListView.builder(
-                              itemCount: todayUsers.length,
-                              shrinkWrap:
-                                  true, // ✅ Important: wrap content height
-                              physics:
-                                  const NeverScrollableScrollPhysics(), // ✅ Prevent internal scrolling
-                              itemBuilder: (context, index) {
-                                final user = todayUsers[index];
-                                return ListTile(
-                                  contentPadding: const EdgeInsets.all(0),
-                                  title: Text(
-                                    user.customerName ?? 'No Name',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                  ),
-                                  subtitle: Text(maskFirst6Digits(
-                                      user.contactNumber ?? '')),
-                                  leading: IconButton(
-                                    onPressed: () {
-                                      // your logic...
-                                    },
-                                    icon: const Icon(Icons.call),
-                                  ),
-                                  trailing: Text(
-                                    DateFormat('dd-MM-yy hh:mm:ss a').format(
-                                        DateTime.parse(
-                                            user.entryDate.toString())),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        Container(
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.black)),
-                          child: const Text(
-                            "Monthly Call back list",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        FutureBuilder<List<followuplist.Data>>(
-                          future: getMonthlyFollowList(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text('Error: ${snapshot.error}'));
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return const Center(
-                                  child: Text('No follow-ups for today'));
-                            }
-
-                            final todayUsers = snapshot.data!;
-
-                            return ListView.builder(
-                              itemCount: todayUsers.length,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                final user = todayUsers[index];
-                                return ListTile(
-                                  contentPadding: const EdgeInsets.all(0),
-                                  title: Text(
-                                    user.customerName ?? 'No Name',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                  ),
-                                  subtitle: Text(maskFirst6Digits(
-                                      user.contactNumber ?? '')),
-                                  leading: IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.call),
-                                  ),
-                                  trailing: Text(
-                                    DateFormat('dd-MM-yy hh:mm:ss a').format(
-                                        DateTime.parse(
-                                            user.entryDate.toString())),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        )
-                      ],
-                    ]),
-              ),
-            );
-          }
-        }),
       ),
     );
   }
@@ -711,6 +671,71 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String maskFirst6Digits(String number) {
     if (number.length < 6) return number; // Handle edge case
     return 'xxxxxx${number.substring(6)}';
+  }
+
+  Widget dashboardStatCard({
+    required String iconPath,
+    required String value,
+    required String label,
+    Color? iconColor,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.grey.shade300, width: 1),
+          borderRadius: BorderRadius.circular(6.r),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Icon + Value
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  height: 22.h,
+                  width: 22.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4.r),
+                  ),
+                  child: Center(
+                    child: SvgPicture.asset(
+                      iconPath,
+                      color: iconColor,
+                      height: 22.h,
+                      width: 22.w,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 6.w),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 6.h),
+            // Label
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: label.length > 10 ? 11.sp : 12.sp,
+                color: Colors.black54,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
 

@@ -9,7 +9,6 @@ import 'package:smart_solutions/views/dashboard_screen.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
 import 'package:smart_solutions/views/report_page.dart';
-import 'package:smart_solutions/views/reset_password.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -157,12 +156,28 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 
 // Reusable ListTile with compact spacing
-  Widget _drawerTile(IconData icon, String title, VoidCallback onTap) {
+
+  Widget _drawerTile(
+    IconData icon,
+    String title,
+    VoidCallback onTap, {
+    bool isBottomTile = false, // flag to style differently
+  }) {
     return ListTile(
       dense: true,
-      visualDensity: const VisualDensity(vertical: -4),
-      leading: Icon(icon),
-      title: Text(title),
+      visualDensity: const VisualDensity(vertical: -2),
+      leading: Icon(
+        icon,
+        size: isBottomTile ? 28 : 22, // bigger icon for bottom tiles
+        color: Colors.black87,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: isBottomTile ? 16 : 14, // bigger text for bottom tiles
+          fontWeight: isBottomTile ? FontWeight.w600 : FontWeight.normal,
+        ),
+      ),
       onTap: onTap,
     );
   }

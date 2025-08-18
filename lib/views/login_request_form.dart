@@ -216,10 +216,10 @@ class LoginRequestForm extends StatelessWidget {
             padding: const EdgeInsets.only(left: 12.0, right: 8.0),
             child: prefixIcon,
           ),
-          Container(
+          const SizedBox(
             height: 50,
             width: 5,
-            child: const VerticalDivider(
+            child: VerticalDivider(
               width: 1,
               // width: 1,
               thickness: 1,
@@ -302,7 +302,7 @@ class LoginRequestForm extends StatelessWidget {
                 },
               ),
               const Text(
-                'Add remark',
+                'Add Remark',
                 style: TextStyle(color: Colors.black),
               )
             ],

@@ -9,8 +9,9 @@ import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/controllers/notification_controller.dart';
 import 'package:smart_solutions/models/dashBoardToday_model.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
-import 'package:smart_solutions/views/drawer.dart';
 import 'package:smart_solutions/views/notification_screen.dart';
+import 'package:smart_solutions/widget/common_scaffold.dart';
+import 'package:smart_solutions/widget/loading_page.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../models/getGroupStatus.dart';
 import '../models/FollowUpSubmittedList.dart' as followuplist;
@@ -64,89 +65,144 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final NotificationController notificationController =
         Get.put(NotificationController());
 
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      key: _scaffoldKey,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: const Color.fromRGBO(25, 118, 210, 1),
-        centerTitle: true,
-        title: const Text(
-          "Dashboard",
-          style: TextStyle(color: Colors.white),
-        ),
-        leading: IconButton(
+    return CommonScaffold(
+      title: "Dashboard",
+      isDrawer: true,
+      showBack: false,
+      actions: [
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: IconButton(
             onPressed: () async {
-              controller.toggleDrawer();
-              controller.isDrawerOpen.value
-                  ? _scaffoldKey.currentState!.openDrawer()
-                  : _scaffoldKey.currentState!.closeDrawer();
-
-              // if (controller.isDrawerOpen.value) {
-              //   logOutput("opening drawer");
-              //   _scaffoldKey.currentState!.openDrawer();
-              // } else {
-              //   _scaffoldKey.currentState!.closeDrawer();
-
-              //   logOutput('closing drawer');
-              //   Get.back();
-              // }
+              Get.to(() => const NotificationSCreen());
+              //     controller.onInit();
+              //    refreshDashboard();
+              // await controller
+              //     .fetchDashboardData(true); // Refresh monthly data
+              // await controller.fetchDashboardData(false);
             },
-            icon: const Icon(
-              Icons.menu,
-              color: Colors.white,
-            )),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: IconButton(
-              onPressed: () async {
-                Get.to(() => const NotificationSCreen());
-                //     controller.onInit();
-                //    refreshDashboard();
-                // await controller
-                //     .fetchDashboardData(true); // Refresh monthly data
-                // await controller.fetchDashboardData(false);
-              },
-              icon: Obx(
-                () => Stack(
-                  children: [
-                    const Icon(Icons.notifications),
-                    notificationController.unreadCount.value != 0
-                        ? Positioned(
-                            right: 0,
-                            top: 0,
-                            bottom: 5,
-                            child: Container(
-                              padding: const EdgeInsets.all(0),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(10),
+            icon: Obx(
+              () => Stack(
+                children: [
+                  const Icon(
+                    Icons.notifications,
+                    color: AppColors.appBarTextColor,
+                  ),
+                  notificationController.unreadCount.value != 0
+                      ? Positioned(
+                          right: 0,
+                          top: 0,
+                          bottom: 5,
+                          child: Container(
+                            padding: const EdgeInsets.all(0),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 15,
+                              minHeight: 12,
+                            ),
+                            child: Text(
+                              notificationController.unreadCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
                               ),
-                              constraints: const BoxConstraints(
-                                minWidth: 15,
-                                minHeight: 12,
-                              ),
-                              child: Text(
-                                notificationController.unreadCount.toString(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ))
-                        : const SizedBox(),
-                  ],
-                ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ))
+                      : const SizedBox(),
+                ],
               ),
-              // const Icon(Icons.refresh_rounded),
             ),
+            // const Icon(Icons.refresh_rounded),
           ),
-        ],
-      ),
-      drawerEnableOpenDragGesture: false,
-      drawer: const CustomDrawer(),
+        ),
+      ],
+
+      //   backgroundColor: Colors.grey[50],
+      key: _scaffoldKey,
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   backgroundColor: AppColors.primaryColor,
+      //   centerTitle: true,
+      //   title: const Text(
+      //     "Dashboard",
+      //     style: TextStyle(color: Colors.white),
+      //   ),
+      //   leading: IconButton(
+      //       onPressed: () async {
+      //         controller.toggleDrawer();
+      //         controller.isDrawerOpen.value
+      //             ? _scaffoldKey.currentState!.openDrawer()
+      //             : _scaffoldKey.currentState!.closeDrawer();
+
+      //         // if (controller.isDrawerOpen.value) {
+      //         //   logOutput("opening drawer");
+      //         //   _scaffoldKey.currentState!.openDrawer();
+      //         // } else {
+      //         //   _scaffoldKey.currentState!.closeDrawer();
+
+      //         //   logOutput('closing drawer');
+      //         //   Get.back();
+      //         // }
+      //       },
+      //       icon: const Icon(
+      //         Icons.menu,
+      //         color: Colors.white,
+      //       )),
+      //   actions: [
+      //     Padding(
+      //       padding: const EdgeInsets.all(10.0),
+      //       child: IconButton(
+      //         onPressed: () async {
+      //           Get.to(() => const NotificationSCreen());
+      //           //     controller.onInit();
+      //           //    refreshDashboard();
+      //           // await controller
+      //           //     .fetchDashboardData(true); // Refresh monthly data
+      //           // await controller.fetchDashboardData(false);
+      //         },
+      //         icon: Obx(
+      //           () => Stack(
+      //             children: [
+      //               const Icon(Icons.notifications),
+      //               notificationController.unreadCount.value != 0
+      //                   ? Positioned(
+      //                       right: 0,
+      //                       top: 0,
+      //                       bottom: 5,
+      //                       child: Container(
+      //                         padding: const EdgeInsets.all(0),
+      //                         decoration: BoxDecoration(
+      //                           color: Colors.red,
+      //                           borderRadius: BorderRadius.circular(10),
+      //                         ),
+      //                         constraints: const BoxConstraints(
+      //                           minWidth: 15,
+      //                           minHeight: 12,
+      //                         ),
+      //                         child: Text(
+      //                           notificationController.unreadCount.toString(),
+      //                           style: const TextStyle(
+      //                             color: Colors.white,
+      //                             fontSize: 10,
+      //                           ),
+      //                           textAlign: TextAlign.center,
+      //                         ),
+      //                       ))
+      //                   : const SizedBox(),
+      //             ],
+      //           ),
+      //         ),
+      //         // const Icon(Icons.refresh_rounded),
+      //       ),
+      //     ),
+      //   ],
+      // ),
+      // drawerEnableOpenDragGesture: false,
+      // drawer: const CustomDrawer(),
       body: RefreshIndicator(
         onRefresh: () async {
           controller.onInit();
@@ -155,7 +211,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         },
         child: Obx(() {
           if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: LoadingPage());
           } else {
             return SingleChildScrollView(
               child: Padding(
@@ -249,7 +305,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           ),
                           Text(
-                            controller.totalNotPicked.value,
+                            controller.totalDuration.value,
                             style: TextStyle(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.bold,
@@ -258,9 +314,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 15.h,
-                      ),
+                      SizedBox(height: 15.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -312,7 +366,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
-                                color: Colors.blue,
+                                color: AppColors.primaryColor,
                                 border: Border.all(
                                   color: AppColors.primaryColor,
                                   width: 1,
@@ -475,7 +529,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           alignment: Alignment.center,
                           padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                              color: Colors.blue,
+                              color: AppColors.primaryColor,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(color: Colors.black)),
                           child: const Text(
@@ -492,8 +546,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
+                              return LoadingPage();
                             } else if (snapshot.hasError) {
                               return Center(
                                   child: Text(
@@ -549,7 +602,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           alignment: Alignment.center,
                           padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                              color: Colors.blue,
+                              color: AppColors.primaryColor,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(color: Colors.black)),
                           child: const Text(

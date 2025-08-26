@@ -63,19 +63,23 @@ class AppTheme {
 // Define your app-specific colors
 
 class AppColors {
-   
-    static const Color grid1 = Color(0xFFBDE7F4); // Light Blue (Completed Calls)
+  static const Color grid1 = Color(0xFFBDE7F4); // Light Blue (Completed Calls)
   static const Color grid2 = Color(0xFFD7F1FE); // Sky Blue (Pending Calls)
   static const Color grid3 = Color(0xFFF6E6C6); // Beige (Interested Calls)
-  static const Color grid4 = Color(0xFFFFE6EB); // Light Pink (Not Interested Calls)
-  static const Color textColor2 = Color(0xFF000000); // Black (Text color for contrast)
-  static const Color primaryColor =  Color.fromRGBO(25, 118, 210, 1); // Example: Purple
+  static const Color grid4 =
+      Color(0xFFFFE6EB); // Light Pink (Not Interested Calls)
+  static const Color textColor2 =
+      Color(0xFF000000); // Black (Text color for contrast)
+  static const Color primaryColor = Color(0xFF356EFF);
+    //  Color.fromRGBO(25, 118, 210, 1); // Example: Purple
   static const Color secondayColor = Color(0xFF5E5E5E); // Example: Purple
   static const Color accentColor = Color(0xFFFF5722); // Example: Orange
   static const Color backgroundColor =
       Color.fromARGB(255, 255, 255, 255); // Scaffold background color
   static const Color textColor =
       Color.fromARGB(255, 255, 255, 255); // Text color
-  static const Color appBarColor =  Color.fromRGBO(25, 118, 210, 1); // AppBar background color
+  static const Color appBarColor =
+      Color.fromRGBO(25, 118, 210, 1); // AppBar background color
   static const Color appBarTextColor = Colors.white; // AppBar text/icon color
+  static const Color greyColor = Color(0xFFF1F1F1);
 }

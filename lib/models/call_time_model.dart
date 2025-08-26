@@ -26,16 +26,21 @@ class CallTimeModel {
   List<TotalAttemptContact>? totalAttemptContact;
 
   List<TotalNoContact>? totalNocontact;
+  String? totalDuration;
 
-  CallTimeModel({this.totalAttempt, this.totalContact, this.totalNocontact});
+  CallTimeModel(
+      {this.totalAttempt,
+      this.totalContact,
+      this.totalNocontact,
+      this.totalDuration});
 
   CallTimeModel.fromJson(Map<String, dynamic> json) {
     totalAttempt = json['total_attempt'];
-    
+    totalDuration = json['total_callduration'];
 
- if (json['total_attempt_contact'] != null) {
+    if (json['total_attempt_contact'] != null) {
       totalAttemptContact = <TotalAttemptContact>[];
-      
+
       json['total_attempt_contact'].forEach((v) {
         totalAttemptContact!.add(TotalAttemptContact.fromJson(v));
       });
@@ -59,12 +64,10 @@ class CallTimeModel {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['total_attempt'] = totalAttempt;
     if (totalContact != null) {
-      data['total_contact'] =
-          totalContact!.map((v) => v.toJson()).toList();
+      data['total_contact'] = totalContact!.map((v) => v.toJson()).toList();
     }
     if (totalNocontact != null) {
-      data['total_nocontact'] =
-          totalNocontact!.map((v) => v.toJson()).toList();
+      data['total_nocontact'] = totalNocontact!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -75,11 +78,11 @@ class TotalContact {
   String? created;
   String? count;
 
-  TotalContact({this.callStatus, this.created,this.count});
+  TotalContact({this.callStatus, this.created, this.count});
 
   TotalContact.fromJson(Map<String, dynamic> json) {
     callStatus = json['call_status'];
-   created = json['created'];
+    created = json['created'];
     // try {
     //   DateTime dateTime = DateTime.parse(cr);
     //   String formattedTime = DateFormat('h a').format(dateTime);
@@ -134,7 +137,7 @@ class TotalAttemptContact {
 
   TotalAttemptContact.fromJson(Map<String, dynamic> json) {
     callStatus = json['call_status'];
-   created = json['created'];
+    created = json['created'];
     // try {
     //   DateTime dateTime = DateTime.parse(cr);
     //   String formattedTime = DateFormat('h a').format(dateTime);

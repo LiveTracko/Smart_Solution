@@ -20,7 +20,8 @@ class KeypadRowWidget extends StatelessWidget {
       children: [
         _buildDialButton(numbers[0], subText: subTexts[0]),
         _buildDialButton(numbers[1], subText: subTexts[1]),
-        _buildDialButton(numbers[2], subText: subTexts.length > 2 ? subTexts[2] : null),
+        _buildDialButton(numbers[2],
+            subText: subTexts.length > 2 ? subTexts[2] : null),
       ],
     );
   }
@@ -28,37 +29,47 @@ class KeypadRowWidget extends StatelessWidget {
   Widget _buildDialButton(String number, {String? subText}) {
     return Expanded(
       child: Container(
-        margin: EdgeInsets.all(4.w), // Responsive margin
-        child: TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: AppColors.backgroundColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.r), // Responsive border radius
-            ),
-          ),
-          onPressed: () => onDialButtonPressed(number),
-          child: SizedBox(
-            height: 55.h, // Responsive height
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  number,
-                  style: TextStyle(
-                    fontSize: 24.sp, // Responsive font size
-                    color: AppColors.secondayColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (subText != null)
-                  Text(
-                    subText,
-                    style: TextStyle(
-                      fontSize: 10.sp, // Responsive font size for subtext
-                      color: AppColors.secondayColor,
+        margin: EdgeInsets.all(0.w), // Responsive margin
+        padding: EdgeInsets.all(3.w),
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+        ),
+        child: CircleAvatar(
+          radius: 32,
+          backgroundColor: AppColors.secondayColor,
+          child: Material(
+            color: AppColors.greyColor,
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              splashColor: AppColors.primaryColor.withOpacity(0.3),
+              highlightColor: Colors.transparent,
+              onTap: () => onDialButtonPressed(number),
+              child: SizedBox(
+                height: 64, // circle size
+                width: 64,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      number,
+                      style: TextStyle(
+                        fontSize: 20.sp, // Responsive font size
+                        color: AppColors.secondayColor,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-              ],
+                    if (subText != null)
+                      Text(
+                        subText,
+                        style: TextStyle(
+                          fontSize: 10.sp, // Responsive font size for subtext
+                          color: AppColors.secondayColor,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

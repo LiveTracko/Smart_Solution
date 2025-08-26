@@ -22,6 +22,7 @@ class DashboardController extends GetxController {
   RxString totalNoValActive = "0".obs;
   RxString totalPicked = "0".obs;
   RxString totalNotPicked = "0".obs;
+  RxString totalDuration = "0".obs;
   RxString dateRange = ''.obs;
   RxString formattedDate = ''.obs;
   formateDate() {
@@ -153,6 +154,7 @@ class DashboardController extends GetxController {
           monthlyData.value = DashboardMonthlyModel.fromJson(decodedResponse);
         } else {
           todayData.value = DashboardTodayModel.fromJson(decodedResponse);
+          //      totalDuration.value = todayData
         }
       } else if (response.statusCode == 204) {
         Get.snackbar(
@@ -336,6 +338,8 @@ class DashboardController extends GetxController {
           callTimeModel.callTimeModel?.totalNocontact ?? <TotalNoContact>[];
       totalAttempt = callTimeModel.callTimeModel?.totalAttemptContact ??
           <TotalAttemptContact>[];
+      totalDuration.value =
+          callTimeModel.callTimeModel!.totalDuration.toString();
       try {
         activeCallMap.clear();
         activeNoCallMap.clear();

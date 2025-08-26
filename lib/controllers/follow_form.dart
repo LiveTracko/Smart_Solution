@@ -28,13 +28,19 @@ class FollowBackFormController extends GetxController {
   var filteredFollowBackList = <Data>[].obs;
   var dateRangeList = <DateTime?>[].obs;
 
+// search variables
+  var showSearchField = false.obs; // 👈 observable toggle
+  var searchText = "".obs;
+
   @override
   void onInit() {
     getAllBanks();
-    
-
     //   fetchFollowBackList();
     super.onInit();
+  }
+
+  void toggleSearch() {
+    showSearchField.value = !showSearchField.value;
   }
 
   // Form fields
@@ -76,15 +82,28 @@ class FollowBackFormController extends GetxController {
             dateRangeList.last != null
         ? "${dateRangeList.first},${dateRangeList.last}"
         : "";
+
+    // Create form data with required telecaller_id
+    final Map<String, dynamic> formData = {
+      "telecaller_id": StaticStoredData.userId,
+      "daterange": dateRage,
+      "secure_type": secureType.toString(),
+    };
+
+    // ✅ Add search filter
+    if (searchText.value.isNotEmpty) {
+      formData['search'] = searchText.value.trim();
+    }
+
     try {
-      var response = await _apiService.postRequest(
-        APIUrls.followUpSubmitedData,
-        {
-          "telecaller_id": StaticStoredData.userId,
-          "daterange": dateRage,
-          "secure_type": secureType.toString(),
-        },
-      );
+      var response =
+          await _apiService.postRequest(APIUrls.followUpSubmitedData, formData
+              // {
+              //   "telecaller_id": StaticStoredData.userId,
+              //   "daterange": dateRage,
+              //   "secure_type": secureType.toString(),
+              // },
+              );
 
       debugPrint(" data -->  ${response.statusCode} ${response.body}");
 
@@ -276,7 +295,7 @@ class FollowBackFormController extends GetxController {
 
     try {
       if (toDate.isNotEmpty && fromDate.isNotEmpty) {
-        debugPrint(" date range --> ${toDate},${fromDate}");
+        debugPrint(" date range --> $toDate,$fromDate");
 
         var response = await _apiService.postRequest(
           APIUrls.followUpSubmitedData,

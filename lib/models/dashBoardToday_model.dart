@@ -39,6 +39,7 @@ class Data {
   int? totalContact;
   int? totalNocontact;
   int? totalLead;
+  String? totalDuration;
 
   Data(
       {this.totalAttempt,
@@ -51,6 +52,7 @@ class Data {
     totalContact = json['total_contact'];
     totalNocontact = json['total_nocontact'];
     totalLead = json['total_lead'];
+    totalDuration = json['total_callduration'];
   }
 
   Map<String, dynamic> toJson() {
@@ -59,6 +61,7 @@ class Data {
     data['total_contact'] = totalContact;
     data['total_nocontact'] = totalNocontact;
     data['total_lead'] = totalLead;
+    data['total_callduration'] = totalDuration;
     return data;
   }
 }

@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/core/app_bindings.dart';
 import 'package:smart_solutions/services/api_service.dart';
-import 'package:smart_solutions/views/dailer_scree.dart';
+import 'package:smart_solutions/views/dialer_screen.dart';
 import 'package:smart_solutions/views/followBackList.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_request_screen.dart';

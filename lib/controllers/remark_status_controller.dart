@@ -41,7 +41,10 @@ class RemarkStatusController extends GetxController {
       }
     } catch (e) {
       logOutput('Error fetching remark status: $e');
-      Get.snackbar('Error', 'Failed to load remark status options');
+      Get.snackbar(
+        'Error',
+        'Failed to load remark status options',
+      );
     } finally {
       isLoading(false);
     }

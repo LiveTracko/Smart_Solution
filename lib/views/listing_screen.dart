@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/button_controller.dart';
 import 'package:smart_solutions/controllers/pin_code_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
+import 'package:smart_solutions/widget/common_scaffold.dart';
+import 'package:smart_solutions/widget/loading_page.dart';
 
 class ListingScreen extends StatefulWidget {
   const ListingScreen({super.key});
@@ -75,17 +78,17 @@ class _ListingScreenState extends State<ListingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: const Text('Listing Page'),
-          actions: const [],
-        ),
-        body: Obx(() => Column(children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-                child: TextField(
+    return CommonScaffold(
+        title: 'Listing Page',
+        // appBar: AppBar(
+        //   centerTitle: true,
+        //   title: const Text('Listing Page'),
+        //   actions: const [],
+        // ),
+        body: Obx(() => Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(children: [
+                TextField(
                   style: const TextStyle(color: Colors.black),
                   keyboardType: TextInputType.text,
                   controller: searchController,
@@ -112,77 +115,107 @@ class _ListingScreenState extends State<ListingScreen> {
                         : 'Search by Pincode',
                     prefixIcon: const Icon(Icons.search),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: const BorderSide(color: Colors.white),
                     ),
                     filled: true,
-                    fillColor: Colors.grey[200],
+                    fillColor: Colors.white12,
                   ),
-                ),
-              ),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                ElevatedButton(
-                  onPressed: () {
-                    toggleController.select(0);
-                    searchController.clear(); // ✅ Clear search text
-                    pincodeController.companyPage.value = 1;
-                    pincodeController.companyhasMore.value = true;
-                    pincodeController.fetchCompany(); // Optionally refresh
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: toggleController.selectedIndex.value == 0
-                        ? AppColors.appBarColor
-                        : Colors.grey[300],
-                    foregroundColor: toggleController.selectedIndex.value == 0
-                        ? Colors.white
-                        : Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
-                  ),
-                  child: const Text('Company Listing'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    toggleController.select(1);
-                    searchController.clear(); // ✅ Clear search text
-                    pincodeController.page.value = 1;
-                    pincodeController.hasMore.value = true;
-                    pincodeController.fetchPincodes(); // Optionally refresh
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: toggleController.selectedIndex.value == 1
-                        ? AppColors.appBarColor
-                        : Colors.grey[300],
-                    foregroundColor: toggleController.selectedIndex.value == 1
-                        ? Colors.white
-                        : Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
-                  ),
-                  child: const Text('Pin Code Listing'),
                 ),
                 const SizedBox(height: 16),
-              ]),
+                Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: SvgPicture.asset(
+                        'assets/images/company_listing.svg',
+                        color: toggleController.selectedIndex.value == 0
+                            ? AppColors.appBarTextColor
+                            : AppColors.primaryColor,
+                      ),
+                      onPressed: () {
+                        toggleController.select(0);
+                        searchController.clear(); // ✅ Clear search text
+                        pincodeController.companyPage.value = 1;
+                        pincodeController.companyhasMore.value = true;
+                        pincodeController.fetchCompany(); // Optionally refresh
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            toggleController.selectedIndex.value == 0
+                                ? AppColors.primaryColor
+                                : Colors.white,
+                        foregroundColor:
+                            toggleController.selectedIndex.value == 0
+                                ? Colors.white
+                                : Colors.black,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 4,
+                      ),
+                      label: const Text(
+                        'Company Listing',
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: Image.asset(
+                        'assets/images/pincode.png',
+                        color: toggleController.selectedIndex.value == 1
+                            ? AppColors.appBarTextColor
+                            : AppColors.primaryColor,
+                      ),
+                      onPressed: () {
+                        toggleController.select(1);
+                        searchController.clear(); // ✅ Clear search text
+                        pincodeController.page.value = 1;
+                        pincodeController.hasMore.value = true;
+                        pincodeController.fetchPincodes(); // Optionally refresh
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            toggleController.selectedIndex.value == 1
+                                ? AppColors.primaryColor
+                                : Colors.white,
+                        foregroundColor:
+                            toggleController.selectedIndex.value == 1
+                                ? Colors.white
+                                : Colors.black,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 4,
+                      ),
+                      label: const Text(
+                        'Pin Code Listing',
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ]),
 
-              // Data Table
-              Expanded(
-                child: Obx(() {
-                  if (toggleController.selectedIndex.value == 0) {
-                    return _buildCompanyTable();
-                  } else {
-                    return _buildPincodeTable();
-                  }
-                }),
-              ),
-            ])));
+                // Data Table
+                Expanded(
+                  child: Obx(() {
+                    if (toggleController.selectedIndex.value == 0) {
+                      return _buildCompanyTable();
+                    } else {
+                      return _buildPincodeTable();
+                    }
+                  }),
+                ),
+              ]),
+            )));
   }
 
   /// Dummy company table
@@ -195,20 +228,29 @@ class _ListingScreenState extends State<ListingScreen> {
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
+            const SizedBox(height: 8),
             DataTable(
               columnSpacing: 32,
               headingRowHeight: 50,
               dataRowHeight: 70,
+              headingRowColor: MaterialStateProperty.all(
+                  AppColors.greyColor.withOpacity(0.9)),
               columns: const [
                 //  DataColumn(label: Text('DSA Name')),
                 DataColumn(
-                    columnWidth: IntrinsicColumnWidth(), label: Text('Bank')),
+                    columnWidth: IntrinsicColumnWidth(),
+                    label: Text(
+                      'Bank',
+                      style: TextStyle(color: AppColors.primaryColor),
+                    )),
                 DataColumn(
                     columnWidth: IntrinsicColumnWidth(),
-                    label: Text('Company Category')),
+                    label: Text('Company Category',
+                        style: TextStyle(color: AppColors.primaryColor))),
                 DataColumn(
                     columnWidth: IntrinsicColumnWidth(),
-                    label: Text('Category')),
+                    label: Text('Category',
+                        style: TextStyle(color: AppColors.primaryColor))),
               ],
               rows: list
                   .map((pin) => DataRow(cells: [
@@ -250,10 +292,15 @@ class _ListingScreenState extends State<ListingScreen> {
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
+            const SizedBox(height: 8),
             DataTable(
               columnSpacing: 32,
               headingRowHeight: 50,
               dataRowHeight: 50,
+              headingTextStyle: const TextStyle(
+                  color: AppColors.primaryColor, fontWeight: FontWeight.bold),
+              headingRowColor: MaterialStateProperty.all(
+                  AppColors.greyColor.withOpacity(0.9)),
               columns: const [
                 //    DataColumn(label: Text('DSA Name')),
                 DataColumn(
@@ -286,7 +333,7 @@ class _ListingScreenState extends State<ListingScreen> {
             if (pincodeController.isLoading.value)
               const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: CircularProgressIndicator(),
+                child: LoadingPage(),
               ),
           ],
         ),

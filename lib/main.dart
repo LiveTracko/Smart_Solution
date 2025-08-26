@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUtil
 import 'package:get/get.dart';
 import 'package:smart_solutions/components/commons.dart';
+import 'package:smart_solutions/controllers/internet_checker.dart';
 import 'package:smart_solutions/services/firbase_notifications.dart';
 import 'package:smart_solutions/services/local_notification_service.dart';
 import 'core/app_bindings.dart';
@@ -13,6 +14,10 @@ import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Create and keep controller alive for whole app
+  Get.put(ConnectivityController()); // Global instance
+
   await FireBaseNotificatinService.initializeApp();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await LocalNotificationService.initLocalNotification();

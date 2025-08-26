@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/controllers/notification_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
+import 'package:smart_solutions/widget/common_scaffold.dart';
+import 'package:smart_solutions/widget/loading_page.dart';
 
 class NotificationSCreen extends StatefulWidget {
   const NotificationSCreen({super.key});
@@ -24,19 +26,21 @@ class _NotificationSCreenState extends State<NotificationSCreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.grey[50],
-        appBar: AppBar(
-          automaticallyImplyLeading: true,
-          centerTitle: true,
-          title: const Text(
-            'Notifications',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-        ),
+    return CommonScaffold(
+        title: 'Notifications',
+        showBack: true,
+        // backgroundColor: Colors.grey[50],
+        // appBar: AppBar(
+        //   automaticallyImplyLeading: true,
+        //   centerTitle: true,
+        //   title: const Text(
+        //     'Notifications',
+        //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        //   ),
+        // ),
         body: Obx(
           () => notificationController.isLoading.value
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: LoadingPage())
               : ListView.builder(
                   itemCount: notificationController.notificationData.length,
                   itemBuilder: (context, index) {

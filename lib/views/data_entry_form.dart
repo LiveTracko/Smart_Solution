@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
+import 'package:smart_solutions/utils/currency_util.dart';
+import 'package:smart_solutions/widget/common_scaffold.dart';
+import 'package:smart_solutions/widget/loading_page.dart';
 import '../constants/services.dart';
 
 class DataEntryForm extends StatefulWidget {
@@ -38,7 +42,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
     controller.fetchDataEntryListSpecificId();
     controller.getSourcingList();
     controller.getDsaBankList(widget.dsaId ?? '');
-    controller.getBankerName(widget.bankerId ?? '');
+    // controller.getBankerDetailsName(widget.bankerId ?? '');
     controller.getMobileByCustomerData(controller.contactNumber.value);
     controller.getTeamLeadById(widget.tellecallerId.toString());
   }
@@ -76,13 +80,8 @@ class _DataEntryFormState extends State<DataEntryForm> {
             controller.teamleader.value = '';
           }
         },
-        child: Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
-            title: const Text(
-              'Data Entry Form',
-              style: TextStyle(fontSize: 20),
-            ),
+        child: CommonScaffold(
+            title: 'Data Entry Form',
             actions: [
               Obx(() => controller.isNew.value
                   ? const SizedBox.shrink()
@@ -96,320 +95,326 @@ class _DataEntryFormState extends State<DataEntryForm> {
                             controller.isEdit.value ? Colors.red : Colors.white,
                       )))
             ],
-          ),
-          body: Obx(
-            () => controller.isLoading.value
-                ? const CircularProgressIndicator()
-                : Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SingleChildScrollView(
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 10.h),
-                            _buildDsaDropdown(),
-                            const SizedBox(height: 10),
+            // appBar: AppBar(
+            //   centerTitle: true,
+            //   title:
+            //       const Text('Data Entry Form', style: TextStyle(fontSize: 20)),
+            //   actions: [
+            //     Obx(() => controller.isNew.value
+            //         ? const SizedBox.shrink()
+            //         : IconButton(
+            //             onPressed: () {
+            //               controller.isEdit.value = !controller.isEdit.value;
+            //             },
+            //             icon: Icon(
+            //               Icons.edit,
+            //               color: controller.isEdit.value
+            //                   ? Colors.red
+            //                   : Colors.white,
+            //             )))
+            //   ],
+            // ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 10.h),
+                      _buildTextField(
+                          content: controller.date,
+                          prefixIcon: SvgPicture.asset(
+                              'assets/images/calendar.svg',
+                              height: 20,
+                              width: 20),
+                          label: 'Date',
+                          validator: (value) => _validatePhone(value),
+                          onChanged: (value) => controller.date.value = value),
 
-                            _buildTextField(
-                                content: controller.date,
-                                label: 'Date',
-                                validator: (value) => _validatePhone(value),
-                                onChanged: (value) =>
-                                    controller.date.value = value),
+                      SizedBox(height: 10.h),
+                      _buildDsaDropdown(),
 
-                            // _buildDateField(
-                            //   label: 'Date',
-                            //   content: controller.date,
-                            //   context: context,
-                            // ),
-                            // _buildDateField(
-                            //     label: 'Date',
-                            //     content:controller.dob.map((date) => DateFormat('yyyy-MM-dd').format(date)),
-                            //     onChanged: (value) =>
-                            //         controller.date.value = DateTime.parse(value),
-                            //     inputType: TextInputType.phone,
-                            //     validator: _validatePhone),
+                      // _buildDateField(
+                      //   label: 'Date',
+                      //   content: controller.date,
+                      //   context: context,
+                      // ),
+                      // _buildDateField(
+                      //     label: 'Date',
+                      //     content:controller.dob.map((date) => DateFormat('yyyy-MM-dd').format(date)),
+                      //     onChanged: (value) =>
+                      //         controller.date.value = DateTime.parse(value),
+                      //     inputType: TextInputType.phone,
+                      //     validator: _validatePhone),
 
-                            _buildTextField(
-                              label: 'Mobile Number',
-                              content: controller.contactNumber,
-                              onChanged: (value) =>
-                                  controller.contactNumber.value = value,
-                              inputType: TextInputType.phone,
-                              validator: _validatePhone,
-                            ),
-                            Obx(
-                              () => _buildTextField(
-                                label: 'Customer Name',
-                                content: controller.customerName,
-                                onChanged: (value) =>
-                                    controller.customerName.value = value,
-                                inputType: TextInputType.phone,
-                                validator: _validateNotEmpty,
-                              ),
-                            ),
-
-                            _buildTextField(
-                              label: 'Income',
-                              content: controller.income,
-                              onChanged: (value) =>
-                                  controller.income.value = value,
-                              inputType: TextInputType.phone,
-                              validator: _validateNotEmpty,
-                            ),
-
-                            _buildTextField(
-                              label: 'Company Name',
-                              content: controller.companyName,
-                              onChanged: (value) =>
-                                  controller.companyName.value = value,
-                              inputType: TextInputType.phone,
-                              validator: _validateNotEmpty,
-                            ),
-                            _buildCaseTypeDropdown(),
-                            const SizedBox(height: 10),
-                            _buildTextField(
-                              label: 'Loan Amount',
-                              content: NumberFormat.currency(
-                                      locale: 'en_IN',
-                                      symbol: '',
-                                      decimalDigits: 0)
-                                  .format(int.tryParse(controller
-                                          .loanAmount.value
-                                          .replaceAll(RegExp(r'[^\d]'), '')) ??
-                                      0)
-                                  .obs,
-                              // ?
-                              // NumberFormat.currency(
-                              //     locale: 'en_IN',
-                              //     symbol: '',
-                              //     decimalDigits: 0,
-                              //   )
-                              //     .format(
-                              //       int.tryParse(controller.loanAmount.value
-                              //               .replaceAll(',', '')) ??
-                              //           0,
-                              //     )
-                              //     .obs
-                              // : ''.obs, // ✅ convert to RxString
-                              onChanged: (value) {
-                                // Remove commas to get the numeric value before formatting
-                                String plainTextValue =
-                                    value.replaceAll(',', '');
-                                controller.loanAmount.value = plainTextValue;
-
-                                // Format the numeric value back to the Indian format
-                                String formattedValue = NumberFormat.currency(
-                                        locale: 'en_IN',
-                                        symbol: '',
-                                        decimalDigits: 0)
-                                    .format(int.tryParse(plainTextValue) ?? 0);
-
-                                controller.loanAmount.value = formattedValue;
-                              },
-                              inputType: TextInputType.number,
-                              validator: _validateNumber,
-                            ),
-
-                            const SizedBox(height: 10),
-                            _buildTextField(
-                              content: controller.dob,
-                              label: 'DOB',
-                              validator: (value) => _validateNotEmpty(value),
-                              onChanged: (value) =>
-                                  controller.dob.value = value,
-                            ),
-
-                            // _buildDateField(
-                            //     label: 'DOB',
-                            //     content: controller.dob,
-                            //     // onChanged: (value) =>
-                            //     //     controller.dob.value = DateTime.parse(value),
-                            //     context: context
-                            //     // validator: _validateNotEmpty,
-                            //     ),
-                            const SizedBox(height: 10),
-
-                            _buildProductTypeDropdown(),
-                            const SizedBox(height: 10),
-
-                            _buildloginBankDropdown(),
-                            const SizedBox(height: 10),
-
-                            _buildBankerNameDropdown(),
-                            const SizedBox(height: 10),
-
-                            _buildTextField(
-                              label: 'Banker Mobile',
-                              content: controller.bankerMobile,
-                              onChanged: (value) =>
-                                  controller.bankerMobile.value = value,
-                              // validator: _validateNotEmpty,
-                            ),
-
-                            _buildTextField(
-                              label: 'Banker Email',
-                              content: controller.bankerEmail,
-                              onChanged: (value) =>
-                                  controller.bankerEmail.value = value,
-                              // validator: _validateNotEmpty,
-                            ),
-                            const SizedBox(height: 10),
-
-                            _buildTextField(
-                              label: 'LOS No.',
-                              content: controller.losNo,
-                              onChanged: (value) =>
-                                  controller.losNo.value = value,
-                              // validator: _validateNotEmpty,
-                            ),
-                            const SizedBox(height: 10),
-
-                            _buildTeleCallerDropdown(),
-                            const SizedBox(height: 10),
-
-                            _buildTextField(
-                              label: 'Team Leader',
-                              content: controller.teamleader,
-                              onChanged: (value) =>
-                                  controller.teamleader.value = value,
-                              // validator: _validateNotEmpty,
-                            ),
-
-                            const SizedBox(height: 10),
-
-                            _buildStatusDropdown(),
-                            const SizedBox(height: 10),
-
-                            _buildSourcingDropdown(),
-                            const SizedBox(height: 10),
-
-                            _buildTextField(
-                              label: 'Case Study ',
-                              content: controller.caseStudy,
-                              onChanged: (value) =>
-                                  controller.caseStudy.value = value,
-                              // validator: _validateNotEmpty,
-                            ),
-                            const SizedBox(height: 10),
-
-                            _buildTextField(
-                              label: 'Comments ',
-                              content: controller.comments,
-                              onChanged: (value) =>
-                                  controller.comments.value = value,
-                              // validator: _validateNotEmpty,
-                            ),
-                            const SizedBox(height: 20),
-                            // // _buildLoanStatusDropdown(),
-                            // // const SizedBox(height: 10),
-                            // _buildAllBankNamesDropdown(),
-                            // const SizedBox(height: 10),
-
-                            // _buildSourcingDropdown(),
-                            // const SizedBox(height: 10),
-
-                            // _buildTextField(
-                            //   label: 'Common remark',
-                            //   content: controller.commonRemark.value,
-                            //   onChanged: (value) => controller.commonRemark.value = value,
-                            //   // validator: _validateNotEmpty,
-                            // ),
-                            // const SizedBox(height: 10),
-                            // // Dynamic Remarks Section
-                            // _buildRemarksSection(),
-                            // const SizedBox(height: 20),
-
-                            Center(
-                              child: Obx(() => ElevatedButton(
-                                    onPressed: () {
-                                      if (_formKey.currentState!.validate()) {
-                                        controller
-                                            .saveDataEntryForm(); // Call save method
-                                        //        controller.getLoginRequestList();
-                                      }
-                                    },
-                                    child: controller.isLoading.value
-                                        ? const CircularProgressIndicator(
-                                            color: Colors.white,
-                                          )
-                                        : const Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 24.0),
-                                            child: Text(
-                                              'Submit',
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                  )),
-                            ),
-                          ],
+                      _buildTextField(
+                        label: 'Mobile Number',
+                        prefixIcon: SvgPicture.asset(
+                          'assets/images/phone.svg',
+                          height: 20,
+                          width: 20,
+                        ),
+                        content: controller.contactNumber,
+                        onChanged: (value) =>
+                            controller.contactNumber.value = value,
+                        inputType: TextInputType.phone,
+                        validator: _validatePhone,
+                      ),
+                      Obx(
+                        () => _buildTextField(
+                          label: 'Customer Name',
+                          prefixIcon: SvgPicture.asset(
+                            'assets/images/user.svg',
+                            height: 20,
+                            width: 20,
+                          ),
+                          content: controller.customerName,
+                          onChanged: (value) =>
+                              controller.customerName.value = value,
+                          inputType: TextInputType.phone,
+                          validator: _validateNotEmpty,
                         ),
                       ),
-                    ),
+
+                      _buildTextField(
+                        label: 'Income',
+                        prefixIcon: SvgPicture.asset(
+                          'assets/images/data_type.svg',
+                          height: 20,
+                          width: 20,
+                        ),
+                        content: controller.income,
+                        onChanged: (value) => controller.income.value = value,
+                        inputType: TextInputType.phone,
+                        validator: _validateNotEmpty,
+                      ),
+
+                      _buildTextField(
+                        label: 'Company Name',
+                        prefixIcon: SvgPicture.asset(
+                          'assets/images/company_name.svg',
+                          height: 20,
+                          width: 20,
+                        ),
+                        content: controller.companyName,
+                        onChanged: (value) =>
+                            controller.companyName.value = value,
+                        inputType: TextInputType.phone,
+                        validator: _validateNotEmpty,
+                      ),
+                      _buildCaseTypeDropdown(),
+                      const SizedBox(height: 10),
+                      _buildTextField(
+                        label: 'Loan Amount',
+                        prefixIcon: SvgPicture.asset(
+                          'assets/images/rupees.svg',
+                          height: 20,
+                          width: 20,
+                        ),
+                        content: controller.loanAmount,
+                        formatAsCurrency: true,
+                        // CurrencyUtils.formatIndianCurrency(
+                        //     controller.loanAmount.value),
+                        onChanged: (value) {
+                          // Remove commas to get the numeric value before formatting
+                          String plainTextValue = value.replaceAll(',', '');
+                          controller.loanAmount.value = plainTextValue;
+
+                          // Format the numeric value back to the Indian format
+                          String formattedValue = NumberFormat.currency(
+                                  locale: 'en_IN', symbol: '', decimalDigits: 0)
+                              .format(int.tryParse(plainTextValue) ?? 0);
+
+                          controller.loanAmount.value = formattedValue;
+                        },
+                        inputType: TextInputType.number,
+                        validator: _validateNumber,
+                      ),
+
+                      const SizedBox(height: 10),
+                      _buildTextField(
+                        content: controller.dob,
+                        prefixIcon: SvgPicture.asset(
+                          'assets/images/dob.svg',
+                          height: 20,
+                          width: 20,
+                        ),
+                        label: 'DOB',
+                        validator: (value) => _validateNotEmpty(value),
+                        onChanged: (value) => controller.dob.value = value,
+                      ),
+
+                      // _buildDateField(
+                      //     label: 'DOB',
+                      //     content: controller.dob,
+                      //     // onChanged: (value) =>
+                      //     //     controller.dob.value = DateTime.parse(value),
+                      //     context: context
+                      //     // validator: _validateNotEmpty,
+                      //     ),
+                      const SizedBox(height: 10),
+
+                      _buildProductTypeDropdown(),
+                      const SizedBox(height: 10),
+
+                      _buildloginBankDropdown(),
+                      const SizedBox(height: 10),
+
+                      _buildBankerNameDropdown(),
+                      const SizedBox(height: 10),
+
+                      _buildTextField(
+                        label: 'Banker Mobile',
+                        prefixIcon: SvgPicture.asset(
+                          'assets/images/phone.svg',
+                          height: 20,
+                          width: 20,
+                        ),
+                        content: controller.bankerMobile,
+                        onChanged: (value) =>
+                            controller.bankerMobile.value = value,
+                        // validator: _validateNotEmpty,
+                      ),
+
+                      _buildTextField(
+                        label: 'Banker Email',
+                        prefixIcon: SvgPicture.asset(
+                          'assets/images/email.svg',
+                          height: 20,
+                          width: 20,
+                        ),
+                        content: controller.bankerEmail,
+                        onChanged: (value) =>
+                            controller.bankerEmail.value = value,
+                        // validator: _validateNotEmpty,
+                      ),
+                      const SizedBox(height: 10),
+
+                      _buildTextField(
+                        label: 'LOS No.',
+                        prefixIcon: SvgPicture.asset(
+                          'assets/images/company_name.svg',
+                          height: 20,
+                          width: 20,
+                        ),
+                        content: controller.losNo,
+                        onChanged: (value) => controller.losNo.value = value,
+                        // validator: _validateNotEmpty,
+                      ),
+                      const SizedBox(height: 10),
+
+                      _buildTeleCallerDropdown(),
+                      const SizedBox(height: 10),
+
+                      _buildTextField(
+                        label: 'Team Leader',
+                        prefixIcon: SvgPicture.asset(
+                          'assets/images/teamleader.svg',
+                          height: 20,
+                          width: 20,
+                        ),
+                        content: controller.teamleader,
+                        onChanged: (value) =>
+                            controller.teamleader.value = value,
+                        // validator: _validateNotEmpty,
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      _buildStatusDropdown(),
+                      const SizedBox(height: 10),
+
+                      _buildSourcingDropdown(),
+                      const SizedBox(height: 10),
+
+                      _buildTextField(
+                        label: 'Case Study ',
+                        content: controller.caseStudy,
+
+                        onChanged: (value) =>
+                            controller.caseStudy.value = value,
+                        // validator: _validateNotEmpty,
+                      ),
+                      const SizedBox(height: 10),
+
+                      _buildTextField(
+                        label: 'Comments ',
+                        content: controller.comments,
+                        onChanged: (value) => controller.comments.value = value,
+                        // validator: _validateNotEmpty,
+                      ),
+                      const SizedBox(height: 5),
+                      Container(
+                        alignment: Alignment.bottomRight,
+                        child: Text(
+                          textAlign: TextAlign.end,
+                          'By ${controller.admin_subadmin_name}',
+                          //on ${DateFormat('dd-MM-yy HH:mm:ss').format(DateTime.parse(controller.date.toString()))}',
+                          style:
+                              const TextStyle(fontSize: 15, color: Colors.grey),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // // _buildLoanStatusDropdown(),
+                      // // const SizedBox(height: 10),
+                      // _buildAllBankNamesDropdown(),
+                      // const SizedBox(height: 10),
+
+                      // _buildSourcingDropdown(),
+                      // const SizedBox(height: 10),
+
+                      // _buildTextField(
+                      //   label: 'Common remark',
+                      //   content: controller.commonRemark.value,
+                      //   onChanged: (value) => controller.commonRemark.value = value,
+                      //   // validator: _validateNotEmpty,
+                      // ),
+                      // const SizedBox(height: 10),
+                      // // Dynamic Remarks Section
+                      // _buildRemarksSection(),
+                      // const SizedBox(height: 20),
+
+                      Center(
+                        child: Obx(() => ElevatedButton(
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  controller
+                                      .saveDataEntryForm(); // Call save method
+                                  //        controller.getLoginRequestList();
+                                }
+                              },
+                              child: controller.isLoading.value
+                                  ? LoadingPage()
+                                  : const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 24.0),
+                                      child: Text(
+                                        'Submit',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                            )),
+                      ),
+                    ],
                   ),
-          ),
-        ));
-  }
-
-  Widget _buildDateField({
-    required String label,
-    required Rx<DateTime> content,
-    required BuildContext context,
-  }) {
-    return Obx(() {
-      final controller = TextEditingController(
-        text: DateFormat('yyyy-MM-dd').format(content.value),
-      );
-
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: TextFormField(
-          style: const TextStyle(color: AppColors.primaryColor),
-          controller: controller,
-          readOnly: true,
-          decoration: InputDecoration(
-            labelText: label,
-            border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0),
-              borderSide: const BorderSide(color: AppColors.primaryColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0),
-              borderSide:
-                  const BorderSide(color: AppColors.primaryColor, width: 2),
-            ),
-            filled: true,
-            fillColor: AppColors.backgroundColor,
-          ),
-          onTap: () async {
-            DateTime? picked = await showDatePicker(
-              context: context,
-              initialDate: content.value,
-              firstDate: DateTime(1950),
-              lastDate: DateTime(2100),
-            );
-            if (picked != null) {
-              content.value = picked;
-            }
-          },
-        ),
-      );
-    });
+                ),
+              ),
+            )));
   }
 
   Widget _buildTextField({
     required RxString content,
     required String label,
     required ValueChanged<String> onChanged,
+    Widget? prefixIcon,
     TextInputType inputType = TextInputType.text,
     int maxLines = 1,
     String? Function(String?)? validator,
+    bool formatAsCurrency = false, // optional flag
   }) {
     final textController = TextEditingController(text: content.value);
 
@@ -418,11 +423,37 @@ class _DataEntryFormState extends State<DataEntryForm> {
       TextPosition(offset: textController.text.length),
     );
 
+    Widget? decoratedPrefixIcon;
+
+    if (prefixIcon != null) {
+      decoratedPrefixIcon = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0, right: 8.0),
+            child: prefixIcon,
+          ),
+          const SizedBox(
+            height: 50,
+            width: 5,
+            child: VerticalDivider(
+                width: 1, thickness: 1, color: AppColors.primaryColor),
+          ),
+        ],
+      );
+    }
     return Obx(() {
-      // Sync Rx -> Controller
-      if (textController.text != content.value) {
-        textController.text = content.value;
+      final displayValue = formatAsCurrency
+          ? CurrencyUtils.formatIndianCurrency(content.value)
+          : content.value;
+
+      if (textController.text != displayValue) {
+        textController.text = displayValue;
+        textController.selection = TextSelection.fromPosition(
+          TextPosition(offset: textController.text.length),
+        );
       }
+
       return Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
@@ -432,16 +463,17 @@ class _DataEntryFormState extends State<DataEntryForm> {
             controller: textController,
             //  initialValue: content.isNotEmpty ? content : null,
             decoration: InputDecoration(
-              labelText: label,
+              prefixIcon: decoratedPrefixIcon,
+              hintText: label,
               labelStyle: const TextStyle(color: AppColors.secondayColor),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
+                borderRadius: BorderRadius.circular(10.0),
                 borderSide: const BorderSide(color: AppColors.primaryColor),
               ),
               focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20.0),
+                  borderRadius: BorderRadius.circular(10.0),
                   borderSide: const BorderSide(
                       color: AppColors.primaryColor, width: 2)),
               filled: true,
@@ -486,7 +518,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
   Widget _buildAllBankNamesDropdown() {
     return Obx(
       () => controller.isLoading.value
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: LoadingPage())
           : Padding(
               padding: const EdgeInsets.all(8.0),
               child: DropdownButtonFormField<String>(
@@ -567,7 +599,24 @@ class _DataEntryFormState extends State<DataEntryForm> {
         child: DropdownButtonFormField<String>(
           isExpanded: true,
           decoration: InputDecoration(
-            labelText: 'Select Source',
+            hintText: 'Select Source',
+            prefixIcon: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset('assets/images/source.svg',
+                        height: 20, width: 20),
+                    SizedBox(width: 5.w),
+                    const VerticalDivider(
+                      thickness: 1,
+                      color: AppColors.primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             labelStyle: const TextStyle(color: AppColors.secondayColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.0.r),
@@ -617,7 +666,27 @@ class _DataEntryFormState extends State<DataEntryForm> {
         child: DropdownButtonFormField<String>(
           isExpanded: true,
           decoration: InputDecoration(
-            labelText: 'DSA Name',
+            hintText: 'DSA Name',
+            prefixIcon: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/bank.svg',
+                      height: 20,
+                      width: 20,
+                    ),
+                    SizedBox(width: 5.w),
+                    const VerticalDivider(
+                      thickness: 1,
+                      color: AppColors.primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             labelStyle: const TextStyle(color: AppColors.secondayColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.0.r),
@@ -646,7 +715,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
               ? (newValue) {
                   if (newValue != null) {
                     controller.dsaName.value = newValue;
-
+                    controller.selectedDsaId.value = newValue;
                     controller.getDsaBankList(newValue);
                   }
                 }
@@ -669,7 +738,27 @@ class _DataEntryFormState extends State<DataEntryForm> {
         child: DropdownButtonFormField<String>(
           isExpanded: true,
           decoration: InputDecoration(
-            labelText: 'Case Type',
+            hintText: 'Case Type',
+            prefixIcon: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/case_type.svg',
+                      height: 24,
+                      width: 24,
+                    ),
+                    SizedBox(width: 5.w),
+                    const VerticalDivider(
+                      thickness: 1,
+                      color: AppColors.primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             labelStyle: const TextStyle(color: AppColors.secondayColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.0.r),
@@ -719,7 +808,27 @@ class _DataEntryFormState extends State<DataEntryForm> {
         child: DropdownButtonFormField<String>(
           isExpanded: true,
           decoration: InputDecoration(
-            labelText: 'Product Type',
+            hintText: 'Product Type',
+            prefixIcon: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/product_type.svg',
+                      height: 24,
+                      width: 24,
+                    ),
+                    SizedBox(width: 5.w),
+                    const VerticalDivider(
+                      thickness: 1,
+                      color: AppColors.primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             labelStyle: const TextStyle(color: AppColors.secondayColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.0.r),
@@ -769,7 +878,24 @@ class _DataEntryFormState extends State<DataEntryForm> {
         child: DropdownButtonFormField<String>(
           isExpanded: true,
           decoration: InputDecoration(
-            labelText: 'Login Bank',
+            prefixIcon: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset('assets/images/bank.svg',
+                        height: 24, width: 24),
+                    SizedBox(width: 5.w),
+                    const VerticalDivider(
+                      thickness: 1,
+                      color: AppColors.primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            hintText: 'Login Bank',
             labelStyle: const TextStyle(color: AppColors.secondayColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.0.r),
@@ -798,7 +924,9 @@ class _DataEntryFormState extends State<DataEntryForm> {
               ? (newValue) {
                   if (newValue != null) {
                     controller.selectedBankName.value = newValue;
-                    controller.getBankerName(controller.dsaName.value);
+                    controller.getBankerNameByloginBank(
+                        controller.selectedDsaId.toString(),
+                        controller.selectedBankName.toString());
                   }
                 }
               : null,
@@ -820,7 +948,27 @@ class _DataEntryFormState extends State<DataEntryForm> {
         child: DropdownButtonFormField<String>(
           isExpanded: true,
           decoration: InputDecoration(
-            labelText: 'Banker Name',
+            hintText: 'Banker Name',
+            prefixIcon: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/user.svg',
+                      height: 20,
+                      width: 20,
+                    ),
+                    SizedBox(width: 5.w),
+                    const VerticalDivider(
+                      thickness: 1,
+                      color: AppColors.primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             labelStyle: const TextStyle(color: AppColors.secondayColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.0.r),
@@ -849,6 +997,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
               ? (newValue) {
                   if (newValue != null) {
                     controller.bankName.value = newValue;
+                    controller.getBankerDetailsName(newValue.toString());
                   }
                 }
               : null,
@@ -870,7 +1019,27 @@ class _DataEntryFormState extends State<DataEntryForm> {
         child: DropdownButtonFormField<String>(
           isExpanded: true,
           decoration: InputDecoration(
-            labelText: 'Tele Caller',
+            hintText: 'Tele Caller',
+            prefixIcon: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/telecaller_call.svg',
+                      height: 24,
+                      width: 24,
+                    ),
+                    SizedBox(width: 5.w),
+                    const VerticalDivider(
+                      thickness: 1,
+                      color: AppColors.primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             labelStyle: const TextStyle(color: AppColors.secondayColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.0.r),
@@ -920,7 +1089,27 @@ class _DataEntryFormState extends State<DataEntryForm> {
         child: DropdownButtonFormField<String>(
           isExpanded: true,
           decoration: InputDecoration(
-            labelText: 'Status',
+            hintText: 'Status',
+            prefixIcon: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/status.svg',
+                      height: 24,
+                      width: 24,
+                    ),
+                    SizedBox(width: 5.w),
+                    const VerticalDivider(
+                      thickness: 1,
+                      color: AppColors.primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             labelStyle: const TextStyle(color: AppColors.secondayColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20.0.r),

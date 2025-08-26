@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:smart_solutions/widget/common_scaffold.dart';
 
 class ReportPage extends StatelessWidget {
   const ReportPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text(
-          'Report Page',
-          style: TextStyle(fontSize: 20),
-        ),
-      ),
+    return CommonScaffold(
+      title: 'Report Page',
       body: const Center(
         child: Text(
           'Report Page Are in Progress',

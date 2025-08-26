@@ -2,15 +2,19 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
+import 'package:smart_solutions/widget/common_scaffold.dart';
+import 'package:smart_solutions/widget/loading_page.dart';
 
 import '../constants/services.dart';
 
 class AppColors {
-  static const Color primaryColor = Colors.blue;
+  static const Color primaryColor = Color(0xFF356EFF);
+  //Colors.blue;
   static const Color secondaryColor = Colors.grey;
   static const Color backgroundColor = Colors.white;
 }
@@ -45,27 +49,29 @@ class LoginRequestForm extends StatelessWidget {
           controller.sourceId.value = '';
         }
       },
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: const Text(
-            'Login Request Form',
-            style: TextStyle(fontSize: 20),
-          ),
-          actions: [
-            Obx(() => controller.isNew.value
-                ? const SizedBox.shrink()
-                : IconButton(
-                    onPressed: () {
-                      controller.isEdit.value = !controller.isEdit.value;
-                    },
-                    icon: Icon(
-                      Icons.edit,
-                      color:
-                          controller.isEdit.value ? Colors.red : Colors.white,
-                    )))
-          ],
-        ),
+      child: CommonScaffold(
+        title: 'Login Request Form',
+        showBack: true,
+
+        // appBar: AppBar(
+        //   centerTitle: true,
+        //   title: const Text(
+        //     'Login Request Form',
+        //     style: TextStyle(fontSize: 20),
+        //   ),
+        actions: [
+          Obx(() => controller.isNew.value
+              ? const SizedBox.shrink()
+              : IconButton(
+                  onPressed: () {
+                    controller.isEdit.value = !controller.isEdit.value;
+                  },
+                  icon: Icon(
+                    Icons.edit,
+                    color: controller.isEdit.value ? Colors.red : Colors.white,
+                  )))
+        ],
+
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
@@ -77,6 +83,11 @@ class LoginRequestForm extends StatelessWidget {
                   SizedBox(height: 10.h),
                   _buildTextField(
                     label: 'Customer Name',
+                    prefixIcon: SvgPicture.asset(
+                      'assets/images/user.svg',
+                      height: 24,
+                      width: 24,
+                    ),
                     content: controller.customerName.value,
                     onChanged: (value) => controller.customerName.value = value,
                     validator: _validateNotEmpty,
@@ -84,6 +95,7 @@ class LoginRequestForm extends StatelessWidget {
                   const SizedBox(height: 10),
                   _buildTextField(
                     label: 'Contact Number',
+                    prefixIcon: SvgPicture.asset('assets/images/phone.svg'),
                     content: controller.contactNumber.value,
                     onChanged: (value) =>
                         controller.contactNumber.value = value,
@@ -93,6 +105,11 @@ class LoginRequestForm extends StatelessWidget {
                   const SizedBox(height: 10),
                   _buildTextField(
                     label: 'Loan Amount',
+                    prefixIcon: SvgPicture.asset(
+                      'assets/images/rupees.svg',
+                      height: 24,
+                      width: 24,
+                    ),
                     content: controller.loanAmount.value.isNotEmpty
                         ? NumberFormat.currency(
                                 locale: 'en_IN', symbol: '', decimalDigits: 0)
@@ -137,25 +154,27 @@ class LoginRequestForm extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   Center(
-                    child: Obx(() => ElevatedButton(
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              controller.saveLoginRequest(); // Call save method
-                              controller.getLoginRequestList();
-                            }
-                          },
-                          child: controller.isLoading.value
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : const Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 24.0),
-                                  child: Text(
-                                    'Save Request',
-                                    style: TextStyle(color: Colors.white),
+                    child: Obx(() => SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                controller
+                                    .saveLoginRequest(); // Call save method
+                                controller.getLoginRequestList();
+                              }
+                            },
+                            child: controller.isLoading.value
+                                ? LoadingPage()
+                                : const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 24.0),
+                                    child: Text(
+                                      'Save Request',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
                                   ),
-                                ),
+                          ),
                         )),
                   ),
                 ],
@@ -171,10 +190,30 @@ class LoginRequestForm extends StatelessWidget {
     required String content,
     required String label,
     required ValueChanged<String> onChanged,
+    Widget? prefixIcon,
     TextInputType inputType = TextInputType.text,
     int maxLines = 1,
     String? Function(String?)? validator,
   }) {
+    Widget? decoratedPrefixIcon;
+
+    if (prefixIcon != null) {
+      decoratedPrefixIcon = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0, right: 8.0),
+            child: prefixIcon,
+          ),
+          const SizedBox(
+            height: 50,
+            width: 5,
+            child: VerticalDivider(
+                width: 1, thickness: 1, color: AppColors.primaryColor),
+          ),
+        ],
+      );
+    }
     return Obx(() => Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
@@ -183,17 +222,20 @@ class LoginRequestForm extends StatelessWidget {
             readOnly: !controller.isEdit.value,
             initialValue: content.isNotEmpty ? content : null,
             decoration: InputDecoration(
-              labelText: label,
-              labelStyle: const TextStyle(color: AppColors.secondaryColor),
+              prefixIcon: decoratedPrefixIcon,
+              //   labelText: label,
+              hintText: label,
+              //    labelStyle: const TextStyle(color: AppColors.primaryColor),
+              hintStyle: const TextStyle(color: AppColors.primaryColor),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
+                borderRadius: BorderRadius.circular(10.0),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
+                borderRadius: BorderRadius.circular(10.0),
                 borderSide: const BorderSide(color: AppColors.primaryColor),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20.0),
+                borderRadius: BorderRadius.circular(10.0),
                 borderSide:
                     const BorderSide(color: AppColors.primaryColor, width: 2),
               ),
@@ -285,22 +327,42 @@ class LoginRequestForm extends StatelessWidget {
   Widget _buildAllBankNamesDropdown() {
     return Obx(
       () => controller.isLoading.value
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: LoadingPage())
           : Padding(
               padding: const EdgeInsets.all(8.0),
               child: DropdownButtonFormField<String>(
                 isExpanded: true,
                 decoration: InputDecoration(
+                  prefixIcon: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/images/bank.svg',
+                            height: 24,
+                            width: 24,
+                          ),
+                          SizedBox(width: 5.w),
+                          const VerticalDivider(
+                            thickness: 1,
+                            color: AppColors.primaryColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   labelStyle: const TextStyle(color: AppColors.secondaryColor),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
+                    borderRadius: BorderRadius.circular(10.0.r),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
+                    borderRadius: BorderRadius.circular(10.0.r),
                     borderSide: const BorderSide(color: AppColors.primaryColor),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
+                    borderRadius: BorderRadius.circular(10.0.r),
                     borderSide: const BorderSide(
                       color: AppColors.primaryColor,
                       width: 2,
@@ -350,7 +412,7 @@ class LoginRequestForm extends StatelessWidget {
       return DropdownMenuItem<String>(
         value: bank.id,
         child: Text(
-          bank.bankName ?? '',
+          bank.bankName,
           overflow: TextOverflow.ellipsis,
         ),
       );
@@ -361,23 +423,45 @@ class LoginRequestForm extends StatelessWidget {
   Widget _buildSourcingDropdown() {
     return Obx(
       () => controller.isLoading.value
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: LoadingPage())
           : Padding(
               padding: const EdgeInsets.all(8.0),
               child: DropdownButtonFormField<String>(
                 isExpanded: true,
                 decoration: InputDecoration(
-                  labelText: 'Select Source',
-                  labelStyle: const TextStyle(color: AppColors.secondaryColor),
+                  prefixIcon: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/images/data_type.svg',
+                            height: 24,
+                            width: 24,
+                          ),
+                          SizedBox(width: 5.w),
+                          const VerticalDivider(
+                            thickness: 1,
+                            color: AppColors.primaryColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  hintText: 'Select Source',
+                  //  labelText: 'Select Source',
+                  //   labelStyle: const TextStyle(color: AppColors.secondaryColor),
+                  hintStyle: const TextStyle(color: AppColors.primaryColor),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
+                    borderRadius: BorderRadius.circular(10.0.r),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
+                    borderRadius: BorderRadius.circular(10.0.r),
                     borderSide: const BorderSide(color: AppColors.primaryColor),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
+                    borderRadius: BorderRadius.circular(10.0.r),
                     borderSide: const BorderSide(
                       color: AppColors.primaryColor,
                       width: 2,

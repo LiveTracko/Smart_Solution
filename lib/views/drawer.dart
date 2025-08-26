@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
+import 'package:smart_solutions/models/dashBoardToday_model.dart';
+import 'package:smart_solutions/views/dashboard_screen.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
-import 'package:smart_solutions/views/reset_password.dart';
+import 'package:smart_solutions/views/report_page.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -36,108 +40,142 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return Padding(
+      padding: EdgeInsets.only(top: 100.h),
       child: Drawer(
         width: MediaQuery.of(context).size.width * 0.6,
-        child: Column(
-          children: <Widget>[
-            Stack(children: [
-              UserAccountsDrawerHeader(
-                accountName: Text(
-                  _userName.toUpperCase(),
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                accountEmail: const Text(''),
-                currentAccountPicture: CircleAvatar(
-                    backgroundColor: Colors.white, // Set a background color
-                    child: Text(
-                        _userName.isNotEmpty
-                            ? _userName[0].toUpperCase()
-                            : "A", // Get the first letter
-                        style: const TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black, // Text color
-                        ))),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomRight: Radius.zero,
+            topRight: Radius.circular(30),
+          ),
+        ),
+        child: Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [Color(0xFFFFFFFF), Color(0xFF356EFF)],
+                  stops: [0.7788, 1.0],
                 ),
               ),
-              Positioned(
-                  top: 10,
-                  right: 10,
-                  child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: IconButton(
-                        onPressed: () {
-                          _dashboardController.toggleDrawer();
-                          Get.back();
-                        },
-                        icon: const Icon(Icons.close),
-                      )))
-            ]),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home'),
-              onTap: () {
-                Navigator.pop(context); // Close the drawer
-                // Add navigation logic here
-              },
-            ),
-            // ListTile(
-            //   leading: const Icon(Icons.list_alt_rounded),
-            //   title: const Text('Data Entry'),
-            //   onTap: () {
-            //     Get.to(() => DataEntryViewScreen()); // Close the drawer
-            //     // Add navigation logic here
-            //   },
-            // ),
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('About Us'),
-              onTap: () {
-                Navigator.pop(context); // Close the drawer
-                // Add navigation logic here
-              },
-            ),
-            StaticStoredData.roleName == 'telecaller'
-                ? ListTile(
-                    leading: const Icon(Icons.list),
+              child: Column(
+                children: [
+                  // ===== HEADER =====
+                  Container(
+                    height: 150,
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.indigo.shade700,
+                          child: Text(
+                            _userName.isNotEmpty
+                                ? _userName[0].toUpperCase()
+                                : "A",
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Text(
+                          _userName.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // ===== TOP GROUP =====
+                  ListTile(
+                    leading: const Icon(Icons.list_alt),
                     title: const Text('Listing'),
-                    onTap: () {
-                      Get.to(() => const ListingScreen());
-                    },
-                  )
-                : const SizedBox.shrink(),
+                    onTap: () => Get.to(() => const ListingScreen()),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.list),
+                    title: const Text('Reports'),
+                    onTap: () => Get.to(() => const ReportPage()),
+                  ),
+                  if (StaticStoredData.roleName == 'telecaller')
+                    ListTile(
+                      leading: const Icon(Icons.supervisor_account_rounded),
+                      title: const Text('Customer'),
+                      onTap: () {},
+                    ),
 
-            ListTile(
-              leading: const Icon(Icons.lock),
-              title: const Text('Reset Password'),
-              onTap: () {
-                Get.to(() => ChangePasswordScreen());
-              },
+                  const Spacer(), // pushes the next section to the bottom
+
+                  // ===== BOTTOM GROUP =====
+                  const Divider(),
+                  _drawerTile(Icons.home, 'Home', () async {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.clear();
+                    StaticStoredData.userId = '';
+                    Get.put(DashboardTodayModel());
+                    Get.offAll(() => DashboardScreen());
+                  }),
+                  _drawerTile(Icons.info_rounded, 'About us', () {}),
+                  _drawerTile(Icons.lock, 'Reset Password', () {}),
+                  _drawerTile(Icons.logout, 'Logout', () async {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.clear();
+                    StaticStoredData.userId = '';
+                    Get.put(LoginViewModel());
+                    Get.offAll(() => const LoginView());
+                  }),
+                ],
+              ),
             ),
-            const Divider(), // Divider for separation
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
-              onTap: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.clear();
-                StaticStoredData.userId = '';
 
-                Get.put(LoginViewModel());
-
-                Get.offAll(() => const LoginView());
-
-                // ignore: unused_local_variable
-                final LoginViewModel controller = Get.find();
-              },
-            ),
+            // Close button
+            Positioned(
+                top: 15,
+                right: 15,
+                child: SvgPicture.asset('assets/images/cross.svg')),
           ],
         ),
       ),
+    );
+  }
+
+// Reusable ListTile with compact spacing
+
+  Widget _drawerTile(
+    IconData icon,
+    String title,
+    VoidCallback onTap, {
+    bool isBottomTile = false, // flag to style differently
+  }) {
+    return ListTile(
+      dense: true,
+      visualDensity: const VisualDensity(vertical: -2),
+      leading: Icon(
+        icon,
+        size: isBottomTile ? 28 : 22, // bigger icon for bottom tiles
+        color: Colors.black87,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: isBottomTile ? 16 : 14, // bigger text for bottom tiles
+          fontWeight: isBottomTile ? FontWeight.w600 : FontWeight.normal,
+        ),
+      ),
+      onTap: onTap,
     );
   }
 }

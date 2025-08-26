@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +7,8 @@ import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/controllers/remark_status_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
+import 'package:smart_solutions/widget/common_scaffold.dart';
+import 'package:smart_solutions/widget/loading_page.dart';
 import '../constants/services.dart';
 
 // ignore: must_be_immutable
@@ -54,19 +57,21 @@ class FollowBackForm extends StatelessWidget {
 
         logOutput("$canPop and $backPressCounter");
       },
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: const Text('Follow Up Add'),
-          backgroundColor: AppColors.primaryColor,
-        ),
+      child: CommonScaffold(
+        showBack: true,
+        title: 'Follow Up Add',
+
+        // appBar: AppBar(
+        //   automaticallyImplyLeading: false,
+        //   title: const Text('Follow Up Add'),
+        //   backgroundColor: AppColors.primaryColor,
+        // ),
         body: Padding(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Form(
             key: _formKey,
             child: ListView(
               children: [
-                SizedBox(height: 20.h),
                 _buildDatePicker(context, false),
                 SizedBox(height: 16.h),
                 // loan amount field
@@ -75,6 +80,11 @@ class FollowBackForm extends StatelessWidget {
                         ? false
                         : true,
                     label: 'Loan amount',
+                    prefixIcon: SvgPicture.asset(
+                      'assets/images/rupees.svg',
+                      height: 24,
+                      width: 24,
+                    ),
                     value: CurrencyUtils.formatIndianCurrency(
                         _dialerController.customerLoan.value),
                     onChanged: (value) =>
@@ -86,6 +96,11 @@ class FollowBackForm extends StatelessWidget {
                 Obx(
                   () => _buildTextField(
                     label: 'Customer Name',
+                    prefixIcon: SvgPicture.asset(
+                      'assets/images/user.svg',
+                      height: 24,
+                      width: 24,
+                    ),
                     value: _formController.customerName.value,
                     onChanged: (value) =>
                         _formController.customerName.value = value,
@@ -110,6 +125,7 @@ class FollowBackForm extends StatelessWidget {
                 _buildMobileField(
                   label: _formController.mobile.value,
                   inputType: TextInputType.phone,
+                  prefixIcon: SvgPicture.asset('assets/images/phone.svg'),
                   onChanged: (value) {
                     if (_formController.mobile.value.isEmpty) {
                       _formController.mobile.value = value;
@@ -134,6 +150,7 @@ class FollowBackForm extends StatelessWidget {
                 // Data Type Field
                 _buildTextField(
                     label: 'Data Type',
+                    prefixIcon: SvgPicture.asset('assets/images/data_type.svg'),
                     value: _dialerController.datatype.value.isEmpty
                         ? ""
                         : _dialerController.datatype.value,
@@ -143,7 +160,7 @@ class FollowBackForm extends StatelessWidget {
                 SizedBox(height: 16.h),
 
                 // Contact Status Radio Buttons
-                _buildContactStatusRadio(),
+                _buildContactStatusRadio(mobileNumber.isEmpty),
                 SizedBox(height: 16.h),
 
                 // Remark Status Dropdown
@@ -180,27 +197,49 @@ class FollowBackForm extends StatelessWidget {
     bool? isRead,
     required ValueChanged<String> onChanged,
     required String? Function(String?)? validator,
+    Widget? prefixIcon,
     TextInputType inputType = TextInputType.text,
     int maxLines = 1,
   }) {
+    Widget? decoratedPrefixIcon;
+
+    if (prefixIcon != null) {
+      decoratedPrefixIcon = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0, right: 8.0),
+            child: prefixIcon,
+          ),
+          const SizedBox(
+            height: 50,
+            width: 5,
+            child: VerticalDivider(
+                width: 1, thickness: 1, color: AppColors.primaryColor),
+          ),
+        ],
+      );
+    }
     return TextFormField(
       keyboardType: inputType,
       maxLines: maxLines,
       readOnly: isRead ?? false,
       initialValue: value ?? "",
       decoration: InputDecoration(
-        labelText: label,
+        //    labelText: label,
         hintText: label,
-        labelStyle: const TextStyle(color: AppColors.secondaryColor),
+        hintStyle: const TextStyle(color: AppColors.primaryColor),
+        prefixIcon: decoratedPrefixIcon,
+        labelStyle: const TextStyle(color: AppColors.primaryColor),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20.0.r),
+          borderRadius: BorderRadius.circular(10.0.r),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20.0.r),
+          borderRadius: BorderRadius.circular(10.0.r),
           borderSide: const BorderSide(color: AppColors.primaryColor),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20.0.r),
+          borderRadius: BorderRadius.circular(10.0.r),
           borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
         ),
         filled: true,
@@ -217,8 +256,31 @@ class FollowBackForm extends StatelessWidget {
     required ValueChanged<String> onChanged,
     required String? Function(String?)? validator,
     TextInputType inputType = TextInputType.text,
+    Widget? prefixIcon,
     int maxLines = 1,
   }) {
+    Widget? decoratedPrefixIcon;
+
+    if (prefixIcon != null) {
+      decoratedPrefixIcon = Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0, right: 8.0),
+            child: prefixIcon,
+          ),
+          const SizedBox(
+            height: 50,
+            width: 5,
+            child: VerticalDivider(
+              thickness: 1,
+              color: AppColors.primaryColor,
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+      );
+    }
     return TextFormField(
       keyboardType: inputType,
       maxLines: maxLines,
@@ -227,16 +289,22 @@ class FollowBackForm extends StatelessWidget {
       decoration: InputDecoration(
         // labelText: _formController.mobile.isEmpty ? "Enter mobile" : '',
         hintText: _formController.mobile.isEmpty ? "Enter mobile" : label,
+        hintStyle: TextStyle(color: AppColors.primaryColor),
+        prefixIcon: decoratedPrefixIcon,
+        prefixIconConstraints: const BoxConstraints(
+          minWidth: 0,
+          minHeight: 0,
+        ), //,
         labelStyle: const TextStyle(color: AppColors.secondaryColor),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20.0.r),
+          borderRadius: BorderRadius.circular(10.0.r),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20.0.r),
+          borderRadius: BorderRadius.circular(10.0.r),
           borderSide: const BorderSide(color: AppColors.primaryColor),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20.0.r),
+          borderRadius: BorderRadius.circular(10.0.r),
           borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
         ),
         filled: true,
@@ -318,15 +386,33 @@ class FollowBackForm extends StatelessWidget {
         }
       },
       child: Container(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.symmetric(horizontal: 5.w),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.primaryColor),
-          borderRadius: BorderRadius.circular(20.0.r),
+          borderRadius: BorderRadius.circular(10.0.r),
           color: AppColors.backgroundColor,
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            SvgPicture.asset(
+              'assets/images/calendar.svg',
+              height: 24,
+              width: 24,
+            ),
+            SizedBox(width: 12.w),
+            const SizedBox(
+              width: 5,
+              height: 50,
+              child: VerticalDivider(
+                width: 1,
+
+                // width: 1,
+                thickness: 1,
+                color: AppColors.primaryColor,
+              ),
+            ),
+            const SizedBox(width: 8),
             chooseDate
                 ? Obx(() => Text(
                       '${'Follow Up Date'}: ${selectedDate.value != null ? DateFormat('dd-MM-yyyy').format(selectedDate.value!) : '-'}',
@@ -336,21 +422,20 @@ class FollowBackForm extends StatelessWidget {
                     '${'Date'}: ${DateFormat('dd-MM-yyyy').format(DateTime.now())}',
                     style: const TextStyle(color: AppColors.primaryColor),
                   ),
-            const Icon(Icons.calendar_today, color: AppColors.primaryColor),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildContactStatusRadio() {
+  Widget _buildContactStatusRadio(bool isRestricted) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Contacted Status',
           style: TextStyle(
-            color: AppColors.secondaryColor,
+            color: AppColors.primaryColor,
             fontSize: 16.sp,
           ),
         ),
@@ -360,6 +445,12 @@ class FollowBackForm extends StatelessWidget {
                   value: 'Yes',
                   groupValue: _formController.contacted.value,
                   onChanged: (value) {
+                    isRestricted
+                        ? {
+                            _formController.contacted.value = value!,
+                            _remarkController.fetchRemarkStatus('1')
+                          }
+                        : {};
                     // _formController.contacted.value = value!;
                     // _remarkController.fetchRemarkStatus('1');
                   },
@@ -376,6 +467,12 @@ class FollowBackForm extends StatelessWidget {
                   value: 'No',
                   groupValue: _formController.contacted.value,
                   onChanged: (value) {
+                    isRestricted
+                        ? {
+                            _formController.contacted.value = value!,
+                            _remarkController.fetchRemarkStatus('2')
+                          }
+                        : {};
                     // _formController.contacted.value = value!;
                     // _remarkController.fetchRemarkStatus('2');
                   },
@@ -396,20 +493,21 @@ class FollowBackForm extends StatelessWidget {
   Widget _buildRemarkStatusDropdown() {
     return Obx(
       () => _remarkController.isLoading.value
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: LoadingPage())
           : DropdownButtonFormField<String>(
               decoration: InputDecoration(
-                labelText: 'Remark Status',
-                labelStyle: const TextStyle(color: AppColors.secondaryColor),
+                hintText: 'Remark Status',
+                hintStyle: const TextStyle(color: AppColors.primaryColor),
+                labelStyle: const TextStyle(color: AppColors.primaryColor),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20.0.r),
+                  borderRadius: BorderRadius.circular(10.0.r),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20.0.r),
+                  borderRadius: BorderRadius.circular(10.0.r),
                   borderSide: const BorderSide(color: AppColors.primaryColor),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20.0.r),
+                  borderRadius: BorderRadius.circular(10.0.r),
                   borderSide:
                       const BorderSide(color: AppColors.primaryColor, width: 2),
                 ),
@@ -422,7 +520,10 @@ class FollowBackForm extends StatelessWidget {
                 //     _remarkController.remarkStatusList.first.id ?? "";
                 return DropdownMenuItem<String>(
                   value: status.id, // Use the ID as the value
-                  child: Text(status.title ?? 'Select remark status'),
+                  child: Text(
+                    status.title ?? 'Select remark status',
+                    style: const TextStyle(color: AppColors.primaryColor),
+                  ),
                 );
               }).toList(),
               onChanged: (newValue) {
@@ -457,23 +558,45 @@ class FollowBackForm extends StatelessWidget {
   Widget _buildAllBankNamesDropdown() {
     return Obx(
       () => _formController.isLoading.value
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: LoadingPage())
           : SizedBox(
               width: double.infinity,
               child: DropdownButtonFormField<String>(
                 isExpanded: true,
+
                 decoration: InputDecoration(
-                  labelText: 'Select bank',
-                  labelStyle: const TextStyle(color: AppColors.secondaryColor),
+                  prefixIcon: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/images/bank.svg',
+                            height: 24,
+                            width: 24,
+                          ),
+                          SizedBox(width: 5.w),
+                          const VerticalDivider(
+                            thickness: 1,
+                            color: AppColors.primaryColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  hintText: "Select bank",
+                  hintStyle: const TextStyle(color: AppColors.primaryColor),
+                  labelStyle: const TextStyle(color: AppColors.primaryColor),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
+                    borderRadius: BorderRadius.circular(10.0.r),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
+                    borderRadius: BorderRadius.circular(10.0.r),
                     borderSide: const BorderSide(color: AppColors.primaryColor),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
+                    borderRadius: BorderRadius.circular(10.0.r),
                     borderSide: const BorderSide(
                         color: AppColors.primaryColor, width: 2),
                   ),
@@ -485,7 +608,8 @@ class FollowBackForm extends StatelessWidget {
                 items: _formController.allBankNamesList.map((bank) {
                   return DropdownMenuItem<String>(
                     value: bank.bankName,
-                    child: Text(bank.bankName ?? 'Select bank'),
+                    child: Text(bank.bankName ?? 'Select bank',
+                        style: TextStyle(color: AppColors.primaryColor)),
                   );
                 }).toList(),
                 onChanged: (newValue) {
@@ -531,7 +655,7 @@ class FollowBackForm extends StatelessWidget {
             ),
           ),
           child: _formController.isLoading.value
-              ? const CircularProgressIndicator(color: Colors.white)
+              ?const LoadingPage()
               : Text(
                   'Submit',
                   style: TextStyle(
@@ -545,8 +669,12 @@ class FollowBackForm extends StatelessWidget {
 
 // Constants class for colors
 class AppColors {
-  static const Color primaryColor = Color(0xFF2196F3);
+//  static const Color primaryColor = Color(0xFF2196F3);
+  static const Color primaryColor = Color(0xFF356EFF);
   static const Color secondaryColor = Color(0xFF757575);
   static const Color backgroundColor = Color(0xFFF5F5F5);
   static const Color ongoindCallColor = Color.fromARGB(255, 245, 43, 43);
+  static const Color greyColor = Color(0xFFF1F1F1);
+  static const Color greenColor = Color(0xFF00AB1A);
+  static const Color blackColor = Color.fromARGB(255, 23, 23, 23);
 }

@@ -37,6 +37,7 @@ class APIUrls {
   static const String productTypeList = "Auth/getproductlist";
   static const String dsaBanklist = "Auth/getloginbankbydsa";
   static const String bankerNamelist = "Auth/getBankerDetailsbyid";
+  static const String bankerNamedata = "Auth/getbanknamebyloginbank";
   static const String telecallerlist = 'Auth/gettelecallerdata';
   static const String statuslist = 'Auth/getleaddatastatus';
   static const String dataentrySave = 'Auth/savedataentry';

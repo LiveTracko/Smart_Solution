@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/models/banker_details_model.dart';
 import 'package:smart_solutions/models/banker_name_model.dart';
 import 'package:smart_solutions/models/customerData_mobileNumber.dart';
 import 'package:smart_solutions/models/data_entery_model.dart';
@@ -31,6 +32,7 @@ class DataController extends GetxController {
   RxString dataId = ''.obs;
   RxString dsaId = ''.obs;
   RxString Id = ''.obs;
+  RxString admin_subadmin_name = ''.obs;
   var dsaNameList = <DsaModel>[].obs;
   var dsaBankList = <DsaBank>[].obs;
   var producttypeList = <productData>[].obs;
@@ -47,6 +49,7 @@ class DataController extends GetxController {
   RxString selectedCaseType = ''.obs; // the selected value
   var loanAmount = ''.obs;
   var dob = ''.obs;
+  var selectedDsaId = ''.obs;
   var selectedproductType = ''.obs;
   var selectedBankName = ''.obs;
   var selectedBankerName = ''.obs;
@@ -74,10 +77,24 @@ class DataController extends GetxController {
   final String defaultTelecallerId = StaticStoredData.userId;
   //  "${StaticStoredData.userId}";
 
+// search variables
+  var showSearchField = false.obs; // 👈 observable toggle
+  var searchText = "".obs;
+
   @override
   void onInit() {
     super.onInit();
     _loadAllData();
+  }
+
+  void toggleSearch() {
+    showSearchField.value = !showSearchField.value;
+  }
+
+  void clearSearch() {
+    searchText.value = "";
+    showSearchField.value = false;
+    refreshData(); // 👈 reload without filter
   }
 
   Future<void> _loadAllData() async {
@@ -120,6 +137,11 @@ class DataController extends GetxController {
         'telecaller_id': defaultTelecallerId,
         'daterange': dateRange.isEmpty ? dateRange : selectedDateRange,
       };
+
+      // ✅ Add search filter
+      if (searchText.value.isNotEmpty) {
+        formData['search'] = searchText.value.trim();
+      }
 
       // Using POST request instead of GET since it requires form-data
       final response = await _apiService.postRequest(
@@ -319,7 +341,7 @@ class DataController extends GetxController {
     }
   }
 
-  Future<void> getBankerName(String id) async {
+  Future<void> getBankerDetailsName(String id) async {
     try {
       var body = {
         "id": id,
@@ -330,10 +352,40 @@ class DataController extends GetxController {
 
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body)['data'];
+        final List<BankerDetailsData> bankername =
+            responseData.map((e) => BankerDetailsData.fromJson(e)).toList();
+        if (bankername.isNotEmpty) {
+          selectedBankerName.value = bankername.first.bankerName.toString();
+          bankerMobile.value = bankername.first.mobile.toString();
+          bankerEmail.value = bankername.first.email.toString();
+          //      bankerNameList.assignAll(bankername);
+        }
+      }
+    } catch (e) {
+      logOutput('An error occurred while fetching source list: $e');
+      // Ensure loading is set to false on error as well
+    }
+  }
+
+  Future<void> getBankerNameByloginBank(String dsaId, String bankName) async {
+    try {
+      var body = {
+        "dsa_id": dsaId,
+        'bankName': bankName
+        //     "bankName": bankName,
+      };
+      var response =
+          await ApiService().postRequest(APIUrls.bankerNamedata, body);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> responseData = json.decode(response.body)['data'];
         final List<BankerNameData> bankername =
             responseData.map((e) => BankerNameData.fromJson(e)).toList();
         if (bankername.isNotEmpty) {
+          // selectedBankerName.value = bankername.first.bankerName.toString();
+          // contactNumber.value = bankername.first.mobile.toString();
           bankerNameList.assignAll(bankername);
+          // getBankerDetailsName(bankername.first.id);
         }
       }
     } catch (e) {
@@ -407,8 +459,10 @@ class DataController extends GetxController {
           selectedBankerName.value = entry.bankerName ?? '';
           selectedStatus.value = entry.status ?? '';
           selectedSource.value = entry.sourcing ?? '';
+          admin_subadmin_name.value = entry.adminSubAdminName ?? '';
 
           //      loginBank.value = entry.loginBank ?? '';
+
           bankName.value = entry.bankName ?? '';
           //   bankerName.value = entry.bankerName ?? '';
           bankerMobile.value = entry.bankerMobile ?? '';

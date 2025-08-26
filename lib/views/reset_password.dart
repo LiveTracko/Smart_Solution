@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/reset_password_controller.dart';
+import 'package:smart_solutions/widget/loading_page.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   @override
@@ -109,13 +110,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             ),
             const SizedBox(height: 15),
             Obx(() => controller.isLoading.value
-                ? Center(child: CircularProgressIndicator())
+                ? const LoadingPage()
                 : ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 50),
                     ),
                     onPressed: () => controller.resetPassword(),
-                    child: Text(
+                    child:const Text(
                       "Submit",
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),

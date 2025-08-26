@@ -19,6 +19,7 @@ class CurrencyUtils {
         locale: 'en_IN',
         symbol: '₹',
         decimalDigits: 0,
+        
       ).format(numericAmount);
     } catch (e) {
       logOutput("error occurred while formatting currency: $e");

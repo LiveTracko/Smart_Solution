@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:smart_solutions/views/dashboard_screen.dart';
+import 'package:smart_solutions/views/internet_checker.dart';
 import 'package:smart_solutions/views/navigationbar.dart';
 import 'package:smart_solutions/views/splash_screen.dart';
 import '../views/login_screen.dart';
@@ -19,12 +20,14 @@ class AppRoutes {
         final int pageIndex = args['pageIndex'] ?? 0;
         final String phone = args['phone']?.toString() ?? '';
 
-        return MainScreen(
-          pageIndex: pageIndex,
+        return InternetChecker(
+          child: MainScreen(
+            pageIndex: pageIndex,
+          ),
         );
       },
     ),
-    GetPage(name: login, page: () => const LoginView()),
-    GetPage(name: home, page: () => DashboardScreen()),
+    GetPage(name: login, page: () => const InternetChecker(child: LoginView())),
+    GetPage(name: home, page: () => InternetChecker(child: DashboardScreen())),
   ];
 }

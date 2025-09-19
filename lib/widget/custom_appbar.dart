@@ -26,7 +26,7 @@ class CurvedAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: SizedBox(
             height: preferredSize.height,
             child: Transform.translate(
-              offset: Offset(0, -20.h), // moves the whole row up
+              offset: Offset(0, -10.h), // moves the whole row up
               child: Row(
                 children: [
                   // Leading (menu/back)

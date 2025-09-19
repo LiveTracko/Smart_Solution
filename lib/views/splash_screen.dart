@@ -28,12 +28,13 @@ class _SplashScreenState extends State<SplashScreen> {
       'userId',
     ); // Retrieve user ID from Shared Preferences
     String? roleName = prefs.getString('roleName');
-
+    String? number = prefs.getString('userName');
     // Navigate to the appropriate screen after a delay
     Future.delayed(const Duration(seconds: 3), () {
       if (userId != null) {
         StaticStoredData.userId = userId;
         StaticStoredData.roleName = roleName ?? '';
+        StaticStoredData.number = number ?? '';
 
         Get.offAllNamed(AppRoutes.navigationscreen);
       } else {

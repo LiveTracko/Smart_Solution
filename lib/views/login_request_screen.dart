@@ -93,8 +93,7 @@ class LoginRequestScreen extends StatelessWidget {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color:
-                                  Colors.black.withOpacity(0.2), // Light shadow
+                              color: Colors.black.withOpacity(0.2),
                               offset: const Offset(0, 4), // Only downward
                               blurRadius: 8, // Softness
                               spreadRadius: 0, // No spread
@@ -239,17 +238,25 @@ class LoginRequestScreen extends StatelessWidget {
                                         color: (request.title ?? '')
                                                     .toLowerCase() ==
                                                 'not doable'
-                                            ? const Color.fromARGB(
-                                                255, 235, 52, 39)
-                                            : Colors.green,
+                                            ? Colors.redAccent.shade200
+                                            : Colors.green.shade400,
                                         borderRadius: BorderRadius.circular(5),
                                       ),
-                                      child: Text(
-                                          request.title!.isNotEmpty
-                                              ? request.title.toString()
-                                              : 'No status',
-                                          style: const TextStyle(
-                                              color: Colors.white)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 1),
+                                        child: Text(
+                                            request.title!.isNotEmpty
+                                                ? request.title.toString()
+                                                : 'No status',
+                                            style: TextStyle(color: Colors.white
+                                                //  (request.title ?? '')
+                                                //             .toLowerCase() ==
+                                                //         'not doable'
+                                                //     ? Colors.green.shade700
+                                                //     : Colors.orange.shade700,
+                                                )),
+                                      ),
                                     ),
                                     const Spacer(),
                                     Row(
@@ -362,6 +369,14 @@ class LoginRequestScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    // StaticStoredData.roleName != 'telecaller'
+                                    //     ? _buildDoubleRow(
+                                    //         iconLeft: SvgPicture.asset(
+                                    //         'assets/images/tellecaller_call.svg'),
+                                    //         valueLeft: request. ?? '',
+                                    //         iconRight: Icons.verified_user,
+                                    //         valueRight: data.tlName ?? '')
+                                    //     : const SizedBox.shrink(),
                                     _buildDoubleRow(
                                         iconLeft: SvgPicture.asset(
                                             'assets/images/grey_call_icon.svg'),

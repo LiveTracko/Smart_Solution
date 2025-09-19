@@ -1,5 +1,7 @@
 class APIUrls {
   static const String baseUrl = 'https://smartdial.co.in/api/index.php/';
+  static const String imagebaseUrl =
+      'https://smartdial.co.in/misadmin/uploads/profile_images/';
   // static const String baseUrl = 'https://smartsolutionsmumbai.com/mis/api/index.php/';
   static const String loginUrl = 'Auth/login_user';
   static const String apiKey = 'ftc_apikey@';
@@ -19,8 +21,8 @@ class APIUrls {
   static const String getRemarkList = 'Auth/login_remarklist';
   static const String newBaseUrl = 'https://smartdial.co.in/';
   static const String logoutCheck = 'Auth/useractivecheck';
-  static const String filteronMonthURL =
-      'https://smartdial.co.in/misadmin/api/index.php/Auth/getfollowuplist';
+  // static const String filteronMonthURL =
+  //     'https://smartdial.co.in/misadmin/api/index.php/Auth/getfollowuplist';
   static const String changePassword = "Auth/change_password";
   static const String activity = "Auth/useractivecheck";
   static const String sourcingList = "Auth/getdatasourcingapi";
@@ -31,7 +33,12 @@ class APIUrls {
   static const String pinCodelist = 'Auth/getpincodelist';
   static const String companylist = 'Auth/getcompanylist';
 
-  // adda dataentry
+  static const String callLoglist = 'Auth/getcalllog';
+  static const String callBacklist = 'Auth/getcallback';
+  static const String disbursmentlist = 'Auth/getdisbursementbyid';
+  static const String teamleaderlist = '/Auth/getallteamleader';
+
+  // add dataentry
 
   static const String dsaNameList = "Auth/getdsalist";
   static const String productTypeList = "Auth/getproductlist";
@@ -43,4 +50,11 @@ class APIUrls {
   static const String dataentrySave = 'Auth/savedataentry';
   static const String mobileByCustomeData = 'Auth/getmobilebycustomerdata';
   static const String teamLeadByTeamId = 'Auth/gettelecallerbyteamid';
+
+  //profile Update
+  static const String profileUpdate = 'Auth/profileupdate';
+  static const String fetchProfileImage = 'Auth/getfetchprofile';
+
+  //top disburse User
+  static const String topDisburseUser = "Auth/gettopdisburseduser";
 }

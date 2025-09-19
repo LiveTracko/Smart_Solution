@@ -18,7 +18,7 @@ class ApiService {
     final companyName = shared.get("companyname");
     final response = await http.get(
       Uri.parse(
-          "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}${companyName}/api/index.php/"}$endpoint"),
+          "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}$companyName/api/index.php/"}$endpoint"),
       headers: {
         "x-api-key": APIUrls.apiKey,
       },
@@ -160,7 +160,6 @@ class ApiService {
   Future<dynamic> checkUserStillLoggedIn() async {
     SharedPreferences shared = await SharedPreferences.getInstance();
     final companyName = shared.get("companyname");
-    
 
     // final tellecallerid = shared.getString("telecaller_id");
 

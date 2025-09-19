@@ -34,8 +34,6 @@ class LoginRequestForm extends StatelessWidget {
           controller.remarksList.clear();
           controller.isEdit.value = false;
           controller.isNew.value = false;
-          controller.currentId.value = '';
-
           controller.loginRequestDate = DateTime.now().obs;
           controller.telecallerId = StaticStoredData.userId.obs;
           controller.customerName.value = '';
@@ -45,7 +43,7 @@ class LoginRequestForm extends StatelessWidget {
           controller.loanAmount.value = '';
           controller.commonRemark.value = '';
           controller.remarksList.value = []; // To hold multiple remarks
-          controller.id = ''.obs;
+          controller.currentId = ''.obs;
           controller.sourceId.value = '';
         }
       },

@@ -89,8 +89,11 @@ class _ListingScreenState extends State<ListingScreen> {
               padding: const EdgeInsets.all(12.0),
               child: Column(children: [
                 TextField(
+                  key: ValueKey(toggleController.selectedIndex.value),
                   style: const TextStyle(color: Colors.black),
-                  keyboardType: TextInputType.text,
+                  keyboardType: toggleController.selectedIndex.value == 0
+                      ? TextInputType.text
+                      : TextInputType.number,
                   controller: searchController,
                   onChanged: (value) {
                     if (_debounce?.isActive ?? false) _debounce!.cancel();

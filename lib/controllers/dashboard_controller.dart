@@ -6,25 +6,38 @@ import 'package:intl/intl.dart';
 import 'package:smart_solutions/components/commons.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/models/call_time_model.dart';
 import 'package:smart_solutions/models/dashBoardToday_model.dart';
 import 'package:smart_solutions/models/getGroupStatus.dart';
+import 'package:smart_solutions/models/top_disburse_model.dart';
 import 'package:smart_solutions/services/api_service.dart';
 import '../components/dashboardgrid.dart';
 import '../constants/services.dart';
 
-class DashboardController extends GetxController {
+class DashboardController extends GetxController
+    with GetSingleTickerProviderStateMixin {
   var dateRangeList = <DateTime?>[].obs;
   final ApiService _apiService = ApiService();
   GetCallTimeModel callTimeModel = GetCallTimeModel();
   var isLoading = true.obs;
   RxString totalValActive = "0".obs;
   RxString totalNoValActive = "0".obs;
+
   RxString totalPicked = "0".obs;
   RxString totalNotPicked = "0".obs;
   RxString totalDuration = "0".obs;
+  RxString totalActiveCount = "0".obs;
+  RxString totalInActiveCount = "0".obs;
+
   RxString dateRange = ''.obs;
   RxString formattedDate = ''.obs;
+  late TabController tabController;
+  RxInt selectedTab = (-1).obs;
+  var isApiCalled = false.obs;
+
+  var topDisburserUser = <TopDisburseUser>[].obs;
+
   formateDate() {
     if (dateRangeList.length > 1 && dateRangeList.isNotEmpty) {
       String firstDate = '';
@@ -43,8 +56,10 @@ class DashboardController extends GetxController {
   }
 
   var isDrawerOpen = false.obs;
-  List<StatusGroupModel> activeList = [];
-  List<StatusGroupModel> inActiveList = [];
+
+  RxList<StatusGroupModel> activeList = <StatusGroupModel>[].obs;
+  RxList<StatusGroupModel> inActiveList = <StatusGroupModel>[].obs;
+
   List<TotalContact> totalContact = [];
   List<TotalNoContact> totalNoContact = [];
   List<TotalAttemptContact> totalAttempt = [];
@@ -52,9 +67,15 @@ class DashboardController extends GetxController {
   RxList<CallGraphModel> finalActiveNoCallList = <CallGraphModel>[].obs;
   RxList<CallGraphModel> finalTotalAttemptCallList = <CallGraphModel>[].obs;
 
+  double itemHeight = 55.h;
+
+  double get activeHeight => activeList.length * itemHeight;
+  double get inActiveHeight => inActiveList.length * itemHeight;
   // Store today's and monthly data sepa rately
-  var todayData = DashboardTodayModel().obs;
-  var monthlyData = DashboardMonthlyModel().obs;
+  // var todayData = DashboardTodayModel().obs;
+  // var monthlyData = DashboardMonthlyModel().obs;
+  var selectedIndex = 0.obs;
+
   Map<String, dynamic> timeMap = {
     "10 AM": null,
     "11 AM": null,
@@ -119,81 +140,120 @@ class DashboardController extends GetxController {
     isDrawerOpen.value = false;
 
     Future.microtask(() async {
-      fetchDashboardData(true); // Fetch monthly data
-      fetchDashboardData(false); // Fetch today’s data
-      await getActiveData(status: 1);
-      await getActiveData(status: 2);
-      getTimeGraph();
+      isApiCalled.value = true;
+
+      try {
+        // await fetchDashboardData(true); // Fetch monthly data
+        // await fetchDashboardData(false); // Fetch today’s data
+        await getActiveData(status: 1);
+        await getActiveData(status: 2);
+        await getTimeGraph();
+        await getTopDisburseUser();
+      } catch (e) {
+        logOutput('Error fetching dashboard data: $e');
+      } finally {
+        isLoading.value = false;
+      }
     });
 
     super.onInit();
   }
 
-  Future<void> fetchDashboardData(bool isMonthly) async {
-    try {
-      //   isLoading(true);
-      DateTime now = DateTime.now();
-      DateTime startDate = DateTime(now.year, now.month, 1);
+  // Future<void> fetchDashboardData(bool isMonthly) async {
+  //   //FollowBackFormController followBackFormController = Get.find();
+  //   try {
+  //     isLoading(true);
+  //     DateTime now = DateTime.now();
+  //     DateTime startDate = DateTime(now.year, now.month, 1);
 
-      String dateRange = isMonthly
-          ? '${DateFormat('dd-MM-yyyy').format(startDate)},${DateFormat('dd-MM-yyyy').format(now)}'
-          : '${DateFormat('dd-MM-yyyy').format(now)},${DateFormat('dd-MM-yyyy').format(now)}';
+  //     String dateRange = isMonthly
+  //         ? '${DateFormat('dd-MM-yyyy').format(startDate)},${DateFormat('dd-MM-yyyy').format(now)}'
+  //         : '${DateFormat('dd-MM-yyyy').format(now)},${DateFormat('dd-MM-yyyy').format(now)}';
 
-      final requestData = {
-        'telecaller_id': StaticStoredData.userId,
-        'daterange': dateRange,
-      };
+  //     final requestData = {
+  //       'telecaller_id': StaticStoredData.userId,
+  //       'daterange': dateRange,
+  //     };
 
-      final response =
-          await _apiService.postRequest(APIUrls.todaysDashboard, requestData);
+  //     final response =
+  //         await _apiService.postRequest(APIUrls.todaysDashboard, requestData);
 
-      if (response.statusCode == 200) {
-        final decodedResponse = json.decode(response.body);
+  //     if (response.statusCode == 200) {
+  //       final decodedResponse = json.decode(response.body);
 
-        if (isMonthly) {
-          monthlyData.value = DashboardMonthlyModel.fromJson(decodedResponse);
-        } else {
-          todayData.value = DashboardTodayModel.fromJson(decodedResponse);
-          //      totalDuration.value = todayData
-        }
-      } else if (response.statusCode == 204) {
-        Get.snackbar(
-          'Opps',
-          'No Data Found',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red[100],
-          colorText: Colors.red[900],
-          duration: const Duration(seconds: 3),
-        );
-      } else {
-        throw Exception('Server returned ${response.statusCode}');
-      }
-    } catch (e) {
-      // Get.snackbar(
-      //   'Error',
-      //   'Failed to load dashboard data',
-      //   snackPosition: SnackPosition.BOTTOM,
-      //   backgroundColor: Colors.red[100],
-      //   colorText: Colors.red[900],
-      //   duration: const Duration(seconds: 3),
-      // );
-      logOutput('Error fetching dashboard data: $e');
-    } finally {
-      //  isLoading(false);
-    }
-  }
+  //       if (isMonthly) {
+  //         monthlyData.value = DashboardMonthlyModel.fromJson(decodedResponse);
+  //       } else {
+  //         todayData.value = DashboardTodayModel.fromJson(decodedResponse);
+  //         //      totalDuration.value = todayData
+  //       }
+  //     } else if (response.statusCode == 204) {
+  //       Get.snackbar(
+  //         'Opps',
+  //         'No Data Found',
+  //         snackPosition: SnackPosition.BOTTOM,
+  //         backgroundColor: Colors.red[100],
+  //         colorText: Colors.red[900],
+  //         duration: const Duration(seconds: 3),
+  //       );
+  //     } else {
+  //       throw Exception('Server returned ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     // Get.snackbar(
+  //     //   'Error',
+  //     //   'Failed to load dashboard data',
+  //     //   snackPosition: SnackPosition.BOTTOM,
+  //     //   backgroundColor: Colors.red[100],
+  //     //   colorText: Colors.red[900],
+  //     //   duration: const Duration(seconds: 3),
+  //     // );
+  //     logOutput('Error fetching dashboard data: $e');
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
 
+  
+  
   void toggleDrawer() {
     isDrawerOpen.value = !isDrawerOpen.value;
   }
 
   getActiveData({required int status}) async {
+    FollowBackFormController followBackFormController = Get.find();
     isLoading(true);
+
+    final String dateRage = dateRangeList.isNotEmpty &&
+            dateRangeList.first != null &&
+            dateRangeList.last != null
+        ? "${dateRangeList.first},${dateRangeList.last}"
+        : "";
     try {
       final requestData = {
         "status": "$status",
-        "telecaller_id": StaticStoredData.userId
+        //  "telecaller_id": StaticStoredData.userId,
+        'daterange': dateRage,
       };
+
+      bool hasValidTelecaller = false;
+      //Add telecaller IDs dynamically if the list is not empty
+      if (followBackFormController.selectedtellecaller.isNotEmpty) {
+        for (var i = 0;
+            i < followBackFormController.selectedtellecaller.length;
+            i++) {
+          final telecallerId = followBackFormController.selectedtellecaller[i];
+
+          requestData["telecaller_ids[$i]"] = telecallerId;
+          hasValidTelecaller = true;
+        }
+      }
+
+      // If no valid telecaller IDs were added, fallback to current user
+      if (!hasValidTelecaller) {
+        requestData['telecaller_id'] = StaticStoredData.userId;
+      }
+
       final response =
           await _apiService.postRequest(APIUrls.getUserGroup, requestData);
       final decodedResponse = json.decode(response.body);
@@ -266,11 +326,23 @@ class DashboardController extends GetxController {
     return val;
   }
 
+  String capitalizeWords(String text) {
+    if (text.isEmpty) return "";
+    return text
+        .split(" ")
+        .map((word) => word.isEmpty
+            ? ""
+            : "${word[0].toUpperCase()}${word.substring(1).toLowerCase()}")
+        .join(" ");
+  }
+
   getTotalPriceCount(List<StatusGroupModel> list, int status) {
     if (status == 1) {
       totalValActive.value = '0';
+      totalActiveCount.value = "0";
     } else {
       totalNoValActive.value = '0';
+      totalInActiveCount.value = '0';
     }
     int totalI = status == 1
         ? int.tryParse(totalValActive.value) ?? 0
@@ -278,10 +350,24 @@ class DashboardController extends GetxController {
     double totalD = status == 1
         ? double.tryParse(totalValActive.value) ?? 0
         : double.tryParse(totalNoValActive.value) ?? 0;
+
+    int countI = status == 1
+        ? int.parse(totalActiveCount.toString())
+        : int.parse(totalInActiveCount.toString());
+
+    int countD = status == 1
+        ? int.parse(totalActiveCount.toString())
+        : int.parse(totalInActiveCount.toString());
+
     for (var i in list) {
       try {
+        int? count = int.tryParse('${i.filecount}');
         int? val = int.tryParse("${i.totalLoanAmount}");
         // double? vals = double.tryParse("${i.totalLoanAmount}");
+
+        if (count != null) {
+          countI += count;
+        }
         if (val != null) {
           totalI += val;
         } else {
@@ -302,9 +388,22 @@ class DashboardController extends GetxController {
             : totalD != 0
                 ? "$totalD"
                 : "0.0";
+
+    status == 1
+        ? totalActiveCount.value = countI != 0
+            ? "$countI"
+            : countD != 0
+                ? "$countD"
+                : "0"
+        : totalInActiveCount.value = countI != 0
+            ? "$countI"
+            : countD != 0
+                ? "$countD"
+                : "0";
   }
 
   getTimeGraph() async {
+    FollowBackFormController followBackFormController = Get.find();
     timeMap = dateRangeList.length > 1 && dateRange.isNotEmpty
         ? {}
         : {
@@ -322,9 +421,28 @@ class DashboardController extends GetxController {
     isLoading(true);
     try {
       final requestData = {
-        "telecaller_id": StaticStoredData.userId,
+        //   "telecaller_id": StaticStoredData.userId,
         "daterange": dateRange.value
       };
+
+      bool hasValidTelecaller = false;
+      //Add telecaller IDs dynamically if the list is not empty
+      if (followBackFormController.selectedtellecaller.isNotEmpty) {
+        for (var i = 0;
+            i < followBackFormController.selectedtellecaller.length;
+            i++) {
+          final telecallerId = followBackFormController.selectedtellecaller[i];
+
+          requestData["telecaller_ids[$i]"] = telecallerId;
+          hasValidTelecaller = true;
+        }
+      }
+
+      // If no valid telecaller IDs were added, fallback to current user
+      if (!hasValidTelecaller) {
+        requestData['telecaller_id'] = StaticStoredData.userId;
+      }
+
       totalContact.clear();
       totalNoContact.clear();
       totalAttempt.clear();
@@ -493,6 +611,56 @@ class DashboardController extends GetxController {
       customLog("error while parsing data $e", name: "getTimeGraph");
     }
     isLoading(false);
+  }
+
+  Future<void> getTopDisburseUser() async {
+    isLoading.value = true;
+
+    final String dateRage = dateRangeList.isNotEmpty &&
+            dateRangeList.first != null &&
+            dateRangeList.last != null
+        ? "${dateRangeList.first},${dateRangeList.last}"
+        : "";
+
+    bool hasValidTelecaller = false;
+    final formdata = {
+      "daterange": dateRage,
+    };
+
+    //Add telecaller IDs dynamically if the list is not empty
+    // if (selectedtellecaller.isNotEmpty) {
+    //   for (var i = 0; i < selectedtellecaller.length; i++) {
+    //     final telecallerId = selectedtellecaller[i];
+
+    //     formdata["telecaller_ids[$i]"] = telecallerId;
+    //     hasValidTelecaller = true;
+    //   }
+    // }
+
+    // If no valid telecaller IDs were added, fallback to current user
+    if (!hasValidTelecaller) {
+      formdata['telecaller_id'] = StaticStoredData.userId;
+    }
+    try {
+      final response =
+          await _apiService.postRequest(APIUrls.topDisburseUser, formdata);
+
+      debugPrint(
+          "FollowUp calllog Response => ${response.statusCode}: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final topDisburseUser = TopDisburseUser.fromJson(responseData);
+
+        topDisburserUser.assign(topDisburseUser);
+      } else {
+        logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      logOutput("Exception while fetching follow-back list: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Widget buildChunkedGrid(List<StatusGroupModel> items, int itemsPerRow) {

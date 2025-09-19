@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // Add this import
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 
 class KeypadRowWidget extends StatelessWidget {
@@ -30,12 +30,10 @@ class KeypadRowWidget extends StatelessWidget {
     return Expanded(
       child: Container(
         margin: EdgeInsets.all(0.w), // Responsive margin
-        padding: EdgeInsets.all(3.w),
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 8.0),
+        decoration: const BoxDecoration(shape: BoxShape.circle),
         child: CircleAvatar(
-          radius: 32,
+          radius: 33,
           backgroundColor: AppColors.secondayColor,
           child: Material(
             color: AppColors.greyColor,
@@ -50,11 +48,12 @@ class KeypadRowWidget extends StatelessWidget {
                 width: 64,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 0.0,
                   children: [
                     Text(
                       number,
                       style: TextStyle(
-                        fontSize: 20.sp, // Responsive font size
+                        fontSize: 26.sp, // Responsive font size
                         color: AppColors.secondayColor,
                         fontWeight: FontWeight.bold,
                       ),

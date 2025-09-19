@@ -6,11 +6,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
+import 'package:smart_solutions/controllers/profile_controller.dart';
 import 'package:smart_solutions/models/dashBoardToday_model.dart';
 import 'package:smart_solutions/views/dashboard_screen.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
-import 'package:smart_solutions/views/report_page.dart';
+import 'package:smart_solutions/views/profile_screen.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -22,6 +23,8 @@ class CustomDrawer extends StatefulWidget {
 class _CustomDrawerState extends State<CustomDrawer> {
   final DashboardController _dashboardController =
       Get.put(DashboardController());
+
+  final ProfileController _profileController = Get.put(ProfileController());
   String _userName = ""; // Default text while loading
 
   @override
@@ -70,21 +73,36 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.indigo.shade700,
-                          child: Text(
-                            _userName.isNotEmpty
-                                ? _userName[0].toUpperCase()
-                                : "A",
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                        InkWell(
+                          onTap: () => Get.to(() => UpdateProfilePage()),
+                          child: CircleAvatar(
+                            radius: 35,
+                            backgroundColor: Colors.indigo.shade700,
+                            backgroundImage: _profileController
+                                        .imageFile.value !=
+                                    null
+                                ? FileImage(_profileController.imageFile.value!)
+                                : (_profileController
+                                        .profileImageUrl.value.isNotEmpty
+                                    ? NetworkImage(_profileController
+                                        .profileImageUrl.value)
+                                    : const AssetImage(
+                                            "assets/images/app_login.png")
+                                        as ImageProvider),
+
+                            //  Text(
+                            //   _userName.isNotEmpty
+                            //       ? _userName[0].toUpperCase()
+                            //       : "A",
+                            //   style: const TextStyle(
+                            //     fontSize: 18,
+                            //     fontWeight: FontWeight.bold,
+                            //     color: Colors.white,
+                            //   ),
+                            // ),
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 11),
                         Text(
                           _userName.toUpperCase(),
                           style: const TextStyle(
@@ -103,11 +121,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     title: const Text('Listing'),
                     onTap: () => Get.to(() => const ListingScreen()),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.list),
-                    title: const Text('Reports'),
-                    onTap: () => Get.to(() => const ReportPage()),
-                  ),
+                  // ListTile(
+                  //   leading: const Icon(Icons.list),
+                  //   title: const Text('Reports'),
+                  //   onTap: () => Get.to(() => const ReportPage()),
+                  // ),
                   if (StaticStoredData.roleName == 'telecaller')
                     ListTile(
                       leading: const Icon(Icons.supervisor_account_rounded),

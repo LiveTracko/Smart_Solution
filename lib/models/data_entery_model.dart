@@ -57,6 +57,7 @@ class Data {
   String? calculationId;
   String? invoiceNumber;
   String? bankName;
+  String? dataStatus;
   String? dataEntryStatus;
 
   // Constructor with named parameters
@@ -97,6 +98,7 @@ class Data {
     this.calculationId,
     this.invoiceNumber,
     this.bankName,
+    this.dataStatus,
     this.dataEntryStatus,
   });
 
@@ -140,6 +142,7 @@ class Data {
       calculationId: json['calculationid'],
       invoiceNumber: json['invoice_number'],
       bankName: json['bank_name'],
+      dataStatus: json['data_status_text'],
       dataEntryStatus: json['data_entry_status'],
     );
   }
@@ -172,8 +175,8 @@ class Data {
       'teleCallerName': teleCallerName,
       'teleCallerid': teleCallerId,
       'teamLeader': teamLeader,
-      'product_type':productType,
-      'sourcing':sourcing,
+      'product_type': productType,
+      'sourcing': sourcing,
       'status': status,
       'comment_data': comments,
       'invoice_id': invoiceId,
@@ -184,6 +187,7 @@ class Data {
       'calculationid': calculationId,
       'invoice_number': invoiceNumber,
       'bank_name': bankName,
+      'data_status_text': dataStatus,
       'data_entry_status': dataEntryStatus,
     };
   }

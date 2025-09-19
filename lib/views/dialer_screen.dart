@@ -169,15 +169,34 @@ class _DialerScreenState extends State<DialerScreen> {
                     ),
                   )),
               Padding(
-                padding: EdgeInsets.all(16.0.w),
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Obx(() {
                   return Column(
                     children: [
                       Center(
-                        child: Text(
-                          dialerController.phoneNumber.value.isEmpty
-                              ? 'Enter number'
-                              : dialerController.phoneNumber.value,
+                        child: TextField(
+                          textAlign: TextAlign.center,
+                          controller: TextEditingController(
+                              text:
+                                  // dialerController.phoneNumber.value.isEmpty
+                                  //     ? 'Enter number'
+                                  //     :
+                                  dialerController.phoneNumber.value),
+                          // onChanged: (value) {
+                          //   dialerController.phoneNumber.value = value;
+                          // },
+                          decoration: InputDecoration(
+                            border: InputBorder.none, // looks like plain Text
+                            hintText: "Enter number",
+                            hintStyle: TextStyle(
+                              fontSize: 20.sp,
+                              color: AppColors.secondaryColor.withOpacity(0.5),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          enableInteractiveSelection:
+                              true, // enables copy/paste menu
+
                           style: TextStyle(
                             fontSize: 20.sp,
                             color: AppColors.secondaryColor,
@@ -274,17 +293,69 @@ class _DialerScreenState extends State<DialerScreen> {
                   ],
                 ),
               ),
-              SizedBox(
-                height: 10.h,
-              ),
+
               // Call and delete buttons
               Padding(
-                padding: EdgeInsets.only(bottom: 0.h, left: 40.h, right: 50.h),
+                padding: EdgeInsets.only(bottom: 0.h, left: 20.w, right: 50.w),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 0.w, vertical: 8.0),
+                      child: Obx(() {
+                        return dialerController.isManual.value
+                            ? const SizedBox.shrink()
+                            : _buildIconNextCallButton(
+                                Icons.headphones_outlined,
+                                AppColors.primaryColor,
+                                dialerController.isManual.value
+                                    ? null
+                                    : dialerController.isLoading.value
+                                        ? null
+                                        : () async {
+                                            dialerController.isCallOngoing.value
+                                                ? Get.defaultDialog(
+                                                    title: "End Call",
+                                                    titleStyle: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize:
+                                                            20), // Bold title for emphasis.
+                                                    middleText:
+                                                        "Want to end the call? End the call from the caller screen.", // Updated guiding message.
+                                                    middleTextStyle:
+                                                        const TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize:
+                                                                16), // Clear and readable middle text.
+                                                    backgroundColor: Colors
+                                                        .white, // Dialog background in white.
+                                                    textConfirm:
+                                                        "OK", // Single button labeled 'OK'.
+                                                    confirmTextColor: Colors
+                                                        .white, // Confirm button text in white.
+                                                    buttonColor: Colors
+                                                        .blue, // 'OK' button in blue for neutrality.
+                                                    barrierDismissible:
+                                                        false, // Prevent accidental dismiss by tapping outside.
+                                                    onConfirm: () {
+                                                      Get.back(); // Simply close the dialog.
+                                                    },
+                                                  )
+                                                : await dialerController
+                                                    .fetchNextPhoneNumber();
+                                          },
+                              );
+                      }),
+                    ),
+
                     Obx(() => _buildCallButton(
-                          SvgPicture.asset('assets/images/call_icon.svg'),
+                          SvgPicture.asset(
+                            'assets/images/call_icon.svg',
+                            height: 150,
+                          ),
                           dialerController.phoneNumber.isNotEmpty &&
                                   !dialerController.isCallOngoing.value
                               ? () {
@@ -301,7 +372,7 @@ class _DialerScreenState extends State<DialerScreen> {
                                 }
                               : null,
                         )),
-                    SizedBox(width: 5.sp),
+                    SizedBox(width: 10.sp),
                     // Obx(() => Expanded(
                     //       child: ElevatedButton(
                     //         style: ElevatedButton.styleFrom(
@@ -365,10 +436,11 @@ class _DialerScreenState extends State<DialerScreen> {
                     //     )),
 
                     SizedBox(
-                      width: 20.sp,
+                      width: 5.sp,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(right: 10),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 5.w, vertical: 8.0),
                       child: _buildIconButton(
                         Icons.backspace_outlined,
                         AppColors.greyColor,
@@ -382,74 +454,75 @@ class _DialerScreenState extends State<DialerScreen> {
                 height: 10.h,
               ),
 
-              Obx(() => dialerController.isManual.value
-                  ? const SizedBox.shrink()
-                  : Padding(
-                      padding:
-                          EdgeInsets.only(bottom: 0.h, left: 20.h, right: 20.h),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                dialerController.isCallOngoing.value
-                                    ? AppColors.ongoindCallColor
-                                    : AppColors.primaryColor,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: 16.h),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                          ),
-                          onPressed: dialerController.isManual.value
-                              ? null
-                              : dialerController.isLoading.value
-                                  ? null
-                                  : () async {
-                                      dialerController.isCallOngoing.value
-                                          ? Get.defaultDialog(
-                                              title: "End Call",
-                                              titleStyle: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize:
-                                                      20), // Bold title for emphasis.
-                                              middleText:
-                                                  "Want to end the call? End the call from the caller screen.", // Updated guiding message.
-                                              middleTextStyle: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize:
-                                                      16), // Clear and readable middle text.
-                                              backgroundColor: Colors
-                                                  .white, // Dialog background in white.
-                                              textConfirm:
-                                                  "OK", // Single button labeled 'OK'.
-                                              confirmTextColor: Colors
-                                                  .white, // Confirm button text in white.
-                                              buttonColor: Colors
-                                                  .blue, // 'OK' button in blue for neutrality.
-                                              barrierDismissible:
-                                                  false, // Prevent accidental dismiss by tapping outside.
-                                              onConfirm: () {
-                                                Get.back(); // Simply close the dialog.
-                                              },
-                                            )
-                                          : await dialerController
-                                              .fetchNextPhoneNumber();
-                                    },
-                          child: dialerController.isLoading.value
-                              ? const Text('Loading...')
-                              : Text(
-                                  dialerController.isCallOngoing.value
-                                      ? "End Call"
-                                      : 'NEXT CALL',
-                                  style: TextStyle(
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                        ),
-                      ),
-                    ))
+              // Obx(() => dialerController.isManual.value
+              //     ? const SizedBox.shrink()
+              //     : Padding(
+              //         padding:
+              //             EdgeInsets.only(bottom: 0.h, left: 20.h, right: 20.h),
+              //         child: SizedBox(
+              //           width: double.infinity,
+              //           child: ElevatedButton(
+              //             style: ElevatedButton.styleFrom(
+              //               backgroundColor:
+              //                   dialerController.isCallOngoing.value
+              //                       ? AppColors.ongoindCallColor
+              //                       : AppColors.primaryColor,
+              //               foregroundColor: Colors.white,
+              //               padding: EdgeInsets.symmetric(vertical: 16.h),
+              //               shape: RoundedRectangleBorder(
+              //                 borderRadius: BorderRadius.circular(12.r),
+              //               ),
+              //             ),
+              //             onPressed: dialerController.isManual.value
+              //                 ? null
+              //                 : dialerController.isLoading.value
+              //                     ? null
+              //                     : () async {
+              //                         dialerController.isCallOngoing.value
+              //                             ? Get.defaultDialog(
+              //                                 title: "End Call",
+              //                                 titleStyle: const TextStyle(
+              //                                     color: Colors.black,
+              //                                     fontWeight: FontWeight.bold,
+              //                                     fontSize:
+              //                                         20), // Bold title for emphasis.
+              //                                 middleText:
+              //                                     "Want to end the call? End the call from the caller screen.", // Updated guiding message.
+              //                                 middleTextStyle: const TextStyle(
+              //                                     color: Colors.black,
+              //                                     fontSize:
+              //                                         16), // Clear and readable middle text.
+              //                                 backgroundColor: Colors
+              //                                     .white, // Dialog background in white.
+              //                                 textConfirm:
+              //                                     "OK", // Single button labeled 'OK'.
+              //                                 confirmTextColor: Colors
+              //                                     .white, // Confirm button text in white.
+              //                                 buttonColor: Colors
+              //                                     .blue, // 'OK' button in blue for neutrality.
+              //                                 barrierDismissible:
+              //                                     false, // Prevent accidental dismiss by tapping outside.
+              //                                 onConfirm: () {
+              //                                   Get.back(); // Simply close the dialog.
+              //                                 },
+              //                               )
+              //                             : await dialerController
+              //                                 .fetchNextPhoneNumber();
+              //                       },
+
+              //             child: dialerController.isLoading.value
+              //                 ? const Text('Loading...')
+              //                 : Text(
+              //                     dialerController.isCallOngoing.value
+              //                         ? "End Call"
+              //                         : 'NEXT CALL',
+              //                     style: TextStyle(
+              //                         fontSize: 16.sp,
+              //                         fontWeight: FontWeight.bold),
+              //                   ),
+              //           ),
+              //         ),
+              //       )),
             ]),
       ),
     );
@@ -457,29 +530,51 @@ class _DialerScreenState extends State<DialerScreen> {
 
   Widget _buildIconButton(IconData icon, Color color, VoidCallback? onPressed) {
     return Container(
-      width: 65.w,
-      height: 65.h,
+      width: 70.w,
+      height: 70.h,
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
       ),
       child: IconButton(
         icon: Icon(icon, color: AppColors.secondaryColor),
-        iconSize: 25.r,
+        iconSize: 30.r,
+        onPressed: onPressed,
+      ),
+    );
+  }
+
+  Widget _buildIconNextCallButton(
+      IconData icon, Color color, VoidCallback? onPressed) {
+    return Container(
+      width: 70.w,
+      height: 70.h,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: AppColors.backgroundColor),
+        iconSize: 30.r,
         onPressed: onPressed,
       ),
     );
   }
 
   Widget _buildCallButton(Widget icon, VoidCallback? onPressed) {
-    return SizedBox(
-      width: 80.w,
-      height: 80.h,
-      child: IconButton(
-        icon: icon,
-        // Icon(icon, color: AppColors.secondaryColor),
-        iconSize: 25.r,
-        onPressed: onPressed,
+    return Padding(
+      padding: EdgeInsets.only(left: 17.w),
+      child: Container(
+        width: 85.w,
+        height: 85.h,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+        ),
+        child: IconButton(
+          icon: icon,
+          iconSize: 45.r,
+          onPressed: onPressed,
+        ),
       ),
     );
   }

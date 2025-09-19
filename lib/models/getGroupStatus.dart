@@ -32,12 +32,12 @@ class StatusGroupModel {
 
   StatusGroupModel(
       {this.id,
-        this.StatusGroupModelName,
-        this.status,
-        this.sequenceNo,
-        this.seqNoNumeric,
-        this.totalLoanAmount,
-        this.filecount});
+      this.StatusGroupModelName,
+      this.status,
+      this.sequenceNo,
+      this.seqNoNumeric,
+      this.totalLoanAmount,
+      this.filecount});
 
   StatusGroupModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];

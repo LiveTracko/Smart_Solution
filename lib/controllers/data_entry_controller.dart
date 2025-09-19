@@ -40,6 +40,8 @@ class DataController extends GetxController {
   var bankerNameList = <BankerNameData>[].obs;
   var telecallerlist = <TellecallerData>[].obs;
   var statuslist = <statusData>[].obs;
+  var allstatuslist = <statusData>[].obs;
+  RxList filterLeadStatus = [].obs;
   var date = ''.obs;
   var contactNumber = ''.obs;
   var customerName = ''.obs;
@@ -89,6 +91,10 @@ class DataController extends GetxController {
 
   void toggleSearch() {
     showSearchField.value = !showSearchField.value;
+    if (!showSearchField.value) {
+      searchText.value = "";
+      refreshData();
+    }
   }
 
   void clearSearch() {
@@ -99,6 +105,7 @@ class DataController extends GetxController {
 
   Future<void> _loadAllData() async {
     try {
+      isLoading(true);
       await Future.wait([
         fetchDataEntryList(),
         getDsaNameList(),
@@ -106,9 +113,30 @@ class DataController extends GetxController {
         getTelecallerData(),
         getStatusData(),
       ]);
-      isLoading(false);
     } catch (e) {
       logOutput("Error loading data: $e");
+    } finally {
+      isLoading(false); // 👈 stop loading in all cases
+    }
+  }
+
+  var selectedStatuses = <String>[].obs;
+
+  void toggleStatus(String status) {
+    if (selectedStatuses.contains(status)) {
+      selectedStatuses.remove(status);
+    } else {
+      selectedStatuses.add(status);
+    }
+  }
+
+  Future<void> applyStatusFilter() async {
+    try {
+      isLoading(true);
+      dataList.clear();
+      await fetchDataEntryList();
+    } finally {
+      isLoading(false);
     }
   }
 
@@ -138,11 +166,17 @@ class DataController extends GetxController {
         'daterange': dateRange.isEmpty ? dateRange : selectedDateRange,
       };
 
-      // ✅ Add search filter
+      //  Add search filter
       if (searchText.value.isNotEmpty) {
         formData['search'] = searchText.value.trim();
       }
 
+      //  Add dynamic status list using loop
+      if (selectedStatuses.isNotEmpty) {
+        for (var i = 0; i < selectedStatuses.length; i++) {
+          formData["status[$i]"] = selectedStatuses[i];
+        }
+      }
       // Using POST request instead of GET since it requires form-data
       final response = await _apiService.postRequest(
         APIUrls.dataEntryFeild,
@@ -156,6 +190,10 @@ class DataController extends GetxController {
         final dataEntryModel = DataEntryModel.fromJson(responseData);
         if (dataEntryModel.data != null) {
           dataList.assignAll(dataEntryModel.data!);
+
+          filterLeadStatus.assignAll(
+            dataList.map((e) => e.dataEntryStatus).toSet().toList(),
+          );
         }
       } else if (response.statusCode == 204) {
         Get.snackbar(
@@ -176,10 +214,17 @@ class DataController extends GetxController {
     } finally {}
   }
 
-  // Refresh data
   Future<void> refreshData() async {
-    dataList.clear();
-    await fetchDataEntryList();
+    try {
+      isLoading(true); // start loading
+      selectedStatuses.clear();
+      dataList.clear();
+      await fetchDataEntryList();
+    } catch (e) {
+      logOutput("Error: $e");
+    } finally {
+      isLoading(false); // stop loading
+    }
   }
 
   // Search functionality

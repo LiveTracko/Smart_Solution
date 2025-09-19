@@ -14,7 +14,7 @@ class LoginViewModel extends GetxController {
   var usernameController = TextEditingController();
   var passwordController = TextEditingController();
 
-  Rxn<int> secureType = Rxn<int>(); // Initialize with null
+  Rxn<int> secureType = Rxn<int>(0); // Initialize with null
   var isLoading = false.obs;
   final ApiService _apiService = ApiService(); // ApiService instance
   final DashboardController dashboardController =
@@ -51,8 +51,12 @@ class LoginViewModel extends GetxController {
           String roleName =
               responseData['profile']['data']['profile']['role_name'];
 
+          String number =
+              responseData['profile']['data']['profile']['username'];
+
           StaticStoredData.userId = userId;
           StaticStoredData.roleName = roleName;
+          StaticStoredData.number = number;
           // Store the user ID locally using Shared Preferences
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('userId', userId);
@@ -68,8 +72,8 @@ class LoginViewModel extends GetxController {
           await prefs.setString(
               'companyname', responseData['profile']['companyname'].toString());
           // Navigate to the MainScreen on successful login
-          dashboardController.fetchDashboardData(false);
-          dashboardController.fetchDashboardData(true);
+          // dashboardController.fetchDashboardData(false);
+          // dashboardController.fetchDashboardData(true);
           Get.off(() => MainScreen());
           showDialog(
               context: (Get.context!),

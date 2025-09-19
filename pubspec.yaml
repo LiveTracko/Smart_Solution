@@ -42,7 +42,7 @@ dependencies:
   http: ^1.2.2
   shared_preferences: ^2.3.2
   flutter_animated_dialog: ^2.0.1
-  lottie: ^3.1.2
+  lottie: ^3.3.1
   flutter_launcher_icons: ^0.14.4
   phone_state: ^2.1.1
   permission_handler: ^11.3.1
@@ -57,7 +57,8 @@ dependencies:
   connectivity_plus: ^6.1.4
   flutter_svg: ^2.0.13
   google_fonts: ^6.3.0
-
+  image_picker: ^1.0.4
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

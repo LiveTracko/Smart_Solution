@@ -1,52 +1,98 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
+import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/controllers/notification_controller.dart';
+import 'package:smart_solutions/controllers/profile_controller.dart';
 import 'package:smart_solutions/models/dashBoardToday_model.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
+import 'package:smart_solutions/views/data_entry_screen.dart'
+    show DataEntryViewScreen;
 import 'package:smart_solutions/views/notification_screen.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
+import 'package:smart_solutions/widget/image_helper.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
+import 'package:smart_solutions/widget/tellecaller_filter.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../models/getGroupStatus.dart';
 import '../models/FollowUpSubmittedList.dart' as followuplist;
 
 class DashboardScreen extends StatefulWidget {
-  DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({Key? key}) : super(key: key);
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends State<DashboardScreen>
+    with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   final DashboardController controller = Get.put(DashboardController());
   final FollowBackFormController followBackFormController =
       Get.put(FollowBackFormController());
 
+  final DialerController _dialerController = Get.put(DialerController());
+  final DataController dataController = Get.put(DataController());
+
+  final ProfileController profileController = Get.put(ProfileController());
+
   @override
   void initState() {
     controller.onInit();
-    if (StaticStoredData.roleName == 'telecaller') {
-      followBackFormController.fetchFollowBackList();
+    int tabBarlength = StaticStoredData.roleName == 'telecaller' ? 2 : 3;
+
+    controller.tabController = TabController(length: 2, vsync: this);
+
+    controller.tabController.addListener(() {
+      if (!controller.tabController.indexIsChanging) {
+        controller.selectedIndex.value = controller.tabController.index;
+      }
+    });
+
+    followBackFormController.callController =
+        TabController(length: tabBarlength, vsync: this);
+    followBackFormController.callController.addListener(() {
+      debugPrint(
+          "Second TabBar index: ${followBackFormController.callController.index}");
+      if (!followBackFormController.callController.indexIsChanging) {
+        followBackFormController.selectedIndex.value =
+            followBackFormController.callController.index;
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       loadFollowData();
-    }
+      followBackFormController.getCallBackData();
+      followBackFormController.getCallLogData();
+      followBackFormController.getteamLeaderData();
+    });
+
     super.initState();
   }
 
-  Future<void> loadFollowData() async {
+  @override
+  void dispose() {
+    controller.tabController.dispose();
+    followBackFormController.callController.dispose();
+    super.dispose();
+  }
+
+  loadFollowData() async {
     await getMonthlyFollowList();
     await getDailyFollowList();
   }
 
   DateTime today = DateTime.now();
-
   List todayUsers = [];
 
   Future<List<followuplist.Data>> getMonthlyFollowList() async {
@@ -65,13 +111,67 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final NotificationController notificationController =
         Get.put(NotificationController());
 
+    String role = StaticStoredData.roleName; // example role
+
+    final List<String> labels =
+        role == "telecaller" ? ["Select Date"] : ["Select Date", "Filter"];
+
+    final String tellecallerLabels = role == "telecaller"
+        ? "Call Back & Incentive"
+        : "Tellecaller Performance";
+
+    //   final List<String> labels = ["Select Date", "Filter"];
+
+    final callBackTabFortellecaller = [
+      const Tab(text: "Today"),
+      const Tab(text: "Monthly"),
+      //     const Tab(text: "Incentive"),
+    ];
+
+    final callBackTabForAdmin = [
+      const Tab(text: "Call Back"),
+      const Tab(text: "Call Log"),
+      const Tab(text: "Disbursement"),
+      //  const Tab(text: "Incentive"),
+    ];
+
+    final callBackTabBarFortellecaller = [
+      dailyCallBack(),
+      dailyCallBack(),
+      //     callDisbursement(Icons.person)
+    ];
+
+    final callBackTabBarForAdmin = [
+      callback(Icons.person),
+      callLog(Icons.person),
+      callDisbursement(Icons.person),
+      // callDisbursement(Icons.person)
+    ];
+
+    final List<VoidCallback> callbacks = [
+      () => showDatePicker(),
+      () => showDialog(
+          context: context,
+          builder: (context) {
+            return Obx(
+              () => TellecallerFilterChipDialog(
+                title1: 'Teamleader',
+                title2: 'Tellecaller',
+                teamleader: followBackFormController.teamleaderList.toList(),
+                tellecaller: followBackFormController.tellecallerList.toList(),
+                onApply: (teamleader, tellecaller) {},
+              ),
+            );
+          })
+    ];
+
     return CommonScaffold(
       title: "Dashboard",
       isDrawer: true,
       showBack: false,
       actions: [
         Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(5.0),
           child: IconButton(
             onPressed: () async {
               Get.to(() => const NotificationSCreen());
@@ -206,466 +306,884 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: RefreshIndicator(
         onRefresh: () async {
           controller.onInit();
-          await controller.fetchDashboardData(true); // Refresh monthly data
-          await controller.fetchDashboardData(false); // Refresh today's data
+          // await controller.fetchDashboardData(true); // Refresh monthly data
+          // await controller.fetchDashboardData(false); // Refresh today's data
         },
         child: Obx(() {
+          final List<Map<String, dynamic>> dashboardItems = [
+            {
+              "icon": "assets/images/dashboard_attempted.svg",
+              "value": (controller.callTimeModel.callTimeModel?.totalAttempt)
+                  .toString(),
+              "label": "Attempted",
+              'duration': (controller.totalDuration).toString()
+            },
+            {
+              "icon": "assets/images/dashboard_connected.svg",
+              "value": (controller.totalPicked.value).toString(),
+              "label": "Connected",
+              'duration': (controller.totalDuration).toString()
+            },
+            {
+              "icon": "assets/images/dashboard_not_connected.svg",
+              "value": (controller.totalNotPicked.value).toString(),
+              "label": "Not Connected",
+              'duration': '00:00:00'
+            },
+          ];
           if (controller.isLoading.value) {
             return const Center(child: LoadingPage());
           } else {
             return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Attempted",
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                          SizedBox(
+                            height: 120.h,
+                            child: GridView.builder(
+                              padding: EdgeInsets.all(3.w),
+                              itemCount: dashboardItems.length,
+                              shrinkWrap: true,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                      childAspectRatio: 1.0,
+                                      crossAxisCount: dashboardItems.length),
+                              itemBuilder: (context, index) {
+                                var item = dashboardItems[index];
+                                return dashboardStatCard(
+                                    iconPath: item['icon'],
+                                    value: item['value'],
+                                    label: item['label'],
+                                    duration: item['duration']);
+                              },
                             ),
                           ),
-                          Text(
-                            "${controller.callTimeModel.callTimeModel?.totalAttempt ?? '0'}",
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                          SizedBox(height: 10.h),
+                          Container(
+                            height: 40,
+                            padding: const EdgeInsets.all(5),
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: labels.length,
+                              itemBuilder: (context, index) {
+                                return Obx(() {
+                                  final isSelected =
+                                      controller.selectedTab.value == index;
+                                  return GestureDetector(
+                                    onTap: () {
+                                      controller.selectedTab.value = index;
+                                      callbacks[index]();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(5),
+                                        decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? AppColors.primaryColor
+                                                : AppColors.backgroundColor,
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            border: Border.all(
+                                                color: AppColors.primaryColor)),
+                                        child: Text(
+                                          textAlign: TextAlign.center,
+                                          labels[index],
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              color: isSelected
+                                                  ? AppColors.backgroundColor
+                                                  : AppColors.primaryColor),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                });
+                              },
                             ),
                           ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5.h,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Connected",
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          Text(
-                            controller.totalPicked.value,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5.h,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Not Connected",
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          Text(
-                            controller.totalNotPicked.value,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
-                      ),
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.end,
+                          //   children: [
+                          //     const Spacer(),
+                          //     Container(
+                          //       height: 40,
+                          //       width: MediaQuery.of(context).size.width - 35.w,
+                          //       child: ListView.builder(
+                          //         scrollDirection: Axis.horizontal,
+                          //         itemCount: followBackFormController
+                          //             .selectedtellecallerName.length,
+                          //         itemBuilder: (context, index) {
+                          //           final name = followBackFormController
+                          //               .selectedtellecallerName[index];
+                          //           final id = followBackFormController
+                          //               .selectedtellecaller[index];
 
-                      SizedBox(
-                        height: 5.h,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Duration",
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          Text(
-                            controller.totalDuration.value,
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 15.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          GestureDetector(
-                            onTap: () async {
-                              var results = await showCalendarDatePicker2Dialog(
-                                context: context,
-                                config:
-                                    CalendarDatePicker2WithActionButtonsConfig(
-                                  calendarType: CalendarDatePicker2Type.range,
+                          //           return Padding(
+                          //             padding: const EdgeInsets.symmetric(
+                          //                 horizontal: 4),
+                          //             child: Container(
+                          //               padding: const EdgeInsets.symmetric(
+                          //                   horizontal: 8),
+                          //               decoration: BoxDecoration(
+                          //                 color: Colors.grey[200],
+                          //                 borderRadius:
+                          //                     BorderRadius.circular(20),
+                          //               ),
+                          //               child: Row(
+                          //                 mainAxisSize: MainAxisSize.min,
+                          //                 children: [
+                          //                   Text(
+                          //                     name,
+                          //                     style: const TextStyle(
+                          //                       fontSize: 16,
+                          //                       fontWeight: FontWeight.w500,
+                          //                       color: Colors.black,
+                          //                     ),
+                          //                     overflow: TextOverflow.ellipsis,
+                          //                   ),
+                          //                   const SizedBox(width: 4),
+                          //                   GestureDetector(
+                          //                     onTap: () {
+                          //                       // Remove name and id from controller
+                          //                       followBackFormController
+                          //                           .selectedtellecaller
+                          //                           .remove(id);
+                          //                       followBackFormController
+                          //                           .selectedtellecallerName
+                          //                           .remove(name);
+                          //                     },
+                          //                     child: const Icon(
+                          //                       Icons.close,
+                          //                       size: 18,
+                          //                       color: Colors.red,
+                          //                     ),
+                          //                   ),
+                          //                 ],
+                          //               ),
+                          //             ),
+                          //           );
+                          //         },
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              if (controller.dateRangeList.isNotEmpty) ...[
+                                const Spacer(),
+                                Text(
+                                  controller.formattedDate.value,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                                dialogSize: const Size(325, 400),
-                                value: controller.dateRangeList,
-                                borderRadius: BorderRadius.circular(15),
-                              );
-
-                              if (results != null) {
-                                if (results.first == results.last) {
-                                  controller.dateRangeList.clear();
-                                  controller.dateRangeList.add(results.first);
-                                } else {
-                                  controller.dateRangeList.value = results;
-                                }
-                                controller.formateDate();
-
-                                if (controller.dateRangeList.length != 1) {
-                                  DateTime? date =
-                                      controller.dateRangeList.first;
-                                  DateTime? lDate =
-                                      controller.dateRangeList.last;
-                                  // if(date!=null){
-                                  controller.dateRange.value =
-                                      "${date?.day}-${date?.month}-${lDate?.year},${lDate?.day}-${lDate?.month}-${date?.year}";
-                                  print(controller.dateRange.value);
-                                } else {
-                                  DateTime? date =
-                                      controller.dateRangeList.first;
-                                  if (date != null) {
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    controller.dateRangeList.clear();
+                                    controller.totalContact.clear();
+                                    controller.totalNoContact.clear();
+                                    controller.totalAttempt.clear();
+                                    controller.activeCallMap.clear();
+                                    controller.activeNoCallMap.clear();
+                                    controller.activeAttemptMap.clear();
+                                    controller.finalActiveNoCallList.clear();
+                                    controller.finalActiveCallList.clear();
+                                    controller.finalTotalAttemptCallList
+                                        .clear();
+                                    DateTime now = DateTime.now();
                                     controller.dateRange.value =
-                                        "${date.day}-${date.month}-${date.year},${date.day}-${date.month}-${date.year}";
-                                    print(controller.dateRange.value);
-                                  }
-                                }
-                                controller.getTimeGraph();
-                              }
-                              // controller.fetchFollowBackList();
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: AppColors.primaryColor,
-                                border: Border.all(
-                                  color: AppColors.primaryColor,
-                                  width: 1,
-                                ),
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              child: const Row(
-                                children: [
-                                  Text(
-                                    'Select Date',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                        "${now.day}-${now.month}-${now.year},${now.day}-${now.month}-${now.year}";
+                                    controller.getTimeGraph();
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(5.0.w),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.grid1.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    child: Icon(
+                                      Icons.close,
+                                      size: 20.sp,
                                     ),
                                   ),
-                                  // SizedBox(
-                                  //   width: 10,
-                                  // ),
-                                  // Icon(
-                                  //   Icons.filter_alt,
-                                  //   color: Colors.white,
-                                  // )
-                                ],
-                              ),
+                                ),
+                              ]
+                            ],
+                          ),
+                          SizedBox(
+                            height: 300,
+                            child: SfCartesianChart(
+                              primaryXAxis: const CategoryAxis(),
+                              tooltipBehavior: TooltipBehavior(enable: true),
+                              legend: const Legend(isVisible: true),
+                              series: <CartesianSeries<CallGraphModel, String>>[
+                                StackedBarSeries<CallGraphModel, String>(
+                                  width: 0.7,
+                                  color: AppColors.appBarColor, // Not Connected
+                                  dataSource:
+                                      controller.finalTotalAttemptCallList,
+                                  xValueMapper: (CallGraphModel data, _) =>
+                                      data.time,
+                                  yValueMapper: (CallGraphModel data, _) =>
+                                      data.data ?? 0,
+                                  name: 'Attempted',
+                                  dataLabelSettings: const DataLabelSettings(
+                                    isVisible: true,
+                                    textStyle: TextStyle(
+                                      fontSize: 10, // font size
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white, // label color
+                                    ),
+                                  ),
+                                ),
+                                StackedBarSeries<CallGraphModel, String>(
+                                  width: 0.7,
+                                  color: Colors.green, // Connected
+                                  dataSource: controller.finalActiveCallList,
+                                  xValueMapper: (CallGraphModel data, _) =>
+                                      data.time,
+                                  yValueMapper: (CallGraphModel data, _) =>
+                                      data.data ?? 0,
+                                  name: 'Connected',
+                                  dataLabelSettings: const DataLabelSettings(
+                                    isVisible: true,
+                                    textStyle: TextStyle(
+                                      fontSize: 10, // font size
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white, // label color
+                                    ),
+                                  ),
+                                ),
+                                StackedBarSeries<CallGraphModel, String>(
+                                  width: 0.7,
+                                  color: Colors.red, // Not Connected
+                                  dataSource: controller.finalActiveNoCallList,
+                                  xValueMapper: (CallGraphModel data, _) =>
+                                      data.time,
+                                  yValueMapper: (CallGraphModel data, _) =>
+                                      data.data ?? 0,
+                                  name: 'Not Connected',
+                                  dataLabelSettings: const DataLabelSettings(
+                                    isVisible: true,
+                                    textStyle: TextStyle(
+                                      fontSize: 10, // font size
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white, // label color
+                                    ),
+                                  ),
+                                ),
+
+                                // BarSeries<CallGraphModel, String>(
+                                //   color: AppColors.primaryColor,
+                                //   dataSource: controller.finalActiveCallList,
+                                //   xValueMapper: (CallGraphModel data, _) =>
+                                //       data.time,
+                                //   yValueMapper: (CallGraphModel data, _) =>
+                                //       data.data ?? 0,
+                                //   name: 'Connected',
+                                //   dataLabelSettings:
+                                //       const DataLabelSettings(isVisible: true),
+                                // ),
+
+                                // BarSeries<CallGraphModel, String>(
+                                //   color: Colors.red,
+                                //   dataSource: controller.finalActiveNoCallList,
+                                //   xValueMapper: (CallGraphModel data, _) =>
+                                //       data.time,
+                                //   yValueMapper: (CallGraphModel data, _) =>
+                                //       data.data ?? 0,
+                                //   name: 'Not connected',
+                                //   dataLabelSettings:
+                                //       const DataLabelSettings(isVisible: true),
+                                // ),
+
+                                // LineSeries<CallGraphModel, String>(
+                                //   color: AppColors.primaryColor,
+                                //   dataSource: controller.finalTotalAttemptCallList,
+                                //   xValueMapper: (CallGraphModel data, _) =>
+                                //       data.time,
+                                //   yValueMapper: (CallGraphModel data, _) =>
+                                //       data.data ?? 0,
+                                //   name: 'Attempted',
+                                //   dataLabelSettings:
+                                //       const DataLabelSettings(isVisible: true),
+                                // ),
+                                // LineSeries<CallGraphModel, String>(
+                                //   color: Colors.green,
+                                //   dataSource: controller.finalActiveCallList,
+                                //   xValueMapper: (CallGraphModel data, _) =>
+                                //       data.time,
+                                //   yValueMapper: (CallGraphModel data, _) =>
+                                //       data.data ?? 0,
+                                //   name: 'Connected',
+                                //   dataLabelSettings:
+                                //       const DataLabelSettings(isVisible: true),
+                                // ),
+                                // LineSeries<CallGraphModel, String>(
+                                //   color: Colors.red,
+                                //   dataSource: controller.finalActiveNoCallList,
+                                //   xValueMapper: (CallGraphModel data, _) =>
+                                //       data.time,
+                                //   yValueMapper: (CallGraphModel data, _) =>
+                                //       data.data ?? 0,
+                                //   name: 'Not Connected',
+                                //   dataLabelSettings:
+                                //       const DataLabelSettings(isVisible: true),
+                                // ),
+                              ],
                             ),
                           ),
-                          // MonthDropdown(
-                          //   onChanged: (value) {
-                          //     print("val: $value");
-                          //     controller.getDataOnMonth(
-                          //       value,
-                          //       DateTime.now().toString(),
-                          //     );
-                          //   },
-                          // ),
-                          if (controller.dateRangeList.isNotEmpty) ...[
-                            const Spacer(),
-                            Text(
-                              controller.formattedDate.value,
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border:
+                                    Border.all(color: Colors.grey.shade300)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                performer(
+                                    controller.topDisburserUser.first.monthly
+                                        .profileImage
+                                        .toString(),
+                                    'MTD Performer',
+                                    controller
+                                        .topDisburserUser.first.monthly.name,
+                                    controller
+                                        .topDisburserUser.first.monthly.amount),
+                                performer(
+                                    controller.topDisburserUser.first.yearly
+                                        .profileImage
+                                        .toString(),
+                                    'YTD Performer',
+                                    controller
+                                        .topDisburserUser.first.yearly.name,
+                                    controller
+                                        .topDisburserUser.first.yearly.amount),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 15.h),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 8),
+                            // decoration: BoxDecoration(
+                            //     border: Border.all(color: Colors.grey.shade300),
+                            //     borderRadius: BorderRadius.circular(5)),
+                            child: const Text(
+                              'Login File Status',
+                              style: TextStyle(
+                                  color: AppColors.textColor2,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          SizedBox(height: 5.h),
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border:
+                                    Border.all(color: Colors.grey.shade400)),
+                            child: Column(
+                              children: [
+                                Obx(
+                                  () => TabBar(
+                                      indicatorSize: TabBarIndicatorSize.tab,
+                                      indicatorWeight: 3.0,
+                                      // onTap: (_) {
+                                      //   controller.selectedIndex.value =
+                                      //       controller.tabController.index;
+                                      // },
+                                      controller: controller.tabController,
+                                      dividerColor: Colors.transparent,
+                                      indicatorColor: AppColors.backgroundColor,
+                                      indicator: BoxDecoration(
+                                          color: AppColors.primaryColor,
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          border: Border.all(
+                                              color: AppColors.primaryColor)),
+                                      labelColor: Colors.white,
+                                      unselectedLabelColor: Colors.black,
+                                      padding: EdgeInsets.all(5.w),
+                                      tabs: [
+                                        Tab(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 3, vertical: 3),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                    "Active - ${controller.totalActiveCount}"),
+                                                Text(
+                                                  controller.priceFormatter(
+                                                      controller.totalValActive
+                                                          .value),
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        Tab(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 5, vertical: 3),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Text(
+                                                    "InActive - ${controller.totalInActiveCount}"),
+                                                Text(
+                                                  controller.priceFormatter(
+                                                      controller
+                                                          .totalNoValActive
+                                                          .value),
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ]),
+                                ),
+                                Obx(
+                                  () => SizedBox(
+                                    height: (controller.activeList.isNotEmpty ||
+                                            controller.inActiveList.isNotEmpty)
+                                        ? (controller.selectedIndex.value == 0
+                                            ? controller.activeList.length *
+                                                controller.itemHeight
+                                            : controller.inActiveList.length *
+                                                controller.itemHeight)
+                                        : 100,
+                                    child: TabBarView(
+                                        controller: controller.tabController,
+                                        // physics:
+                                        //     const NeverScrollableScrollPhysics(),
+                                        children: [
+                                          controller.activeList.isNotEmpty
+                                              ? ListView.builder(
+                                                  padding: EdgeInsets.zero,
+                                                  shrinkWrap: true,
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(),
+                                                  itemCount: controller
+                                                      .activeList.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final item = controller
+                                                        .activeList[index];
+                                                    return Material(
+                                                      color: Colors.transparent,
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          dataController
+                                                              .selectedStatuses
+                                                              .clear();
+                                                          dataController
+                                                              .selectedStatuses
+                                                              .add(item.StatusGroupModelName
+                                                                      .toString()
+                                                                  .toUpperCase());
+                                                          dataController
+                                                              .applyStatusFilter();
+                                                          Get.to(() =>
+                                                              DataEntryViewScreen());
+                                                        },
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 5,
+                                                                  horizontal:
+                                                                      12),
+                                                          margin:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 2,
+                                                                  horizontal:
+                                                                      4),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors.white,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .grey
+                                                                    .withOpacity(
+                                                                        0.2),
+                                                                spreadRadius: 1,
+                                                                blurRadius: 5,
+                                                                offset:
+                                                                    const Offset(
+                                                                        0, 2),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Expanded(
+                                                                flex: 3,
+                                                                child: Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: [
+                                                                    Text(
+                                                                      controller.capitalizeWords(item
+                                                                          .StatusGroupModelName!
+                                                                          .toLowerCase()),
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        color: AppColors
+                                                                            .textColor2,
+                                                                      ),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                    ),
+                                                                    Text(
+                                                                      '${item.filecount} files',
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
+                                                                        color: AppColors
+                                                                            .appBarColor,
+                                                                      ),
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .ellipsis,
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              // Expanded(
+                                                              //   flex: 2,
+                                                              //   child: Text(
+                                                              //     '${item.filecount} files',
+                                                              //     style:
+                                                              //         const TextStyle(
+                                                              //       fontWeight:
+                                                              //           FontWeight
+                                                              //               .w600,
+                                                              //       color: AppColors
+                                                              //           .appBarColor,
+                                                              //     ),
+                                                              //     overflow:
+                                                              //         TextOverflow
+                                                              //             .ellipsis,
+                                                              //   ),
+                                                              // ),
+                                                              Expanded(
+                                                                flex: 1,
+                                                                child: Text(
+                                                                  controller
+                                                                      .priceFormatter(
+                                                                          item.totalLoanAmount),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .end,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        13,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: AppColors
+                                                                        .textColor2,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                )
+                                              : const Center(
+                                                  child:
+                                                      Text("No Active Cases")),
+                                          controller.inActiveList.isNotEmpty
+                                              ? ListView.builder(
+                                                  padding: EdgeInsets.zero,
+                                                  shrinkWrap: true,
+                                                  physics:
+                                                      const NeverScrollableScrollPhysics(), // ✅ disable inner scroll
+                                                  itemCount: controller
+                                                      .inActiveList.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final item = controller
+                                                        .inActiveList[index];
+                                                    return GestureDetector(
+                                                      onTap: () {
+                                                        dataController
+                                                            .selectedStatuses
+                                                            .clear();
+                                                        dataController
+                                                            .selectedStatuses
+                                                            .add(item.StatusGroupModelName
+                                                                    .toString()
+                                                                .toUpperCase());
+                                                        dataController
+                                                            .applyStatusFilter();
+                                                        Get.to(() =>
+                                                            DataEntryViewScreen());
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                vertical: 5,
+                                                                horizontal: 12),
+                                                        margin: const EdgeInsets
+                                                            .symmetric(
+                                                            vertical: 2,
+                                                            horizontal: 4),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                              color: Colors.grey
+                                                                  .withOpacity(
+                                                                      0.2),
+                                                              spreadRadius: 1,
+                                                              blurRadius: 5,
+                                                              offset:
+                                                                  const Offset(
+                                                                      0, 2),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            Expanded(
+                                                              flex: 4,
+                                                              child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    item.StatusGroupModelName ??
+                                                                        "",
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: AppColors
+                                                                          .textColor2,
+                                                                    ),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                  Text(
+                                                                    '${item.filecount} files',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                      color: AppColors
+                                                                          .appBarColor,
+                                                                    ),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                            // Expanded(
+                                                            //   flex: 2,
+                                                            //   child: Text(
+                                                            //     '${item.filecount} files',
+                                                            //     style:
+                                                            //         const TextStyle(
+                                                            //       fontWeight:
+                                                            //           FontWeight
+                                                            //               .w600,
+                                                            //       color: AppColors
+                                                            //           .appBarColor,
+                                                            //     ),
+                                                            //     overflow:
+                                                            //         TextOverflow
+                                                            //             .ellipsis,
+                                                            //   ),
+                                                            // ),
+                                                            Expanded(
+                                                              flex: 2,
+                                                              child: Text(
+                                                                controller
+                                                                    .priceFormatter(
+                                                                        item.totalLoanAmount),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .end,
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 13,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: AppColors
+                                                                      .textColor2,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                )
+                                              : const Center(
+                                                  child: Text(
+                                                      "No  IActive Cases")),
+                                        ]),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 15.h),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 8),
+                            // decoration: BoxDecoration(
+                            //     border: Border.all(color: Colors.grey.shade300),
+                            //     borderRadius: BorderRadius.circular(5)),
+                            child: Text(
+                              tellecallerLabels,
                               style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black,
-                              ),
+                                  color: AppColors.textColor2,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold),
                             ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                controller.dateRangeList.clear();
-                                controller.totalContact.clear();
-                                controller.totalNoContact.clear();
-                                controller.totalAttempt.clear();
-                                controller.activeCallMap.clear();
-                                controller.activeNoCallMap.clear();
-                                controller.activeAttemptMap.clear();
-                                controller.finalActiveNoCallList.clear();
-                                controller.finalActiveCallList.clear();
-                                controller.finalTotalAttemptCallList.clear();
-                                DateTime now = DateTime.now();
-                                controller.dateRange.value =
-                                    "${now.day}-${now.month}-${now.year},${now.day}-${now.month}-${now.year}";
-                                controller.getTimeGraph();
-                              },
-                              child: Container(
-                                padding: EdgeInsets.all(5.0.w),
-                                decoration: BoxDecoration(
-                                  color: AppColors.grid1.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(25),
-                                ),
-                                child: Icon(
-                                  Icons.close,
-                                  size: 20.sp,
-                                ),
-                              ),
-                            ),
-                          ]
-                        ],
-                      ),
-
-                      SizedBox(
-                        height: 300,
-                        child: SfCartesianChart(
-                          primaryXAxis: const CategoryAxis(),
-                          tooltipBehavior: TooltipBehavior(enable: true),
-                          legend: const Legend(isVisible: true),
-                          series: <CartesianSeries<CallGraphModel, String>>[
-                            LineSeries<CallGraphModel, String>(
-                              color: AppColors.primaryColor,
-                              dataSource: controller.finalTotalAttemptCallList,
-                              xValueMapper: (CallGraphModel data, _) =>
-                                  data.time,
-                              yValueMapper: (CallGraphModel data, _) =>
-                                  data.data ?? 0,
-                              name: 'Attempted',
-                              dataLabelSettings:
-                                  const DataLabelSettings(isVisible: true),
-                            ),
-                            LineSeries<CallGraphModel, String>(
-                              color: Colors.green,
-                              dataSource: controller.finalActiveCallList,
-                              xValueMapper: (CallGraphModel data, _) =>
-                                  data.time,
-                              yValueMapper: (CallGraphModel data, _) =>
-                                  data.data ?? 0,
-                              name: 'Connected',
-                              dataLabelSettings:
-                                  const DataLabelSettings(isVisible: true),
-                            ),
-                            LineSeries<CallGraphModel, String>(
-                              color: Colors.red,
-                              dataSource: controller.finalActiveNoCallList,
-                              xValueMapper: (CallGraphModel data, _) =>
-                                  data.time,
-                              yValueMapper: (CallGraphModel data, _) =>
-                                  data.data ?? 0,
-                              name: 'Not Connected',
-                              dataLabelSettings:
-                                  const DataLabelSettings(isVisible: true),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 34),
-
-                      if (controller.activeList.isNotEmpty) ...[
-                        DashboardSection(
-                          graphLabel: 'Active cases',
-                          amount: controller
-                              .priceFormatter(controller.totalValActive.value),
-                          title: "Active Cases",
-                          data: controller.todayData.value.data,
-                          controller: controller,
-                          list: controller.activeList,
-                        ),
-                        const SizedBox(height: 34),
-                      ],
-                      // Monthly Section
-                      if (controller.inActiveList.isNotEmpty) ...[
-                        DashboardSection(
-                          graphLabel: "Inactive Cases",
-                          amount: controller.priceFormatter(
-                              controller.totalNoValActive.value),
-                          title: "Inactive Cases",
-                          data: controller.monthlyData.value.data,
-                          controller: controller,
-                          list: controller.inActiveList,
-                        ),
-                        SizedBox(height: 10.h),
-                      ],
-                      SizedBox(
-                        height: 6.h,
-                      ),
-
-                      const SizedBox(height: 15),
-                      if (StaticStoredData.roleName == 'telecaller') ...[
-                        Container(
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              color: AppColors.primaryColor,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.black)),
-                          child: const Text(
-                            "Today Call back list",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold),
                           ),
-                        ),
-                        FutureBuilder<List<followuplist.Data>>(
-                          future: getDailyFollowList(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return LoadingPage();
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text(
-                                'Error: ${snapshot.error}',
-                                style: const TextStyle(color: Colors.black),
-                              ));
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return const Center(
-                                  child: Text(
-                                'No follow-ups for today',
-                                style: TextStyle(color: Colors.black),
-                              ));
-                            }
+                          SizedBox(height: 5.h),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.grey.shade400),
+                            ),
+                            child: Column(children: [
+                              TabBar(
+                                  isScrollable: false,
+                                  indicatorPadding: EdgeInsets.zero,
+                                  padding: EdgeInsets.zero,
+                                  indicatorSize: TabBarIndicatorSize.tab,
+                                  controller:
+                                      followBackFormController.callController,
+                                  labelPadding: EdgeInsets.zero,
+                                  labelStyle: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold),
+                                  dividerColor: Colors.transparent,
+                                  indicatorColor: AppColors.backgroundColor,
+                                  indicator: BoxDecoration(
+                                      color: AppColors.primaryColor,
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(
+                                          color: AppColors.primaryColor)),
+                                  labelColor: Colors.white,
+                                  unselectedLabelColor: Colors.black,
+                                  tabs:
+                                      StaticStoredData.roleName == 'telecaller'
+                                          ? callBackTabFortellecaller
+                                          : callBackTabForAdmin),
 
-                            final todayUsers = snapshot.data!;
+                              SizedBox(height: 5.h),
 
-                            return ListView.builder(
-                              itemCount: todayUsers.length,
-                              shrinkWrap:
-                                  true, // ✅ Important: wrap content height
-                              physics:
-                                  const NeverScrollableScrollPhysics(), // ✅ Prevent internal scrolling
-                              itemBuilder: (context, index) {
-                                final user = todayUsers[index];
-                                return ListTile(
-                                  contentPadding: const EdgeInsets.all(0),
-                                  title: Text(
-                                    user.customerName ?? 'No Name',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                  ),
-                                  subtitle: Text(maskFirst6Digits(
-                                      user.contactNumber ?? '')),
-                                  leading: IconButton(
-                                    onPressed: () {
-                                      // your logic...
-                                    },
-                                    icon: const Icon(Icons.call),
-                                  ),
-                                  trailing: Text(
-                                    DateFormat('dd-MM-yy hh:mm:ss a').format(
-                                        DateTime.parse(
-                                            user.entryDate.toString())),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        Container(
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              color: AppColors.primaryColor,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.black)),
-                          child: const Text(
-                            "Monthly Call back list",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        FutureBuilder<List<followuplist.Data>>(
-                          future: getMonthlyFollowList(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text('Error: ${snapshot.error}'));
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return const Center(
-                                  child: Text('No follow-ups for today'));
-                            }
+                              /// TabBarView Content
 
-                            final todayUsers = snapshot.data!;
+                              // final selectedIndex = followBackFormController
+                              //     .selectedIndex.value;
+                              // int length = 0;
 
-                            return ListView.builder(
-                              itemCount: todayUsers.length,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                final user = todayUsers[index];
-                                return ListTile(
-                                  contentPadding: const EdgeInsets.all(0),
-                                  title: Text(
-                                    user.customerName ?? 'No Name',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16),
-                                  ),
-                                  subtitle: Text(maskFirst6Digits(
-                                      user.contactNumber ?? '')),
-                                  leading: IconButton(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.call),
-                                  ),
-                                  trailing: Text(
-                                    DateFormat('dd-MM-yy hh:mm:ss a').format(
-                                        DateTime.parse(
-                                            user.entryDate.toString())),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        )
-                      ],
-                    ]),
-              ),
-            );
+                              // double cardHeight =
+                              //     StaticStoredData.roleName == 'tellecaller'
+                              //         ? followBackFormController
+                              //             .tellececalleritemHeight
+                              //         : followBackFormController
+                              //             .tellececalleritemHeight;
+
+                              // if (selectedIndex == 0) {
+                              //   length = followBackFormController
+                              //       .dailycallbackData
+                              //       .map((e) => e.tcname)
+                              //       .toSet()
+                              //       .length;
+                              // } else if (selectedIndex == 1) {
+                              //   length = followBackFormController
+                              //       .callLogData.length;
+                              // } else if (selectedIndex == 2) {
+                              //   length = followBackFormController
+                              //           .disbursementList.length +
+                              //       2;
+                              // }
+
+                              // final height = length > 0
+                              //     ? (length * cardHeight).toDouble()
+                              //     : 100.0;
+
+                              SizedBox(
+                                height: 500.h,
+                                child: TabBarView(
+                                    physics: const ScrollPhysics(),
+                                    controller:
+                                        followBackFormController.callController,
+                                    children: StaticStoredData.roleName ==
+                                            'telecaller'
+                                        ? callBackTabBarFortellecaller
+                                        : callBackTabBarForAdmin),
+                              ),
+
+                              SizedBox(
+                                height: 6.h,
+                              ),
+
+                              const SizedBox(height: 15),
+                            ]),
+                          )
+                        ])));
           }
         }),
       ),
@@ -676,6 +1194,700 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (number.length < 6) return number; // Handle edge case
     return 'xxxxxx${number.substring(6)}';
   }
+
+  Widget dashboardStatCard({
+    required String iconPath,
+    required String value,
+    required String label,
+    required String duration,
+    Color? iconColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(3.0),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 2.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.grey.shade300, width: 1),
+          borderRadius: BorderRadius.circular(6.r),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Icon + Value
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  height: 40.h,
+                  width: 40.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4.r),
+                  ),
+                  child: Center(
+                    child: SvgPicture.asset(
+                      iconPath,
+                      color: iconColor,
+                      height: 35.h,
+                      width: 35.w,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 3.w),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 6.h),
+            // Label
+            Column(
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: Colors.black54,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  duration,
+                  style: TextStyle(
+                    fontSize: 13.sp,
+                    color: Colors.black54,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget performer(String profileImage, String performerDuration, String name,
+      String amount) {
+    return Column(
+      children: [
+        Text(
+          performerDuration,
+          style: const TextStyle(
+              fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        SizedBox(
+          height: 5.h,
+        ),
+        CircleAvatar(
+          radius: 40,
+          backgroundImage: ImageHelper.getImageProvider(
+            profileImage: profileImage, // string from API
+            fallbackUrl:
+                "https://ui-avatars.com/api/?name=$name&background=random&color=fff",
+            baseUrl: APIUrls.imagebaseUrl,
+            assetPath: "assets/images/user.png",
+          ),
+        ),
+        SizedBox(
+          height: 5.h,
+        ),
+        Column(
+          children: [
+            Text(name,
+                style: const TextStyle(fontSize: 13, color: Colors.black)),
+            Text(controller.priceFormatter(amount),
+                style: const TextStyle(fontSize: 13, color: Colors.black)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget dailyCallBack() {
+    return Obx(() {
+      final uniqueTcNames = followBackFormController.dailycallbackData
+          .map((e) => e.tcname)
+          .toSet()
+          .toList();
+      return ListView.builder(
+          padding: EdgeInsets.zero,
+          itemCount: uniqueTcNames.length,
+          shrinkWrap: true,
+          physics: const ScrollPhysics(),
+          itemBuilder: (context, index) {
+            final item = followBackFormController
+                .dailycallbackData[index]; // Use the passed list
+
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300, width: 1),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: ExpansionTile(
+                minTileHeight: 60,
+                tilePadding:
+                    EdgeInsets.symmetric(horizontal: 10.h, vertical: 0.0),
+                shape: const RoundedRectangleBorder(
+                  side: BorderSide(color: Colors.transparent, width: 0),
+                ),
+                childrenPadding: EdgeInsets.zero,
+                expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                initiallyExpanded: false,
+                dense: true,
+                leading: GestureDetector(
+                    onTap: () {
+                      if (!_dialerController.isCallOngoing.value) {
+                        _dialerController.makePhoneCall(
+                            item.contactNumber.toString(),
+                            followUpId: item.id ?? '');
+                      }
+
+                      followBackFormController.mobile.value =
+                          item.contactNumber ?? "";
+                      followBackFormController.bankName.value =
+                          item.bankName ?? "";
+                      followBackFormController.customerName.value =
+                          item.customerName ?? "";
+                      _dialerController.customerName.value =
+                          item.customerName ?? '';
+                      // _dialerController.customerLoan.value =
+                      //     '';
+                      // _dialerController.customerName.value =
+                      //     item.customerName ?? "";
+                      _dialerController.datatype.value = '';
+                      followBackFormController.remark.value = item.remark ?? '';
+                      _dialerController.followup_id.value = item.id ?? '';
+                      _dialerController.excel_id.value = '';
+                    },
+                    child: SvgPicture.asset('assets/images/dialler.svg')),
+                title: Text(
+                  item.customerName.toString(),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: Text(
+                  maskFirst6Digits(item.contactNumber.toString()),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                trailing: Text(
+                  DateFormat('dd-MM-yy hh:mm:ss a')
+                      .format(DateTime.parse(item.entryDate.toString())),
+                ),
+                children: [
+                  _buildSingleRow(Icons.comment, item.remark ?? 'NA'),
+                ],
+              ),
+            );
+          });
+    });
+  }
+
+  Widget callback(IconData data) {
+    return Obx(() {
+      final uniqueTcNames = followBackFormController.callBackData
+          .map((e) => e.name)
+          .toSet()
+          .toList();
+
+      final totaldata = followBackFormController.callBackTotalData.first;
+
+      return Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 6),
+            padding: EdgeInsets.symmetric(vertical: 4.h),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade300, width: 1),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 4.h),
+              child: ListTile(
+                dense: true,
+                leading: CircleAvatar(
+                  radius: 23,
+                  backgroundColor: AppColors.primaryColor,
+                  child: data != null
+                      ? Icon(data, color: Colors.white)
+                      : const Text(
+                          'T',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ), // you can change color
+                ),
+                title: const Text(
+                  'Total',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Today- ${totaldata.todayCallbackTotal}'),
+                    Text('Monthly -${totaldata.monthlyCallbackTotal}')
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: uniqueTcNames.length,
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  // 👇 Remaining rows → CallBackData
+                  final item = followBackFormController.callBackData[
+                      index]; // subtract 1 because first row is totals
+
+                  return Container(
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 6),
+                    padding: EdgeInsets.symmetric(vertical: 7.h),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300, width: 1),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.zero,
+                      child: ListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 15.w, vertical: 0.8.h),
+                        leading: CircleAvatar(
+                          radius: 23,
+                          backgroundImage: ImageHelper.getImageProvider(
+                            profileImage: item.profileImage, // string from API
+                            fallbackUrl:
+                                "https://ui-avatars.com/api/?name=${item.name}&background=random&color=fff",
+                            // profileController.profileImageUrl.value,
+                            baseUrl: APIUrls.imagebaseUrl,
+                            assetPath: "assets/images/user.png",
+                          ),
+                        ),
+                        //  CircleAvatar(
+                        //   radius: 23,
+                        //   backgroundColor: AppColors.primaryColor,
+                        //   child: data != null
+                        //       ? Icon(data, color: Colors.white)
+                        //       : Text(
+                        //           item.name[index].isNotEmpty
+                        //               ? item.name[index][0].toUpperCase()
+                        //               : "?",
+                        //           style: const TextStyle(
+                        //             color: Colors.white,
+                        //             fontWeight: FontWeight.bold,
+                        //           ),
+                        //         ), // you can change color
+                        // ),
+                        title: Text(
+                          followBackFormController.callBackData[index].name,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Today- ${item.todayCallbackCount}'),
+                            Text('Monthly -${item.monthlyCallbackCount}')
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget callLog(IconData data) {
+    return Obx(() {
+      final uniqueTcNames = followBackFormController.callLogData
+          .map((e) => e.name)
+          .toSet()
+          .toList();
+
+      return ListView.builder(
+          itemCount: uniqueTcNames.length,
+          padding: EdgeInsets.zero,
+          physics: BouncingScrollPhysics(),
+          itemBuilder: (context, index) {
+            final callData = followBackFormController.callLogData[index];
+
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+              decoration: BoxDecoration(
+                color: index == 0 ? Colors.blue.shade50 : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300, width: 1),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: EdgeInsets.zero,
+                child: ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
+                  leading: CircleAvatar(
+                    radius: 23,
+                    backgroundColor: AppColors.primaryColor,
+                    // ignore: unnecessary_null_comparison
+                    child: CircleAvatar(
+                      radius: 40,
+                      backgroundImage: ImageHelper.getImageProvider(
+                        profileImage: callData.profileImage, // string from API
+                        fallbackUrl:
+                            "https://ui-avatars.com/api/?name=${callData.name}&background=random&color=fff",
+                        baseUrl: APIUrls.imagebaseUrl,
+                        assetPath: "assets/images/user.png",
+                      ),
+                    ), // you can change color
+                  ),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        callData.name.toString(),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 75.w,
+                            child: Text(
+                              callData.totalCallTime,
+                              style: TextStyle(fontSize: 12.sp),
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  subtitle: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      const SizedBox(height: 10),
+                      Expanded(
+                        child: Container(
+                          width: 35.w,
+                          alignment: Alignment.bottomLeft,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SvgPicture.asset(
+                                'assets/images/dashboard_attempted.svg',
+                                width: 12,
+                                height: 12,
+                              ),
+                              SizedBox(width: 5.w),
+                              Text(
+                                callData.callAttempt,
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 25.w,
+                      ),
+                      Expanded(
+                        child: Container(
+                          width: 35.w,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SvgPicture.asset(
+                                  'assets/images/dashboard_connected.svg',
+                                  height: 12,
+                                  width: 12),
+                              SizedBox(width: 5.w),
+                              Text(
+                                callData.callContacted,
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 25.w,
+                      ),
+                      Expanded(
+                        child: Container(
+                          width: 35.w,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SvgPicture.asset(
+                                  'assets/images/dashboard_not_connected.svg',
+                                  height: 12,
+                                  width: 12),
+                              SizedBox(width: 5.w),
+                              Text(
+                                callData.callNotcontact,
+                                style: TextStyle(
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 25.w,
+                      ),
+                    ],
+                  ),
+                  // trailing: Column(
+                  //   mainAxisAlignment: MainAxisAlignment.start,
+                  //   children: [
+                  //     Text(
+                  //       callData.totalCallTime,
+                  //       style: TextStyle(fontSize: 12.sp),
+                  //       textAlign: TextAlign.end,
+                  //     ),
+                  //   ],
+                  // ),
+                ),
+              ),
+            );
+          });
+    });
+  }
+
+  Widget callDisbursement(IconData data) {
+    return Obx(() {
+      final uniqueTcNames = followBackFormController.disbursementList
+          .map((e) => e.name)
+          .toSet()
+          .toList();
+
+      final totaldata = followBackFormController.disbursementTotal.first;
+      return Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 6),
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade300, width: 1),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
+              dense: true,
+              leading: CircleAvatar(
+                  radius: 23,
+                  backgroundColor: AppColors.primaryColor,
+                  child: Icon(data, color: Colors.white)),
+              title: const Text(
+                'Total',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text('Login Files -${totaldata.loginCountTotal}'),
+              trailing: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(controller.priceFormatter(totaldata.amountTotal)),
+                  SizedBox(height: 10.h),
+                  Text(' Disbursed File - ${totaldata.disbursedCountTotal}'),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: uniqueTcNames.length,
+                physics: BouncingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  final disbursementData =
+                      followBackFormController.disbursementList;
+
+                  return Container(
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300, width: 1),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.zero,
+                      child: ListTile(
+                        dense: true,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
+                        leading: CircleAvatar(
+                          radius: 23,
+                          backgroundColor: AppColors.primaryColor,
+                          // ignore: unnecessary_null_comparison
+                          child: CircleAvatar(
+                            radius: 40,
+                            backgroundImage: ImageHelper.getImageProvider(
+                              profileImage: disbursementData[index]
+                                  .profileImage, // string from API
+                              fallbackUrl:
+                                  "https://ui-avatars.com/api/?name=${disbursementData[index].name}&background=random&color=fff",
+                              baseUrl: APIUrls.imagebaseUrl,
+                              assetPath: "assets/images/user.png",
+                            ),
+                          ), // you can change color
+                        ),
+                        title: Text(
+                          disbursementData[index].name,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                            'Login Files -${disbursementData[index].loginCount}'),
+                        trailing: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(controller.priceFormatter(
+                                disbursementData[index].amount)),
+                            SizedBox(height: 10.h),
+                            Text(
+                                'Disbursed File - ${disbursementData[index].disbursedCount}'),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+          ),
+        ],
+      );
+    });
+  }
+
+  showDatePicker() async {
+    var results = await showCalendarDatePicker2Dialog(
+      context: context,
+      config: CalendarDatePicker2WithActionButtonsConfig(
+        calendarType: CalendarDatePicker2Type.range,
+      ),
+      dialogSize: const Size(325, 400),
+      value: controller.dateRangeList,
+      borderRadius: BorderRadius.circular(15),
+    );
+
+    if (results != null) {
+      if (results.first == results.last) {
+        controller.dateRangeList.clear();
+        controller.dateRangeList.add(results.first);
+      } else {
+        controller.dateRangeList.value = results;
+      }
+      controller.formateDate();
+
+      if (controller.dateRangeList.length != 1) {
+        DateTime? date = controller.dateRangeList.first;
+        DateTime? lDate = controller.dateRangeList.last;
+        // if(date!=null){
+        controller.dateRange.value =
+            "${date?.day}-${date?.month}-${lDate?.year},${lDate?.day}-${lDate?.month}-${date?.year}";
+        print(controller.dateRange.value);
+      } else {
+        DateTime? date = controller.dateRangeList.first;
+        if (date != null) {
+          controller.dateRange.value =
+              "${date.day}-${date.month}-${date.year},${date.day}-${date.month}-${date.year}";
+          print(controller.dateRange.value);
+        }
+      }
+      await controller.getTimeGraph();
+    }
+  }
+}
+
+Widget _buildSingleRow(IconData icon, String value) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+    child: Row(
+      children: [
+        Icon(icon, size: 14, color: Colors.grey[700]),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 14, color: Colors.black),
+            maxLines: 10,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class DashboardSection extends StatefulWidget {

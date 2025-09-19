@@ -58,7 +58,7 @@ class _MainScreenState extends State<MainScreen> {
         itemBuilder: (context, index) {
           switch (index) {
             case 0:
-              return DashboardScreen();
+              return const DashboardScreen();
             case 1:
               return DataEntryViewScreen();
             case 2:

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/services.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/remark_status_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
@@ -15,9 +16,12 @@ class FollowBackListScreen extends StatelessWidget {
   final FollowBackFormController controller =
       Get.put(FollowBackFormController());
   final DialerController _dialerController = Get.put(DialerController());
-  final TextEditingController _searchController = TextEditingController();
+
   final FollowBackFormController _formController =
       Get.put(FollowBackFormController());
+
+  final RemarkStatusController _remarkStatusController =
+      Get.put(RemarkStatusController());
 
   FollowBackListScreen({Key? key}) : super(key: key);
 
@@ -154,7 +158,7 @@ class FollowBackListScreen extends StatelessWidget {
                   children: [
                     _formController.showSearchField.value
                         ? SizedBox(
-                            width: 200.w,
+                            width: 300.w,
                             child: TextField(
                               autofocus: true,
                               style: const TextStyle(
@@ -222,22 +226,25 @@ class FollowBackListScreen extends StatelessWidget {
                               SizedBox(
                                 width: 12.w,
                               ),
-                              Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primaryColor,
-                                    border: Border.all(
+                              GestureDetector(
+                                onTap: () => showFilterDialog(context),
+                                child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 5),
+                                    decoration: BoxDecoration(
                                       color: AppColors.primaryColor,
-                                      width: 1,
+                                      border: Border.all(
+                                        color: AppColors.primaryColor,
+                                        width: 1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(12.0),
                                     ),
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    'assets/images/filter.svg',
-                                    height: 24,
-                                    width: 24,
-                                  )),
+                                    child: SvgPicture.asset(
+                                      'assets/images/filter.svg',
+                                      height: 24,
+                                      width: 24,
+                                    )),
+                              ),
                             ],
                           ),
                     // MonthDropdown(
@@ -253,23 +260,26 @@ class FollowBackListScreen extends StatelessWidget {
                     const Spacer(),
                     Row(
                       children: [
-                        Container(
-                          height: 35.h,
-                          padding: const EdgeInsets.all(0),
-                          decoration: BoxDecoration(
-                            color: AppColors.grid1.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: TextButton(
-                              onPressed: () {
-                                controller.clearDateRange();
-                                controller.fetchFollowBackList();
-                              },
-                              child: const Text(
-                                'Clear Filter',
-                                style: TextStyle(color: Colors.blue),
-                              )),
-                        ),
+                        !controller.showSearchField.value
+                            ? Container(
+                                height: 35.h,
+                                padding: const EdgeInsets.all(0),
+                                decoration: BoxDecoration(
+                                  color: AppColors.grid1.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: TextButton(
+                                    onPressed: () {
+                                      controller.clearDateRange();
+                                      controller.fetchFollowBackList();
+                                    },
+                                    child: const Text(
+                                      'Clear Filter',
+                                      style: TextStyle(
+                                          color: AppColors.primaryColor),
+                                    )),
+                              )
+                            : const SizedBox.shrink(),
                         Obx(() => IconButton(
                               icon: Icon(
                                 _formController.showSearchField.value
@@ -438,7 +448,7 @@ class FollowBackListScreen extends StatelessWidget {
                           ),
                           subtitle: Text(
                             softWrap: true,
-                            style: TextStyle(fontSize: 11),
+                            style: const TextStyle(fontSize: 11),
                             DateFormat('dd-MM-yyyy hh:mm:ss a').format(
                                 DateTime.parse(item.entryDate.toString())),
                           ),
@@ -451,16 +461,28 @@ class FollowBackListScreen extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(
-                                      item.remarkStatus.toString(),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
-                                      softWrap: true,
-                                      style: TextStyle(
-                                        fontSize: 12,
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
                                         color: item.contactStatus == '1'
-                                            ? Colors.green.shade700
-                                            : Colors.orange.shade700,
+                                            ? Colors.green.shade400
+                                            : Colors.redAccent.shade200,
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5, vertical: 1),
+                                        child: Text(
+                                          item.remarkStatus.toString(),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          softWrap: true,
+                                          style: const TextStyle(
+                                              fontSize: 12, color: Colors.white
+                                              //  item.contactStatus == '1'
+                                              //     ? Colors.green.shade700
+                                              //     : Colors.orange.shade700,
+                                              ),
+                                        ),
                                       ),
                                     ),
                                     const Icon(
@@ -816,5 +838,42 @@ class FollowBackListScreen extends StatelessWidget {
   String maskFirst6Digits(String number) {
     if (number.length < 6) return number; // Handle edge case
     return 'xxxxxx${number.substring(6)}';
+  }
+
+  void showFilterDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text("Filter by Status"),
+        content: Obx(() {
+          return SingleChildScrollView(
+              child: Wrap(
+                  spacing: 3,
+                  children:
+                      _remarkStatusController.remarkStatusList.map((element) {
+                    return ChoiceChip(
+                      label: Text(element.title.toString()),
+                      selected:
+                          controller.selectedStatuses.contains(element.id),
+                      onSelected: (_) {
+                        controller.toggleStatus(element.id.toString());
+                      },
+                    );
+                  }).toList()));
+        }),
+        actions: [
+          TextButton(
+            onPressed: () {
+              controller.applyStatusFilter();
+              Get.back(); // close after applying
+            },
+            child: const Text("Apply"),
+          ),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text("Cancel"),
+          ),
+        ],
+      ),
+    );
   }
 }

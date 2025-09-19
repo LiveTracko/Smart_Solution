@@ -32,7 +32,7 @@ class LoginRequestController extends GetxController {
   var loanAmount = ''.obs;
   var commonRemark = ''.obs;
   var remarksList = <String>[].obs; // To hold multiple remarks
-  var id = ''.obs; // For existing records
+//  var id = ''.obs; // For existing records
 
   var allBankNamesList = <LoginRequestBankList>[].obs;
 
@@ -68,8 +68,8 @@ class LoginRequestController extends GetxController {
 
           // log('raw -->>> ${resData['data'] }');
 
-          loginRequestList.value = loginData; // Update observable list
-          currentId.value = loginRequestList[0].id;
+          loginRequestList.value = loginData; 
+     //     currentId.value = loginRequestList[0].id;
           await getRemarks();
 
           // log('pppp -->>> ${loginRequestList.map((e) => e.toJson()).toList()}');
@@ -185,7 +185,7 @@ class LoginRequestController extends GetxController {
         loanAmount.value = '';
         commonRemark.value = '';
         remarksList.value = []; // To hold multiple remarks
-        id = ''.obs;
+    //    id = ''.obs;
         sourceId.value = '';
         Get.back();
         Get.snackbar('Success', 'Login request saved successfully!');

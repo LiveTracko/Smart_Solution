@@ -388,7 +388,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                                 }
                               },
                               child: controller.isLoading.value
-                                  ? LoadingPage()
+                                  ? const LoadingPage()
                                   : const Padding(
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 24.0),
@@ -716,6 +716,16 @@ class _DataEntryFormState extends State<DataEntryForm> {
                   if (newValue != null) {
                     controller.dsaName.value = newValue;
                     controller.selectedDsaId.value = newValue;
+                    controller.caseType.clear();
+                    controller.producttypeList.clear();
+                    controller.selectedBankName.value = '';
+                    controller.dsaName.value = '';
+                    controller.bankerNameList.clear();
+                    controller.bankerMobile.value = '';
+                    controller.bankerEmail.value = '';
+                    controller.telecaller.value = '';
+                    controller.teamleader.value = '';
+                    controller.status.value = '';
                     controller.getDsaBankList(newValue);
                   }
                 }

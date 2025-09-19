@@ -23,7 +23,7 @@ class LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey<FormState>(); // Form key for validation
   bool _isObscured = true; // State for password visibility
 
-  String? _selectedLoanType; // 'secure' or 'unsecure'
+  String? _selectedLoanType = 'unsecure'; // 'secure' or 'unsecure'
   String? token;
 
   @override
@@ -352,7 +352,7 @@ class LoginViewState extends State<LoginView> {
                                       text: TextSpan(
                                         recognizer: TapGestureRecognizer()
                                           ..onTap = () {
-                                            Get.to(() => ForgetView());
+                                            Get.to(() => const ForgetView());
                                           },
                                         text: 'Forgot Password',
                                         style: TextStyle(
@@ -381,7 +381,16 @@ class LoginViewState extends State<LoginView> {
                             // Login button or loading indicator
                             Obx(() {
                               return controller.isLoading.value
-                                  ? const LoadingPage()
+                                  ? Container(
+                                      color: const Color(0xFF356EFF),
+                                      height: 50,
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors
+                                              .white, // or AppColors.backgroundColor
+                                        ),
+                                      ),
+                                    )
                                   : ButtonComponent(
                                       text: 'Log in',
                                       color: const Color(0xFF356EFF),

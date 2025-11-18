@@ -80,6 +80,7 @@ class _ListingScreenState extends State<ListingScreen> {
   Widget build(BuildContext context) {
     return CommonScaffold(
         title: 'Listing Page',
+        showBack: false,
         // appBar: AppBar(
         //   centerTitle: true,
         //   title: const Text('Listing Page'),

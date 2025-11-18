@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.smart_solutions.app-mergeDebugResources-29:/values-night-v8/values-night-v8.xml",
+            "outputFile": "com.cosmicwebsolution.smart_solutions.app-mergeDebugResources-29:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
                     "source": "C:\\Users\\cosmi\\FlutterProjects\\Smart-Solutions-main (1)\\Smart-Solutions-main\\android\\app\\src\\main\\res\\values-night\\styles.xml",

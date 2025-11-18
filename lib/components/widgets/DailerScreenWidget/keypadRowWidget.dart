@@ -30,13 +30,13 @@ class KeypadRowWidget extends StatelessWidget {
     return Expanded(
       child: Container(
         margin: EdgeInsets.all(0.w), // Responsive margin
-        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 8.0),
+        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.h),
         decoration: const BoxDecoration(shape: BoxShape.circle),
         child: CircleAvatar(
-          radius: 33,
-          backgroundColor: AppColors.secondayColor,
+          radius: 32,
+          //    backgroundColor: AppColors.secondayColor,
           child: Material(
-            color: AppColors.greyColor,
+            color: AppColors.diallerBtnColor,
             shape: const CircleBorder(),
             child: InkWell(
               customBorder: const CircleBorder(),
@@ -53,9 +53,9 @@ class KeypadRowWidget extends StatelessWidget {
                     Text(
                       number,
                       style: TextStyle(
-                        fontSize: 26.sp, // Responsive font size
-                        color: AppColors.secondayColor,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 25.sp, // Responsive font size
+                        color: AppColors.textColor2,
+                        //     fontWeight: FontWeight.bold,
                       ),
                     ),
                     if (subText != null)

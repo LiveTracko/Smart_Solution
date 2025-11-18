@@ -1,6 +1,6 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-3    package="com.example.smart_solutions"
+3    package="com.cosmicwebsolution.smart_solutions"
 4    android:versionCode="1"
 5    android:versionName="1.0.0" >
 6
@@ -65,12 +65,12 @@
 43
 44    <permission
 44-->[androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
-45        android:name="com.example.smart_solutions.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+45        android:name="com.cosmicwebsolution.smart_solutions.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
 45-->[androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
 46        android:protectionLevel="signature" />
 46-->[androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
 47
-48    <uses-permission android:name="com.example.smart_solutions.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+48    <uses-permission android:name="com.cosmicwebsolution.smart_solutions.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
 48-->[androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
 48-->[androidx.core:core:1.13.1] C:\Users\cosmi\.gradle\caches\transforms-3\0bb6d36784b33459e2f139caba2a0682\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
 49
@@ -83,7 +83,7 @@
 55        android:icon="@mipmap/ic_launcher"
 56        android:label="smart_solutions" >
 57        <activity
-58            android:name="com.example.smart_solutions.MainActivity"
+58            android:name="com.cosmicwebsolution.smart_solutions.MainActivity"
 59            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
 60            android:exported="true"
 61            android:hardwareAccelerated="true"
@@ -142,7 +142,7 @@
 103-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:24:9-32:20
 104            android:name="androidx.startup.InitializationProvider"
 104-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:25:13-67
-105            android:authorities="com.example.smart_solutions.androidx-startup"
+105            android:authorities="com.cosmicwebsolution.smart_solutions.androidx-startup"
 105-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:26:13-68
 106            android:exported="false" >
 106-->[androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\cosmi\.gradle\caches\transforms-3\1ae01238dad94ebfab0279d6aff8105b\transformed\jetified-lifecycle-process-2.7.0\AndroidManifest.xml:27:13-37

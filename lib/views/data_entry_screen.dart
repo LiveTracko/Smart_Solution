@@ -16,17 +16,25 @@ import 'package:smart_solutions/widget/loading_page.dart';
 
 class AppColors {
   static const Color primaryColor = Color(0xFF356EFF);
-  // Colors.blue;
   static const Color secondaryColor = Colors.grey;
   static const Color backgroundColor = Colors.white;
 }
 
-class DataEntryViewScreen extends StatelessWidget {
-  DataEntryViewScreen({super.key});
+class DataEntryViewScreen extends StatefulWidget {
+  bool showBack;
+  DataEntryViewScreen({super.key, this.showBack = false});
+
+  @override
+  State<DataEntryViewScreen> createState() => _DataEntryViewScreenState();
+}
+
+class _DataEntryViewScreenState extends State<DataEntryViewScreen> {
   final DataController dataController = Get.put(DataController());
+
   final DialerController _dialerController = Get.put(DialerController());
+
   final FollowBackFormController _formController =
-      Get.put(FollowBackFormController());
+      Get.find<FollowBackFormController>();
 
   Timer? _debounce;
 
@@ -41,20 +49,16 @@ class DataEntryViewScreen extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    super.initState();
+    dataController.fetchDataEntryList();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: 'Leads',
-      showBack: false,
-      // appBar: AppBar(
-      //   centerTitle: true,
-      //   title: const Text('Leads'),
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.refresh),
-      //       onPressed: () => dataController.refreshData(),
-      //     ),
-      //   ],
-      // ),
+      showBack: widget.showBack,
       body: Column(
         children: [
           Padding(
@@ -67,7 +71,8 @@ class DataEntryViewScreen extends StatelessWidget {
                           width: 300.w,
                           child: TextField(
                             autofocus: true,
-                            style: TextStyle(color: AppColors.primaryColor),
+                            style:
+                                const TextStyle(color: AppColors.primaryColor),
                             decoration: InputDecoration(
                               hintText: "Search...",
                               hintStyle: const TextStyle(
@@ -309,13 +314,11 @@ class DataEntryViewScreen extends StatelessWidget {
                                 style: const TextStyle(
                                     color: Colors.black, fontSize: 15),
                               ),
-                              subtitle: Text(
-                                data.loginBank.toString(),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                    color: Colors.black, fontSize: 12),
-                              ),
+                              subtitle: Text(data.loginBank.toString(),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      color: Colors.black, fontSize: 12)),
                               trailing: Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -325,6 +328,7 @@ class DataEntryViewScreen extends StatelessWidget {
                                               'teamleader'
                                       ? GestureDetector(
                                           onTap: () {
+                                            dataController.editLoadData();
                                             Get.to(DataEntryForm(
                                               id: data.id,
                                               tellecallerId: data.teleCallerId,
@@ -737,23 +741,6 @@ class DataEntryViewScreen extends StatelessWidget {
   }
 
   // Widget _buildSingleRow(IconData icon, String value) {
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(vertical: 2),
-  //     child: Row(
-  //       children: [
-  //         Icon(icon, size: 14, color: Colors.grey[700]),
-  //         const SizedBox(width: 4),
-  //         Text(
-  //           value,
-  //           style: const TextStyle(fontSize: 12),
-  //           maxLines: 1,
-  //           overflow: TextOverflow.ellipsis,
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   void showDetailsDialogue(String content) {
     showDialog(
       context: Get.context!,
@@ -778,21 +765,24 @@ class DataEntryViewScreen extends StatelessWidget {
       AlertDialog(
         title: const Text("Filter by Status"),
         content: Obx(() {
+          final uniqueItems = {
+            for (var e in dataController.filterLeadStatus.expand((e) => e.data))
+              e.statusGroupName: e
+          }.values.toList();
+
           return SingleChildScrollView(
             child: Wrap(
               spacing: 2,
               children: [
-                for (var item in dataController.filterLeadStatus
-                    .map((element) => element)
-                    .toSet())
+                for (var item in uniqueItems)
                   ChoiceChip(
                     label: Text(
-                      item.toString(),
+                      item.statusGroupName.toString(),
                       style: const TextStyle(fontSize: 12),
                     ),
-                    selected: dataController.selectedStatuses.contains(item),
+                    selected: dataController.selectedStatuses.contains(item.id),
                     onSelected: (_) {
-                      dataController.toggleStatus(item.toString());
+                      dataController.toggleStatus(item.id.toString());
                     },
                   ),
               ],

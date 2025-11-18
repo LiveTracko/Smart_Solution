@@ -5,27 +5,34 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/remark_status_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
+import 'package:smart_solutions/widget/text_style.dart';
 import '../constants/services.dart';
 
 // ignore: must_be_immutable
 class FollowBackForm extends StatelessWidget {
-  final String mobileNumber;
-  FollowBackForm({Key? key, required this.mobileNumber}) : super(key: key);
+  final bool isRefresh;
+  FollowBackForm({Key? key, this.isRefresh = true}) : super(key: key);
 
   final FollowBackFormController _formController =
-      Get.put(FollowBackFormController());
+      Get.find<FollowBackFormController>();
   final RemarkStatusController _remarkController =
       Get.put(RemarkStatusController());
+  final LoginRequestController _loginRequestController =
+      Get.put(LoginRequestController());
   final _formKey = GlobalKey<FormState>();
   var selectedDate = DateTime.now().obs;
 
-  final DialerController _dialerController = Get.put(DialerController());
+  // final DialerController _dialerController = Get.put(DialerController());
+  final DialerController _dialerController = Get.find<DialerController>();
   int backPressCounter = 0;
   bool canPop = false;
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +54,8 @@ class FollowBackForm extends StatelessWidget {
           });
         } else {
           // Get.back();
+          _dialerController.salary.value = '';
+          _formController.bankName.value = '';
           _formController.mobile.value = '';
           _dialerController.elapsedTimeInSeconds.value = 0;
           _dialerController.customerName.value = '';
@@ -68,10 +77,10 @@ class FollowBackForm extends StatelessWidget {
         // ),
         body: RefreshIndicator(
           onRefresh: () async {
-            await _formController.loadData();
+            await _formController.loadData(isRefresh);
           },
           child: Obx(() {
-            if (_formController.isLoading.value) {
+            if (_formController.isBankAndStatusLoading.value) {
               return const Center(child: LoadingPage());
             } else {
               return Padding(
@@ -80,14 +89,86 @@ class FollowBackForm extends StatelessWidget {
                   key: _formKey,
                   child: ListView(
                     children: [
-                      _buildDatePicker(context, false),
-                      SizedBox(height: 16.h),
+                      // _buildDatePicker(context, false),
+                      // SizedBox(height: 16.h),
                       // loan amount field
+
+                      _buildTextField(
+                        label: 'Customer Name',
+                        prefixIcon: SvgPicture.asset(
+                          'assets/images/user.svg',
+                          height: 24,
+                          width: 24,
+                        ),
+                        controller: _dialerController.customerNameController,
+                        onChanged: (value) =>
+                            _dialerController.customerName.value = value,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter customer name';
+                          }
+                          // else if (_dialerController
+                          //     .customerName.value.isNotEmpty) {
+                          //   _dialerController.customerName.value =
+                          //       _formController.customerName.value;
+                          //   // _formController.customerName.value =
+                          //   //     _dialerController.customerName.value;
+                          // }
+                          return null;
+                        },
+                      ),
+
+                      SizedBox(height: 16.h),
+
+                      _buildMobileField(
+                        label: 'Enter Mobile Number',
+                        controller: _formController.customerNumberController,
+                        inputType: TextInputType.number,
+                        prefixIcon: SvgPicture.asset(
+                          'assets/images/phone.svg',
+                          height: 24,
+                          width: 24,
+                        ),
+                        onChanged: (value) {
+                          _formController.mobile.value =
+                              value; // ✅ Proper update
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter mobile number';
+                          } else if (value.length < 10) {
+                            return 'Please enter a valid phone number';
+                          }
+                          return null;
+                        },
+                      ),
+
+                      SizedBox(height: 16.h),
+
+                      _buildTextField(
+                          isRead: _dialerController.salary.value.isEmpty
+                              ? false
+                              : true,
+                          inputType: TextInputType.number,
+                          label: 'Salary',
+                          prefixIcon: SvgPicture.asset(
+                            'assets/images/rupees.svg',
+                            height: 24,
+                            width: 24,
+                          ),
+                          value: CurrencyUtils.formatAmount(
+                              _dialerController.salary.value),
+                          onChanged: (value) =>
+                              _dialerController.salary.value = value,
+                          validator: null),
+                      SizedBox(height: 16.h),
+
                       _buildTextField(
                           isRead: _dialerController.customerLoan.value.isEmpty
                               ? false
                               : true,
-                          label: 'Loan amount',
+                          label: 'Loan Amount',
+                          inputType: TextInputType.number,
                           prefixIcon: SvgPicture.asset(
                             'assets/images/rupees.svg',
                             height: 24,
@@ -100,76 +181,27 @@ class FollowBackForm extends StatelessWidget {
                           validator: null),
                       SizedBox(height: 16.h),
 
-                      // Customer Name Field
-                      Obx(
-                        () => _buildTextField(
-                          label: 'Customer Name',
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/user.svg',
-                            height: 24,
-                            width: 24,
-                          ),
-                          value: _formController.customerName.value,
-                          onChanged: (value) =>
-                              _formController.customerName.value = value,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter customer name';
-                            }
-                            // else if (_dialerController
-                            //     .customerName.value.isNotEmpty) {
-                            //   _dialerController.customerName.value =
-                            //       _formController.customerName.value;
-                            //   // _formController.customerName.value =
-                            //   //     _dialerController.customerName.value;
-                            // }
-                            return null;
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 16.h),
-
-                      // Mobile Number Field
-                      _buildMobileField(
-                        label: _formController.mobile.value,
-                        inputType: TextInputType.phone,
-                        prefixIcon: SvgPicture.asset('assets/images/phone.svg'),
-                        onChanged: (value) {
-                          if (_formController.mobile.value.isEmpty) {
-                            _formController.mobile.value = value;
-                          }
-                          value = _formController.mobile.value;
-                        },
-                        validator: (value) {
-                          if (_formController.mobile.value.isEmpty) {
-                            return 'Please enter mobile number';
-                          } else if (_formController.mobile.value.length > 10) {
-                            return 'Please enter a valid phone number';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 16.h),
-
                       // Bank Name Field
                       _buildAllBankNamesDropdown(),
                       SizedBox(height: 16.h),
 
+                      _buildDataSourcingDropdown(),
                       // Data Type Field
-                      _buildTextField(
-                          label: 'Data Type',
-                          prefixIcon:
-                              SvgPicture.asset('assets/images/data_type.svg'),
-                          value: _dialerController.datatype.value.isEmpty
-                              ? ""
-                              : _dialerController.datatype.value,
-                          onChanged: (value) =>
-                              _formController.dataType.value = value,
-                          validator: null),
+                      // _buildTextField(
+                      //     label: 'Data Type',
+                      //     prefixIcon:
+                      //         SvgPicture.asset('assets/images/data_type.svg'),
+                      //     value: _dialerController.datatype.value.isEmpty
+                      //         ? ""
+                      //         : _dialerController.datatype.value,
+                      //     onChanged: (value) =>
+                      //         _formController.dataType.value = value,
+                      //     validator: null),
                       SizedBox(height: 16.h),
 
                       // Contact Status Radio Buttons
-                      _buildContactStatusRadio(mobileNumber.isEmpty),
+                      _buildContactStatusRadio(_formController
+                          .customerNumberController.text.isEmpty),
                       SizedBox(height: 16.h),
 
                       // Remark Status Dropdown
@@ -192,7 +224,10 @@ class FollowBackForm extends StatelessWidget {
                       SizedBox(height: 24.h),
 
                       // Submit Button
-                      _buildSubmitButton(),
+                      Padding(
+                        padding: EdgeInsetsGeometry.only(bottom: 20.h),
+                        child: _buildSubmitButton(),
+                      ),
                     ],
                   ),
                 ),
@@ -207,6 +242,7 @@ class FollowBackForm extends StatelessWidget {
   Widget _buildTextField({
     required String label,
     String? value,
+    TextEditingController? controller,
     bool? isRead,
     required ValueChanged<String> onChanged,
     required String? Function(String?)? validator,
@@ -230,20 +266,24 @@ class FollowBackForm extends StatelessWidget {
             child: VerticalDivider(
                 width: 1, thickness: 1, color: AppColors.primaryColor),
           ),
+          const SizedBox(width: 5)
         ],
       );
     }
+
     return TextFormField(
       keyboardType: inputType,
       maxLines: maxLines,
-      readOnly: isRead ?? false,
-      initialValue: value ?? "",
+      readOnly: false,
+      controller: controller,
+      initialValue:
+          controller == null && (value!.isNotEmpty ?? false) ? value : null,
       decoration: InputDecoration(
         //    labelText: label,
         hintText: label,
-        hintStyle: const TextStyle(color: AppColors.primaryColor),
+        hintStyle: AppTextStyle.hintText,
         prefixIcon: decoratedPrefixIcon,
-        labelStyle: const TextStyle(color: AppColors.primaryColor),
+        labelStyle: AppTextStyle.textStyle,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0.r),
         ),
@@ -265,7 +305,9 @@ class FollowBackForm extends StatelessWidget {
   }
 
   Widget _buildMobileField({
+    String? value,
     required String label,
+    TextEditingController? controller,
     required ValueChanged<String> onChanged,
     required String? Function(String?)? validator,
     TextInputType inputType = TextInputType.text,
@@ -290,19 +332,21 @@ class FollowBackForm extends StatelessWidget {
               color: AppColors.primaryColor,
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 5)
         ],
       );
     }
     return TextFormField(
+      initialValue:
+          controller == null && (value!.isNotEmpty ?? false) ? value : null,
       keyboardType: inputType,
+      controller: controller,
       maxLines: maxLines,
       maxLength: 10,
       readOnly: false,
       decoration: InputDecoration(
-        // labelText: _formController.mobile.isEmpty ? "Enter mobile" : '',
-        hintText: _formController.mobile.isEmpty ? "Enter mobile" : label,
-        hintStyle: const TextStyle(color: AppColors.primaryColor),
+        hintText: label,
+        hintStyle: AppTextStyle.hintText,
         prefixIcon: decoratedPrefixIcon,
         prefixIconConstraints: const BoxConstraints(
           minWidth: 0,
@@ -452,191 +496,266 @@ class FollowBackForm extends StatelessWidget {
             fontSize: 16.sp,
           ),
         ),
-        Obx(() => Row(
-              children: [
-                Radio<String>(
-                  value: 'Yes',
-                  groupValue: _formController.contacted.value,
-                  onChanged: (value) {
-                    isRestricted
-                        ? {
-                            _formController.contacted.value = value!,
-                            _remarkController.fetchRemarkStatus('1')
-                          }
-                        : {};
-                    // _formController.contacted.value = value!;
-                    // _remarkController.fetchRemarkStatus('1');
-                  },
-                  activeColor: AppColors.primaryColor,
-                ),
-                const Text(
-                  'Yes',
-                  style: TextStyle(
-                    color: AppColors.secondaryColor,
-                  ),
-                ),
-                SizedBox(width: 20.w),
-                Radio<String>(
-                  value: 'No',
-                  groupValue: _formController.contacted.value,
-                  onChanged: (value) {
-                    isRestricted
-                        ? {
-                            _formController.contacted.value = value!,
-                            _remarkController.fetchRemarkStatus('2')
-                          }
-                        : {};
-                    // _formController.contacted.value = value!;
-                    // _remarkController.fetchRemarkStatus('2');
-                  },
-                  activeColor: AppColors.primaryColor,
-                ),
-                const Text(
-                  'No',
-                  style: TextStyle(
-                    color: AppColors.secondaryColor,
-                  ),
-                ),
-              ],
-            )),
+        // Obx(() =>
+        Row(
+          children: [
+            Radio<String>(
+              value: 'Yes',
+              groupValue: _formController.contacted.value,
+              onChanged: (value) {
+                isRestricted
+                    ? {
+                        _formController.contacted.value = value!,
+                        _remarkController.fetchRemarkStatus('1')
+                      }
+                    : {};
+                // _formController.contacted.value = value!;
+                // _remarkController.fetchRemarkStatus('1');
+              },
+              activeColor: AppColors.primaryColor,
+            ),
+            const Text(
+              'Yes',
+              style: TextStyle(
+                color: AppColors.secondaryColor,
+              ),
+            ),
+            SizedBox(width: 20.w),
+            Radio<String>(
+              value: 'No',
+              groupValue: _formController.contacted.value,
+              onChanged: (value) {
+                isRestricted
+                    ? {
+                        _formController.contacted.value = value!,
+                        _remarkController.fetchRemarkStatus('2')
+                      }
+                    : {};
+                // _formController.contacted.value = value!;
+                // _remarkController.fetchRemarkStatus('2');
+              },
+              activeColor: AppColors.primaryColor,
+            ),
+            const Text(
+              'No',
+              style: TextStyle(
+                color: AppColors.secondaryColor,
+              ),
+            ),
+          ],
+          // )),
+        )
       ],
     );
   }
 
   Widget _buildRemarkStatusDropdown() {
     return Obx(
-      () => _remarkController.isLoading.value
-          ? const Center(child: LoadingPage())
-          : DropdownButtonFormField<String>(
-              decoration: InputDecoration(
-                hintText: 'Remark Status',
-                hintStyle: const TextStyle(color: AppColors.primaryColor),
-                labelStyle: const TextStyle(color: AppColors.primaryColor),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0.r),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0.r),
-                  borderSide: const BorderSide(color: AppColors.primaryColor),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0.r),
-                  borderSide:
-                      const BorderSide(color: AppColors.primaryColor, width: 2),
-                ),
-                filled: true,
-                fillColor: AppColors.backgroundColor,
-              ),
-              value: null,
-              items: _remarkController.remarkStatusList.map((status) {
-                // _formController.remarkStatus.value =
-                //     _remarkController.remarkStatusList.first.id ?? "";
-                return DropdownMenuItem<String>(
-                  value: status.id, // Use the ID as the value
-                  child: Text(
-                    status.title ?? 'Select remark status',
-                    style: const TextStyle(color: AppColors.primaryColor),
-                  ),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                _formController.remarkStatus.value = newValue ?? '';
-
-                logOutput("Selected ID: ${_formController.remarkStatus.value}");
-
-                // Find the selected status using the ID
-                var selectedStatus = _remarkController.remarkStatusList
-                    .firstWhereOrNull((status) => status.id == newValue);
-                logOutput('selected status ${selectedStatus?.title}');
-
-                // Check if the selected status title is 'CallBack'
-                if (selectedStatus?.title == 'Callback') {
-                  logOutput("Setting isCallback to true");
-                  _remarkController.isCallback.value = true;
-                } else {
-                  logOutput("Setting isCallback to false");
-                  _remarkController.isCallback.value = false;
-                }
-              },
-              validator: (value) {
-                if (_formController.remarkStatus.value.isEmpty) {
-                  return 'Please select a remark status';
-                }
-                return null;
-              },
+      () =>
+          // _remarkController.isLoading.value
+          //     ? const Center(child: LoadingPage())
+          //     :
+          DropdownButtonFormField<String>(
+        style: AppTextStyle.hintText,
+        decoration: InputDecoration(
+          hintText: 'Remark Status',
+          hintStyle: AppTextStyle.hintText,
+          labelStyle: const TextStyle(color: AppColors.primaryColor),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0.r),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0.r),
+            borderSide: const BorderSide(color: AppColors.primaryColor),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0.r),
+            borderSide:
+                const BorderSide(color: AppColors.primaryColor, width: 2),
+          ),
+          filled: true,
+          fillColor: AppColors.backgroundColor,
+        ),
+        value: null,
+        items: _remarkController.remarkStatusList.map((status) {
+          // _formController.remarkStatus.value =
+          //     _remarkController.remarkStatusList.first.id ?? "";
+          return DropdownMenuItem<String>(
+            value: status.id, // Use the ID as the value
+            child: Text(
+              status.title ?? 'Select remark status',
+              style: const TextStyle(color: AppColors.primaryColor),
             ),
+          );
+        }).toList(),
+        onChanged: (newValue) {
+          _formController.remarkStatus.value = newValue ?? '';
+
+          logOutput("Selected ID: ${_formController.remarkStatus.value}");
+
+          // Find the selected status using the ID
+          var selectedStatus = _remarkController.remarkStatusList
+              .firstWhereOrNull((status) => status.id == newValue);
+          logOutput('selected status ${selectedStatus?.title}');
+
+          // Check if the selected status title is 'CallBack'
+          if (selectedStatus?.title == 'Callback') {
+            logOutput("Setting isCallback to true");
+            _remarkController.isCallback.value = true;
+          } else {
+            logOutput("Setting isCallback to false");
+            _remarkController.isCallback.value = false;
+          }
+        },
+        validator: (value) {
+          if (_formController.remarkStatus.value.isEmpty) {
+            return 'Please select a remark status';
+          }
+          return null;
+        },
+      ),
     );
   }
 
   Widget _buildAllBankNamesDropdown() {
     return Obx(
-      () => _formController.isLoading.value
-          ? const Center(child: LoadingPage())
-          : SizedBox(
-              width: double.infinity,
-              child: DropdownButtonFormField<String>(
-                isExpanded: true,
-
-                decoration: InputDecoration(
-                  prefixIcon: IntrinsicHeight(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0, right: 5.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/images/bank.svg',
-                            height: 24,
-                            width: 24,
-                          ),
-                          SizedBox(width: 5.w),
-                          const VerticalDivider(
-                            thickness: 1,
-                            color: AppColors.primaryColor,
-                          ),
-                        ],
-                      ),
+      () =>
+          // _formController.isLoading.value
+          //     ? const Center(child: LoadingPage())
+          //     :
+          SizedBox(
+        width: double.infinity,
+        child: DropdownButtonFormField<String>(
+          isExpanded: true,
+          isDense: true,
+          style: AppTextStyle.hintText,
+          decoration: InputDecoration(
+            prefixIcon: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 12.0, right: 0.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/bank.svg',
+                      height: 24,
+                      width: 24,
                     ),
-                  ),
-                  hintText: "Select bank",
-                  hintStyle: const TextStyle(color: AppColors.primaryColor),
-                  labelStyle: const TextStyle(color: AppColors.primaryColor),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0.r),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0.r),
-                    borderSide: const BorderSide(color: AppColors.primaryColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0.r),
-                    borderSide: const BorderSide(
-                        color: AppColors.primaryColor, width: 2),
-                  ),
-                  filled: true,
-                  fillColor: AppColors.backgroundColor,
+                    const VerticalDivider(
+                      thickness: 1,
+                      color: AppColors.primaryColor,
+                    ),
+                  ],
                 ),
-                value:
-                    _getInitialBankValue(), // Use the method to get the initial value
-                items: _formController.allBankNamesList.map((bank) {
-                  return DropdownMenuItem<String>(
-                    value: bank.bankName,
-                    child: Text(bank.bankName ?? 'Select bank',
-                        style: TextStyle(color: AppColors.primaryColor)),
-                  );
-                }).toList(),
-                onChanged: (newValue) {
-                  logOutput("bank is $newValue");
-                  _formController.bankName.value = newValue ?? 'Select bank';
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a bank';
-                  }
-                  return null;
-                },
               ),
             ),
+            hintText: "Select Bank",
+            hintStyle: AppTextStyle.hintText,
+
+            // labelStyle: AppTextStyle.hintText,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+              borderSide: const BorderSide(color: AppColors.primaryColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+              borderSide:
+                  const BorderSide(color: AppColors.primaryColor, width: 2),
+            ),
+            filled: true,
+            fillColor: AppColors.backgroundColor,
+          ),
+
+          value:
+              _getInitialBankValue(), // Use the method to get the initial value
+          items: _formController.allBankNamesList.map((bank) {
+            return DropdownMenuItem<String>(
+              value: bank.bankName,
+              child: Text(bank.bankName ?? 'Select bank',
+                  style: const TextStyle(color: AppColors.primaryColor)),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            logOutput("bank is $newValue");
+            _formController.bankName.value = newValue ?? 'Select bank';
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please select a bank';
+            }
+            return null;
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDataSourcingDropdown() {
+    return Obx(
+      () => SizedBox(
+        width: double.infinity,
+        child: DropdownButtonFormField<String>(
+          isExpanded: true,
+          isDense: true,
+          style: AppTextStyle.hintText,
+          padding: EdgeInsets.zero,
+
+          decoration: InputDecoration(
+            prefixIcon: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 12.0, right: 0.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/data_type.svg',
+                      height: 24,
+                      width: 24,
+                    ),
+                    const VerticalDivider(
+                      thickness: 1,
+                      color: AppColors.primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            hintText: "Select Source",
+            hintStyle: AppTextStyle.hintText,
+            //  labelStyle: const TextStyle(color: AppColors.primaryColor),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+              borderSide: const BorderSide(color: AppColors.primaryColor),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+              borderSide:
+                  const BorderSide(color: AppColors.primaryColor, width: 2),
+            ),
+            filled: true,
+            fillColor: AppColors.backgroundColor,
+          ),
+          value:
+              _getInitialSourceValue(), // Use the method to get the initial value
+          items: _buildSourceDropdownItems(),
+
+          onChanged: (newValue) {
+            _formController.dataType.value = newValue.toString();
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please select a source';
+            }
+            return null;
+          },
+        ),
+      ),
     );
   }
 
@@ -651,13 +770,41 @@ class FollowBackForm extends StatelessWidget {
         ?.bankName; // If found, return it; otherwise, return null
   }
 
+  // Helper method to get the initial bank value
+  String? _getInitialSourceValue() {
+    final existingSource =
+        _loginRequestController.sourcingList.firstWhereOrNull(
+      (source) =>
+          source.sourcingTitle?.toLowerCase().trim() ==
+          _loginRequestController.sourceId.value.toLowerCase().trim(),
+    );
+
+    return existingSource?.id;
+  }
+
   Widget _buildSubmitButton() {
     return Obx(() => ElevatedButton(
-          onPressed: _formController.isLoading.value
+          onPressed: _formController.isFormSubmitted.value
               ? null
-              : () {
+              : () async {
                   if (_formKey.currentState!.validate()) {
-                    _formController.submitFollowUp();
+                    final res = await _formController.submitFollowUp();
+                    // Hide keyboard first (optional)
+                    // FocusManager.instance.primaryFocus?.unfocus();
+
+                    // Show snackbar here in the UI
+                    if (res) {
+                      Get.snackbar(
+                        'Success',
+                        'Follow up saved successfully',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.green.shade400,
+                        colorText: Colors.white,
+                        margin: const EdgeInsets.all(12),
+                        borderRadius: 8,
+                        duration: const Duration(seconds: 2),
+                      );
+                    }
                   }
                 },
           style: ElevatedButton.styleFrom(
@@ -677,6 +824,19 @@ class FollowBackForm extends StatelessWidget {
                       color: Colors.white),
                 ),
         ));
+  }
+
+  // Helper method to build dropdown items
+  List<DropdownMenuItem<String>> _buildSourceDropdownItems() {
+    return _loginRequestController.sourcingList.map((source) {
+      return DropdownMenuItem<String>(
+          value: source.id,
+          child: Text(
+            source.sourcingTitle ?? '',
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyle.textStyle,
+          ));
+    }).toList();
   }
 }
 

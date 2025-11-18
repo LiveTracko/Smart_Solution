@@ -114,296 +114,305 @@ class _DataEntryFormState extends State<DataEntryForm> {
             //             )))
             //   ],
             // ),
-            body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 10.h),
-                      _buildTextField(
-                          content: controller.date,
+            body: Obx(() {
+              if (controller.iseditLoading.value) {
+                return const LoadingPage();
+              }
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 10.h),
+                        _buildTextField(
+                            content: controller.date,
+                            prefixIcon: SvgPicture.asset(
+                                'assets/images/calendar.svg',
+                                height: 20,
+                                width: 20),
+                            label: 'Date',
+                            validator: (value) => _validatePhone(value),
+                            onChanged: (value) =>
+                                controller.date.value = value),
+
+                        SizedBox(height: 10.h),
+                        _buildDsaDropdown(),
+
+                        // _buildDateField(
+                        //   label: 'Date',
+                        //   content: controller.date,
+                        //   context: context,
+                        // ),
+                        // _buildDateField(
+                        //     label: 'Date',
+                        //     content:controller.dob.map((date) => DateFormat('yyyy-MM-dd').format(date)),
+                        //     onChanged: (value) =>
+                        //         controller.date.value = DateTime.parse(value),
+                        //     inputType: TextInputType.phone,
+                        //     validator: _validatePhone),
+
+                        _buildTextField(
+                          label: 'Mobile Number',
                           prefixIcon: SvgPicture.asset(
-                              'assets/images/calendar.svg',
-                              height: 20,
-                              width: 20),
-                          label: 'Date',
-                          validator: (value) => _validatePhone(value),
-                          onChanged: (value) => controller.date.value = value),
-
-                      SizedBox(height: 10.h),
-                      _buildDsaDropdown(),
-
-                      // _buildDateField(
-                      //   label: 'Date',
-                      //   content: controller.date,
-                      //   context: context,
-                      // ),
-                      // _buildDateField(
-                      //     label: 'Date',
-                      //     content:controller.dob.map((date) => DateFormat('yyyy-MM-dd').format(date)),
-                      //     onChanged: (value) =>
-                      //         controller.date.value = DateTime.parse(value),
-                      //     inputType: TextInputType.phone,
-                      //     validator: _validatePhone),
-
-                      _buildTextField(
-                        label: 'Mobile Number',
-                        prefixIcon: SvgPicture.asset(
-                          'assets/images/phone.svg',
-                          height: 20,
-                          width: 20,
-                        ),
-                        content: controller.contactNumber,
-                        onChanged: (value) =>
-                            controller.contactNumber.value = value,
-                        inputType: TextInputType.phone,
-                        validator: _validatePhone,
-                      ),
-                      Obx(
-                        () => _buildTextField(
-                          label: 'Customer Name',
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/user.svg',
+                            'assets/images/phone.svg',
                             height: 20,
                             width: 20,
                           ),
-                          content: controller.customerName,
+                          content: controller.contactNumber,
                           onChanged: (value) =>
-                              controller.customerName.value = value,
+                              controller.contactNumber.value = value,
+                          inputType: TextInputType.phone,
+                          validator: _validatePhone,
+                        ),
+                        Obx(
+                          () => _buildTextField(
+                            label: 'Customer Name',
+                            prefixIcon: SvgPicture.asset(
+                              'assets/images/user.svg',
+                              height: 20,
+                              width: 20,
+                            ),
+                            content: controller.customerName,
+                            onChanged: (value) =>
+                                controller.customerName.value = value,
+                            inputType: TextInputType.phone,
+                            validator: _validateNotEmpty,
+                          ),
+                        ),
+
+                        _buildTextField(
+                          label: 'Income',
+                          prefixIcon: SvgPicture.asset(
+                            'assets/images/data_type.svg',
+                            height: 20,
+                            width: 20,
+                          ),
+                          content: controller.income,
+                          onChanged: (value) => controller.income.value = value,
                           inputType: TextInputType.phone,
                           validator: _validateNotEmpty,
                         ),
-                      ),
 
-                      _buildTextField(
-                        label: 'Income',
-                        prefixIcon: SvgPicture.asset(
-                          'assets/images/data_type.svg',
-                          height: 20,
-                          width: 20,
+                        _buildTextField(
+                          label: 'Company Name',
+                          prefixIcon: SvgPicture.asset(
+                            'assets/images/company_name.svg',
+                            height: 20,
+                            width: 20,
+                          ),
+                          content: controller.companyName,
+                          onChanged: (value) =>
+                              controller.companyName.value = value,
+                          inputType: TextInputType.phone,
+                          validator: _validateNotEmpty,
                         ),
-                        content: controller.income,
-                        onChanged: (value) => controller.income.value = value,
-                        inputType: TextInputType.phone,
-                        validator: _validateNotEmpty,
-                      ),
+                        _buildCaseTypeDropdown(),
+                        const SizedBox(height: 10),
+                        _buildTextField(
+                          label: 'Loan Amount',
+                          prefixIcon: SvgPicture.asset(
+                            'assets/images/rupees.svg',
+                            height: 20,
+                            width: 20,
+                          ),
+                          content: controller.loanAmount,
+                          formatAsCurrency: true,
+                          // CurrencyUtils.formatIndianCurrency(
+                          //     controller.loanAmount.value),
+                          onChanged: (value) {
+                            // Remove commas to get the numeric value before formatting
+                            String plainTextValue = value.replaceAll(',', '');
+                            controller.loanAmount.value = plainTextValue;
 
-                      _buildTextField(
-                        label: 'Company Name',
-                        prefixIcon: SvgPicture.asset(
-                          'assets/images/company_name.svg',
-                          height: 20,
-                          width: 20,
+                            // Format the numeric value back to the Indian format
+                            String formattedValue = NumberFormat.currency(
+                                    locale: 'en_IN',
+                                    symbol: '',
+                                    decimalDigits: 0)
+                                .format(int.tryParse(plainTextValue) ?? 0);
+
+                            controller.loanAmount.value = formattedValue;
+                          },
+                          inputType: TextInputType.number,
+                          validator: _validateNumber,
                         ),
-                        content: controller.companyName,
-                        onChanged: (value) =>
-                            controller.companyName.value = value,
-                        inputType: TextInputType.phone,
-                        validator: _validateNotEmpty,
-                      ),
-                      _buildCaseTypeDropdown(),
-                      const SizedBox(height: 10),
-                      _buildTextField(
-                        label: 'Loan Amount',
-                        prefixIcon: SvgPicture.asset(
-                          'assets/images/rupees.svg',
-                          height: 20,
-                          width: 20,
+
+                        const SizedBox(height: 10),
+                        _buildTextField(
+                          content: controller.dob,
+                          prefixIcon: SvgPicture.asset(
+                            'assets/images/dob.svg',
+                            height: 20,
+                            width: 20,
+                          ),
+                          label: 'DOB',
+                          validator: (value) => _validateNotEmpty(value),
+                          onChanged: (value) => controller.dob.value = value,
                         ),
-                        content: controller.loanAmount,
-                        formatAsCurrency: true,
-                        // CurrencyUtils.formatIndianCurrency(
-                        //     controller.loanAmount.value),
-                        onChanged: (value) {
-                          // Remove commas to get the numeric value before formatting
-                          String plainTextValue = value.replaceAll(',', '');
-                          controller.loanAmount.value = plainTextValue;
 
-                          // Format the numeric value back to the Indian format
-                          String formattedValue = NumberFormat.currency(
-                                  locale: 'en_IN', symbol: '', decimalDigits: 0)
-                              .format(int.tryParse(plainTextValue) ?? 0);
+                        // _buildDateField(
+                        //     label: 'DOB',
+                        //     content: controller.dob,
+                        //     // onChanged: (value) =>
+                        //     //     controller.dob.value = DateTime.parse(value),
+                        //     context: context
+                        //     // validator: _validateNotEmpty,
+                        //     ),
+                        const SizedBox(height: 10),
 
-                          controller.loanAmount.value = formattedValue;
-                        },
-                        inputType: TextInputType.number,
-                        validator: _validateNumber,
-                      ),
+                        _buildProductTypeDropdown(),
+                        const SizedBox(height: 10),
 
-                      const SizedBox(height: 10),
-                      _buildTextField(
-                        content: controller.dob,
-                        prefixIcon: SvgPicture.asset(
-                          'assets/images/dob.svg',
-                          height: 20,
-                          width: 20,
+                        _buildloginBankDropdown(),
+                        const SizedBox(height: 10),
+
+                        _buildBankerNameDropdown(),
+                        const SizedBox(height: 10),
+
+                        _buildTextField(
+                          label: 'Banker Mobile',
+                          prefixIcon: SvgPicture.asset(
+                            'assets/images/phone.svg',
+                            height: 20,
+                            width: 20,
+                          ),
+                          content: controller.bankerMobile,
+                          onChanged: (value) =>
+                              controller.bankerMobile.value = value,
+                          // validator: _validateNotEmpty,
                         ),
-                        label: 'DOB',
-                        validator: (value) => _validateNotEmpty(value),
-                        onChanged: (value) => controller.dob.value = value,
-                      ),
 
-                      // _buildDateField(
-                      //     label: 'DOB',
-                      //     content: controller.dob,
-                      //     // onChanged: (value) =>
-                      //     //     controller.dob.value = DateTime.parse(value),
-                      //     context: context
-                      //     // validator: _validateNotEmpty,
-                      //     ),
-                      const SizedBox(height: 10),
-
-                      _buildProductTypeDropdown(),
-                      const SizedBox(height: 10),
-
-                      _buildloginBankDropdown(),
-                      const SizedBox(height: 10),
-
-                      _buildBankerNameDropdown(),
-                      const SizedBox(height: 10),
-
-                      _buildTextField(
-                        label: 'Banker Mobile',
-                        prefixIcon: SvgPicture.asset(
-                          'assets/images/phone.svg',
-                          height: 20,
-                          width: 20,
+                        _buildTextField(
+                          label: 'Banker Email',
+                          prefixIcon: SvgPicture.asset(
+                            'assets/images/email.svg',
+                            height: 20,
+                            width: 20,
+                          ),
+                          content: controller.bankerEmail,
+                          onChanged: (value) =>
+                              controller.bankerEmail.value = value,
+                          // validator: _validateNotEmpty,
                         ),
-                        content: controller.bankerMobile,
-                        onChanged: (value) =>
-                            controller.bankerMobile.value = value,
-                        // validator: _validateNotEmpty,
-                      ),
+                        const SizedBox(height: 10),
 
-                      _buildTextField(
-                        label: 'Banker Email',
-                        prefixIcon: SvgPicture.asset(
-                          'assets/images/email.svg',
-                          height: 20,
-                          width: 20,
+                        _buildTextField(
+                          label: 'LOS No.',
+                          prefixIcon: SvgPicture.asset(
+                            'assets/images/company_name.svg',
+                            height: 20,
+                            width: 20,
+                          ),
+                          content: controller.losNo,
+                          onChanged: (value) => controller.losNo.value = value,
+                          // validator: _validateNotEmpty,
                         ),
-                        content: controller.bankerEmail,
-                        onChanged: (value) =>
-                            controller.bankerEmail.value = value,
-                        // validator: _validateNotEmpty,
-                      ),
-                      const SizedBox(height: 10),
+                        const SizedBox(height: 10),
 
-                      _buildTextField(
-                        label: 'LOS No.',
-                        prefixIcon: SvgPicture.asset(
-                          'assets/images/company_name.svg',
-                          height: 20,
-                          width: 20,
+                        _buildTeleCallerDropdown(),
+                        const SizedBox(height: 10),
+
+                        _buildTextField(
+                          label: 'Team Leader',
+                          prefixIcon: SvgPicture.asset(
+                            'assets/images/teamleader.svg',
+                            height: 20,
+                            width: 20,
+                          ),
+                          content: controller.teamleader,
+                          onChanged: (value) =>
+                              controller.teamleader.value = value,
+                          // validator: _validateNotEmpty,
                         ),
-                        content: controller.losNo,
-                        onChanged: (value) => controller.losNo.value = value,
-                        // validator: _validateNotEmpty,
-                      ),
-                      const SizedBox(height: 10),
 
-                      _buildTeleCallerDropdown(),
-                      const SizedBox(height: 10),
+                        const SizedBox(height: 10),
 
-                      _buildTextField(
-                        label: 'Team Leader',
-                        prefixIcon: SvgPicture.asset(
-                          'assets/images/teamleader.svg',
-                          height: 20,
-                          width: 20,
+                        _buildStatusDropdown(),
+                        const SizedBox(height: 10),
+
+                        _buildSourcingDropdown(),
+                        const SizedBox(height: 10),
+
+                        _buildTextField(
+                          label: 'Case Study ',
+                          content: controller.caseStudy,
+
+                          onChanged: (value) =>
+                              controller.caseStudy.value = value,
+                          // validator: _validateNotEmpty,
                         ),
-                        content: controller.teamleader,
-                        onChanged: (value) =>
-                            controller.teamleader.value = value,
-                        // validator: _validateNotEmpty,
-                      ),
+                        const SizedBox(height: 10),
 
-                      const SizedBox(height: 10),
-
-                      _buildStatusDropdown(),
-                      const SizedBox(height: 10),
-
-                      _buildSourcingDropdown(),
-                      const SizedBox(height: 10),
-
-                      _buildTextField(
-                        label: 'Case Study ',
-                        content: controller.caseStudy,
-
-                        onChanged: (value) =>
-                            controller.caseStudy.value = value,
-                        // validator: _validateNotEmpty,
-                      ),
-                      const SizedBox(height: 10),
-
-                      _buildTextField(
-                        label: 'Comments ',
-                        content: controller.comments,
-                        onChanged: (value) => controller.comments.value = value,
-                        // validator: _validateNotEmpty,
-                      ),
-                      const SizedBox(height: 5),
-                      Container(
-                        alignment: Alignment.bottomRight,
-                        child: Text(
-                          textAlign: TextAlign.end,
-                          'By ${controller.admin_subadmin_name}',
-                          //on ${DateFormat('dd-MM-yy HH:mm:ss').format(DateTime.parse(controller.date.toString()))}',
-                          style:
-                              const TextStyle(fontSize: 15, color: Colors.grey),
+                        _buildTextField(
+                          label: 'Comments ',
+                          content: controller.comments,
+                          onChanged: (value) =>
+                              controller.comments.value = value,
+                          // validator: _validateNotEmpty,
                         ),
-                      ),
+                        const SizedBox(height: 5),
+                        Container(
+                          alignment: Alignment.bottomRight,
+                          child: Text(
+                            textAlign: TextAlign.end,
+                            'By ${controller.admin_subadmin_name}',
+                            //on ${DateFormat('dd-MM-yy HH:mm:ss').format(DateTime.parse(controller.date.toString()))}',
+                            style: const TextStyle(
+                                fontSize: 15, color: Colors.grey),
+                          ),
+                        ),
 
-                      const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                      // // _buildLoanStatusDropdown(),
-                      // // const SizedBox(height: 10),
-                      // _buildAllBankNamesDropdown(),
-                      // const SizedBox(height: 10),
+                        // // _buildLoanStatusDropdown(),
+                        // // const SizedBox(height: 10),
+                        // _buildAllBankNamesDropdown(),
+                        // const SizedBox(height: 10),
 
-                      // _buildSourcingDropdown(),
-                      // const SizedBox(height: 10),
+                        // _buildSourcingDropdown(),
+                        // const SizedBox(height: 10),
 
-                      // _buildTextField(
-                      //   label: 'Common remark',
-                      //   content: controller.commonRemark.value,
-                      //   onChanged: (value) => controller.commonRemark.value = value,
-                      //   // validator: _validateNotEmpty,
-                      // ),
-                      // const SizedBox(height: 10),
-                      // // Dynamic Remarks Section
-                      // _buildRemarksSection(),
-                      // const SizedBox(height: 20),
+                        // _buildTextField(
+                        //   label: 'Common remark',
+                        //   content: controller.commonRemark.value,
+                        //   onChanged: (value) => controller.commonRemark.value = value,
+                        //   // validator: _validateNotEmpty,
+                        // ),
+                        // const SizedBox(height: 10),
+                        // // Dynamic Remarks Section
+                        // _buildRemarksSection(),
+                        // const SizedBox(height: 20),
 
-                      Center(
-                        child: Obx(() => ElevatedButton(
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  controller
-                                      .saveDataEntryForm(); // Call save method
-                                  //        controller.getLoginRequestList();
-                                }
-                              },
-                              child: controller.isLoading.value
-                                  ? const LoadingPage()
-                                  : const Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 24.0),
-                                      child: Text(
-                                        'Submit',
-                                        style: TextStyle(color: Colors.white),
+                        Center(
+                          child: Obx(() => ElevatedButton(
+                                onPressed: () {
+                                  if (_formKey.currentState!.validate()) {
+                                    controller
+                                        .saveDataEntryForm(); // Call save method
+                                    //        controller.getLoginRequestList();
+                                  }
+                                },
+                                child: controller.isLoading.value
+                                    ? const LoadingPage()
+                                    : const Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 24.0),
+                                        child: Text(
+                                          'Submit',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
                                       ),
-                                    ),
-                            )),
-                      ),
-                    ],
+                              )),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            )));
+              );
+            })));
   }
 
   Widget _buildTextField({

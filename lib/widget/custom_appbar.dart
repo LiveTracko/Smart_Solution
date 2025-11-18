@@ -7,6 +7,7 @@ class CurvedAppBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final Widget? leading;
   final bool? showBack;
+  final double height;
 
   const CurvedAppBar({
     Key? key,
@@ -14,59 +15,54 @@ class CurvedAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBack = true,
     this.actions,
     this.leading,
+    this.height = 30,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ClipPath(
-      child: Container(
+    return Container(
         color: const Color(0xFF356eff),
         child: SafeArea(
           bottom: false,
           child: SizedBox(
             height: preferredSize.height,
-            child: Transform.translate(
-              offset: Offset(0, -10.h), // moves the whole row up
-              child: Row(
-                children: [
-                  // Leading (menu/back)
-                  showBack == true
-                      ? IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back,
-                            color: AppColors.backgroundColor,
-                          ),
-                          onPressed: () => Navigator.of(context).maybePop(),
-                        )
-                      : (leading ?? SizedBox(width: 55.w)),
-
-                  // Title
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.sp, // responsive font size
+            child: Row(
+              children: [
+                // Leading (menu/back)
+                showBack == true
+                    ? IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: AppColors.backgroundColor,
                         ),
+                        onPressed: () => Navigator.of(context).maybePop(),
+                      )
+                    : (leading ?? SizedBox(width: 55.w)),
+
+                // Title
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.sp, // responsive font size
                       ),
                     ),
                   ),
+                ),
 
-                  // Actions
-                  if (actions != null && actions!.isNotEmpty)
-                    Row(children: actions!)
-                  else
-                    SizedBox(width: 48.w),
-                ],
-              ),
+                // Actions
+                if (actions != null && actions!.isNotEmpty)
+                  Row(children: actions!)
+                else
+                  SizedBox(width: 48.w),
+              ],
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight + 30.h);
+  Size get preferredSize => Size.fromHeight(kToolbarHeight + height.h);
 }

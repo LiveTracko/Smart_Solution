@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:smart_solutions/controllers/dailer_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/models/all_followup_status.dart';
 import 'package:smart_solutions/models/remark_status_model.dart';
 import '../constants/services.dart';
 import '../services/api_service.dart';
@@ -13,16 +12,15 @@ class RemarkStatusController extends GetxController {
   var isLoading = false.obs;
   var isCallback = false.obs;
 
-  final FollowBackFormController _followBackFormController =
-      Get.find<FollowBackFormController>();
-
+  var filterFollowupStatus = <GetAllFollowupStatus>[].obs;
   @override
   void onInit() {
     super.onInit();
 
-    DialerController dialerController = Get.find();
-    dialerController.fetchNextPhoneNumber();
-    fetchRemarkStatus(_followBackFormController.contactStatus);
+    // DialerController dialerController = Get.find();
+    //  dialerController.fetchNextPhoneNumber();
+    fetchRemarkStatus('2');
+    getAllFollowupStatusName();
   }
 
   Future<void> fetchRemarkStatus(String status) async {
@@ -47,6 +45,23 @@ class RemarkStatusController extends GetxController {
       );
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<void> getAllFollowupStatusName() async {
+    try {
+      var response = await ApiService().getRequest(APIUrls.getFollowUpStatus);
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final statusList = GetAllFollowupStatus.fromJson(responseData);
+        if (statusList.data.isNotEmpty) {
+          filterFollowupStatus.add(statusList);
+        }
+      }
+    } catch (e) {
+      logOutput('An error occurred while fetching source list: $e');
+      // Ensure loading is set to false on error as well
     }
   }
 }

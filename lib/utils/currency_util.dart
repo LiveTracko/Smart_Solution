@@ -19,11 +19,16 @@ class CurrencyUtils {
         locale: 'en_IN',
         symbol: '₹',
         decimalDigits: 0,
-        
       ).format(numericAmount);
     } catch (e) {
       logOutput("error occurred while formatting currency: $e");
-      return 'N/A';
+      return '';
     }
+  }
+
+  static String formatAmount(String amount) {
+    final f = NumberFormat.decimalPattern('hi_IN');
+    final numValue = num.tryParse(amount) ?? 0;
+    return f.format(numValue);
   }
 }

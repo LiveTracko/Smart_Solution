@@ -6,9 +6,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
+import 'package:smart_solutions/widget/suggestin_textfiels.dart';
 
 import '../constants/services.dart';
 
@@ -21,10 +23,14 @@ class AppColors {
 
 class LoginRequestForm extends StatelessWidget {
   final LoginRequestController controller = Get.put(LoginRequestController());
+  final FollowBackFormController _followBackFormController =
+      Get.find<FollowBackFormController>();
 
   final _formKey = GlobalKey<FormState>(); // Form key for validation
 
   LoginRequestForm({super.key});
+
+  final TextEditingController customerNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -50,13 +56,6 @@ class LoginRequestForm extends StatelessWidget {
       child: CommonScaffold(
         title: 'Login Request Form',
         showBack: true,
-
-        // appBar: AppBar(
-        //   centerTitle: true,
-        //   title: const Text(
-        //     'Login Request Form',
-        //     style: TextStyle(fontSize: 20),
-        //   ),
         actions: [
           Obx(() => controller.isNew.value
               ? const SizedBox.shrink()
@@ -69,117 +68,177 @@ class LoginRequestForm extends StatelessWidget {
                     color: controller.isEdit.value ? Colors.red : Colors.white,
                   )))
         ],
-
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 10.h),
-                  _buildTextField(
-                    label: 'Customer Name',
-                    prefixIcon: SvgPicture.asset(
-                      'assets/images/user.svg',
-                      height: 24,
-                      width: 24,
-                    ),
-                    content: controller.customerName.value,
-                    onChanged: (value) => controller.customerName.value = value,
-                    validator: _validateNotEmpty,
-                  ),
-                  const SizedBox(height: 10),
-                  _buildTextField(
-                    label: 'Contact Number',
-                    prefixIcon: SvgPicture.asset('assets/images/phone.svg'),
-                    content: controller.contactNumber.value,
-                    onChanged: (value) =>
-                        controller.contactNumber.value = value,
-                    inputType: TextInputType.phone,
-                    validator: _validatePhone,
-                  ),
-                  const SizedBox(height: 10),
-                  _buildTextField(
-                    label: 'Loan Amount',
-                    prefixIcon: SvgPicture.asset(
-                      'assets/images/rupees.svg',
-                      height: 24,
-                      width: 24,
-                    ),
-                    content: controller.loanAmount.value.isNotEmpty
-                        ? NumberFormat.currency(
-                                locale: 'en_IN', symbol: '', decimalDigits: 0)
-                            .format(
-                                int.tryParse(controller.loanAmount.value) ?? 0)
-                        : '',
-                    onChanged: (value) {
-                      // Remove commas to get the numeric value before formatting
-                      String plainTextValue = value.replaceAll(',', '');
-                      controller.loanAmount.value = plainTextValue;
-
-                      // Format the numeric value back to the Indian format
-                      String formattedValue = NumberFormat.currency(
-                              locale: 'en_IN', symbol: '', decimalDigits: 0)
-                          .format(int.tryParse(plainTextValue) ?? 0);
-
-                      controller.loanAmount.value = formattedValue;
-                    },
-                    inputType: TextInputType.number,
-                    validator: _validateNumber,
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // _buildLoanStatusDropdown(),
-                  // const SizedBox(height: 10),
-                  _buildAllBankNamesDropdown(),
-                  const SizedBox(height: 10),
-
-                  _buildSourcingDropdown(),
-                  const SizedBox(height: 10),
-
-                  // _buildTextField(
-                  //   label: 'Common remark',
-                  //   content: controller.commonRemark.value,
-                  //   onChanged: (value) => controller.commonRemark.value = value,
-                  //   // validator: _validateNotEmpty,
-                  // ),
-                  const SizedBox(height: 10),
-                  // Dynamic Remarks Section
-                  _buildRemarksSection(),
-                  const SizedBox(height: 20),
-
-                  Center(
-                    child: Obx(() => SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                controller
-                                    .saveLoginRequest(); // Call save method
-                                controller.getLoginRequestList();
-                              }
+        body: Obx(() {
+          if (customerNameController.text != controller.customerName.value) {
+            customerNameController.text = controller.customerName.value;
+          }
+          final filteredNames = _followBackFormController.allCustomerName
+              .where((e) => e.contactNumber == controller.contactNumber.value)
+              .map((e) => e.customerName ?? '')
+              .toList();
+          return controller.iseditLoading.value
+              ? const LoadingPage()
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 10.h),
+                          _buildTextField(
+                            label: 'Contact Number',
+                            prefixIcon:
+                                SvgPicture.asset('assets/images/phone.svg'),
+                            content: controller.contactNumber.value,
+                            onChanged: (value) {
+                              controller.contactNumber.value = value;
                             },
-                            child: controller.isLoading.value
-                                ? LoadingPage()
-                                : const Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 24.0),
-                                    child: Text(
-                                      'Save Request',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
+                            inputType: TextInputType.phone,
+                            validator: _validatePhone,
                           ),
-                        )),
+                          const SizedBox(height: 10),
+                          SuggestionTextField(
+                              label: 'Customer Name',
+                              svgIconPath: 'assets/images/user.svg',
+                              onChanged: (value) {
+                                controller.customerName.value = value;
+
+                                final matchedCustomer =
+                                    _followBackFormController.allCustomerName
+                                        .firstWhereOrNull(
+                                  (e) =>
+                                      e.customerName ==
+                                      controller.customerName.value,
+                                );
+
+                                final sourceTitle =
+                                    matchedCustomer?.dataType ?? '';
+
+                                // 🔍 find match by name (case-insensitive)
+                                final matchedSource = controller.sourcingList
+                                    .firstWhereOrNull((source) =>
+                                        (source.id ?? '')
+                                            .toLowerCase()
+                                            .trim() ==
+                                        sourceTitle.toLowerCase().trim());
+
+                                if (matchedSource != null) {
+                                  // ✅ update values when name matches
+                                  controller.sourceId.value =
+                                      matchedSource.sourcingTitle.toString();
+                                  // controller.sourceId.value =
+                                  //     matchedSource.sourcingTitle ?? '';
+                                  log('Matched: ${matchedSource.sourcingTitle} (ID: ${matchedSource.id})');
+                                  _getInitialSourceValue();
+                                } else {
+                                  // ❌ clear if no match found
+                                  controller.sourceId.value = '';
+
+                                  log('No matching source found for name: $value');
+                                }
+                              },
+                              controller: customerNameController,
+                              suggestions: filteredNames),
+
+                          // _buildTextField(
+                          //   label: 'Customer Name',
+                          //   prefixIcon: SvgPicture.asset(
+                          //     'assets/images/user.svg',
+                          //     height: 24,
+                          //     width: 24,
+                          //   ),
+                          //   content: controller.customerName.value,
+                          //   onChanged: (value) =>
+                          //       controller.customerName.value = value,
+                          //   validator: _validateNotEmpty,
+                          // ),
+                          const SizedBox(height: 10),
+
+                          _buildTextField(
+                            label: 'Loan Amount',
+                            prefixIcon: SvgPicture.asset(
+                              'assets/images/rupees.svg',
+                              height: 24,
+                              width: 24,
+                            ),
+                            content: controller.loanAmount.value.isNotEmpty
+                                ? NumberFormat.currency(
+                                        locale: 'en_IN',
+                                        symbol: '',
+                                        decimalDigits: 0)
+                                    .format(int.tryParse(
+                                            controller.loanAmount.value) ??
+                                        0)
+                                : '',
+                            onChanged: (value) {
+                              // Remove commas to get the numeric value before formatting
+                              String plainTextValue = value.replaceAll(',', '');
+                              controller.loanAmount.value = plainTextValue;
+
+                              // Format the numeric value back to the Indian format
+                              String formattedValue = NumberFormat.currency(
+                                      locale: 'en_IN',
+                                      symbol: '',
+                                      decimalDigits: 0)
+                                  .format(int.tryParse(plainTextValue) ?? 0);
+
+                              controller.loanAmount.value = formattedValue;
+                            },
+                            inputType: TextInputType.number,
+                            validator: _validateNumber,
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // _buildLoanStatusDropdown(),
+                          // const SizedBox(height: 10),
+                          _buildAllBankNamesDropdown(),
+                          const SizedBox(height: 10),
+
+                          _buildSourcingDropdown(),
+                          const SizedBox(height: 10),
+
+                          // _buildTextField(
+                          //   label: 'Common remark',
+                          //   content: controller.commonRemark.value,
+                          //   onChanged: (value) => controller.commonRemark.value = value,
+                          //   // validator: _validateNotEmpty,
+                          // ),
+                          const SizedBox(height: 10),
+                          // Dynamic Remarks Section
+                          _buildRemarksSection(),
+
+                          Center(
+                            child: Obx(() => SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        controller
+                                            .saveLoginRequest(); // Call save method
+                                        controller.getLoginRequestList();
+                                      }
+                                    },
+                                    child: controller.isLoading.value
+                                        ? const LoadingPage()
+                                        : const Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 24.0),
+                                            child: Text(
+                                              'Save Request',
+                                            ),
+                                          ),
+                                  ),
+                                )),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-              ),
-            ),
-          ),
-        ),
+                );
+        }),
       ),
     );
   }
@@ -209,6 +268,9 @@ class LoginRequestForm extends StatelessWidget {
             child: VerticalDivider(
                 width: 1, thickness: 1, color: AppColors.primaryColor),
           ),
+          const SizedBox(
+            width: 5,
+          )
         ],
       );
     }

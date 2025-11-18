@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/routes/app_routes.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
@@ -18,7 +20,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus(); // Check login status when the splash screen initializes
+    checkForUpdate();
+    //  _checkLoginStatus(); // Check login status when the splash screen initializes
   }
 
   // Check if user is already logged in
@@ -43,6 +46,46 @@ class _SplashScreenState extends State<SplashScreen> {
         Get.offAllNamed(AppRoutes.login);
       }
     });
+  }
+
+  Future<void> checkForUpdate() async {
+    // Skip update checks entirely in debug mode
+    if (kDebugMode) {
+      debugPrint("🚫 Skipping in-app update in debug mode.");
+      _checkLoginStatus();
+      return;
+    }
+
+    try {
+      AppUpdateInfo updateInfo = await InAppUpdate.checkForUpdate();
+
+      if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable &&
+          updateInfo.immediateUpdateAllowed) {
+        // Force the user to update immediately
+        await InAppUpdate.performImmediateUpdate();
+      } else {
+        // No update needed
+        _checkLoginStatus();
+      }
+    } catch (e) {
+      final errorMsg = e.toString();
+
+      // Specific handling for sideload/debug error
+      if (errorMsg.contains("ERROR_APP_NOT_OWNED") ||
+          errorMsg.contains("Install Error(-10)") ||
+          errorMsg.contains('PlatformException(TASK_FAILURE') ||
+          errorMsg.contains('java.lang.NullPointerException')) {
+        debugPrint("⚠️ Skipping update: app not owned by Play Store.");
+        // Don’t stop app — just continue normally
+        _checkLoginStatus();
+        // WidgetsBinding.instance.addPostFrameCallback((_) {
+        //   navigateToHome();
+        // });
+      } else {
+        debugPrint("❌ Update check failed: $e");
+        _checkLoginStatus();
+      }
+    }
   }
 
   @override

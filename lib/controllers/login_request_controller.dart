@@ -19,6 +19,7 @@ class LoginRequestController extends GetxController {
   var loanStatusList = <LoanStatus>[].obs;
   List<RemarkList> remarks = []; // Observable list for reactive UI
   var isLoading = false.obs;
+  var iseditLoading = false.obs;
   var currentId = ''.obs;
   var isEdit = false.obs;
   var isNew = false.obs;
@@ -40,12 +41,28 @@ class LoginRequestController extends GetxController {
   var sourceId = ''.obs;
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
-    getLoginRequestList();
-    fetchLoanStatuses();
-    getLoginRequestBanks();
-    getSourcingList();
+    await getLoginRequestList();
+    await editLoadData();
+    // fetchLoanStatuses();
+    // getLoginRequestBanks();
+    // getSourcingList();
+  }
+
+  Future<void> editLoadData() async {
+    try {
+      iseditLoading(true);
+      await Future.wait([
+        fetchLoanStatuses(),
+        getLoginRequestBanks(),
+        getSourcingList(),
+      ]);
+    } catch (e) {
+      logOutput("Error loading data: $e");
+    } finally {
+      iseditLoading(false); // 👈 stop loading in all cases
+    }
   }
 
   // Fetch the login request list
@@ -68,8 +85,8 @@ class LoginRequestController extends GetxController {
 
           // log('raw -->>> ${resData['data'] }');
 
-          loginRequestList.value = loginData; 
-     //     currentId.value = loginRequestList[0].id;
+          loginRequestList.value = loginData;
+          //     currentId.value = loginRequestList[0].id;
           await getRemarks();
 
           // log('pppp -->>> ${loginRequestList.map((e) => e.toJson()).toList()}');
@@ -185,7 +202,7 @@ class LoginRequestController extends GetxController {
         loanAmount.value = '';
         commonRemark.value = '';
         remarksList.value = []; // To hold multiple remarks
-    //    id = ''.obs;
+        //    id = ''.obs;
         sourceId.value = '';
         Get.back();
         Get.snackbar('Success', 'Login request saved successfully!');

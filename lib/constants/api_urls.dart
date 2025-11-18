@@ -8,6 +8,7 @@ class APIUrls {
   static const String loginApiKey = 'Surplus_apikey@';
   static const String todaysDashboard = 'Auth/getdashboarddata';
   static const String followListData = 'Auth/followupsave';
+  static const String followListData2 = 'Auth/followupsave2';
   static const String remarkStatusCode = 'Auth/getremarkstatus';
   static const String followUpSubmitedData = 'Auth/getfollowuplist';
   static const String callBackdData = 'Auth/getfollowuplistbyfilter';
@@ -57,4 +58,8 @@ class APIUrls {
 
   //top disburse User
   static const String topDisburseUser = "Auth/gettopdisburseduser";
+
+  //get lead status group
+  static const String getAllStatusGroup = "Auth/getallstatusgroup";
+  static const String getFollowUpStatus = "Auth/getallfollowupstatus";
 }

@@ -12,18 +12,25 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
 
-class FollowBackListScreen extends StatelessWidget {
-  final FollowBackFormController controller =
-      Get.put(FollowBackFormController());
+class FollowBackListScreen extends StatefulWidget {
+  FollowBackListScreen({Key? key}) : super(key: key);
+
+  @override
+  State<FollowBackListScreen> createState() => _FollowBackListScreenState();
+}
+
+class _FollowBackListScreenState extends State<FollowBackListScreen> {
+  // final FollowBackFormController controller =
+  //     Get.put(FollowBackFormController());
+  final controller = Get.find<FollowBackFormController>();
+
   final DialerController _dialerController = Get.put(DialerController());
 
   final FollowBackFormController _formController =
-      Get.put(FollowBackFormController());
+      Get.find<FollowBackFormController>();
 
   final RemarkStatusController _remarkStatusController =
       Get.put(RemarkStatusController());
-
-  FollowBackListScreen({Key? key}) : super(key: key);
 
   Future<void> onRefresh() async {
     controller.fetchFollowBackList();
@@ -81,18 +88,16 @@ class FollowBackListScreen extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    _formController.fetchFollowBackList();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: 'Follow-up',
-      showBack: false,
-      // appBar: AppBar(
-      //   centerTitle: true,
-      //   title: const Text(
-      //     'Follow - Up',
-      //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-      //   ),
-      //   backgroundColor: AppColors.appBarColor,
-      // ),
+      title: 'Follow Up',
+      showBack: true,
       body: RefreshIndicator(
         onRefresh: onRefresh,
         child: Column(
@@ -199,6 +204,7 @@ class FollowBackListScreen extends StatelessWidget {
 
                                   if (results != null) {
                                     controller.dateRangeList.value = results;
+                                    controller.clearDateRange();
                                     controller.fetchFollowBackList();
                                   }
                                 },
@@ -512,8 +518,17 @@ class FollowBackListScreen extends StatelessWidget {
                                         item.followupDate!.isNotEmpty
                                     ? Icons.schedule
                                     : null,
-                                valueRight: DateFormat('dd-MM-yyyy').format(
-                                    DateTime.parse(item.entryDate.toString()))),
+                                valueRight: item.followupDate != "-"
+                                    ? DateFormat('yyyy-MM-dd').format(
+                                        DateFormat('yyyy-M-d').parse(
+                                            item.followupDate.toString()))
+                                    : ''),
+
+                            // item.followupDate != "-"
+                            //     ? DateFormat('yyyy-MM-dd').format(
+                            //         DateTime.parse(
+                            //             item.followupDate.toString()))
+                            //     : ''),
                             _buildSingleRow(
                                 Icons.comment,
                                 item.remark!.isNotEmpty
@@ -845,20 +860,34 @@ class FollowBackListScreen extends StatelessWidget {
       AlertDialog(
         title: const Text("Filter by Status"),
         content: Obx(() {
+          final uniqueItems = {
+            for (var e in _remarkStatusController.filterFollowupStatus
+                .expand((e) => e.data))
+              e.title: e
+          }.values.toList();
           return SingleChildScrollView(
-              child: Wrap(
-                  spacing: 3,
-                  children:
-                      _remarkStatusController.remarkStatusList.map((element) {
-                    return ChoiceChip(
-                      label: Text(element.title.toString()),
-                      selected:
-                          controller.selectedStatuses.contains(element.id),
-                      onSelected: (_) {
-                        controller.toggleStatus(element.id.toString());
-                      },
-                    );
-                  }).toList()));
+              child: Wrap(spacing: 3, children: [
+            for (var item in uniqueItems)
+              ChoiceChip(
+                label: Text(item.title.toString()),
+                selected: controller.selectedStatuses.contains(item.id),
+                onSelected: (_) {
+                  controller.toggleStatus(item.id.toString());
+                },
+              )
+          ]));
+
+          //  _remarkStatusController.filterFollowupStatus
+          //     .map((element) {
+          //    ChoiceChip(
+          //     label: Text(element..toString()),
+          //     selected:
+          //         controller.selectedStatuses.contains(element.id),
+          //     onSelected: (_) {
+          //       controller.toggleStatus(element.id.toString());
+          //     },
+          //   );
+          // }).toList()));
         }),
         actions: [
           TextButton(

@@ -71,15 +71,25 @@ class AppColors {
   static const Color textColor2 =
       Color(0xFF000000); // Black (Text color for contrast)
   static const Color primaryColor = Color(0xFF356EFF);
-    //  Color.fromRGBO(25, 118, 210, 1); // Example: Purple
+  //  Color.fromRGBO(25, 118, 210, 1); // Example: Purple
   static const Color secondayColor = Color(0xFF5E5E5E); // Example: Purple
   static const Color accentColor = Color(0xFFFF5722); // Example: Orange
-  static const Color backgroundColor =
-      Color.fromARGB(255, 255, 255, 255); // Scaffold background color
+  static const Color backgroundColor = Color(0xFFF5F5F5); // Example: Orange
+
+  // static const Color backgroundColor =
+  //     Color.fromARGB(255, 255, 255, 255); // Scaffold background color
   static const Color textColor =
       Color.fromARGB(255, 255, 255, 255); // Text color
   static const Color appBarColor =
       Color.fromRGBO(25, 118, 210, 1); // AppBar background color
   static const Color appBarTextColor = Colors.white; // AppBar text/icon color
   static const Color greyColor = Color(0xFFF1F1F1);
+
+  // text color
+  static const Color blueColor = Color(0xFF356EFF); // Example: Purple
+  static const Color greenCOlor = Color(0xFF12AF69); // Example: Orange
+  static const Color redColor = Color(0xFFFF3131); // Example: Orange
+  static const Color diallerBtnColor = Color(0xFFE4E4E6); // Example: Orange
+  static const Color diallerContainerColor =
+      Color(0xFFEBF0FF); // Example: Orange
 }

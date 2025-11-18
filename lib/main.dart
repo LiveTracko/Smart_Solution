@@ -8,9 +8,9 @@ import 'package:smart_solutions/components/commons.dart';
 import 'package:smart_solutions/controllers/internet_checker.dart';
 import 'package:smart_solutions/services/firbase_notifications.dart';
 import 'package:smart_solutions/services/local_notification_service.dart';
+import 'package:smart_solutions/theme/app_theme.dart';
 import 'core/app_bindings.dart';
 import 'routes/app_routes.dart';
-import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -73,7 +73,27 @@ class MyApp extends StatelessWidget {
           getPages: AppRoutes.pages,
           debugShowCheckedModeBanner: false,
           title: 'Smart Solutions',
-          theme: AppTheme.lightTheme,
+          // theme: AppTheme.lightTheme,
+          theme: ThemeData(
+            fontFamily: 'Poppins',
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor, // ✅ button background
+                foregroundColor: Colors.white, // ✅ text/icon color
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+              ),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                
+                  // foregroundColor: AppColors.primaryColor,
+                  textStyle: const TextStyle(color: Colors.white)),
+            ),
+          ),
         );
       },
     );

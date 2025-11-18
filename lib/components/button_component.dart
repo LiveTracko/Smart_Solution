@@ -31,7 +31,7 @@ class ButtonComponent extends StatelessWidget {
         onPressed: onPressed,
         child: Text(
           text, // Dynamic text
-          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -19,6 +20,7 @@ class DialerController extends GetxController {
   var phoneNumber = ''.obs;
   var customerName = ''.obs;
   var customerLoan = ''.obs;
+  var salary = ''.obs;
   var excel_id = ''.obs;
   var datatype = ''.obs;
   DateTime? callStartTime;
@@ -28,13 +30,16 @@ class DialerController extends GetxController {
   RxInt elapsedTimeInSeconds = 0.obs;
   final ApiService apiService = ApiService();
   StreamSubscription<PhoneStateStatus>? _phoneStateSubscription;
-
   var followup_id = ''.obs;
 
   var isManual = false.obs;
+  final customerNameController = TextEditingController();
+
   @override
   void onInit() {
     super.onInit();
+    ever(customerName, (name) => customerNameController.text = name);
+
     checkAndRequestPermissions();
   }
 
@@ -42,6 +47,7 @@ class DialerController extends GetxController {
   void onClose() {
     _timer?.cancel();
     _phoneStateSubscription?.cancel();
+    customerNameController.dispose();
     super.onClose();
   }
 
@@ -78,6 +84,7 @@ class DialerController extends GetxController {
           phoneNumber.value = fetchedData.mobileNo!;
           customerName.value = fetchedData.name!;
           datatype.value = fetchedData.dataType ?? "";
+          //   salary.value = fetchedData.
           customerLoan.value =
               double.tryParse(fetchedData.amount.toString())?.toString() ?? '0';
           excel_id.value = fetchedData.excelId!;
@@ -146,9 +153,15 @@ class DialerController extends GetxController {
           logOutput("Call started");
           handlePhoneCall();
           break;
+
         case PhoneStateStatus.CALL_ENDED:
           handleCallEnd();
           logOutput("Call Ended");
+          break;
+
+        case PhoneStateStatus.CALL_INCOMING:
+          logOutput("Call started");
+          handlePhoneCall();
           break;
         default:
           logOutput("No active call state detected");
@@ -198,15 +211,30 @@ class DialerController extends GetxController {
     //  _timer?.cancel();
     logOutput("${customerName.value}:${phoneNumber.value}");
 
-    Get.to(() => FollowBackForm(mobileNumber: phoneNumber.value));
+    Get.to(() => FollowBackForm());
 
-    elapsedTimeInSeconds.value = await CallStateService.getLastCallDuration();
+    //  final callInfo =
+    await CallStateService.getLastCallInfo();
 
-    callStartTime = null;
-    // customerLoan.value = '';
-    // customerName.value = '';
-    // elapsedTimeInSeconds.value = 0;
-    phoneNumber.value = '';
+    // final int duration = callInfo['duration'] ?? 0;
+    // final String type = callInfo['type'] ?? 'unknown';
+    // final String name = callInfo['name'] ?? 'Unknown';
+    // final String number = callInfo['number'] ?? '';
+
+    // elapsedTimeInSeconds.value = duration;
+    // callStartTime = null;
+    // // customerLoan.value = '';
+    // if (type == "incoming") {
+    //   customerName.value = name;
+    //   phoneNumber.value = number;
+    // } else {
+    //   customerName.value = '';
+    //   // elapsedTimeInSeconds.value = 0;
+    //   phoneNumber.value = '';
+    // }
+    // Log values for debugging
+    logOutput(
+        "incoming call data ${customerName.value}:${phoneNumber.value} | Duration: ${elapsedTimeInSeconds.value}s");
   }
 
   void handleFormSubmitAndFetchNext() {

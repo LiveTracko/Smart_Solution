@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.smart_solutions.app-mergeDebugResources-29:/values/values.xml",
+            "outputFile": "com.cosmicwebsolution.smart_solutions.app-mergeDebugResources-29:/values/values.xml",
             "map": [
                 {
                     "source": "C:\\Users\\cosmi\\.gradle\\caches\\transforms-3\\debecc6f46a7b38c0c51302dfffc8cb2\\transformed\\fragment-1.7.1\\res\\values\\values.xml",

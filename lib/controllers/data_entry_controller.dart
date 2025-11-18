@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
@@ -9,6 +10,8 @@ import 'package:smart_solutions/models/data_entery_model.dart';
 import 'package:smart_solutions/models/data_entry_bank_list.dart';
 import 'package:smart_solutions/models/dsa_bank_list.dart';
 import 'package:smart_solutions/models/dsa_name_model.dart';
+import 'package:smart_solutions/models/getGroupStatus.dart';
+import 'package:smart_solutions/models/leads_status_group.dart';
 import 'package:smart_solutions/models/product_type.dart';
 import 'package:smart_solutions/models/source_model.dart';
 import 'package:smart_solutions/models/status_list_model.dart';
@@ -21,6 +24,8 @@ class DataController extends GetxController {
   final ApiService _apiService = ApiService();
   var dateRangeList = <DateTime?>[].obs;
   var isLoading = true.obs;
+
+  var iseditLoading = true.obs;
   var dataList = <Data>[].obs;
   var errorMessage = ''.obs;
   bool granted = false;
@@ -34,6 +39,7 @@ class DataController extends GetxController {
   RxString Id = ''.obs;
   RxString admin_subadmin_name = ''.obs;
   var dsaNameList = <DsaModel>[].obs;
+  var filterLeadStatus = <GetLeadStatusGroup>[].obs;
   var dsaBankList = <DsaBank>[].obs;
   var producttypeList = <productData>[].obs;
   var sourcingList = <SourceModel>[].obs;
@@ -41,7 +47,7 @@ class DataController extends GetxController {
   var telecallerlist = <TellecallerData>[].obs;
   var statuslist = <statusData>[].obs;
   var allstatuslist = <statusData>[].obs;
-  RxList filterLeadStatus = [].obs;
+  // RxList filterLeadStatus = [].obs;
   var date = ''.obs;
   var contactNumber = ''.obs;
   var customerName = ''.obs;
@@ -77,7 +83,6 @@ class DataController extends GetxController {
 
   // Default telecaller ID
   final String defaultTelecallerId = StaticStoredData.userId;
-  //  "${StaticStoredData.userId}";
 
 // search variables
   var showSearchField = false.obs; // 👈 observable toggle
@@ -86,6 +91,7 @@ class DataController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
     _loadAllData();
   }
 
@@ -105,9 +111,26 @@ class DataController extends GetxController {
 
   Future<void> _loadAllData() async {
     try {
-      isLoading(true);
+      // isLoading(true);
       await Future.wait([
+        getLeadsFilterData(),
         fetchDataEntryList(),
+        // getDsaNameList(),
+        // getProductTypeList(),
+        // getTelecallerData(),
+        // getStatusData(),
+      ]);
+    } catch (e) {
+      logOutput("Error loading data: $e");
+    } finally {
+      //isLoading(false); // 👈 stop loading in all cases
+    }
+  }
+
+  Future<void> editLoadData() async {
+    try {
+      iseditLoading(true);
+      await Future.wait([
         getDsaNameList(),
         getProductTypeList(),
         getTelecallerData(),
@@ -116,7 +139,7 @@ class DataController extends GetxController {
     } catch (e) {
       logOutput("Error loading data: $e");
     } finally {
-      isLoading(false); // 👈 stop loading in all cases
+      iseditLoading(false); // 👈 stop loading in all cases
     }
   }
 
@@ -141,6 +164,7 @@ class DataController extends GetxController {
   }
 
   Future<void> fetchDataEntryList() async {
+    isLoading(true);
     try {
       DateTime? first;
       DateTime? second;
@@ -186,21 +210,25 @@ class DataController extends GetxController {
       logOutput(response.body);
 
       if (response.statusCode == 200) {
+        dataList.clear();
+        selectedStatuses.clear();
+
         final responseData = json.decode(response.body);
         final dataEntryModel = DataEntryModel.fromJson(responseData);
         if (dataEntryModel.data != null) {
           dataList.assignAll(dataEntryModel.data!);
 
-          filterLeadStatus.assignAll(
-            dataList.map((e) => e.dataEntryStatus).toSet().toList(),
-          );
+          // filterLeadStatus.assignAll(
+          //   dataList.map((e) => e.dataEntryStatus).toSet().toList(),
+          // );
         }
       } else if (response.statusCode == 204) {
-        Get.snackbar(
-          'Opps',
-          'No Data Available',
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        logOutput('Data Entry Not Available');
+        // Get.snackbar(
+        //   'Opps',
+        //   'No Data Available',
+        //   snackPosition: SnackPosition.BOTTOM,
+        // );
       } else {
         throw Exception('Failed to load data entries');
       }
@@ -211,20 +239,19 @@ class DataController extends GetxController {
         errorMessage.value,
         snackPosition: SnackPosition.BOTTOM,
       );
-    } finally {}
+    } finally {
+      isLoading(false);
+    }
   }
 
   Future<void> refreshData() async {
     try {
-      isLoading(true); // start loading
       selectedStatuses.clear();
       dataList.clear();
       await fetchDataEntryList();
     } catch (e) {
       logOutput("Error: $e");
-    } finally {
-      isLoading(false); // stop loading
-    }
+    } finally {}
   }
 
   // Search functionality
@@ -244,6 +271,23 @@ class DataController extends GetxController {
         .toList();
 
     dataList.assignAll(filteredList);
+  }
+
+  Future<void> getLeadsFilterData() async {
+    try {
+      var response = await ApiService().getRequest(APIUrls.getAllStatusGroup);
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final statusList = GetLeadStatusGroup.fromJson(responseData);
+        if (statusList.data.isNotEmpty) {
+          filterLeadStatus.add(statusList);
+        }
+      }
+    } catch (e) {
+      logOutput('An error occurred while fetching source list: $e');
+      // Ensure loading is set to false on error as well
+    }
   }
 
   // Save login request

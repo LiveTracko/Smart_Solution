@@ -8,7 +8,6 @@ import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/models/call_time_model.dart';
-import 'package:smart_solutions/models/dashBoardToday_model.dart';
 import 'package:smart_solutions/models/getGroupStatus.dart';
 import 'package:smart_solutions/models/top_disburse_model.dart';
 import 'package:smart_solutions/services/api_service.dart';
@@ -37,6 +36,24 @@ class DashboardController extends GetxController
   var isApiCalled = false.obs;
 
   var topDisburserUser = <TopDisburseUser>[].obs;
+
+  Future<void> loadTodayAndMonthlyData() async {
+    final FollowBackFormController followBackFormController =
+        Get.find<FollowBackFormController>();
+
+    await followBackFormController.getDailyMonthlyCallbackData('1');
+    await followBackFormController.getDailyMonthlyCallbackData('0');
+  }
+
+  // Future<List<followuplist.Data>> getMonthlyFollowList() async {
+  //   await followBackFormController.getDailyMonthlyCallbackData('0');
+  //   return followBackFormController.monthlybackData;
+  // }
+
+  // Future<List<followuplist.Data>> getDailyFollowList() async {
+  //   await followBackFormController.getDailyMonthlyCallbackData('1');
+  //   return followBackFormController.dailycallbackData;
+  // }
 
   formateDate() {
     if (dateRangeList.length > 1 && dateRangeList.isNotEmpty) {
@@ -140,14 +157,16 @@ class DashboardController extends GetxController
     isDrawerOpen.value = false;
 
     Future.microtask(() async {
-      isApiCalled.value = true;
+      isLoading.value = true;
 
       try {
         // await fetchDashboardData(true); // Fetch monthly data
         // await fetchDashboardData(false); // Fetch today’s data
+        await getTimeGraph();
         await getActiveData(status: 1);
         await getActiveData(status: 2);
-        await getTimeGraph();
+        await loadTodayAndMonthlyData();
+        await loadtellecallerTabData(0);
         await getTopDisburseUser();
       } catch (e) {
         logOutput('Error fetching dashboard data: $e');
@@ -157,6 +176,32 @@ class DashboardController extends GetxController
     });
 
     super.onInit();
+  }
+
+  Future<void> loadTabData(int index) async {
+    switch (index) {
+      case 0: // Active
+        await getActiveData(status: 1);
+        break;
+      case 1: // Inactive
+        await getActiveData(status: 2);
+        break;
+    }
+  }
+
+  Future<void> loadtellecallerTabData(int index) async {
+    FollowBackFormController followBackFormController = Get.find();
+    switch (index) {
+      case 0:
+        await followBackFormController.getCallBackData();
+        break;
+      case 1:
+        await followBackFormController.getCallLogData();
+        break;
+      case 2:
+        await followBackFormController.getDisbursementData();
+        break;
+    }
   }
 
   // Future<void> fetchDashboardData(bool isMonthly) async {
@@ -214,15 +259,13 @@ class DashboardController extends GetxController
   //   }
   // }
 
-  
-  
   void toggleDrawer() {
     isDrawerOpen.value = !isDrawerOpen.value;
   }
 
   getActiveData({required int status}) async {
     FollowBackFormController followBackFormController = Get.find();
-    isLoading(true);
+    // isLoading(true);
 
     final String dateRage = dateRangeList.isNotEmpty &&
             dateRangeList.first != null &&
@@ -296,7 +339,7 @@ class DashboardController extends GetxController
         duration: const Duration(seconds: 3),
       );
     }
-    isLoading(false);
+    //  isLoading(false);
   }
 
   String priceFormatter(dynamic price) {
@@ -418,7 +461,7 @@ class DashboardController extends GetxController
             "6 PM": null,
             "7 PM": null
           };
-    isLoading(true);
+    //  isLoading(true);
     try {
       final requestData = {
         //   "telecaller_id": StaticStoredData.userId,
@@ -610,11 +653,11 @@ class DashboardController extends GetxController
     } catch (e) {
       customLog("error while parsing data $e", name: "getTimeGraph");
     }
-    isLoading(false);
+    // isLoading(false);
   }
 
   Future<void> getTopDisburseUser() async {
-    isLoading.value = true;
+    //  isLoading.value = true;
 
     final String dateRage = dateRangeList.isNotEmpty &&
             dateRangeList.first != null &&
@@ -659,7 +702,7 @@ class DashboardController extends GetxController
     } catch (e) {
       logOutput("Exception while fetching follow-back list: $e");
     } finally {
-      isLoading.value = false;
+      //  isLoading.value = false;
     }
   }
 

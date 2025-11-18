@@ -6,14 +6,13 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
-import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/models/FollowUpSubmittedList.dart';
 import 'package:smart_solutions/models/all_bank_names_model.dart';
 import 'package:smart_solutions/models/callBack_model.dart';
 import 'package:smart_solutions/models/call_log_model.dart';
 import 'package:smart_solutions/models/disbursement_model.dart';
-import 'package:smart_solutions/models/followUpDetails.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
+import 'package:smart_solutions/services/call_state_service.dart';
 import '../constants/services.dart';
 import '../services/api_service.dart';
 import '../constants/api_urls.dart';
@@ -23,13 +22,13 @@ class FollowBackFormController extends GetxController
     with GetSingleTickerProviderStateMixin {
   final ApiService _apiService = ApiService();
   final DialerController _dialerController = Get.put(DialerController());
-  final DashboardController _dashboardController =
-      Get.put(DashboardController());
+
   var allBankNamesList = <AllBankNamesData>[].obs;
   var followBackList = <Data>[].obs;
-  var callbackData = <Data>[].obs;
+  var monthlybackData = <Data>[].obs;
   var dailycallbackData = <Data>[].obs;
   var callLogData = <Datum>[].obs;
+
   var callBackData = <CallBackData>[].obs;
   var callBackTotalData = <Totals>[].obs;
 
@@ -46,6 +45,7 @@ class FollowBackFormController extends GetxController
   RxString selectedTeamLeaders = ''.obs;
   late RxList selectedtellecaller = [].obs;
   late RxList selectedtellecallerName = [].obs;
+  var allCustomerName = <Data>[].obs;
   var dateRangeList = <DateTime?>[].obs;
   late TabController callController;
   var selectedIndex = 0.obs;
@@ -58,28 +58,50 @@ class FollowBackFormController extends GetxController
   var searchText = "".obs;
   double itemHeight = 45.h;
   double tellececalleritemHeight = 55.h;
+  final customerNumberController = TextEditingController();
 
   @override
   void onInit() {
+    // ever(mobile, (number) => customerNumberController.text = number);
+
+    // 1️⃣ When text changes, update observable
+    customerNumberController.addListener(() {
+      mobile.value = customerNumberController.text;
+    });
+
+    // 2️⃣ When observable changes, update text
+    ever<String>(mobile, (number) {
+      if (customerNumberController.text != number) {
+        customerNumberController.text = number;
+        customerNumberController.selection = TextSelection.fromPosition(
+          TextPosition(offset: number.length),
+        );
+      }
+    });
+
     callController = TabController(length: 4, vsync: this);
     callController.addListener(() {
       if (!callController.indexIsChanging) {
         selectedIndex.value = callController.index;
       }
     });
-    loadData();
+    // loadData();
 
     super.onInit();
   }
 
-  Future<void> loadData() async {
+  Future<void> loadData(bool isRefresh) async {
+    isBankAndStatusLoading(true);
     try {
       await getAllBanks();
       await getDisbursementData();
+      if (isRefresh) {
+        await CallStateService.getLastCallInfo();
+      }
     } catch (e) {
       print("Error while loading data: $e");
     } finally {
-      isLoading(false);
+      isBankAndStatusLoading(false);
     }
   }
 
@@ -128,12 +150,21 @@ class FollowBackFormController extends GetxController
   final toDateController = TextEditingController(text: "");
 
   var isLoading = false.obs;
+  var isFormSubmitted = false.obs;
+  var isBankAndStatusLoading = false.obs;
+  var iscallBackLoading = false.obs;
+  var iscallLogLoading = false.obs;
+  var iscallDisbursedLoading = false.obs;
+
+  var isdailyCallLoading = false.obs;
+  var isMonthlyCallLoading = false.obs;
 
   // Convert contacted status to API format
   String get contactStatus => contacted.value == 'Yes' ? '1' : '2';
 
   void clearDateRange() {
     dateRangeList.clear();
+    selectedStatuses.clear();
   }
 
   Future<void> fetchFollowBackList() async {
@@ -176,33 +207,35 @@ class FollowBackFormController extends GetxController
         var responseData = jsonDecode(response.body);
 
         var followBackData = FollowUpSubmitedList.fromJson(responseData);
+        allCustomerName.assignAll(followBackData.data!);
+
         followBackList.value = followBackData.data ?? [];
       } else if (response.statusCode == 204) {
         followBackList.clear();
       } else {
-       // logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
+        // logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
       }
     } catch (e) {
-   //   logOutput("Exception fetching follow-back list: $e");
+      //   logOutput("Exception fetching follow-back list: $e");
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<void> getDailyMonthlyCallbackData(String dateRange) async {
-    isLoading.value = true;
+    // isLoading.value = true;
+    isdailyCallLoading.value = true;
+    isMonthlyCallLoading.value = true;
 
     try {
-      final String dateRage = dateRangeList.isNotEmpty &&
-              dateRangeList.first != null &&
-              dateRangeList.last != null
-          ? "${dateRangeList.first},${dateRangeList.last}"
-          : "";
+      // final String dateRage = dateRangeList.isNotEmpty &&
+      //         dateRangeList.first != null &&
+      //         dateRangeList.last != null
+      //     ? "${dateRangeList.first},${dateRangeList.last}"
+      //     : "";
 
       bool hasValidTelecaller = false;
-      final formdata = {
-        "daterange": dateRage,
-      };
+      final formdata = {"daterange": dateRange};
 
       //Add telecaller IDs dynamically if the list is not empty
       if (selectedtellecaller.isNotEmpty) {
@@ -220,12 +253,7 @@ class FollowBackFormController extends GetxController
       }
 
       final response =
-          await _apiService.postRequest(APIUrls.callBackdData, formdata
-              // {
-              //   "telecaller_id": StaticStoredData.userId,
-              //   "daterange": dateRange, // 1 = daily, 0 = monthly
-              // },
-              );
+          await _apiService.postRequest(APIUrls.callBackdData, formdata);
 
       debugPrint(
           "FollowUp callback Response => ${response.statusCode}: ${response.body}");
@@ -236,26 +264,25 @@ class FollowBackFormController extends GetxController
 
         // Assign to observable list
         if (dateRange == "1") {
-          //    dailycallbackData.value = followBackData.data ?? [];
           dailycallbackData.assignAll(followBackData.data ?? []);
         } else {
-          callbackData.assignAll(followBackData.data ?? []);
-          //   callbackData.value = followBackData.data ?? [];
+          monthlybackData.assignAll(followBackData.data ?? []);
         }
       } else if (response.statusCode == 204) {
-        callbackData.clear(); // No data
+        monthlybackData.clear(); // No data
       } else {
         logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
       }
     } catch (e) {
       logOutput("Exception while fetching follow-back list: $e");
     } finally {
-      isLoading.value = false;
+      isdailyCallLoading.value = false;
+      isMonthlyCallLoading.value = false;
     }
   }
 
   Future<void> getCallBackData() async {
-    isLoading.value = true;
+    iscallBackLoading.value = true;
 
     final String dateRage = dateRangeList.isNotEmpty &&
             dateRangeList.first != null &&
@@ -298,19 +325,19 @@ class FollowBackFormController extends GetxController
         callBackData.assignAll(data.data);
         callBackTotalData.assign(totaldata);
       } else if (response.statusCode == 204) {
-        callbackData.clear(); // No data
+        monthlybackData.clear(); // No data
       } else {
         logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
       }
     } catch (e) {
       logOutput("Exception while fetching follow-back list: $e");
     } finally {
-      isLoading.value = false;
+      iscallBackLoading.value = false;
     }
   }
 
   Future<void> getCallLogData() async {
-    isLoading.value = true;
+    iscallLogLoading.value = true;
 
     final String dateRage = dateRangeList.isNotEmpty &&
             dateRangeList.first != null &&
@@ -351,18 +378,19 @@ class FollowBackFormController extends GetxController
 
         callLogData.assignAll(followBackData.data);
       } else if (response.statusCode == 204) {
-        callbackData.clear(); // No data
+        monthlybackData.clear(); // No data
       } else {
         logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
       }
     } catch (e) {
       logOutput("Exception while fetching follow-back list: $e");
     } finally {
-      isLoading.value = false;
+      iscallLogLoading.value = false;
     }
   }
 
   Future<void> getDisbursementData() async {
+    iscallDisbursedLoading.value = true;
     final String dateRage = dateRangeList.isNotEmpty &&
             dateRangeList.first != null &&
             dateRangeList.last != null
@@ -408,7 +436,9 @@ class FollowBackFormController extends GetxController
       }
     } catch (e) {
       logOutput("Exception while fetching follow-back list: $e");
-    } finally {}
+    } finally {
+      iscallDisbursedLoading.value = false;
+    }
   }
 
   Future<void> getteamLeaderData([String? teamleaderId]) async {
@@ -444,13 +474,13 @@ class FollowBackFormController extends GetxController
     }
   }
 
-  Future<void> submitFollowUp() async {
+  Future<bool> submitFollowUp() async {
     try {
-      isLoading(true);
+      isFormSubmitted(true);
 
       final Map<String, dynamic> formData = {
         'mobile': mobile.value,
-        'name': customerName.value,
+        'name': _dialerController.customerName.value,
         'data_type': dataType.value,
         'bank_name':
             bankName.value.isEmpty ? allBankNamesList.first.id : bankName.value,
@@ -467,6 +497,7 @@ class FollowBackFormController extends GetxController
         'telecaller_id': telecallerId.value,
         'call_duration': _dialerController
             .formatElapsedTime(_dialerController.elapsedTimeInSeconds.value),
+        'salary': _dialerController.salary.value,
         'excel_id': _dialerController.excel_id.value,
         'followup_id': _dialerController.followup_id.value,
       };
@@ -477,25 +508,40 @@ class FollowBackFormController extends GetxController
       _dialerController.elapsedTimeInSeconds.value = 0;
       logOutput(response.body);
       if (response.statusCode == 200) {
-        final result = FollowUpDetails.fromJson(json.decode(response.body));
-        Get.back();
-        Get.snackbar(
-            'Success', result.message ?? 'Follow up saved successfully');
+        //   final result = FollowUpDetails.fromJson(json.decode(response.body));
+
+        // Wait a bit (simulate save time)
+        // await Future.delayed(const Duration(milliseconds: 500));
+
         _dialerController.handleFormSubmitAndFetchNext();
         fetchFollowBackList();
+        Get.showSnackbar(
+          GetSnackBar(
+            title: 'Success',
+            message: 'Follow up saved successfully',
+            duration: const Duration(seconds: 2),
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green.shade400,
+            margin: const EdgeInsets.all(12),
+            borderRadius: 8,
+          ),
+        );
+        Get.back(); // close first
         // await _dashboardController
         //     .fetchDashboardData(true); // Fetch monthly data
         // await _dashboardController.fetchDashboardData(false);
 
         clearForm();
+        return true;
       } else {
         throw Exception('Failed to submit form');
       }
     } catch (e) {
       logOutput('Error submitting form: $e');
-      Get.snackbar('Error', 'Failed to submit follow up form');
+      return false;
+      //  Get.snackbar('Error', 'Failed to submit follow up form');
     } finally {
-      isLoading(false);
+      isFormSubmitted(false);
     }
   }
 
@@ -520,7 +566,6 @@ class FollowBackFormController extends GetxController
 
   Future<void> getAllBanks() async {
     try {
-      isLoading(true);
       var body = {'': ''};
       var response = await ApiService().postRequest(APIUrls.allBankNames, body);
 
@@ -532,9 +577,7 @@ class FollowBackFormController extends GetxController
       }
     } catch (e) {
       log('an error occured while fetching banks $e');
-    } finally {
-      isLoading(false);
-    }
+    } finally {}
   }
 
   void clearForm() {
@@ -603,5 +646,22 @@ class FollowBackFormController extends GetxController
     } finally {
       isLoading.value = false;
     }
+  }
+
+  // Create a method to handle these calls
+  Future<void> getAllDashboardData({
+    required var dashboardController,
+  }) async {
+    await Future.microtask(() async {
+      // Dashboard related API calls
+      await dashboardController.getTimeGraph();
+      await dashboardController.getActiveData(status: 1);
+      await dashboardController.getActiveData(status: 2);
+
+      // Follow back form related API calls
+      await getCallBackData();
+      await getCallLogData();
+      await getDisbursementData();
+    });
   }
 }

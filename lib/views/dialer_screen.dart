@@ -5,11 +5,20 @@ import 'package:get/get.dart';
 import 'package:smart_solutions/components/widgets/DailerScreenWidget/KeypadRowWidget.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/utils/currency_util.dart';
+
 import 'package:smart_solutions/views/followBackForm.dart';
+import 'package:smart_solutions/views/spacing_constants.dart';
+import 'package:smart_solutions/widget/common_rows_card.dart';
+
 import 'package:smart_solutions/widget/common_scaffold.dart';
+import 'package:smart_solutions/widget/header_title.dart';
+import 'package:smart_solutions/widget/string.dart';
+import 'package:smart_solutions/widget/text_style.dart';
+import 'package:smart_solutions/theme/app_theme.dart' as themeColor;
 
 class DialerScreen extends StatefulWidget {
-  DialerScreen({Key? key}) : super(key: key);
+  const DialerScreen({Key? key}) : super(key: key);
 
   @override
   State<DialerScreen> createState() => _DialerScreenState();
@@ -20,9 +29,15 @@ class _DialerScreenState extends State<DialerScreen> {
 
   final DialerController dialerController = Get.find<DialerController>();
   final FollowBackFormController _formController =
-      Get.put(FollowBackFormController());
+      Get.find<FollowBackFormController>();
 
   int callsToBeHeld = 5;
+
+  @override
+  void initState() {
+    super.initState();
+    _formController.loadData(false);
+  }
 
   @override
   void dispose() {
@@ -36,13 +51,13 @@ class _DialerScreenState extends State<DialerScreen> {
       actions: [
         IconButton(
           icon: SvgPicture.asset(
-            'assets/images/plus_icon.svg',
-            width: 20,
-            height: 20,
+            'assets/images/user_plus.svg',
+            width: 20.w,
+            height: 20.h,
           ),
           onPressed: () {
             Get.to(() => FollowBackForm(
-                  mobileNumber: '',
+                  isRefresh: true,
                 ));
             // handle click
           },
@@ -50,77 +65,65 @@ class _DialerScreenState extends State<DialerScreen> {
       ],
       title: 'Dialler',
       showBack: false,
-      //   appBar: const CurvedAppBar(title: 'title'),
-
-      //  AppBar(
-      //   automaticallyImplyLeading: false,
-      //   centerTitle: true,
-      //   title: const Text(
-      //     'Dialer',
-      //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-      //   ),
-      //   actions: [
-      //     IconButton(
-      //         onPressed: () {
-      //           dialerController.customerLoan.value = '';
-      //           dialerController.customerName.value = '';
-      //           dialerController.datatype.value = '';
-      //           Get.to(() => FollowBackForm(
-      //                 mobileNumber: '',
-      //               ));
-      //         },
-      //         icon: const Icon(Icons.add_rounded))
-      //   ],
-      // ),
+      isDrawer: true,
       body: SingleChildScrollView(
         child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Obx(() {
                 bool isActive = dialerController.isManual.value;
                 return Align(
                   alignment: Alignment.topRight,
                   child: Row(
-                    mainAxisSize: MainAxisSize
-                        .min, // Ensures the row only takes the necessary width
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // mainAxisSize: MainAxisSize
+                    //     .max, // Ensures the row only takes the necessary width
                     children: [
-                      Text(
-                        isActive
-                            ? "Manual Mode"
-                            : "Auto Mode", // Short text to fit the compact design
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize:
-                              14.h, // Maintain a small but readable font size
-                        ),
-                      ),
-                      const SizedBox(
-                          width: 8), // Small gap between text and switch
-                      Transform.scale(
-                        scale: 0.8, // Ensuring the switch remains compact
-                        child: Switch(
-                          activeColor: AppColors.greenColor,
-                          inactiveTrackColor: Colors.grey.shade100,
-                          value: isActive,
-                          onChanged: dialerController.isCallOngoing.value
-                              ? null
-                              : (value) async {
-                                  if (value) {
-                                    dialerController.phoneNumber.value = '';
-                                    _removeNumber();
-                                  }
-                                  dialerController.isManual.value = value;
-                                },
-                        ),
+                      HeaderTitle(
+                          title: dialerTitle, style: AppTextStyle.headerTitle),
+                      Row(
+                        mainAxisSize: MainAxisSize
+                            .min, // Ensures the row only takes the necessary width
+                        children: [
+                          Text(
+                            isActive
+                                ? "Manual Mode"
+                                : "Auto Mode", // Short text to fit the compact design
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14
+                                  .h, // Maintain a small but readable font size
+                            ),
+                          ),
+
+                          const SizedBox(
+                              width: 8), // Small gap between text and switch
+                          Transform.scale(
+                            scale: 0.8, // Ensuring the switch remains compact
+                            child: Switch(
+                              activeColor: AppColors.greenColor,
+                              inactiveTrackColor: Colors.grey.shade100,
+                              value: isActive,
+                              onChanged: dialerController.isCallOngoing.value
+                                  ? null
+                                  : (value) async {
+                                      if (value) {
+                                        dialerController.phoneNumber.value = '';
+                                        _removeNumber();
+                                      }
+                                      dialerController.isManual.value = value;
+                                    },
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 );
               }),
 
-              SizedBox(height: 5.h),
               Obx(
                 () => dialerController.isCallOngoing.value
                     ? Center(
@@ -140,40 +143,40 @@ class _DialerScreenState extends State<DialerScreen> {
                     : const SizedBox.shrink(),
               ),
 
-              Obx(() => Container(
-                    alignment: AlignmentDirectional.topStart,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      dialerController.customerName.value,
-                      style: TextStyle(
-                        fontSize: 20.sp,
-                        color: AppColors.secondaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )),
-              SizedBox(
-                height: 3.h,
-              ),
-              Obx(() => Container(
-                    alignment: AlignmentDirectional.topStart,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      dialerController
-                          .formatCurrency(dialerController.customerLoan.value),
-                      style: TextStyle(
-                        fontSize: 20.sp,
-                        color: AppColors.secondaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Obx(() {
-                  return Column(
-                    children: [
-                      Center(
+              // Obx(() => Container(
+              //       alignment: AlignmentDirectional.topStart,
+              //       padding: const EdgeInsets.symmetric(horizontal: 10),
+              //       child: Text(
+              //         dialerController.customerName.value,
+              //         style: TextStyle(
+              //           fontSize: 20.sp,
+              //           color: AppColors.secondaryColor,
+              //           fontWeight: FontWeight.bold,
+              //         ),
+              //       ),
+              //     )),
+
+              // Obx(() => Container(
+              //       alignment: AlignmentDirectional.topStart,
+              //       padding: const EdgeInsets.symmetric(horizontal: 10),
+              //       child: Text(
+              //         dialerController
+              //             .formatCurrency(dialerController.customerLoan.value),
+              //         style: TextStyle(
+              //           fontSize: 20.sp,
+              //           color: AppColors.secondaryColor,
+              //           fontWeight: FontWeight.bold,
+              //         ),
+              //       ),
+              //     )),
+
+              SizedBox(height: 25.h),
+              Obx(() {
+                return Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      child: Center(
                         child: TextField(
                           textAlign: TextAlign.center,
                           controller: TextEditingController(
@@ -182,9 +185,9 @@ class _DialerScreenState extends State<DialerScreen> {
                                   //     ? 'Enter number'
                                   //     :
                                   dialerController.phoneNumber.value),
-                          // onChanged: (value) {
-                          //   dialerController.phoneNumber.value = value;
-                          // },
+                          onChanged: (value) {
+                            dialerController.phoneNumber.value = value;
+                          },
                           decoration: InputDecoration(
                             border: InputBorder.none, // looks like plain Text
                             hintText: "Enter number",
@@ -204,66 +207,91 @@ class _DialerScreenState extends State<DialerScreen> {
                           ),
                         ),
                       ),
-                      const Divider(
-                        color: AppColors.secondaryColor,
-                      )
-                    ],
-                  );
+                    ),
 
-                  // Container(
-                  //   height: 50.h,
-                  //   padding: EdgeInsets.symmetric(horizontal: 16.w),
-                  //   decoration: BoxDecoration(
-                  //     color: AppColors.backgroundColor,
-                  //     borderRadius: BorderRadius.circular(12.r),
-                  //     border: Border.all(
-                  //         color: AppColors.primaryColor.withOpacity(0.2)),
-                  //   ),
-                  //   child: Center(
-                  //     child:
-                  //         // TextField(
-                  //         //   inputFormatters: [],
-                  //         //   maxLength: 10,
-                  //         //   readOnly: true,
-                  //         //   controller: TextEditingController()
-                  //         //     ..text = dialerController.phoneNumber.value,
-                  //         //   onChanged: (value) {
-                  //         //     // dialerController.phoneNumber.value = value;
-                  //         //     if (value.length <= 10) {
-                  //         //       dialerController.phoneNumber.value = value;
-                  //         //     }
-                  //         //   },
-                  //         //   style: TextStyle(
-                  //         //     fontSize: 20.sp,
-                  //         //     color: AppColors.secondaryColor,
-                  //         //     fontWeight: FontWeight.bold,
-                  //         //   ),
-                  //         //   decoration: InputDecoration(
-                  //         //     counterText: '',
-                  //         //     border: InputBorder.none,
-                  //         //     hintText: 'Enter number',
-                  //         //     hintStyle: TextStyle(
-                  //         //       fontSize: 20.sp,
-                  //         //       color: AppColors.secondaryColor,
-                  //         //       fontWeight: FontWeight.bold,
-                  //         //     ),
-                  //         //   ),
-                  //         // ),
+                    Obx(
+                      () => Container(
+                        height: 40,
+                        width: double.infinity,
+                        color: themeColor.AppColors.diallerContainerColor,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Visibility(
+                          visible: dialerController.customerName.isEmpty,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CommonRows().buildSingleRowNoExpand(
+                                  'assets/images/user_circle.svg', 'Shashi'
+                                  // dialerController.customerName.value,
+                                  ),
+                              Text(CurrencyUtils.formatIndianCurrency(140000),
+                                  // dialerController.customerLoan.value),
+                                  style: AppTextStyle.headerTitle),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
 
-                  //         Text(
-                  //       dialerController.phoneNumber.value.isEmpty
-                  //           ? 'Enter number'
-                  //           : dialerController.phoneNumber.value,
-                  //       style: TextStyle(
-                  //         fontSize: 20.sp,
-                  //         color: AppColors.secondaryColor,
-                  //         fontWeight: FontWeight.bold,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // );
-                }),
-              ),
+                    //  const Divider(color: AppColors.secondaryColor)
+                  ],
+                );
+
+                // Container(
+                //   height: 50.h,
+                //   padding: EdgeInsets.symmetric(horizontal: 16.w),
+                //   decoration: BoxDecoration(
+                //     color: AppColors.backgroundColor,
+                //     borderRadius: BorderRadius.circular(12.r),
+                //     border: Border.all(
+                //         color: AppColors.primaryColor.withOpacity(0.2)),
+                //   ),
+                //   child: Center(
+                //     child:
+                //         // TextField(
+                //         //   inputFormatters: [],
+                //         //   maxLength: 10,
+                //         //   readOnly: true,
+                //         //   controller: TextEditingController()
+                //         //     ..text = dialerController.phoneNumber.value,
+                //         //   onChanged: (value) {
+                //         //     // dialerController.phoneNumber.value = value;
+                //         //     if (value.length <= 10) {
+                //         //       dialerController.phoneNumber.value = value;
+                //         //     }
+                //         //   },
+                //         //   style: TextStyle(
+                //         //     fontSize: 20.sp,
+                //         //     color: AppColors.secondaryColor,
+                //         //     fontWeight: FontWeight.bold,
+                //         //   ),
+                //         //   decoration: InputDecoration(
+                //         //     counterText: '',
+                //         //     border: InputBorder.none,
+                //         //     hintText: 'Enter number',
+                //         //     hintStyle: TextStyle(
+                //         //       fontSize: 20.sp,
+                //         //       color: AppColors.secondaryColor,
+                //         //       fontWeight: FontWeight.bold,
+                //         //     ),
+                //         //   ),
+                //         // ),
+
+                //         Text(
+                //       dialerController.phoneNumber.value.isEmpty
+                //           ? 'Enter number'
+                //           : dialerController.phoneNumber.value,
+                //       style: TextStyle(
+                //         fontSize: 20.sp,
+                //         color: AppColors.secondaryColor,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   ),
+                // );
+              }),
+
+              SizedBox(height: 10.h),
 
               // Keypad
               Container(
@@ -295,20 +323,21 @@ class _DialerScreenState extends State<DialerScreen> {
               ),
 
               // Call and delete buttons
-              Padding(
-                padding: EdgeInsets.only(bottom: 0.h, left: 20.w, right: 50.w),
+              Container(
+                margin:
+                    EdgeInsets.symmetric(horizontal: 5.w), // Responsive margin
+                padding: EdgeInsets.symmetric(horizontal: 40.w),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 0.w, vertical: 8.0),
+                    Expanded(
                       child: Obx(() {
                         return dialerController.isManual.value
                             ? const SizedBox.shrink()
                             : _buildIconNextCallButton(
-                                Icons.headphones_outlined,
-                                AppColors.primaryColor,
+                                SvgPicture.asset(
+                                  'assets/images/tellecaller.svg',
+                                ),
                                 dialerController.isManual.value
                                     ? null
                                     : dialerController.isLoading.value
@@ -350,97 +379,31 @@ class _DialerScreenState extends State<DialerScreen> {
                               );
                       }),
                     ),
-
-                    Obx(() => _buildCallButton(
-                          SvgPicture.asset(
-                            'assets/images/call_icon.svg',
-                            height: 150,
-                          ),
-                          dialerController.phoneNumber.isNotEmpty &&
-                                  !dialerController.isCallOngoing.value
-                              ? () {
-                                  // if (dialerController.dialNumber.isEmpty) {
-                                  //   dialerController.fetchNextPhoneNumber();
-                                  // } else {
-                                  //   dialerController
-                                  //       .makePhoneCall(dialerController.dialNumber.value);
-                                  // }
-                                  dialerController.makePhoneCall(
-                                      dialerController.phoneNumber.value);
-                                  _formController.mobile.value =
-                                      dialerController.phoneNumber.value;
-                                }
-                              : null,
-                        )),
-                    SizedBox(width: 10.sp),
-                    // Obx(() => Expanded(
-                    //       child: ElevatedButton(
-                    //         style: ElevatedButton.styleFrom(
-                    //           backgroundColor:
-                    //               dialerController.isCallOngoing.value
-                    //                   ? AppColors.ongoindCallColor
-                    //                   : AppColors.primaryColor,
-                    //           foregroundColor: Colors.white,
-                    //           padding: EdgeInsets.symmetric(vertical: 16.h),
-                    //           shape: RoundedRectangleBorder(
-                    //             borderRadius: BorderRadius.circular(12.r),
-                    //           ),
-                    //         ),
-                    //         onPressed: dialerController.isManual.value
-                    //             ? null
-                    //             : dialerController.isLoading.value
-                    //                 ? null
-                    //                 : () async {
-                    //                     dialerController.isCallOngoing.value
-                    //                         ? Get.defaultDialog(
-                    //                             title: "End Call",
-                    //                             titleStyle: const TextStyle(
-                    //                                 color: Colors.black,
-                    //                                 fontWeight: FontWeight.bold,
-                    //                                 fontSize:
-                    //                                     20), // Bold title for emphasis.
-                    //                             middleText:
-                    //                                 "Want to end the call? End the call from the caller screen.", // Updated guiding message.
-                    //                             middleTextStyle: const TextStyle(
-                    //                                 color: Colors.black,
-                    //                                 fontSize:
-                    //                                     16), // Clear and readable middle text.
-                    //                             backgroundColor: Colors
-                    //                                 .white, // Dialog background in white.
-                    //                             textConfirm:
-                    //                                 "OK", // Single button labeled 'OK'.
-                    //                             confirmTextColor: Colors
-                    //                                 .white, // Confirm button text in white.
-                    //                             buttonColor: Colors
-                    //                                 .blue, // 'OK' button in blue for neutrality.
-                    //                             barrierDismissible:
-                    //                                 false, // Prevent accidental dismiss by tapping outside.
-                    //                             onConfirm: () {
-                    //                               Get.back(); // Simply close the dialog.
-                    //                             },
-                    //                           )
-                    //                         : await dialerController
-                    //                             .fetchNextPhoneNumber();
-                    //                   },
-                    //         child: dialerController.isLoading.value
-                    //             ? const Text('Loading...')
-                    //             : Text(
-                    //                 dialerController.isCallOngoing.value
-                    //                     ? "End Call"
-                    //                     : 'NEXT CALL',
-                    //                 style: TextStyle(
-                    //                     fontSize: 16.sp,
-                    //                     fontWeight: FontWeight.bold),
-                    //               ),
-                    //       ),
-                    //     )),
-
-                    SizedBox(
-                      width: 5.sp,
+                    SizedBox(width: 5.w), // spacing
+                    Expanded(
+                      child: Obx(() => _buildCallButton(
+                            SvgPicture.asset(
+                              'assets/images/call_icon.svg',
+                            ),
+                            dialerController.phoneNumber.isNotEmpty &&
+                                    !dialerController.isCallOngoing.value
+                                ? () {
+                                    // if (dialerController.dialNumber.isEmpty) {
+                                    //   dialerController.fetchNextPhoneNumber();
+                                    // } else {
+                                    //   dialerController
+                                    //       .makePhoneCall(dialerController.dialNumber.value);
+                                    // }
+                                    dialerController.makePhoneCall(
+                                        dialerController.phoneNumber.value);
+                                    _formController.mobile.value =
+                                        dialerController.phoneNumber.value;
+                                  }
+                                : null,
+                          )),
                     ),
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 5.w, vertical: 8.0),
+                    SizedBox(width: 5.w), // spacing
+                    Expanded(
                       child: _buildIconButton(
                         Icons.backspace_outlined,
                         AppColors.greyColor,
@@ -449,9 +412,6 @@ class _DialerScreenState extends State<DialerScreen> {
                     ),
                   ],
                 ),
-              ),
-              SizedBox(
-                height: 10.h,
               ),
 
               // Obx(() => dialerController.isManual.value
@@ -529,52 +489,66 @@ class _DialerScreenState extends State<DialerScreen> {
   }
 
   Widget _buildIconButton(IconData icon, Color color, VoidCallback? onPressed) {
-    return Container(
-      width: 70.w,
-      height: 70.h,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: AppColors.secondaryColor),
-        iconSize: 30.r,
-        onPressed: onPressed,
+    return CircleAvatar(
+      radius: 33,
+      backgroundColor: AppColors.secondaryColor,
+      child: Material(
+        color: AppColors.greyColor,
+        shape: const CircleBorder(),
+        child: SizedBox(
+          height: 64, // circle size
+          width: 64,
+          child: IconButton(
+            icon: Icon(icon, color: AppColors.secondaryColor),
+            iconSize: 30.r,
+            onPressed: onPressed,
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildIconNextCallButton(
-      IconData icon, Color color, VoidCallback? onPressed) {
+  // Widget _buildIconNextCallButton(
+  //     Widget icon, Color color, VoidCallback? onPressed) {
+  //   return SizedBox(
+  //     height: 82, // circle size
+  //     width: 82,
+
+  //     child: IconButton(
+  //       icon: icon,
+  //       iconSize: 30.r,
+  //       onPressed: onPressed,
+  //     ),
+  //   );
+  // }
+
+  Widget _buildIconNextCallButton(Widget icon, VoidCallback? onPressed) {
     return Container(
-      width: 70.w,
-      height: 70.h,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: AppColors.backgroundColor),
-        iconSize: 30.r,
-        onPressed: onPressed,
+      height: 70,
+      width: 70,
+      decoration: const BoxDecoration(
+          shape: BoxShape.circle, color: themeColor.AppColors.diallerBtnColor),
+      child: Material(
+        color: Colors.transparent,
+        shape: const CircleBorder(),
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(41),
+          child: Center(
+            child: icon,
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildCallButton(Widget icon, VoidCallback? onPressed) {
-    return Padding(
-      padding: EdgeInsets.only(left: 17.w),
-      child: Container(
-        width: 85.w,
-        height: 85.h,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-        ),
-        child: IconButton(
-          icon: icon,
-          iconSize: 45.r,
-          onPressed: onPressed,
-        ),
+    return SizedBox(
+      height: 82, // circle size
+      width: 82,
+      child: IconButton(
+        icon: icon,
+        onPressed: onPressed,
       ),
     );
   }
@@ -594,9 +568,10 @@ class _DialerScreenState extends State<DialerScreen> {
         dialerController.dialNumber.value = dialerController.dialNumber.value
             .substring(0, dialerController.dialNumber.value.length - 1);
       });
-    } else
+    } else {
       dialerController.customerLoan.value = '';
-    dialerController.customerName.value = '';
+      dialerController.customerName.value = '';
+    }
 
     if (dialerController.phoneNumber.isNotEmpty) {
       dialerController.phoneNumber.value = dialerController.phoneNumber.value

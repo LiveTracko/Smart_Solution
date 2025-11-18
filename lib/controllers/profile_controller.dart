@@ -18,11 +18,11 @@ class ProfileController extends GetxController {
   var profileImageUrl = "".obs;
 
   @override
-  onInit() {
+  onInit() async {
     super.onInit();
     usernameController.text = StaticStoredData.number;
     imageFile.value = null;
-    getProfileData(StaticStoredData.userId);
+    await getProfileData(StaticStoredData.userId);
   }
 
   Future<void> pickImage() async {

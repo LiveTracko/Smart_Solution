@@ -162,14 +162,17 @@ class _TellecallerFilterChipDialogState
         ElevatedButton(
           style: ElevatedButton.styleFrom(padding: EdgeInsets.all(5.w)),
           onPressed: () {
-            Future.microtask(() async {
-              dashboardController.getTimeGraph();
-              dashboardController.getActiveData(status: 1);
-              dashboardController.getActiveData(status: 2);
-              followBackFormController.getCallBackData();
-              followBackFormController.getCallLogData();
-              followBackFormController.getDisbursementData();
-            });
+            followBackFormController.getAllDashboardData(
+              dashboardController: dashboardController,
+            );
+            // Future.microtask(() async {
+            //   dashboardController.getTimeGraph();
+            //   dashboardController.getActiveData(status: 1);
+            //   dashboardController.getActiveData(status: 2);
+            //   followBackFormController.getCallBackData();
+            //   followBackFormController.getCallLogData();
+            //   followBackFormController.getDisbursementData();
+            // });
 
             Navigator.pop(context);
           },

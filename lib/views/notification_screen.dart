@@ -6,6 +6,7 @@ import 'package:smart_solutions/controllers/notification_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
+import 'package:smart_solutions/widget/no_data_available.dart';
 
 class NotificationSCreen extends StatefulWidget {
   const NotificationSCreen({super.key});
@@ -41,26 +42,30 @@ class _NotificationSCreenState extends State<NotificationSCreen> {
         body: Obx(
           () => notificationController.isLoading.value
               ? const Center(child: LoadingPage())
-              : ListView.builder(
-                  itemCount: notificationController.notificationData.length,
-                  itemBuilder: (context, index) {
-                    DateTime parsedDate = DateTime.parse(notificationController
-                        .notificationData[index]['created']);
-                    String date =
-                        DateFormat('dd MMM yyyy hh:mm:ss a').format(parsedDate);
-                    return showNotificationData(
-                        date,
-                        notificationController.notificationData[index]
-                                ['title'] ??
-                            '',
-                        notificationController.notificationData[index]
-                                ['status'] ??
-                            '',
-                        notificationController.notificationData[index]
-                                ['message'] ??
-                            '');
-                  },
-                ),
+              : notificationController.notificationData.isEmpty
+                  ? NoDataAvailable()
+                  : ListView.builder(
+                      itemCount: notificationController.notificationData.length,
+                      itemBuilder: (context, index) {
+                        DateTime parsedDate = DateTime.parse(
+                            notificationController.notificationData[index]
+                                ['created']);
+                        String date = DateFormat('dd MMM yyyy hh:mm:ss a')
+                            .format(parsedDate);
+
+                        return showNotificationData(
+                            date,
+                            notificationController.notificationData[index]
+                                    ['title'] ??
+                                '',
+                            notificationController.notificationData[index]
+                                    ['status'] ??
+                                '',
+                            notificationController.notificationData[index]
+                                    ['message'] ??
+                                '');
+                      },
+                    ),
         ));
   }
 

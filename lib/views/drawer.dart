@@ -40,8 +40,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
     return Padding(
       padding: EdgeInsets.only(top: 100.h),
       child: Drawer(
-        
-        
         width: MediaQuery.of(context).size.width * 0.6,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -181,7 +179,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     prefs.clear();
                     StaticStoredData.userId = '';
                     Get.put(LoginViewModel());
-                    Get.offAll(() => const LoginView());
+                    Get.offAll(() => LoginView());
                   }),
                 ],
               ),
@@ -210,7 +208,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }) {
     return ListTile(
       dense: true,
-      visualDensity: const VisualDensity(vertical: -2),
+      visualDensity: VisualDensity(vertical: -2),
       leading: Icon(
         icon,
         size: isBottomTile ? 28 : 22, // bigger icon for bottom tiles

@@ -62,4 +62,7 @@ class APIUrls {
   //get lead status group
   static const String getAllStatusGroup = "Auth/getallstatusgroup";
   static const String getFollowUpStatus = "Auth/getallfollowupstatus";
+
+  //get updated followup list
+  static const String updatedcalllog = "Auth/getupdatedfollowuplist";
 }

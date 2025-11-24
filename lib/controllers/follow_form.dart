@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/models/FollowUpSubmittedList.dart';
 import 'package:smart_solutions/models/all_bank_names_model.dart';
 import 'package:smart_solutions/models/callBack_model.dart';
@@ -60,9 +61,23 @@ class FollowBackFormController extends GetxController
   double tellececalleritemHeight = 55.h;
   final customerNumberController = TextEditingController();
 
+  // Pagination variables
+  final RxInt currentPage = 1.obs;
+  final RxBool hasMore = true.obs;
+  final int limit = 20; // Fixed limit
+  final RxBool isInitialLoad = true.obs;
+
+  final CommonFilterController commonFilterController =
+      Get.put(CommonFilterController());
+
   @override
   void onInit() {
     // ever(mobile, (number) => customerNumberController.text = number);
+
+    fetchFollowBackList();
+
+    ever(followBackList, (_) => updateFilteredList());
+    ever(commonFilterController.selectedFilter, (_) => updateFilteredList());
 
     // 1️⃣ When text changes, update observable
     customerNumberController.addListener(() {
@@ -85,6 +100,7 @@ class FollowBackFormController extends GetxController
         selectedIndex.value = callController.index;
       }
     });
+
     // loadData();
 
     super.onInit();
@@ -167,8 +183,20 @@ class FollowBackFormController extends GetxController
     selectedStatuses.clear();
   }
 
-  Future<void> fetchFollowBackList() async {
+  Future<void> fetchFollowBackList({bool loadMore = false}) async {
+    // If loading more, don't show loading indicator for initial load
     isLoading.value = true;
+    // if (!loadMore) {
+    //   isLoading.value = true;
+    // }
+
+    if (!loadMore) {
+      currentPage.value = 1;
+      hasMore.value = true;
+      followBackList.clear();
+      allCustomerName.clear();
+    }
+    //  isLoading.value = true;
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final int? secureType = prefs.getInt('secureType');
@@ -182,6 +210,7 @@ class FollowBackFormController extends GetxController
     final Map<String, dynamic> formData = {
       "telecaller_id": StaticStoredData.userId,
       "daterange": dateRage,
+      "page": currentPage.value.toString(),
       "secure_type": secureType.toString(),
     };
 
@@ -199,7 +228,7 @@ class FollowBackFormController extends GetxController
 
     try {
       var response =
-          await _apiService.postRequest(APIUrls.followUpSubmitedData, formData);
+          await _apiService.postRequest(APIUrls.updatedcalllog, formData);
 
       debugPrint(" data -->  ${response.statusCode} ${response.body}");
 
@@ -207,20 +236,53 @@ class FollowBackFormController extends GetxController
         var responseData = jsonDecode(response.body);
 
         var followBackData = FollowUpSubmitedList.fromJson(responseData);
-        allCustomerName.assignAll(followBackData.data!);
 
-        followBackList.value = followBackData.data ?? [];
+        final newItems = followBackData.data ?? [];
+
+        if (loadMore) {
+          // Append to existing list for load more
+          followBackList.addAll(newItems);
+          allCustomerName.addAll(newItems);
+        } else {
+          // Replace list for initial load/search
+          followBackList.assignAll(newItems);
+          allCustomerName.assignAll(newItems);
+        }
+
+        // Check if there are more pages
+        hasMore.value = newItems.length >= limit;
+
+        // Increment page for next load
+        if (newItems.isNotEmpty) {
+          currentPage.value++;
+        }
+
+        // allCustomerName.assignAll(followBackData.data!);
+
+        // followBackList.value = followBackData.data ?? [];
       } else if (response.statusCode == 204) {
-        followBackList.clear();
+        if (!loadMore) {
+          followBackList.clear();
+          allCustomerName.clear();
+        }
+        hasMore.value = false;
       } else {
         // logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
       }
     } catch (e) {
-      //   logOutput("Exception fetching follow-back list: $e");
+      debugPrint("Exception fetching follow-back list: $e");
+
+      if (loadMore) {
+        currentPage.value--; // Revert page increment on error
+      }
     } finally {
       isLoading.value = false;
+
+      isInitialLoad.value = false;
     }
   }
+
+  // Method to load more data
 
   Future<void> getDailyMonthlyCallbackData(String dateRange) async {
     // isLoading.value = true;
@@ -545,24 +607,24 @@ class FollowBackFormController extends GetxController
     }
   }
 
-  void updateFilteredFollowBackList(String query) {
-    if (query.isEmpty) {
-      filteredFollowBackList.assignAll(followBackList);
-    } else {
-      filteredFollowBackList.assignAll(
-        followBackList.where((item) {
-          final name = item.customerName?.toLowerCase() ?? '';
+  // void updateFilteredFollowBackList(String query) {
+  //   if (query.isEmpty) {
+  //     filteredFollowBackList.assignAll(followBackList);
+  //   } else {
+  //     filteredFollowBackList.assignAll(
+  //       followBackList.where((item) {
+  //         final name = item.customerName?.toLowerCase() ?? '';
 
-          final mobile = item.contactNumber?.toLowerCase() ?? '';
-          final bank = item.bankName?.toLowerCase() ?? '';
-          final searchQuery = query.toLowerCase();
-          return name.contains(searchQuery) ||
-              mobile.contains(searchQuery) ||
-              bank.contains(searchQuery);
-        }).toList(),
-      );
-    }
-  }
+  //         final mobile = item.contactNumber?.toLowerCase() ?? '';
+  //         final bank = item.bankName?.toLowerCase() ?? '';
+  //         final searchQuery = query.toLowerCase();
+  //         return name.contains(searchQuery) ||
+  //             mobile.contains(searchQuery) ||
+  //             bank.contains(searchQuery);
+  //       }).toList(),
+  //     );
+  //   }
+  // }
 
   Future<void> getAllBanks() async {
     try {
@@ -663,5 +725,63 @@ class FollowBackFormController extends GetxController
       await getCallLogData();
       await getDisbursementData();
     });
+  }
+
+  // set filterlist
+
+  // void updateFilteredList() {
+  //   final names = followBackList.map((e) => e.remarkStatus ?? '').toList();
+
+  //   commonFilterController.setFilters(names);
+  // }
+
+  void updateFilteredList({String query = ''}) {
+    // 1️⃣ Update filter chip list (remarkStatus)
+    final names = followBackList
+        .map((e) => e.remarkStatus ?? '')
+        .where((e) => e.isNotEmpty)
+        .toSet()
+        .toList();
+    commonFilterController.setFilters(names);
+
+    // 2️⃣ Apply search + chip filter
+    final search = query.toLowerCase();
+    final selected = commonFilterController.selectedFilter.value;
+
+    filteredFollowBackList.assignAll(
+      followBackList.where((item) {
+        final name = item.customerName?.toLowerCase() ?? '';
+        final mobile = item.contactNumber?.toLowerCase() ?? '';
+        final bank = item.bankName?.toLowerCase() ?? '';
+        final remark = item.remarkStatus?.toLowerCase() ?? '';
+
+        // Search filter
+        final searchMatch = search.isEmpty ||
+            name.contains(search) ||
+            mobile.contains(search) ||
+            bank.contains(search);
+
+        // Chip filter
+        final chipMatch =
+            selected == 0 ? true : remark == names[selected - 1].toLowerCase();
+
+        return searchMatch && chipMatch;
+      }).toList(),
+    );
+  }
+
+  // Method to refresh data (pull to refresh)
+
+  Future<void> loadMore() async {
+    if (!isLoading.value && hasMore.value) {
+      await fetchFollowBackList(loadMore: true);
+    }
+  }
+
+  // Call this when search or filters change
+  Future<void> onSearchOrFilterChanged() async {
+    currentPage.value = 1;
+    hasMore.value = true;
+    await fetchFollowBackList(loadMore: false);
   }
 }

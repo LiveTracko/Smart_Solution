@@ -27,7 +27,7 @@ class AppRoutes {
         );
       },
     ),
-    GetPage(name: login, page: () => const InternetChecker(child: LoginView())),
+    GetPage(name: login, page: () =>  InternetChecker(child: LoginView())),
     GetPage(name: home, page: () => InternetChecker(child: DashboardScreen())),
   ];
 }

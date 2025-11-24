@@ -23,8 +23,8 @@ class CommonScaffold extends StatelessWidget {
     this.isDrawer = false,
     this.actions,
     this.showBack = true,
-    this.height = 30,
-    this.bodyPadding = 100,
+    this.height = 15,
+    this.bodyPadding = 80,
   });
 
   final DashboardController controller = Get.put(DashboardController());
@@ -33,6 +33,7 @@ class CommonScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       drawerEnableOpenDragGesture: false,
       drawer: isDrawer ? const CustomDrawer() : null,
       appBar: CurvedAppBar(
@@ -56,12 +57,7 @@ class CommonScaffold extends StatelessWidget {
                   )
               : null),
       key: _scaffoldKey,
-      body: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.backgroundColor,
-        ),
-        child: SafeArea(child: body),
-      ),
+      body: SafeArea(child: body),
     );
   }
 }

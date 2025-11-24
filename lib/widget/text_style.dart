@@ -21,6 +21,13 @@ class AppTextStyle {
     fontFamily: 'Poppins',
   );
 
+  static const whiteHeaderTitletStyle = TextStyle(
+    fontSize: 18,
+    color: AppColors.backgroundColor,
+    fontWeight: FontWeight.bold,
+    fontFamily: 'Poppins',
+  );
+
   static const headerTitle = TextStyle(
       fontSize: 16, color: Colors.black87, fontWeight: FontWeight.bold);
   static const body = TextStyle(
@@ -31,6 +38,10 @@ class AppTextStyle {
   static const label = TextStyle(
     fontSize: 12,
     color: Colors.grey,
+  );
+
+  static const normalHeadingTxt = TextStyle(
+    fontSize: 14,
   );
 
   static const whiteText = TextStyle(

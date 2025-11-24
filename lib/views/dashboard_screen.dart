@@ -763,7 +763,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                               children: [
                                 FileStatusCard(
                                   title: "Today",
-                                  fileCount: "14",
+                                  fileCount: followBackFormController
+                                      .dailycallbackData.length
+                                      .toString(),
                                   statusColor: Colors.green,
                                   onPress: () {
                                     Get.to(CallBackData(
@@ -777,8 +779,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 ),
                                 FileStatusCard(
                                   title: "Monthly",
-                                  fileCount: "08",
-                                  statusColor: Colors.red,
+                                  fileCount: followBackFormController
+                                      .monthlybackData.length
+                                      .toString(),
+                                  statusColor: Colors.blue,
                                   onPress: () {
                                     Get.to(CallBackData(
                                         title: 'Monthly Callback',
@@ -1932,7 +1936,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             width: 25.w,
                           ),
                           Expanded(
-                            child: Container(
+                            child: SizedBox(
                               width: 35.w,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,

@@ -6,9 +6,7 @@ import 'package:smart_solutions/components/widgets/DailerScreenWidget/KeypadRowW
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
-
 import 'package:smart_solutions/views/followBackForm.dart';
-import 'package:smart_solutions/views/spacing_constants.dart';
 import 'package:smart_solutions/widget/common_rows_card.dart';
 
 import 'package:smart_solutions/widget/common_scaffold.dart';
@@ -52,8 +50,6 @@ class _DialerScreenState extends State<DialerScreen> {
         IconButton(
           icon: SvgPicture.asset(
             'assets/images/user_plus.svg',
-            width: 20.w,
-            height: 20.h,
           ),
           onPressed: () {
             Get.to(() => FollowBackForm(
@@ -190,6 +186,7 @@ class _DialerScreenState extends State<DialerScreen> {
                           },
                           decoration: InputDecoration(
                             border: InputBorder.none, // looks like plain Text
+
                             hintText: "Enter number",
                             hintStyle: TextStyle(
                               fontSize: 20.sp,

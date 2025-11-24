@@ -7,7 +7,9 @@ import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/services/api_service.dart';
+import 'package:smart_solutions/utils/error_utils.dart';
 import 'package:smart_solutions/views/navigationbar.dart';
+import 'package:smart_solutions/utils/snackbar_utils.dart';
 import '../constants/services.dart'; // Direct navigation to MainScreen
 
 class LoginViewModel extends GetxController {
@@ -74,7 +76,7 @@ class LoginViewModel extends GetxController {
           // Navigate to the MainScreen on successful login
           // dashboardController.fetchDashboardData(false);
           // dashboardController.fetchDashboardData(true);
-          Get.off(() => MainScreen());
+          Get.off(() => const MainScreen());
           showDialog(
               context: (Get.context!),
               builder: (context) => AlertDialog(
@@ -130,9 +132,16 @@ class LoginViewModel extends GetxController {
         Get.snackbar('Error', 'Invalid username or password');
       }
     } catch (e) {
-      logOutput('$e');
-      Get.snackbar('Error', 'Something went wrong. Please try again.');
-    } finally {
+      logOutput("$e");
+
+      AppSnackbar.error(
+        "Request Failed",
+        getErrorMessage(e),
+      );
+    }
+    // logOutput('$e');
+    // Get.snackbar('Error', 'Something went wrong. Please try again.');
+    finally {
       isLoading.value = false;
     }
   }

@@ -9,6 +9,7 @@ import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/views/chart_card_toggle.dart';
 import 'package:smart_solutions/views/data_entry_form.dart';
@@ -28,7 +29,12 @@ class ActiveFiles extends StatefulWidget {
   int status;
   bool isShowBack = false;
   bool isDrawer = false;
-  ActiveFiles({super.key, required this.title, required this.status , required this.isShowBack , required this.isDrawer});
+  ActiveFiles(
+      {super.key,
+      required this.title,
+      required this.status,
+      required this.isShowBack,
+      required this.isDrawer});
 
   @override
   State<ActiveFiles> createState() => _ActiveFilesState();
@@ -89,35 +95,44 @@ class _ActiveFilesState extends State<ActiveFiles> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              HeaderTitle(title: widget.title, style: AppTextStyle.headerTitle),
-              Visibility(
-                  visible: widget.title == 'Leads' ? true : false,
-                  child: ChartCardsToggle(
-                    data: const ['Active', 'Inactive'],
-                  ))
-            ],
-          ),
-          SearchBarWithClear(
-              controller: _activeFilesController
-                  .filterController.searchController, // Use controller's
-              onChanged: (value) => print('Search text: $value'),
-              onClear: () {
-                _activeFilesController.filterController.clearFilters;
-              }),
-          kVerticalSpace(10),
-          Obx(() {
-            final filterList = _activeFilesController.filterController.filters;
+          Container(
+            color: AppColors.appBarTextColor,
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  HeaderTitle(
+                      title: widget.title, style: AppTextStyle.headerTitle),
+                  Visibility(
+                      visible: widget.title == 'Leads' ? true : false,
+                      child: ChartCardsToggle(
+                        data: const ['Active', 'Inactive'],
+                      ))
+                ],
+              ),
+              SearchBarWithClear(
+                  controller: _activeFilesController
+                      .filterController.searchController, // Use controller's
+                  onChanged: (value) => print('Search text: $value'),
+                  onClear: () {
+                    _activeFilesController.filterController.clearFilters;
+                  }),
+              kVerticalSpace(10),
+              Obx(() {
+                final filterList =
+                    _activeFilesController.filterController.filters;
 
-            return FilterChipList(
-              filters: filterList,
-              selectedIndex:
-                  _activeFilesController.filterController.selectedFilter.value,
-              onSelected: _activeFilesController.filterController.selectFilter,
-            );
-          }),
+                return FilterChipList(
+                  filters: filterList,
+                  selectedIndex: _activeFilesController
+                      .filterController.selectedFilter.value,
+                  onSelected:
+                      _activeFilesController.filterController.selectFilter,
+                );
+              }),
+            ]),
+          ),
           Expanded(child: Obx(() {
             if (dataController.isLoading.value) {
               return const Center(child: LoadingPage());
@@ -137,8 +152,7 @@ class _ActiveFilesState extends State<ActiveFiles> {
             }
             return RefreshIndicator(
               onRefresh: () => dataController.refreshData(),
-              child: Obx(
-                () => ListView.builder(
+              child: ListView.builder(
                     padding: const EdgeInsets.all(10),
                     itemCount: _activeFilesController.filteredList.length,
                     itemBuilder: (context, index) {
@@ -204,10 +218,9 @@ class _ActiveFilesState extends State<ActiveFiles> {
                         ],
                       );
                     }),
-              ),
+              
             );
           }))
-       
         ],
       ),
     );

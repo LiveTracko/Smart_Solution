@@ -56,7 +56,7 @@ class CommonTitleCard extends StatelessWidget {
           shape: const RoundedRectangleBorder(
             side: BorderSide(color: Colors.transparent, width: 0),
           ),
-          onExpansionChanged: onExpansionChanged,
+          onExpansionChanged: children.isNotEmpty ? onExpansionChanged : null,
           leading: leading != null
               ? GestureDetector(
                   onTap: onLeadingTap,
@@ -129,8 +129,11 @@ class CommonTitleCard extends StatelessWidget {
                       style: const TextStyle(fontSize: 14),
                     ),
                   ),
-                  const Icon(Icons.keyboard_arrow_down,
-                      size: 18, color: Colors.black),
+                  if (children.isNotEmpty)
+                    const Icon(Icons.keyboard_arrow_down,
+                        size: 18, color: Colors.black),
+                  // const Icon(Icons.keyboard_arrow_down,
+                  //     size: 18, color: Colors.black),
                 ],
               ),
             ],

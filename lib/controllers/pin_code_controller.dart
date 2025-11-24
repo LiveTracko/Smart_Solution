@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/chartCard_controller.dart';
 import 'package:smart_solutions/models/company_list_model.dart';
 import 'package:smart_solutions/models/pin_code_list.dart';
 import 'package:smart_solutions/services/api_service.dart';
@@ -19,6 +20,8 @@ class PincodeController extends GetxController {
   final int companylimit = 50;
   final int limit = 50;
   final searchQuery = ''.obs;
+  final ChartCardsController _chartCardsController =
+      Get.find<ChartCardsController>();
 
   @override
   void onInit() {
@@ -26,6 +29,9 @@ class PincodeController extends GetxController {
     fetchPincodes();
     fetchCompany();
   }
+
+
+  
 
   Future<void> fetchPincodes({String? search}) async {
     if (isLoading.value || !hasMore.value) return;

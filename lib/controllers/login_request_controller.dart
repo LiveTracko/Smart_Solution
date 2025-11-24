@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
@@ -14,8 +15,8 @@ import 'package:smart_solutions/services/api_service.dart';
 import '../constants/services.dart';
 
 class LoginRequestController extends GetxController {
-  var loginRequestList =
-      <LoginRequest>[].obs; // Observable list for reactive UI
+  var allLoginRequestList = <LoginRequest>[].obs;
+  var loginRequestList = <LoginRequest>[].obs;
   var loanStatusList = <LoanStatus>[].obs;
   List<RemarkList> remarks = []; // Observable list for reactive UI
   var isLoading = false.obs;
@@ -40,9 +41,16 @@ class LoginRequestController extends GetxController {
   var sourcingList = <SourceModel>[].obs;
   var sourceId = ''.obs;
 
+  final searchController = TextEditingController();
+  var selectedFilter = 0.obs;
+  var filters = <String>[].obs;
+
   @override
   void onInit() async {
     super.onInit();
+    ever(loginRequestList, (_) => updateFilteredList());
+    ever(selectedFilter, (_) => updateFilteredList());
+
     await getLoginRequestList();
     await editLoadData();
     // fetchLoanStatuses();
@@ -85,6 +93,7 @@ class LoginRequestController extends GetxController {
 
           // log('raw -->>> ${resData['data'] }');
 
+          allLoginRequestList.value = loginData; // store original
           loginRequestList.value = loginData;
           //     currentId.value = loginRequestList[0].id;
           await getRemarks();
@@ -258,5 +267,49 @@ class LoginRequestController extends GetxController {
       log('An error occurred while fetching source list: $e');
       isLoading(false); // Ensure loading is set to false on error as well
     }
+  }
+
+//filter
+  void filterLoginRequests(String query) {
+    if (query.isEmpty) {
+      loginRequestList.value = allLoginRequestList;
+      return;
+    }
+
+    query = query.toLowerCase();
+
+    loginRequestList.value = allLoginRequestList.where((item) {
+      return item.customerName.toLowerCase().contains(query) ||
+          item.contactNumber.toLowerCase().contains(query);
+    }).toList();
+  }
+
+  void selectFilter(int index) {
+    selectedFilter.value = index;
+  }
+
+  void clearFilters() {
+    selectedFilter.value = 0;
+
+    searchController.clear();
+  }
+
+  void setFilters(List<String> names) {
+    filters.value = ["All", ...names.toSet()];
+    update();
+  }
+
+  void updateFilteredList() {
+    // final names = dataList
+    //     .where((item) => currentStatus.value == 1
+    //         ? item.dataStatus?.toLowerCase() == 'active'
+    //         : item.dataStatus?.toLowerCase() == 'inactive')
+    //     .map((item) => item.dataEntryStatus ?? 'Unknown')
+    //     .toList();
+
+    final names =
+        loginRequestList.map((item) => item.title ?? 'Unknown').toList();
+
+    setFilters(names);
   }
 }

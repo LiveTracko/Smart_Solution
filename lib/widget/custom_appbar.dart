@@ -56,7 +56,7 @@ class CurvedAppBar extends StatelessWidget implements PreferredSizeWidget {
                 if (actions != null && actions!.isNotEmpty)
                   Row(children: actions!)
                 else
-                  SizedBox(width: 48.w),
+                  SizedBox(width: 50.w),
               ],
             ),
           ),

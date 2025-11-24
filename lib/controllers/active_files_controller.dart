@@ -47,26 +47,7 @@ class ActiveFilesController extends GetxController {
     //  updateFilteredList();
   }
 
-  // void setupFilters(int status) {
-  //   currentStatus.value = status;
-  //   final itemList = status == 1
-  //       ? _dashboardController.activeList
-  //       : _dashboardController.inActiveList;
-
-  //   final names =
-  //       itemList.map((item) => item.StatusGroupModelName ?? 'Unknown').toList();
-
-  //   filterController.setFilters(names);
-  // }
-
   void updateFilteredList() {
-    // final names = dataList
-    //     .where((item) => currentStatus.value == 1
-    //         ? item.dataStatus?.toLowerCase() == 'active'
-    //         : item.dataStatus?.toLowerCase() == 'inactive')
-    //     .map((item) => item.dataEntryStatus ?? 'Unknown')
-    //     .toList();
-
     final names = dataList
         .where((item) {
           if (currentStatus.value == 1) {
@@ -91,9 +72,6 @@ class ActiveFilesController extends GetxController {
         }
         return item.dataStatus?.toLowerCase() ==
             'active'; // -1 means show all statuses
-        //  else {
-        //   return true; // -1 means show all statuses
-        // }
       }).toList();
     } else {
       final filterText =
@@ -113,30 +91,8 @@ class ActiveFilesController extends GetxController {
         return item.dataEntryStatus!.toLowerCase() ==
                 selectedStatus.toLowerCase() &&
             item.dataStatus?.toLowerCase() == 'active';
-
-        //  else {
-        //   return item.dataEntryStatus!.toLowerCase() ==
-        //       selectedStatus.toLowerCase();
-        //   // -1 means show all statuses, so only filter by dataEntryStatus
-        // }
       }).toList();
-      //.split(' ').first;
-
-      // filteredList.value = dataList
-      //     .where((item) =>
-      //         item.dataEntryStatus!.toLowerCase() ==
-      //         selectedStatus.toLowerCase())
-      //     .toList();
-      // filteredList.value = dataList
-      //     .where((item) =>
-      //         item.dataEntryStatus!.toLowerCase() ==
-      //             selectedStatus.toLowerCase() &&
-      //         (currentStatus.value == 1
-      //             ? item.dataStatus?.toLowerCase() == 'active'
-      //             : item.dataStatus?.toLowerCase() == 'inactive'))
-      //     .toList();
     }
     print('🔄 Filtered list updated: ${filteredList.length} items');
   }
-
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -6,9 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/core/app_bindings.dart';
 import 'package:smart_solutions/services/api_service.dart';
+import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/views/active_files.dart';
+import 'package:smart_solutions/views/call_log.dart';
 import 'package:smart_solutions/views/dialer_screen.dart';
-import 'package:smart_solutions/views/followBackList.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_request_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
@@ -28,50 +30,42 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   late final PersistentTabController _controller;
+  late final List<PersistentTabConfig> tabs;
   late int _previousIndex;
+  bool _isCheckingAuth = false;
 
   @override
   void initState() {
     super.initState();
     _previousIndex = widget.pageIndex;
     _controller = PersistentTabController(initialIndex: widget.pageIndex);
-  }
-
-  Future<bool> _ensureLoggedIn() async {
-    if (await ApiService().checkUserStillLoggedIn()) return true;
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    Get.off(() => const LoginView(), binding: AppBinding());
-    return false;
+    tabs = _buildTabs();
   }
 
   @override
-  Widget build(BuildContext context) {
-    final tabs = _buildTabs();
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
-    return Scaffold(
-      body: PersistentTabView(
-        tabs: tabs,
-        controller: _controller,
-        navBarBuilder: (navBarConfig) => Style13BottomNavBar(
-          navBarConfig: navBarConfig,
-          height: 60,
-          navBarDecoration: const NavBarDecoration(
-            padding: EdgeInsets.zero,
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(15), topRight: Radius.circular(15)),
-          ),
-        ),
-        backgroundColor: Colors.red,
-        onTabChanged: _onTabChanged,
-        keepNavigatorHistory: true,
-        stateManagement: false,
-        handleAndroidBackButtonPress: true,
-        avoidBottomPadding: false,
-      ),
-    );
+  Future<bool> _ensureLoggedIn() async {
+    if (_isCheckingAuth) return false;
+
+    _isCheckingAuth = true;
+    try {
+      final isLoggedIn = await ApiService().checkUserStillLoggedIn();
+      if (!isLoggedIn) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+        if (mounted) {
+          Get.off(() => LoginView(), binding: AppBinding());
+        }
+        return false;
+      }
+      return true;
+    } finally {
+      _isCheckingAuth = false;
+    }
   }
 
   List<PersistentTabConfig> _buildTabs() {
@@ -79,76 +73,136 @@ class _MainScreenState extends State<MainScreen> {
 
     if (isTelecaller) {
       return [
-        // Dashboard
         PersistentTabConfig(
           screen: const DashboardScreen(),
           item: ItemConfig(
-            icon: const Icon(Icons.dashboard_outlined, size: 24),
+            icon: SvgPicture.asset(
+              'assets/images/dashboard.svg',
+              colorFilter: const ColorFilter.mode(
+                CupertinoColors.activeBlue,
+                BlendMode.srcIn,
+              ),
+            ),
+            inactiveIcon: SvgPicture.asset(
+              'assets/images/dashboard.svg',
+              colorFilter: ColorFilter.mode(
+                Colors.grey.shade600,
+                BlendMode.srcIn,
+              ),
+            ),
             title: "Dashboard",
-            //  activeColorPrimary: AppColors.primaryColor,
-            //  inactiveColorPrimary: Colors.grey.shade600,
+            activeForegroundColor: AppColors.primaryColor,
+            inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
           ),
         ),
-        // Leads
         PersistentTabConfig(
           screen: ActiveFiles(
+            key: const ValueKey('leads_screen'),
             title: 'Leads',
             status: -1,
             isShowBack: false,
             isDrawer: true,
           ),
           item: ItemConfig(
-            icon: const Icon(Icons.assignment_ind_outlined, size: 24),
+            icon: SvgPicture.asset(
+              'assets/images/leads.svg',
+              colorFilter: const ColorFilter.mode(
+                CupertinoColors.activeBlue,
+                BlendMode.srcIn,
+              ),
+            ),
+            inactiveIcon: SvgPicture.asset(
+              'assets/images/leads.svg',
+              colorFilter: ColorFilter.mode(
+                Colors.grey.shade600,
+                BlendMode.srcIn,
+              ),
+            ),
             title: "Leads",
-            //  activeColorPrimary: AppColors.primaryColor,
-            //  inactiveColorPrimary: Colors.grey.shade600,
+            activeForegroundColor: AppColors.primaryColor,
+            inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
           ),
         ),
-        // DIALER (Center tab with different styling)
         PersistentTabConfig(
-          screen: const DialerScreen(),
+          screen: const DialerScreen(key: ValueKey('dialer_screen')),
           item: ItemConfig(
-            icon: SvgPicture.asset('assets/images/fab.svg'),
-
+            icon: SvgPicture.asset(
+              'assets/images/fab.svg',
+              fit: BoxFit.contain,
+            ),
+            iconSize: 50,
             title: "DIALER",
-            // activeColorPrimary: AppColors.primaryColor,
-            // inactiveColorPrimary: AppColors.primaryColor,
-            textStyle: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
+            textStyle:
+                const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            activeColorSecondary: Colors.transparent,
+            inactiveBackgroundColor: Colors.transparent,
           ),
         ),
-        // Call Log
         PersistentTabConfig(
-          screen: FollowBackListScreen(),
+          screen: const CallLogPage(
+            key: ValueKey('call_log_screen'),
+            title: 'Call Log',
+          ),
+          // FollowBackListScreen(key: const ValueKey('call_log_screen')),
           item: ItemConfig(
-            icon: const Icon(Icons.schedule_outlined, size: 24),
+            icon: SvgPicture.asset(
+              'assets/images/clock_fast_forward.svg',
+              colorFilter: const ColorFilter.mode(
+                CupertinoColors.activeBlue,
+                BlendMode.srcIn,
+              ),
+            ),
+            inactiveIcon: SvgPicture.asset(
+              'assets/images/clock_fast_forward.svg',
+              colorFilter: ColorFilter.mode(
+                Colors.grey.shade600,
+                BlendMode.srcIn,
+              ),
+            ),
             title: "Call Log",
-            //  activeColorPrimary: AppColors.primaryColor,
-            //  inactiveColorPrimary: Colors.grey.shade600,
+            activeForegroundColor: AppColors.primaryColor,
+            inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
           ),
         ),
-        // HRM
         PersistentTabConfig(
-          screen: LoginRequestScreen(),
+          screen: LoginRequestScreen(
+            key: const ValueKey('hrm_screen'),
+            title: 'Login Request',
+
+            isShowBack: false,
+            isDrawer: true,
+            //key: const ValueKey('hrm_screen')
+          ),
           item: ItemConfig(
-            icon: const Icon(Icons.co_present_outlined, size: 24),
+            icon: SvgPicture.asset(
+              'assets/images/fingerprint.svg',
+              colorFilter: const ColorFilter.mode(
+                CupertinoColors.activeBlue,
+                BlendMode.srcIn,
+              ),
+            ),
+            inactiveIcon: SvgPicture.asset(
+              'assets/images/fingerprint.svg',
+              colorFilter: ColorFilter.mode(
+                Colors.grey.shade600,
+                BlendMode.srcIn,
+              ),
+            ),
             title: "HRM",
-            //  activeColorPrimary: AppColors.primaryColor,
-            //  inactiveColorPrimary: Colors.grey.shade600,
+            activeForegroundColor: AppColors.primaryColor,
+            inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -157,19 +211,24 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ];
     } else {
-      // Non-telecaller version
       return [
         PersistentTabConfig(
-          screen: const DashboardScreen(),
+          screen: const DashboardScreen(key: ValueKey('dashboard_screen')),
           item: ItemConfig(
             icon: const Icon(Icons.dashboard_outlined, size: 24),
+            inactiveIcon: const Icon(Icons.dashboard_outlined, size: 24),
             title: "Dashboard",
-            //  activeColorPrimary: AppColors.primaryColor,
-            //  inactiveColorPrimary: Colors.grey.shade600,
+            activeForegroundColor: AppColors.primaryColor,
+            inactiveForegroundColor: Colors.grey.shade600,
+            textStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         PersistentTabConfig(
           screen: ActiveFiles(
+            key: const ValueKey('leads_screen'),
             title: 'Leads',
             status: -1,
             isShowBack: false,
@@ -177,211 +236,102 @@ class _MainScreenState extends State<MainScreen> {
           ),
           item: ItemConfig(
             icon: const Icon(Icons.assignment_ind_outlined, size: 24),
+            inactiveIcon: const Icon(Icons.assignment_ind_outlined, size: 24),
             title: "Leads",
-            //  activeColorPrimary: AppColors.primaryColor,
-            //  inactiveColorPrimary: Colors.grey.shade600,
+            activeForegroundColor: AppColors.primaryColor,
+            inactiveForegroundColor: Colors.grey.shade600,
+            textStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         PersistentTabConfig(
-          screen: const ListingScreen(),
+          screen: const ListingScreen(key: ValueKey('listing_screen')),
           item: ItemConfig(
             icon: const Icon(Icons.list_alt_outlined, size: 24),
+            inactiveIcon: const Icon(Icons.list_alt_outlined, size: 24),
             title: "Listing",
-            //  activeColorPrimary: AppColors.primaryColor,
-            //  inactiveColorPrimary: Colors.grey.shade600,
+            activeForegroundColor: AppColors.primaryColor,
+            inactiveForegroundColor: Colors.grey.shade600,
+            textStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         PersistentTabConfig(
-          screen: LoginRequestScreen(),
+          screen: LoginRequestScreen(
+            key: const ValueKey('hrm_screen'),
+            title: 'Login Request',
+
+            isShowBack: false,
+            isDrawer: true,
+            //key: const ValueKey('hrm_screen')
+          ),
           item: ItemConfig(
             icon: const Icon(Icons.co_present_outlined, size: 24),
+            inactiveIcon: const Icon(Icons.co_present_outlined, size: 24),
             title: "HRM",
-            //  activeColorPrimary: AppColors.primaryColor,
-            //  inactiveColorPrimary: Colors.grey.shade600,
+            activeForegroundColor: AppColors.primaryColor,
+            inactiveForegroundColor: Colors.grey.shade600,
+            textStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ];
     }
   }
 
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:smart_solutions/constants/static_stored_data.dart';
-// import 'package:smart_solutions/core/app_bindings.dart';
-// import 'package:smart_solutions/services/api_service.dart';
-// import 'package:smart_solutions/views/active_files.dart';
-// import 'package:smart_solutions/views/dialer_screen.dart';
-// import 'package:smart_solutions/views/followBackList.dart';
-// import 'package:smart_solutions/views/listing_screen.dart';
-// import 'package:smart_solutions/views/login_request_screen.dart';
-// import 'package:smart_solutions/views/login_screen.dart';
-// import '../theme/app_theme.dart';
-// import 'dashboard_screen.dart';
-
-// // ignore: must_be_immutable
-// class MainScreen extends StatefulWidget {
-//   int pageIndex;
-
-//   MainScreen({
-//     Key? key,
-//     this.pageIndex = 0,
-//   }) : super(key: key);
-
-//   @override
-//   State<MainScreen> createState() => _MainScreenState();
-// }
-
-// class _MainScreenState extends State<MainScreen> {
-//   late final PageController _pageController;
-//   late int _selectedIndex;
-//   String? roleName = '';
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _selectedIndex = widget.pageIndex;
-//     _pageController = PageController(initialPage: _selectedIndex);
-//   }
-
-//   final pages = [
-//     const DashboardScreen(),
-//     ActiveFiles(
-//       title: 'Leads',
-//       status: -1,
-//       isShowBack: false,
-//       isDrawer: true,
-//     ),
-//     // DataEntryViewScreen(),
-//     if (StaticStoredData.roleName == 'telecaller') DialerScreen(),
-//     if (StaticStoredData.roleName == 'telecaller')
-//       //  LoginRequestScreen()
-//       FollowBackListScreen()
-//     else
-//       const ListingScreen(),
-//     // ProfilePage()
-//     LoginRequestScreen(),
-//   ];
-//   // final List<Widget> _screens = [
-//   //   DashboardScreen(),
-//   //   DataEntryViewScreen(),
-//   //   StaticStoredData.roleName == 'telecaller'
-//   //       ? DialerScreen()
-//   //       : const ReportPage(),
-//   //   StaticStoredData.roleName == 'telecaller'
-//   //       ? FollowBackListScreen()
-//   //       : const ListingScreen(),
-//   //   LoginRequestScreen()
-//   // ];
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: PageView.builder(
-//         controller: _pageController,
-//         itemCount: pages.length,
-//         itemBuilder: (context, index) => pages[index],
-
-//         onPageChanged: (index) async {
-//           if (await ApiService().checkUserStillLoggedIn()) {
-//             if (index >= 0 && index < 5) {
-//               setState(() {
-//                 _selectedIndex = index;
-//               });
-//             }
-//           } else {
-//             SharedPreferences prefs = await SharedPreferences.getInstance();
-//             await prefs.clear();
-//             Get.off(() => const LoginView(), binding: AppBinding());
-//           }
-//         },
-//       ),
-//       //_screens[_selectedIndex],
-//       bottomNavigationBar: NavigationBar(
-//         indicatorColor: AppColors.backgroundColor,
-//         backgroundColor: AppColors.backgroundColor,
-
-//         selectedIndex: _selectedIndex,
-//         onDestinationSelected: (int index) async {
-//           if (index >= 0 && index < 5) {
-//             if (await ApiService().checkUserStillLoggedIn()) {
-//               _pageController.animateToPage(
-//                 index,
-//                 duration: const Duration(milliseconds: 200),
-//                 curve: Curves.easeInOut,
-//               );
-//             }
-//           } else {
-//             SharedPreferences prefs = await SharedPreferences.getInstance();
-//             await prefs.clear();
-//             Get.off(const LoginView(), binding: AppBinding());
-//           }
-//         },
-//         destinations: [
-//           const NavigationDestination(
-//             icon: Icon(
-//               Icons.dashboard_outlined,
-//               color: AppColors.secondayColor,
-//             ),
-//             selectedIcon: Icon(
-//               Icons.dashboard,
-//               color: AppColors.primaryColor,
-//             ),
-//             label: 'Dashboard',
-//           ),
-//           const NavigationDestination(
-//             icon: Icon(
-//               Icons.assignment_ind,
-//               color: AppColors.secondayColor,
-//             ),
-//             selectedIcon: Icon(
-//               Icons.assignment_ind,
-//               color: AppColors.primaryColor,
-//             ),
-//             label: 'Leads',
-//           ),
-//           if (StaticStoredData.roleName == 'telecaller')
-//             const NavigationDestination(
-//                 icon: Icon(Icons.dialpad_outlined,
-//                     color: AppColors.secondayColor),
-//                 selectedIcon:
-//                     Icon(Icons.dialpad, color: AppColors.primaryColor),
-//                 label: 'Dialer'),
-//           NavigationDestination(
-//             icon: Icon(
-//                 StaticStoredData.roleName == 'telecaller'
-//                     ? Icons.schedule
-//                     : Icons.list_alt,
-//                 color: AppColors.secondayColor),
-//             selectedIcon: Icon(
-//                 StaticStoredData.roleName == 'telecaller'
-//                     ? Icons.schedule
-//                     : Icons.list_alt,
-//                 color: AppColors.primaryColor),
-//             label: StaticStoredData.roleName == 'telecaller'
-//                 ? 'Call Log'
-//                 : 'Listing',
-//           ),
-//           const NavigationDestination(
-//             icon: Icon(
-//               Icons.co_present_rounded,
-//               color: AppColors.secondayColor,
-//             ),
-//             selectedIcon: Icon(
-//               Icons.co_present_rounded,
-//               color: AppColors.primaryColor,
-//             ),
-//             label: 'Request',
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: PersistentTabView(
+        tabs: tabs,
+        controller: _controller,
+        navBarBuilder: (navBarConfig) => Style15BottomNavBar(
+          navBarConfig: navBarConfig,
+          height: 70,
+          navBarDecoration: const NavBarDecoration(
+            padding: EdgeInsets.zero,
+            color: Colors.white12,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
+            ),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        onTabChanged: _onTabChanged,
+        keepNavigatorHistory: false,
+        stateManagement: true, // ⚠️ Changed to true for better state handling
+        navBarOverlap: const NavBarOverlap.custom(),
+        handleAndroidBackButtonPress: true,
+        avoidBottomPadding: false,
+        //     confineInSafeArea: true, // ⚠️ ADD THIS for safety
+        screenTransitionAnimation: const ScreenTransitionAnimation(
+          //     animateTabTransition: true,
+          curve: Curves.ease,
+          duration: Duration(milliseconds: 200),
+        ),
+      ),
+    );
+  }
 
   void _onTabChanged(int newIndex) async {
+    if (newIndex == _previousIndex) return;
+
     final ok = await _ensureLoggedIn();
     if (!ok) {
-      _controller.jumpToTab(_previousIndex);
+      // Jump back to the previous tab if not authenticated
+      Future.microtask(() {
+        if (mounted && _controller.index != _previousIndex) {
+          _controller.jumpToTab(_previousIndex);
+        }
+      });
       return;
     }
     _previousIndex = newIndex;

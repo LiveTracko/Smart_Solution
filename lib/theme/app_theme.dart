@@ -75,6 +75,7 @@ class AppColors {
   static const Color secondayColor = Color(0xFF5E5E5E); // Example: Purple
   static const Color accentColor = Color(0xFFFF5722); // Example: Orange
   static const Color backgroundColor = Color(0xFFF5F5F5); // Example: Orange
+  static const Color whiteColor = Color(0xFFF5F5F5); 
 
   // static const Color backgroundColor =
   //     Color.fromARGB(255, 255, 255, 255); // Scaffold background color

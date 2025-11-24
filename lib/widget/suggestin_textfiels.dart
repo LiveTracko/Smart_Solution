@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
+import 'package:smart_solutions/widget/text_style.dart';
 
 class SuggestionTextField extends StatelessWidget {
   final String label;
@@ -75,8 +76,10 @@ class SuggestionTextField extends StatelessWidget {
             focusNode: focusNode,
             onChanged: onChanged,
             decoration: InputDecoration(
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
               hintText: label,
-              hintStyle: const TextStyle(color: AppColors.primaryColor),
+              hintStyle: AppTextStyle.hintText,
               prefixIcon: decoratedPrefixIcon,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
@@ -91,7 +94,7 @@ class SuggestionTextField extends StatelessWidget {
                     const BorderSide(color: AppColors.primaryColor, width: 2),
               ),
               filled: true,
-              fillColor: AppColors.backgroundColor,
+              fillColor: AppColors.appBarTextColor,
             ),
             style: const TextStyle(color: AppColors.primaryColor),
           ),

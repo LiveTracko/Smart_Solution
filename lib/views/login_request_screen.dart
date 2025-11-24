@@ -7,28 +7,40 @@ import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
-import 'package:smart_solutions/views/data_entry_form.dart';
 import 'package:smart_solutions/views/login_request_form.dart';
+import 'package:smart_solutions/views/spacing_constants.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
+import 'package:smart_solutions/widget/common_title_card.dart';
+import 'package:smart_solutions/widget/flutter_chiplist.dart';
+import 'package:smart_solutions/widget/header_title.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
+import 'package:smart_solutions/widget/searchbarwithclear.dart';
+import '../widget/text_style.dart';
 
 class LoginRequestScreen extends StatelessWidget {
-  LoginRequestScreen({super.key});
+  String title;
+  bool isShowBack = false;
+  bool isDrawer = false;
+
+  LoginRequestScreen(
+      {super.key,
+      required this.title,
+      required this.isShowBack,
+      required this.isDrawer});
   final LoginRequestController controller = Get.put(LoginRequestController());
   final DataController dataEntryController = Get.put(DataController());
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-        title: 'Login Requests',
+        title: title,
         showBack: false,
+        isDrawer: true,
         actions: [
           IconButton(
-            icon: SvgPicture.asset(
-              'assets/images/plus_icon.svg',
-              width: 20,
-              height: 20,
-            ),
+            icon: SvgPicture.asset('assets/images/user_plus.svg'),
             onPressed: () {
               controller.isEdit.value = true;
               controller.isNew.value = true;
@@ -37,523 +49,622 @@ class LoginRequestScreen extends StatelessWidget {
             },
           )
         ],
+        key: _scaffoldKey,
+        body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            color: AppColors.backgroundColor,
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              HeaderTitle(title: title, style: AppTextStyle.headerTitle),
+              SearchBarWithClear(
+                  controller: controller.searchController,
+                  onChanged: (value) => controller.filterLoginRequests(value),
+                  onClear: () {
+                    controller.searchController.clear();
+                    controller.filterLoginRequests("");
+                  }),
+              kVerticalSpace(10),
+              Obx(() {
+                final filterList = controller.filters;
 
-        //  Scaffold(
-        //   floatingActionButton: FloatingActionButton(
-        //       backgroundColor: Theme.of(context).primaryColor,
-        //       child: const Icon(
-        //         Icons.add,
-        //         color: Colors.white,
-        //       ),
-        //       onPressed: () {
-        //         controller.isEdit.value = true;
-        //         controller.isNew.value = true;
-        //         Get.to(() => LoginRequestForm());
-        //       }),
-        //   appBar: AppBar(
-        //     centerTitle: true,
-        //     title: const Text(
-        //       'Login Requests',
-        //       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        //     ),
-        //   ),
-        body: RefreshIndicator(
-            onRefresh: () => controller.getLoginRequestList(),
-            // child: Obx(() {
-            //   if (controller.loginRequestList.isEmpty) {
-            //     return const Center(
-            //       child: Text(
-            //         'No Data',
-            //         style: TextStyle(color: Colors.black),
-            //       ),
-            //     );
-            //   }
+                return FilterChipList(
+                  filters: filterList,
+                  selectedIndex: controller.selectedFilter.value,
+                  onSelected: controller.selectFilter,
+                );
+              }),
+              kVerticalSpace(10),
+            ]),
+          ),
+          Expanded(child: Obx(() {
+            if (controller.isLoading.value) {
+              return const Center(child: LoadingPage());
+            }
+            if (controller.loginRequestList.isEmpty) {
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.no_sim, size: 50, color: Colors.grey),
+                    SizedBox(height: 16),
+                    Text('No data entries available',
+                        style: TextStyle(fontSize: 16, color: Colors.grey)),
+                  ],
+                ),
+              );
+            }
+            return RefreshIndicator(
+                onRefresh: () => controller.getLoginRequestList(),
+                child: Obx(() => controller.isLoading.value
+                    ? const Center(
+                        child: LoadingPage(),
+                      )
+                    : ListView.builder(
+                        padding:
+                            const EdgeInsets.all(8), // Add padding to the list
+                        itemCount: controller.loginRequestList.length,
+                        itemBuilder: (context, index) {
+                          final data = controller.loginRequestList[index];
+                          return CommonTitleCard(
+                            leading: SvgPicture.asset(
+                                'assets/images/phone_call.svg'),
+                            onLeadingTap: () {},
+                            title: data.customerName,
+                            subtitle: data.bankName ?? '',
+                            status: data.title ?? '',
+                            statusColor:
+                                (data.title ?? '').toLowerCase() != 'not doable'
+                                    ? Colors.green.shade400
+                                    : Colors.redAccent.shade200,
+                            amount: CurrencyUtils.formatIndianCurrency(
+                                data.loanAmount),
+                            showEdit: StaticStoredData.roleName != 'telecaller',
+                            onEdit: () async {
+                              controller.currentId.value = data.id;
+                              controller.customerName.value = data.customerName;
+                              controller.contactNumber.value =
+                                  data.contactNumber;
+                              controller.loanAmount.value = data.loanAmount;
+                              controller.loanStatus.value =
+                                  ((data.loanStatus == null ||
+                                          data.loanStatus!.isEmpty)
+                                      ? "NA"
+                                      : data.loanStatus)!;
+                              controller.bankId.value = data.bankName ?? "";
+                              controller.commonRemark.value = data.commonRemark;
+                              controller.sourceId.value =
+                                  data.sourcingTitle ?? "";
 
-            child: Obx(() => controller.isLoading.value
-                ? const Center(
-                    child: LoadingPage(),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(8), // Add padding to the list
-                    itemCount: controller.loginRequestList.length,
-                    itemBuilder: (context, index) {
-                      final request = controller.loginRequestList[index];
-                      return Container(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(5),
-                            border: const Border(
-                              left: BorderSide(
-                                color: Color(0xFF356EFF), // Blue line
-                                width: 3,
+                              controller.getRemarks();
+                              await Get.to(() => LoginRequestForm());
+
+                              controller.getLoginRequestList();
+                            },
+                            children: [
+                              _buildDoubleRow(
+                                iconLeft: 'assets/images/call.svg',
+                                valueLeft: maskFirst6Digits(data.contactNumber),
+                                iconRight: 'assets/images/calendar.svg',
+                                valueRight: DateFormat('dd-MM-yyyy').format(
+                                    DateTime.parse(
+                                        data.loginRequestDate.toString())),
                               ),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                offset: const Offset(0, 4), // Only downward
-                                blurRadius: 8, // Softness
-                                spreadRadius: 0, // No spread
-                              ),
+                              _buildSingleRow(
+                                  'assets/images/message_dots_circle.svg',
+                                  data.remark.isEmpty
+                                      ? 'No remark'
+                                      : data.remark),
                             ],
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: ExpansionTile(
-                              tilePadding:
-                                  const EdgeInsets.symmetric(horizontal: 5.0),
-                              showTrailingIcon: false,
-
-                              childrenPadding: const EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 5),
-                              expandedCrossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                              initiallyExpanded: false,
-                              shape: const RoundedRectangleBorder(
-                                side: BorderSide(
-                                    color: Colors.transparent, width: 0),
-                              ),
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {},
-                                    child: SvgPicture.asset(
-                                        'assets/images/person.svg'),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        width: 200.w,
-                                        child: Text(
-                                          softWrap: true,
-                                          request.customerName.toString(),
-                                          style: const TextStyle(
-                                              overflow: TextOverflow.ellipsis),
-                                        ),
-                                      ),
-                                      Text(
-                                          softWrap: true,
-                                          style: const TextStyle(fontSize: 11),
-                                          request.bankName.toString()),
-                                    ],
-                                  ),
-                                  const Spacer(),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 5),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        GestureDetector(
-                                            onTap: () async {
-                                              controller.currentId.value =
-                                                  request.id;
-                                              controller.customerName.value =
-                                                  request.customerName;
-                                              controller.contactNumber.value =
-                                                  request.contactNumber;
-                                              controller.loanAmount.value =
-                                                  request.loanAmount;
-                                              controller.loanStatus.value =
-                                                  ((request.loanStatus ==
-                                                              null ||
-                                                          request.loanStatus!
-                                                              .isEmpty)
-                                                      ? "NA"
-                                                      : request.loanStatus)!;
-                                              controller.bankId.value =
-                                                  request.bankName ?? "";
-                                              controller.commonRemark.value =
-                                                  request.commonRemark;
-                                              controller.sourceId.value =
-                                                  request.sourcingTitle ?? "";
-
-                                              controller.getRemarks();
-                                              await Get.to(
-                                                  () => LoginRequestForm());
-
-                                              controller.getLoginRequestList();
-                                            },
-                                            child: SvgPicture.asset(
-                                                'assets/images/edit.svg')),
-                                        StaticStoredData.roleName !=
-                                                    'telecaller' &&
-                                                StaticStoredData.roleName !=
-                                                    'teamleader'
-                                            ? GestureDetector(
-                                                onTap: () async {
-                                                  // dataEntryController.customerName
-                                                  //     .value = request.customerName;
-
-                                                  dataEntryController
-                                                          .contactNumber.value =
-                                                      request.contactNumber;
-
-                                                  dataEntryController
-                                                          .loanAmount.value =
-                                                      request.loanAmount;
-
-                                                  dataEntryController.Id.value =
-                                                      request.id;
-
-                                                  dataEntryController
-                                                          .selectedSource
-                                                          .value =
-                                                      request.sourcing
-                                                          .toString();
-
-                                                  dataEntryController
-                                                          .selectTelecallerName
-                                                          .value =
-                                                      request.telecallerId;
-
-                                                  await Get.to(DataEntryForm(
-                                                      id: '',
-                                                      tellecallerId:
-                                                          request.telecallerId,
-                                                      dsaId: request.sourcing,
-                                                      bankerId: ''));
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    SizedBox(
-                                                      width: 15.w,
-                                                    ),
-                                                    const Icon(Icons.login,
-                                                        color: AppColors
-                                                            .primaryColor),
-                                                  ],
-                                                ))
-                                            : const SizedBox.shrink()
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 5, vertical: 5),
-                                child: SizedBox(
-                                  width: double.infinity,
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8),
-                                        decoration: BoxDecoration(
-                                          color: (request.title ?? '')
-                                                      .toLowerCase() ==
-                                                  'not doable'
-                                              ? Colors.redAccent.shade200
-                                              : Colors.green.shade400,
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 5, vertical: 1),
-                                          child: Text(
-                                              request.title!.isNotEmpty
-                                                  ? request.title.toString()
-                                                  : 'No status',
-                                              style: const TextStyle(
-                                                  color: Colors.white
-                                                  //  (request.title ?? '')
-                                                  //             .toLowerCase() ==
-                                                  //         'not doable'
-                                                  //     ? Colors.green.shade700
-                                                  //     : Colors.orange.shade700,
-                                                  )),
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Row(
-                                        children: [
-                                          Text(
-                                              CurrencyUtils
-                                                  .formatIndianCurrency(
-                                                request.loanAmount,
-                                              ),
-                                              style: TextStyle(
-                                                  color: Colors.black)),
-                                          Icon(Icons.expand_more)
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              // trailing: SizedBox(
-                              //   width: 80.w,
-                              //   child: Column(
-                              //     crossAxisAlignment: CrossAxisAlignment.end,
-                              //     mainAxisAlignment:
-                              //         MainAxisAlignment.spaceBetween,
-                              //     children: [
-                              //       Row(
-                              //         mainAxisAlignment: MainAxisAlignment.end,
-                              //         children: [
-                              //           GestureDetector(
-                              //               onTap: () async {
-                              //                 controller.currentId.value =
-                              //                     request.id;
-                              //                 controller.customerName.value =
-                              //                     request.customerName;
-                              //                 controller.contactNumber.value =
-                              //                     request.contactNumber;
-                              //                 controller.loanAmount.value =
-                              //                     request.loanAmount;
-                              //                 controller.loanStatus.value =
-                              //                     ((request.loanStatus == null ||
-                              //                             request.loanStatus!
-                              //                                 .isEmpty)
-                              //                         ? "NA"
-                              //                         : request.loanStatus)!;
-                              //                 controller.bankId.value =
-                              //                     request.bankName ?? "";
-                              //                 controller.commonRemark.value =
-                              //                     request.commonRemark;
-                              //                 controller.sourceId.value =
-                              //                     request.sourcingTitle ?? "";
-
-                              //                 controller.getRemarks();
-                              //                 await Get.to(
-                              //                     () => LoginRequestForm());
-
-                              //                 controller.getLoginRequestList();
-                              //               },
-                              //               child: SvgPicture.asset(
-                              //                   'assets/images/edit.svg')),
-                              //           SizedBox(
-                              //             width: 5.w,
-                              //           ),
-                              //           StaticStoredData.roleName !=
-                              //                       'telecaller' &&
-                              //                   StaticStoredData.roleName !=
-                              //                       'teamleader'
-                              //               ? GestureDetector(
-                              //                   onTap: () async {
-                              //                     // dataEntryController.customerName
-                              //                     //     .value = request.customerName;
-
-                              //                     dataEntryController
-                              //                             .contactNumber.value =
-                              //                         request.contactNumber;
-
-                              //                     dataEntryController.loanAmount
-                              //                         .value = request.loanAmount;
-
-                              //                     dataEntryController.Id.value =
-                              //                         request.id;
-
-                              //                     dataEntryController
-                              //                             .selectedSource.value =
-                              //                         request.sourcing.toString();
-
-                              //                     dataEntryController
-                              //                             .selectTelecallerName
-                              //                             .value =
-                              //                         request.telecallerId;
-
-                              //                     await Get.to(DataEntryForm(
-                              //                         id: '',
-                              //                         tellecallerId:
-                              //                             request.telecallerId,
-                              //                         dsaId: request.sourcing,
-                              //                         bankerId: ''));
-                              //                   },
-                              //                   child: Icon(Icons.login,
-                              //                       color: Colors.grey[700]))
-                              //               : const SizedBox.shrink()
-                              //         ],
-                              //       ),
-                              //     ],
-                              //   ),
-                              // ),
-
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 5.0, vertical: 8.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // StaticStoredData.roleName != 'telecaller'
-                                      //     ? _buildDoubleRow(
-                                      //         iconLeft: SvgPicture.asset(
-                                      //         'assets/images/tellecaller_call.svg'),
-                                      //         valueLeft: request. ?? '',
-                                      //         iconRight: Icons.verified_user,
-                                      //         valueRight: data.tlName ?? '')
-                                      //     : const SizedBox.shrink(),
-                                      _buildDoubleRow(
-                                          iconLeft: SvgPicture.asset(
-                                              'assets/images/grey_call_icon.svg'),
-                                          valueLeft: maskFirst6Digits(
-                                              request.contactNumber.toString()),
-                                          iconRight: SvgPicture.asset(
-                                              'assets/images/date_icon.svg'),
-                                          valueRight: DateFormat('dd-MM-yyyy')
-                                              .format(DateTime.parse(request
-                                                  .loginRequestDate
-                                                  .toString()))),
-
-                                      // _buildSingleRow(
-                                      //     Icons.comment,
-                                      //     request.commonRemark.isNotEmpty
-                                      //         ? request.commonRemark
-                                      //         : ' No common Remark Available'
-                                      //         ),
-
-                                      Obx(() => _buildSingleRow(
-                                          SvgPicture.asset(
-                                              'assets/images/comment-detail.svg'),
-                                          (index <
-                                                      controller
-                                                          .remarksList.length &&
-                                                  controller
-                                                          .remarksList[index] !=
-                                                      null)
-                                              ? controller.remarksList[index]
-                                              : 'No remark'))
-
-                                      // Row(
-                                      //   mainAxisAlignment:
-                                      //       MainAxisAlignment.spaceBetween,
-                                      //   children: [
-                                      //     Text(
-                                      //       'Contact: ${request.contactNumber}',
-                                      //       style: TextStyle(color: Colors.grey[600]),
-                                      //     ),
-                                      //     const SizedBox(width: 4),
-                                      //     Text(
-                                      //       'Loan Status: ${request.title}',
-                                      //       style: TextStyle(color: Colors.grey[600]),
-                                      //     ),
-                                      //   ],
-                                      // )
-
-                                      // ElevatedButton.icon(
-                                      //   onPressed: () async {
-                                      // controller.currentId.value = request.id;
-                                      // controller.customerName.value =
-                                      //     request.customerName;
-                                      // controller.contactNumber.value =
-                                      //     request.contactNumber;
-                                      // controller.loanAmount.value =
-                                      //     request.loanAmount.replaceAll(',', '');
-                                      // controller.loanStatus.value =
-                                      //     ((request.loanStatus == null ||
-                                      //             request.loanStatus!.isEmpty)
-                                      //         ? "NA"
-                                      //         : request.loanStatus)!;
-                                      // controller.bankId.value =
-                                      //     request.bankName ?? "";
-                                      // controller.commonRemark.value =
-                                      //     request.commonRemark;
-                                      // controller.sourceId.value =
-                                      //     request.sourcingTitle ?? "";
-
-                                      // controller.getRemarks();
-                                      // var result =
-                                      //     await Get.to(() => LoginRequestForm());
-
-                                      // controller.getLoginRequestList();
-                                      // },
-                                      // icon: const Icon(Icons.edit),
-                                      // label: const Text('Edit Request'),
-                                      // style: ElevatedButton.styleFrom(
-                                      //   backgroundColor: Colors.blue.shade600,
-                                      // ),
-                                      //  ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ));
-                    },
-                  ))));
+                          );
+                        })));
+          }))
+        ]));
   }
 
-  String maskFirst6Digits(String number) {
-    if (number.length < 6) return number; // Handle edge case
-    return 'xxxxxx${number.substring(6)}';
-  }
+  //  RefreshIndicator(
+  //     onRefresh: () => controller.getLoginRequestList(),
+  //     child: Obx(() => controller.isLoading.value
+  //         ? const Center(
+  //             child: LoadingPage(),
+  //           )
+  //         : ListView.builder(
+  //             padding: const EdgeInsets.all(8), // Add padding to the list
+  //             itemCount: controller.loginRequestList.length,
+  //             itemBuilder: (context, index) {
+  //               final request = controller.loginRequestList[index];
+  //               return Container(
+  //                   margin: const EdgeInsets.symmetric(
+  //                       vertical: 5, horizontal: 4),
+  //                   decoration: BoxDecoration(
+  //                     color: Colors.white,
+  //                     borderRadius: BorderRadius.circular(5),
+  //                     border: const Border(
+  //                       left: BorderSide(
+  //                         color: Color(0xFF356EFF), // Blue line
+  //                         width: 3,
+  //                       ),
+  //                     ),
+  //                     boxShadow: [
+  //                       BoxShadow(
+  //                         color: Colors.black.withOpacity(0.2),
+  //                         offset: const Offset(0, 4), // Only downward
+  //                         blurRadius: 8, // Softness
+  //                         spreadRadius: 0, // No spread
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   child: Padding(
+  //                     padding: const EdgeInsets.all(4.0),
+  //                     child: ExpansionTile(
+  //                       tilePadding:
+  //                           const EdgeInsets.symmetric(horizontal: 5.0),
+  //                       showTrailingIcon: false,
 
-  Widget _buildDoubleRow({
-    required Widget iconLeft,
-    required String valueLeft,
-    required Widget iconRight,
-    required String valueRight,
-    Color? textColorRight,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                iconLeft,
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    valueLeft,
-                    style: const TextStyle(fontSize: 12, color: Colors.black),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                iconRight,
-                const SizedBox(width: 4),
-                Text(
-                  valueRight,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: textColorRight ?? Colors.black87,
-                  ),
+  //                       childrenPadding: const EdgeInsets.symmetric(
+  //                           horizontal: 5, vertical: 5),
+  //                       expandedCrossAxisAlignment:
+  //                           CrossAxisAlignment.start,
+  //                       initiallyExpanded: false,
+  //                       shape: const RoundedRectangleBorder(
+  //                         side: BorderSide(
+  //                             color: Colors.transparent, width: 0),
+  //                       ),
+  //                       title: Row(
+  //                         mainAxisAlignment: MainAxisAlignment.start,
+  //                         children: [
+  //                           GestureDetector(
+  //                             onTap: () {},
+  //                             child: SvgPicture.asset(
+  //                                 'assets/images/person.svg'),
+  //                           ),
+  //                           const SizedBox(width: 8),
+  //                           Column(
+  //                             crossAxisAlignment:
+  //                                 CrossAxisAlignment.start,
+  //                             children: [
+  //                               SizedBox(
+  //                                 width: 200.w,
+  //                                 child: Text(
+  //                                   softWrap: true,
+  //                                   request.customerName.toString(),
+  //                                   style: const TextStyle(
+  //                                       overflow: TextOverflow.ellipsis),
+  //                                 ),
+  //                               ),
+  //                               Text(
+  //                                   softWrap: true,
+  //                                   style: const TextStyle(fontSize: 11),
+  //                                   request.bankName.toString()),
+  //                             ],
+  //                           ),
+  //                           const Spacer(),
+  //                           Padding(
+  //                             padding: const EdgeInsets.symmetric(
+  //                                 horizontal: 10, vertical: 5),
+  //                             child: Row(
+  //                               mainAxisAlignment: MainAxisAlignment.end,
+  //                               children: [
+  //                                 GestureDetector(
+  //                                     onTap: () async {
+  //                                       controller.currentId.value =
+  //                                           request.id;
+  //                                       controller.customerName.value =
+  //                                           request.customerName;
+  //                                       controller.contactNumber.value =
+  //                                           request.contactNumber;
+  //                                       controller.loanAmount.value =
+  //                                           request.loanAmount;
+  //                                       controller.loanStatus.value =
+  //                                           ((request.loanStatus ==
+  //                                                       null ||
+  //                                                   request.loanStatus!
+  //                                                       .isEmpty)
+  //                                               ? "NA"
+  //                                               : request.loanStatus)!;
+  //                                       controller.bankId.value =
+  //                                           request.bankName ?? "";
+  //                                       controller.commonRemark.value =
+  //                                           request.commonRemark;
+  //                                       controller.sourceId.value =
+  //                                           request.sourcingTitle ?? "";
+
+  //                                       controller.getRemarks();
+  //                                       await Get.to(
+  //                                           () => LoginRequestForm());
+
+  //                                       controller.getLoginRequestList();
+  //                                     },
+  //                                     child: SvgPicture.asset(
+  //                                         'assets/images/edit.svg')),
+  //                                 StaticStoredData.roleName !=
+  //                                             'telecaller' &&
+  //                                         StaticStoredData.roleName !=
+  //                                             'teamleader'
+  //                                     ? GestureDetector(
+  //                                         onTap: () async {
+  //                                           // dataEntryController.customerName
+  //                                           //     .value = request.customerName;
+
+  //                                           dataEntryController
+  //                                                   .contactNumber.value =
+  //                                               request.contactNumber;
+
+  //                                           dataEntryController
+  //                                                   .loanAmount.value =
+  //                                               request.loanAmount;
+
+  //                                           dataEntryController.Id.value =
+  //                                               request.id;
+
+  //                                           dataEntryController
+  //                                                   .selectedSource
+  //                                                   .value =
+  //                                               request.sourcing
+  //                                                   .toString();
+
+  //                                           dataEntryController
+  //                                                   .selectTelecallerName
+  //                                                   .value =
+  //                                               request.telecallerId;
+
+  //                                           await Get.to(DataEntryForm(
+  //                                               id: '',
+  //                                               tellecallerId:
+  //                                                   request.telecallerId,
+  //                                               dsaId: request.sourcing,
+  //                                               bankerId: ''));
+  //                                         },
+  //                                         child: Row(
+  //                                           children: [
+  //                                             SizedBox(
+  //                                               width: 15.w,
+  //                                             ),
+  //                                             const Icon(Icons.login,
+  //                                                 color: AppColors
+  //                                                     .primaryColor),
+  //                                           ],
+  //                                         ))
+  //                                     : const SizedBox.shrink()
+  //                               ],
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                       subtitle: Padding(
+  //                         padding: const EdgeInsets.symmetric(
+  //                             horizontal: 5, vertical: 5),
+  //                         child: SizedBox(
+  //                           width: double.infinity,
+  //                           child: Row(
+  //                             children: [
+  //                               Container(
+  //                                 padding: const EdgeInsets.symmetric(
+  //                                     horizontal: 8),
+  //                                 decoration: BoxDecoration(
+  //                                   color: (request.title ?? '')
+  //                                               .toLowerCase() ==
+  //                                           'not doable'
+  //                                       ? Colors.redAccent.shade200
+  //                                       : Colors.green.shade400,
+  //                                   borderRadius:
+  //                                       BorderRadius.circular(5),
+  //                                 ),
+  //                                 child: Padding(
+  //                                   padding: const EdgeInsets.symmetric(
+  //                                       horizontal: 5, vertical: 1),
+  //                                   child: Text(
+  //                                       request.title!.isNotEmpty
+  //                                           ? request.title.toString()
+  //                                           : 'No status',
+  //                                       style: const TextStyle(
+  //                                           color: Colors.white
+  //                                           //  (request.title ?? '')
+  //                                           //             .toLowerCase() ==
+  //                                           //         'not doable'
+  //                                           //     ? Colors.green.shade700
+  //                                           //     : Colors.orange.shade700,
+  //                                           )),
+  //                                 ),
+  //                               ),
+  //                               const Spacer(),
+  //                               Row(
+  //                                 children: [
+  //                                   Text(
+  //                                       CurrencyUtils
+  //                                           .formatIndianCurrency(
+  //                                               request.loanAmount),
+  //                                       style: const TextStyle(
+  //                                           color: Colors.black)),
+  //                                   const Icon(Icons.expand_more)
+  //                                 ],
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                       ),
+  //                       // trailing: SizedBox(
+  //                       //   width: 80.w,
+  //                       //   child: Column(
+  //                       //     crossAxisAlignment: CrossAxisAlignment.end,
+  //                       //     mainAxisAlignment:
+  //                       //         MainAxisAlignment.spaceBetween,
+  //                       //     children: [
+  //                       //       Row(
+  //                       //         mainAxisAlignment: MainAxisAlignment.end,
+  //                       //         children: [
+  //                       //           GestureDetector(
+  //                       //               onTap: () async {
+  //                       //                 controller.currentId.value =
+  //                       //                     request.id;
+  //                       //                 controller.customerName.value =
+  //                       //                     request.customerName;
+  //                       //                 controller.contactNumber.value =
+  //                       //                     request.contactNumber;
+  //                       //                 controller.loanAmount.value =
+  //                       //                     request.loanAmount;
+  //                       //                 controller.loanStatus.value =
+  //                       //                     ((request.loanStatus == null ||
+  //                       //                             request.loanStatus!
+  //                       //                                 .isEmpty)
+  //                       //                         ? "NA"
+  //                       //                         : request.loanStatus)!;
+  //                       //                 controller.bankId.value =
+  //                       //                     request.bankName ?? "";
+  //                       //                 controller.commonRemark.value =
+  //                       //                     request.commonRemark;
+  //                       //                 controller.sourceId.value =
+  //                       //                     request.sourcingTitle ?? "";
+
+  //                       //                 controller.getRemarks();
+  //                       //                 await Get.to(
+  //                       //                     () => LoginRequestForm());
+
+  //                       //                 controller.getLoginRequestList();
+  //                       //               },
+  //                       //               child: SvgPicture.asset(
+  //                       //                   'assets/images/edit.svg')),
+  //                       //           SizedBox(
+  //                       //             width: 5.w,
+  //                       //           ),
+  //                       //           StaticStoredData.roleName !=
+  //                       //                       'telecaller' &&
+  //                       //                   StaticStoredData.roleName !=
+  //                       //                       'teamleader'
+  //                       //               ? GestureDetector(
+  //                       //                   onTap: () async {
+  //                       //                     // dataEntryController.customerName
+  //                       //                     //     .value = request.customerName;
+
+  //                       //                     dataEntryController
+  //                       //                             .contactNumber.value =
+  //                       //                         request.contactNumber;
+
+  //                       //                     dataEntryController.loanAmount
+  //                       //                         .value = request.loanAmount;
+
+  //                       //                     dataEntryController.Id.value =
+  //                       //                         request.id;
+
+  //                       //                     dataEntryController
+  //                       //                             .selectedSource.value =
+  //                       //                         request.sourcing.toString();
+
+  //                       //                     dataEntryController
+  //                       //                             .selectTelecallerName
+  //                       //                             .value =
+  //                       //                         request.telecallerId;
+
+  //                       //                     await Get.to(DataEntryForm(
+  //                       //                         id: '',
+  //                       //                         tellecallerId:
+  //                       //                             request.telecallerId,
+  //                       //                         dsaId: request.sourcing,
+  //                       //                         bankerId: ''));
+  //                       //                   },
+  //                       //                   child: Icon(Icons.login,
+  //                       //                       color: Colors.grey[700]))
+  //                       //               : const SizedBox.shrink()
+  //                       //         ],
+  //                       //       ),
+  //                       //     ],
+  //                       //   ),
+  //                       // ),
+
+  //                       children: [
+  //                         Padding(
+  //                           padding: const EdgeInsets.symmetric(
+  //                               horizontal: 5.0, vertical: 8.0),
+  //                           child: Column(
+  //                             crossAxisAlignment:
+  //                                 CrossAxisAlignment.start,
+  //                             children: [
+  //                               // StaticStoredData.roleName != 'telecaller'
+  //                               //     ? _buildDoubleRow(
+  //                               //         iconLeft: SvgPicture.asset(
+  //                               //         'assets/images/tellecaller_call.svg'),
+  //                               //         valueLeft: request. ?? '',
+  //                               //         iconRight: Icons.verified_user,
+  //                               //         valueRight: data.tlName ?? '')
+  //                               //     : const SizedBox.shrink(),
+  //                               _buildDoubleRow(
+  //                                   iconLeft: SvgPicture.asset(
+  //                                       'assets/images/grey_call_icon.svg'),
+  //                                   valueLeft: maskFirst6Digits(
+  //                                       request.contactNumber.toString()),
+  //                                   iconRight: SvgPicture.asset(
+  //                                       'assets/images/date_icon.svg'),
+  //                                   valueRight: DateFormat('dd-MM-yyyy')
+  //                                       .format(DateTime.parse(request
+  //                                           .loginRequestDate
+  //                                           .toString()))),
+
+  //                               // _buildSingleRow(
+  //                               //     Icons.comment,
+  //                               //     request.commonRemark.isNotEmpty
+  //                               //         ? request.commonRemark
+  //                               //         : ' No common Remark Available'
+  //                               //         ),
+
+  //                               Obx(() => _buildSingleRow(
+  //                                   SvgPicture.asset(
+  //                                       'assets/images/comment-detail.svg'),
+  //                                   (index <
+  //                                               controller
+  //                                                   .remarksList.length &&
+  //                                           controller
+  //                                                   .remarksList[index] !=
+  //                                               null)
+  //                                       ? controller.remarksList[index]
+  //                                       : 'No remark'))
+
+  //                               // Row(
+  //                               //   mainAxisAlignment:
+  //                               //       MainAxisAlignment.spaceBetween,
+  //                               //   children: [
+  //                               //     Text(
+  //                               //       'Contact: ${request.contactNumber}',
+  //                               //       style: TextStyle(color: Colors.grey[600]),
+  //                               //     ),
+  //                               //     const SizedBox(width: 4),
+  //                               //     Text(
+  //                               //       'Loan Status: ${request.title}',
+  //                               //       style: TextStyle(color: Colors.grey[600]),
+  //                               //     ),
+  //                               //   ],
+  //                               // )
+
+  //                               // ElevatedButton.icon(
+  //                               //   onPressed: () async {
+  //                               // controller.currentId.value = request.id;
+  //                               // controller.customerName.value =
+  //                               //     request.customerName;
+  //                               // controller.contactNumber.value =
+  //                               //     request.contactNumber;
+  //                               // controller.loanAmount.value =
+  //                               //     request.loanAmount.replaceAll(',', '');
+  //                               // controller.loanStatus.value =
+  //                               //     ((request.loanStatus == null ||
+  //                               //             request.loanStatus!.isEmpty)
+  //                               //         ? "NA"
+  //                               //         : request.loanStatus)!;
+  //                               // controller.bankId.value =
+  //                               //     request.bankName ?? "";
+  //                               // controller.commonRemark.value =
+  //                               //     request.commonRemark;
+  //                               // controller.sourceId.value =
+  //                               //     request.sourcingTitle ?? "";
+
+  //                               // controller.getRemarks();
+  //                               // var result =
+  //                               //     await Get.to(() => LoginRequestForm());
+
+  //                               // controller.getLoginRequestList();
+  //                               // },
+  //                               // icon: const Icon(Icons.edit),
+  //                               // label: const Text('Edit Request'),
+  //                               // style: ElevatedButton.styleFrom(
+  //                               //   backgroundColor: Colors.blue.shade600,
+  //                               // ),
+  //                               //  ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ));
+  //             },
+  //           ))));
+}
+
+Widget _buildDoubleRow({
+  required dynamic iconLeft,
+  required String valueLeft,
+  required dynamic iconRight,
+  required String valueRight,
+  Color? textColorRight,
+}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              _buildIcon(iconLeft),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  valueLeft,
+                  style: const TextStyle(fontSize: 12, color: Colors.black),
                   overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.right,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+        Expanded(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildIcon(iconLeft),
+              //  Icon(iconRight, size: 14, color: Colors.grey[700]),
+              const SizedBox(width: 4),
+              Text(
+                valueRight,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: textColorRight ?? Colors.black87,
+                ),
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.right,
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
-  Widget _buildSingleRow(Widget icon, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          icon,
-          const SizedBox(width: 4),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 12, color: Colors.black),
-              maxLines: 10,
-              overflow: TextOverflow.ellipsis,
-            ),
+Widget _buildSingleRow(dynamic icon, String value) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+    child: Row(
+      children: [
+        _buildIcon(icon),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 14, color: Colors.black),
+            maxLines: 10,
+            overflow: TextOverflow.ellipsis,
           ),
-        ],
-      ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildIcon(dynamic icon) {
+  if (icon is String) {
+    // SVG PATH
+    return SvgPicture.asset(
+      icon,
+      width: 16,
+      height: 16,
+      color: Colors.grey[700],
     );
+  } else if (icon is IconData) {
+    // NORMAL ICON
+    return Icon(icon, size: 16, color: Colors.grey[700]);
+  } else {
+    return const SizedBox();
   }
+}
+
+String maskFirst6Digits(String number) {
+  if (number.length < 6) return number; // Handle edge case
+  return 'xxxxxx${number.substring(6)}';
 }

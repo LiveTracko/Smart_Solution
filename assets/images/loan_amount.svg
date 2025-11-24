@@ -1,0 +1,5 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M12 2L15 6H9L12 2Z" fill="#1E88E5"></path>
+  <path d="M6 10C6 7.79086 7.79086 6 10 6H14C16.2091 6 18 7.79086 18 10V16C18 18.2091 16.2091 20 14 20H10C7.79086 20 6 18.2091 6 16V10Z" stroke="#1E88E5" stroke-width="2"></path>
+  <text x="9" y="16" font-size="10" font-weight="bold" fill="#1E88E5">₹</text>
+</svg>

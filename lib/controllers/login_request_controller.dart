@@ -48,8 +48,8 @@ class LoginRequestController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    ever(loginRequestList, (_) => updateFilteredList());
-    ever(selectedFilter, (_) => updateFilteredList());
+    ever(allLoginRequestList, (_) => updateFilteredList());
+    ever(selectedFilter, (_) => filterLoginRequests());
 
     await getLoginRequestList();
     await editLoadData();
@@ -270,17 +270,44 @@ class LoginRequestController extends GetxController {
   }
 
 //filter
-  void filterLoginRequests(String query) {
-    if (query.isEmpty) {
-      loginRequestList.value = allLoginRequestList;
-      return;
-    }
+  // void filterLoginRequests({String query = ''}) {
+  //   if (query.isNotEmpty) {
+  //     loginRequestList.value = allLoginRequestList;
+  //     return;
+  //   }
 
-    query = query.toLowerCase();
+  //   query = filters[selectedFilter.value].toLowerCase();
+
+  //   loginRequestList.value = allLoginRequestList.where((item) {
+  //     return item.customerName.toLowerCase().contains(query) ||
+  //         item.contactNumber.toLowerCase().contains(query);
+  //   }).toList();
+  // }
+
+  void filterLoginRequests() {
+    final search = searchController.text.trim().toLowerCase();
+
+    // selected chip text
+    final selectedIndex = selectedFilter.value;
+    final hasChipSelected = selectedIndex != 0;
+    final chipText =
+        hasChipSelected ? filters[selectedIndex].toLowerCase() : '';
 
     loginRequestList.value = allLoginRequestList.where((item) {
-      return item.customerName.toLowerCase().contains(query) ||
-          item.contactNumber.toLowerCase().contains(query);
+      final name = item.customerName.toLowerCase();
+      final mobile = item.contactNumber.toLowerCase();
+      final title = (item.title ?? '').toLowerCase();
+
+      // 🔍 Search check
+      final searchMatch = search.isEmpty ||
+          name.contains(search) ||
+          mobile.contains(search) ||
+          title.contains(search);
+
+      // 🟦 Chip check
+      final chipMatch = !hasChipSelected || title == chipText;
+
+      return searchMatch && chipMatch;
     }).toList();
   }
 
@@ -290,7 +317,6 @@ class LoginRequestController extends GetxController {
 
   void clearFilters() {
     selectedFilter.value = 0;
-
     searchController.clear();
   }
 
@@ -299,16 +325,9 @@ class LoginRequestController extends GetxController {
     update();
   }
 
-  void updateFilteredList() {
-    // final names = dataList
-    //     .where((item) => currentStatus.value == 1
-    //         ? item.dataStatus?.toLowerCase() == 'active'
-    //         : item.dataStatus?.toLowerCase() == 'inactive')
-    //     .map((item) => item.dataEntryStatus ?? 'Unknown')
-    //     .toList();
-
+  void updateFilteredList({String query = ''}) {
     final names =
-        loginRequestList.map((item) => item.title ?? 'Unknown').toList();
+        allLoginRequestList.map((item) => item.title ?? 'Unknown').toList();
 
     setFilters(names);
   }

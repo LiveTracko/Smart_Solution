@@ -12,7 +12,7 @@ class CommonFilterController extends GetxController {
 
   void clearFilters() {
     selectedFilter.value = 0;
-   
+
     searchController.clear();
   }
 

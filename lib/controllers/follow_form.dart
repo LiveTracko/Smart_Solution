@@ -67,6 +67,8 @@ class FollowBackFormController extends GetxController
   final int limit = 20; // Fixed limit
   final RxBool isInitialLoad = true.obs;
 
+  final TextEditingController searchController = TextEditingController();
+
   final CommonFilterController commonFilterController =
       Get.put(CommonFilterController());
 
@@ -77,7 +79,7 @@ class FollowBackFormController extends GetxController
     fetchFollowBackList();
 
     ever(followBackList, (_) => updateFilteredList());
-    ever(commonFilterController.selectedFilter, (_) => updateFilteredList());
+    ever(selectedFilter, (_) => updateFilteredList());
 
     // 1️⃣ When text changes, update observable
     customerNumberController.addListener(() {
@@ -144,6 +146,11 @@ class FollowBackFormController extends GetxController
       isLoading(false);
     }
   }
+
+  //search controller
+
+  var filters = <String>[].obs;
+  var selectedFilter = 0.obs;
 
   // Form fields
   var loanAmount = ''.obs;
@@ -742,11 +749,12 @@ class FollowBackFormController extends GetxController
         .where((e) => e.isNotEmpty)
         .toSet()
         .toList();
-    commonFilterController.setFilters(names);
+
+    setFilters(names);
 
     // 2️⃣ Apply search + chip filter
     final search = query.toLowerCase();
-    final selected = commonFilterController.selectedFilter.value;
+    final selected = selectedFilter.value;
 
     filteredFollowBackList.assignAll(
       followBackList.where((item) {
@@ -768,6 +776,16 @@ class FollowBackFormController extends GetxController
         return searchMatch && chipMatch;
       }).toList(),
     );
+
+    final searchText = searchController.text.trim().toLowerCase();
+
+    if (searchText.isNotEmpty) {
+      filteredFollowBackList.value = filteredFollowBackList.where((item) {
+        return (item.customerName ?? '').toLowerCase().contains(searchText) ||
+            (item.contactNumber ?? '').toLowerCase().contains(searchText) ||
+            (item.bankName ?? '').toLowerCase().contains(searchText);
+      }).toList();
+    }
   }
 
   // Method to refresh data (pull to refresh)
@@ -783,5 +801,20 @@ class FollowBackFormController extends GetxController
     currentPage.value = 1;
     hasMore.value = true;
     await fetchFollowBackList(loadMore: false);
+  }
+
+  void selectFilter(int index) {
+    selectedFilter.value = index;
+  }
+
+  void clearFilters() {
+    selectedFilter.value = 0;
+
+    searchController.clear();
+  }
+
+  void setFilters(List<String> names) {
+    filters.value = ["All", ...names.toSet()];
+    update();
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -58,10 +57,10 @@ class LoginRequestScreen extends StatelessWidget {
               HeaderTitle(title: title, style: AppTextStyle.headerTitle),
               SearchBarWithClear(
                   controller: controller.searchController,
-                  onChanged: (value) => controller.filterLoginRequests(value),
+                  onChanged: (value) => controller.filterLoginRequests(),
                   onClear: () {
                     controller.searchController.clear();
-                    controller.filterLoginRequests("");
+                    controller.filterLoginRequests();
                   }),
               kVerticalSpace(10),
               Obx(() {

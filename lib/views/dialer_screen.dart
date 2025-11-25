@@ -218,10 +218,13 @@ class _DialerScreenState extends State<DialerScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               CommonRows().buildSingleRowNoExpand(
-                                  'assets/images/user_circle.svg', 'Shashi'
+                                  'assets/images/user_circle.svg',
+                                  dialerController.customerName.value
                                   // dialerController.customerName.value,
                                   ),
-                              Text(CurrencyUtils.formatIndianCurrency(140000),
+                              Text(
+                                  CurrencyUtils.formatIndianCurrency(
+                                      dialerController.customerLoan.value),
                                   // dialerController.customerLoan.value),
                                   style: AppTextStyle.headerTitle),
                             ],

@@ -55,7 +55,7 @@ class CommonRows {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildIcon(iconLeft),
+                _buildIcon(iconRight),
                 //  Icon(iconRight, size: 14, color: Colors.grey[700]),
                 const SizedBox(width: 4),
                 Text(
@@ -82,7 +82,7 @@ class CommonRows {
       child: Row(
         mainAxisSize: MainAxisSize.max, // ← Important
         children: [
-          _buildIcon(icon),
+          value.isNotEmpty ? _buildIcon(icon) : SizedBox.shrink(),
           const SizedBox(width: 5),
           Text(
             value,

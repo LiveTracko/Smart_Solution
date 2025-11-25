@@ -17,19 +17,13 @@ import 'package:smart_solutions/widget/text_style.dart';
 class CallLogPage extends StatefulWidget {
   final String title;
   final bool isRefresh;
-  const CallLogPage({
-    super.key,
-    this.isRefresh = true,
-    required this.title,
-  });
+  const CallLogPage({super.key, this.isRefresh = true, required this.title});
 
   @override
   State<CallLogPage> createState() => _CallLogPageState();
 }
 
 class _CallLogPageState extends State<CallLogPage> {
-  final TextEditingController searchController = TextEditingController();
-
   final _followBackController = Get.find<FollowBackFormController>();
   final _diallerController = Get.find<DialerController>();
   final CommonRows _commonRows = CommonRows();
@@ -58,7 +52,7 @@ class _CallLogPageState extends State<CallLogPage> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _followBackController.clearFilters();
     super.dispose();
   }
 
@@ -79,20 +73,24 @@ class _CallLogPageState extends State<CallLogPage> {
                     HeaderTitle(
                         title: widget.title, style: AppTextStyle.headerTitle),
                     SearchBarWithClear(
-                        controller: searchController,
-                        onClear: () {},
-                        onChanged: (value) {}),
+                        controller: _followBackController.searchController,
+                        onClear: () {
+                          //_followBackController.filteredFollowBackList.clear();
+                          _followBackController.searchController.clear();
+                          _followBackController.updateFilteredList();
+                        },
+                        onChanged: (value) {
+                          _followBackController.updateFilteredList();
+                        }),
                     kVerticalSpace(10),
                     Obx(() {
-                      final filterList =
-                          _followBackController.commonFilterController.filters;
+                      final filterList = _followBackController.filters;
 
                       return FilterChipList(
                         filters: filterList,
-                        selectedIndex: _followBackController
-                            .commonFilterController.selectedFilter.value,
-                        onSelected: _followBackController
-                            .commonFilterController.selectFilter,
+                        selectedIndex:
+                            _followBackController.selectedFilter.value,
+                        onSelected: _followBackController.selectFilter,
                       );
                     }),
                     kVerticalSpace(10),
@@ -179,7 +177,7 @@ class _CallLogPageState extends State<CallLogPage> {
                       children: [
                         _commonRows.buildDoubleRow(
                           iconLeft: 'assets/images/call.svg',
-                          valueLeft: data.contactNumber ?? '',
+                          valueLeft: maskFirst6Digits(data.contactNumber ?? ''),
                           iconRight: 'assets/images/clock.svg',
                           valueRight: data.callDuration ?? '',
                         ),
@@ -194,5 +192,10 @@ class _CallLogPageState extends State<CallLogPage> {
         ],
       ),
     );
+  }
+
+  String maskFirst6Digits(String number) {
+    if (number.length < 6) return number; // Handle edge case
+    return 'xxxxxx${number.substring(6)}';
   }
 }

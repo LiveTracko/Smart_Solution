@@ -98,7 +98,8 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             // Replace this with your app's logo image
             Image.asset(
-              'assets/images/splash_logo.png', // Make sure the path matches your image location
+              'assets/images/app_logo_with_name.png',
+              //  'assets/images/splash_logo.png', // Make sure the path matches your image location
               height: 100.h, // Use responsive height
               width: 250.w, // Use responsive width
             ),

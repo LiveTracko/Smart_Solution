@@ -187,20 +187,22 @@ class _MainScreenState extends State<MainScreen> {
           ),
           item: ItemConfig(
             icon: SvgPicture.asset(
-              'assets/images/fingerprint.svg',
+              'assets/images/user_plus_grey.svg',
               colorFilter: const ColorFilter.mode(
                 CupertinoColors.activeBlue,
                 BlendMode.srcIn,
               ),
             ),
             inactiveIcon: SvgPicture.asset(
-              'assets/images/fingerprint.svg',
+              'assets/images/user_plus_grey.svg',
               colorFilter: ColorFilter.mode(
                 Colors.grey.shade600,
                 BlendMode.srcIn,
               ),
             ),
-            title: "HRM",
+            // icon: const Icon(Icons.co_present_outlined, size: 24),
+            // inactiveIcon: const Icon(Icons.co_present_outlined, size: 24),
+            title: "Request ",
             activeForegroundColor: AppColors.primaryColor,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
@@ -209,6 +211,40 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
         ),
+
+        // PersistentTabConfig(
+        //   screen: LoginRequestScreen(
+        //     key: const ValueKey('hrm_screen'),
+        //     title: 'Login Request',
+
+        //     isShowBack: false,
+        //     isDrawer: true,
+        //     //key: const ValueKey('hrm_screen')
+        //   ),
+        //   item: ItemConfig(
+        //     icon: SvgPicture.asset(
+        //       'assets/images/fingerprint.svg',
+        //       colorFilter: const ColorFilter.mode(
+        //         CupertinoColors.activeBlue,
+        //         BlendMode.srcIn,
+        //       ),
+        //     ),
+        //     inactiveIcon: SvgPicture.asset(
+        //       'assets/images/fingerprint.svg',
+        //       colorFilter: ColorFilter.mode(
+        //         Colors.grey.shade600,
+        //         BlendMode.srcIn,
+        //       ),
+        //     ),
+        //     title: "Login Request",
+        //     activeForegroundColor: AppColors.primaryColor,
+        //     inactiveForegroundColor: Colors.grey.shade600,
+        //     textStyle: const TextStyle(
+        //       fontSize: 12,
+        //       fontWeight: FontWeight.w500,
+        //     ),
+        //   ),
+        // ),
       ];
     } else {
       return [
@@ -263,7 +299,7 @@ class _MainScreenState extends State<MainScreen> {
         PersistentTabConfig(
           screen: LoginRequestScreen(
             key: const ValueKey('hrm_screen'),
-            title: 'Login Request',
+            title: 'Request',
 
             isShowBack: false,
             isDrawer: true,
@@ -272,7 +308,7 @@ class _MainScreenState extends State<MainScreen> {
           item: ItemConfig(
             icon: const Icon(Icons.co_present_outlined, size: 24),
             inactiveIcon: const Icon(Icons.co_present_outlined, size: 24),
-            title: "HRM",
+            title: "Request ",
             activeForegroundColor: AppColors.primaryColor,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
@@ -287,35 +323,39 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: PersistentTabView(
-        tabs: tabs,
-        controller: _controller,
-        navBarBuilder: (navBarConfig) => Style15BottomNavBar(
-          navBarConfig: navBarConfig,
-          height: 70,
-          navBarDecoration: const NavBarDecoration(
-            padding: EdgeInsets.zero,
-            color: Colors.white12,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15),
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: PersistentTabView(
+          tabs: tabs,
+          controller: _controller,
+          navBarBuilder: (navBarConfig) => Style15BottomNavBar(
+            navBarConfig: navBarConfig,
+            height: 70,
+            navBarDecoration: const NavBarDecoration(
+              padding: EdgeInsets.zero,
+              color: Colors.white12,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(15),
+                topRight: Radius.circular(15),
+              ),
             ),
           ),
-        ),
-        backgroundColor: Colors.white,
-        onTabChanged: _onTabChanged,
-        keepNavigatorHistory: false,
-        stateManagement: true, // ⚠️ Changed to true for better state handling
-        navBarOverlap: const NavBarOverlap.custom(),
-        handleAndroidBackButtonPress: true,
-        avoidBottomPadding: false,
-        //     confineInSafeArea: true, // ⚠️ ADD THIS for safety
-        screenTransitionAnimation: const ScreenTransitionAnimation(
-          //     animateTabTransition: true,
-          curve: Curves.ease,
-          duration: Duration(milliseconds: 200),
+          backgroundColor: Colors.white,
+          onTabChanged: _onTabChanged,
+          keepNavigatorHistory: false,
+          stateManagement: true, // ⚠️ Changed to true for better state handling
+          navBarOverlap: const NavBarOverlap.custom(),
+
+          handleAndroidBackButtonPress: true,
+          avoidBottomPadding: false,
+          //     confineInSafeArea: true, // ⚠️ ADD THIS for safety
+          screenTransitionAnimation: const ScreenTransitionAnimation(
+            //     animateTabTransition: true,
+            curve: Curves.ease,
+            duration: Duration(milliseconds: 200),
+          ),
         ),
       ),
     );

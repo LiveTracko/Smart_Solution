@@ -63,17 +63,17 @@ class _DashboardScreenState extends State<DashboardScreen>
 
     // followBackFormController.callController =
     //     TabController(length: tabBarlength, vsync: this);
-    followBackFormController.callController.addListener(() {
-      debugPrint(
-          "Second TabBar index: ${followBackFormController.callController.index}");
-      if (!followBackFormController.callController.indexIsChanging) {
-        followBackFormController.selectedIndex.value =
-            followBackFormController.callController.index;
+    // followBackFormController.callController.addListener(() {
+    //   debugPrint(
+    //       "Second TabBar index: ${followBackFormController.callController.index}");
+    //   if (!followBackFormController.callController.indexIsChanging) {
+    //     followBackFormController.selectedIndex.value =
+    //         followBackFormController.callController.index;
 
-        controller.loadtellecallerTabData(
-            followBackFormController.selectedIndex.value);
-      }
-    });
+    //     controller.loadtellecallerTabData(
+    //         followBackFormController.selectedIndex.value);
+    //   }
+    // });
 
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   if (StaticStoredData.roleName == 'telecaller') {
@@ -657,13 +657,14 @@ class _DashboardScreenState extends State<DashboardScreen>
                       SizedBox(
                         height: 80,
                         child: ListView.builder(
-                          itemCount: 3,
+                          itemCount: 4,
                           scrollDirection: Axis.horizontal,
                           itemBuilder: (context, index) {
+                            //  final data = dataController.disbursementdata[index];
                             return Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 7.w),
-                              child: disbursementCard('Jan 2025', '2,50,000'),
-                            );
+                                padding: EdgeInsets.symmetric(horizontal: 7.w),
+                                child:
+                                    disbursementCard('Jan 2025', '2,50,000'));
                           },
                         ),
                       ),

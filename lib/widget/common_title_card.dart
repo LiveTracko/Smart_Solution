@@ -89,7 +89,7 @@ class CommonTitleCard extends StatelessWidget {
             ],
           ),
           trailing: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               showEdit

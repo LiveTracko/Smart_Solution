@@ -76,6 +76,7 @@ class CallBackData extends StatelessWidget {
               var data = dataList[index];
               return CommonTitleCard(
                 leading: SvgPicture.asset('assets/images/phone_call.svg'),
+                followupdate: data.followupDate.toString(),
                 onLeadingTap: () {
                   if (!_dialerController.isCallOngoing.value) {
                     _dialerController.makePhoneCall(
@@ -89,7 +90,7 @@ class CallBackData extends StatelessWidget {
                   _dialerController.customerName.value =
                       data.customerName ?? '';
                   // _dialerController.customerLoan.value =
-                  //     '';
+                  //     '';0
                   // _dialerController.customerName.value =
                   //     item.customerName ?? "";
                   _dialerController.datatype.value = '';

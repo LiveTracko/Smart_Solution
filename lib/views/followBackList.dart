@@ -13,7 +13,7 @@ import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
 
 class FollowBackListScreen extends StatefulWidget {
-  FollowBackListScreen({Key? key}) : super(key: key);
+  const FollowBackListScreen({Key? key}) : super(key: key);
 
   @override
   State<FollowBackListScreen> createState() => _FollowBackListScreenState();

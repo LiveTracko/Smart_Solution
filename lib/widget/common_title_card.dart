@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/views/spacing_constants.dart';
+import 'package:smart_solutions/widget/text_style.dart';
 
 class CommonTitleCard extends StatelessWidget {
   final Widget? leading;
@@ -14,21 +16,22 @@ class CommonTitleCard extends StatelessWidget {
   final VoidCallback? onEdit;
   final VoidCallback? onLeadingTap;
   final ValueChanged<bool>? onExpansionChanged;
+  String? followupdate;
 
-  const CommonTitleCard({
-    super.key,
-    this.leading,
-    required this.title,
-    required this.subtitle,
-    this.status,
-    this.statusColor,
-    required this.amount,
-    required this.children,
-    this.showEdit = false,
-    this.onEdit,
-    this.onLeadingTap,
-    this.onExpansionChanged,
-  });
+  CommonTitleCard(
+      {super.key,
+      this.leading,
+      required this.title,
+      required this.subtitle,
+      this.status,
+      this.statusColor,
+      required this.amount,
+      required this.children,
+      this.showEdit = false,
+      this.onEdit,
+      this.onLeadingTap,
+      this.onExpansionChanged,
+      this.followupdate});
 
   @override
   Widget build(BuildContext context) {
@@ -48,102 +51,182 @@ class CommonTitleCard extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(4.0),
-        child: ExpansionTile(
-          minTileHeight: 40,
-          tilePadding: EdgeInsets.zero,
-          childrenPadding: EdgeInsets.zero,
-          expandedCrossAxisAlignment: CrossAxisAlignment.start,
-          shape: const RoundedRectangleBorder(
-            side: BorderSide(color: Colors.transparent, width: 0),
-          ),
-          onExpansionChanged: children.isNotEmpty ? onExpansionChanged : null,
-          leading: leading != null
-              ? GestureDetector(
-                  onTap: onLeadingTap,
-                  child: leading!,
-                )
-              : null,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-            ],
-          ),
-          trailing: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              showEdit
-                  ? GestureDetector(
-                      onTap: onEdit,
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Icon(Icons.edit, size: 20),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-              if (status != null && status!.isNotEmpty)
-                Container(
-                  decoration: BoxDecoration(
-                    color: statusColor,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-                  child: Text(
-                    status ?? '',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (status != null && status!.isNotEmpty)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: statusColor,
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                  ),
-                ),
-              kVerticalSpace(4.h),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
                     child: Text(
-                      amount,
-                      style: const TextStyle(fontSize: 14),
+                      status ?? '',
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  if (children.isNotEmpty)
-                    const Icon(Icons.keyboard_arrow_down,
-                        size: 18, color: Colors.black),
-                  // const Icon(Icons.keyboard_arrow_down,
-                  //     size: 18, color: Colors.black),
+                showEdit
+                    ? GestureDetector(
+                        onTap: onEdit,
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          child: Icon(Icons.edit, size: 18),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ],
+            ),
+            ExpansionTile(
+              minTileHeight: 40,
+
+              
+              tilePadding: EdgeInsets.zero,
+              childrenPadding: EdgeInsets.zero,
+              expandedCrossAxisAlignment: CrossAxisAlignment.start,
+              shape: const RoundedRectangleBorder(
+                side: BorderSide(color: Colors.transparent, width: 0),
+              ),
+              onExpansionChanged:
+                  children.isNotEmpty ? onExpansionChanged : null,
+              leading: leading != null
+                  ? GestureDetector(
+                      onTap: onLeadingTap,
+                      child: leading!,
+                    )
+                  : null,
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  if (followupdate != null) // your follow up date string
+
+                    Text(
+                      "Follow Up: $followupdate",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyle.blueHeaderTitletStyle
+                          .copyWith(fontSize: 12),
+                    )
                 ],
               ),
-            ],
-          ),
-          children: [
-            const Divider(height: 20, color: Colors.black12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: children,
-            )
+              trailing: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Row(
+                  //   mainAxisSize: MainAxisSize.min,
+                  //   children: [
+                  //     if (status != null && status!.isNotEmpty)
+                  //       Container(
+                  //         decoration: BoxDecoration(
+                  //           color: statusColor,
+                  //           borderRadius: BorderRadius.circular(6),
+                  //         ),
+                  //         padding: const EdgeInsets.symmetric(
+                  //             horizontal: 5, vertical: 3),
+                  //         child: Text(
+                  //           status ?? '',
+                  //           style: const TextStyle(
+                  //             fontSize: 10,
+                  //             color: Colors.white,
+                  //             fontWeight: FontWeight.bold,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     showEdit
+                  //         ? GestureDetector(
+                  //             onTap: onEdit,
+                  //             child: const Padding(
+                  //               padding: EdgeInsets.symmetric(horizontal: 8),
+                  //               child: Icon(Icons.edit, size: 18),
+                  //             ),
+                  //           )
+                  //         : const SizedBox.shrink(),
+                  //   ],
+                  // ),
+                  // showEdit
+                  //     ? GestureDetector(
+                  //         onTap: onEdit,
+                  //         child: const Padding(
+                  //           padding: EdgeInsets.symmetric(horizontal: 8),
+                  //           child: Icon(Icons.edit, size: 20),
+                  //         ),
+                  //       )
+                  //     : const SizedBox.shrink(),
+                  // if (status != null && status!.isNotEmpty)
+                  //   Container(
+                  //     decoration: BoxDecoration(
+                  //       color: statusColor,
+                  //       borderRadius: BorderRadius.circular(6),
+                  //     ),
+                  //     padding:
+                  //         const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                  //     child: Text(
+                  //       status ?? '',
+                  //       style: const TextStyle(
+                  //         fontSize: 10,
+                  //         color: Colors.white,
+                  //         fontWeight: FontWeight.bold,
+                  //       ),
+                  //     ),
+                  //   ),
+
+                  kVerticalSpace(4.h),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 5),
+                        child: Text(
+                          amount,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      if (children.isNotEmpty)
+                        const Icon(Icons.keyboard_arrow_down,
+                            size: 18, color: Colors.black),
+                      // const Icon(Icons.keyboard_arrow_down,
+                      //     size: 18, color: Colors.black),
+                    ],
+                  ),
+                ],
+              ),
+              children: [
+                const Divider(height: 20, color: Colors.black12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: children,
+                )
+              ],
+            ),
           ],
         ),
       ),

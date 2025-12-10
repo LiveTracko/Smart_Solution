@@ -13,7 +13,14 @@ import 'package:smart_solutions/widget/common_title_card.dart';
 import 'package:smart_solutions/widget/searchbarwithclear.dart';
 
 class ListingScreen extends StatefulWidget {
-  const ListingScreen({super.key});
+  String title;
+  bool isShowBack = false;
+  bool isDrawer = false;
+  ListingScreen(
+      {super.key,
+      required this.title,
+      required this.isShowBack,
+      required this.isDrawer});
 
   @override
   State<ListingScreen> createState() => _ListingScreenState();
@@ -26,6 +33,7 @@ class _ListingScreenState extends State<ListingScreen> {
   final PincodeController pincodeController = Get.put(PincodeController());
 
   final ScrollController scrollController = ScrollController();
+
 
   final ScrollController companyScrollController = ScrollController();
   final TextEditingController searchController = TextEditingController();
@@ -117,6 +125,7 @@ class _ListingScreenState extends State<ListingScreen> {
 
                         _debounce =
                             Timer(const Duration(milliseconds: 400), () {
+                          searchController.clear();
                           final trimmed = value.trim(); // use trimmed if needed
 
                           if (_chartCardsController.selectedIndex.value == 0) {

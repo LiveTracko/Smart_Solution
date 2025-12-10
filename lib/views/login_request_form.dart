@@ -23,7 +23,7 @@ class AppColors {
 }
 
 class LoginRequestForm extends StatelessWidget {
-  final LoginRequestController controller = Get.put(LoginRequestController());
+  final LoginRequestController controller = Get.find<LoginRequestController>();
   final FollowBackFormController _followBackFormController =
       Get.find<FollowBackFormController>();
 

@@ -18,7 +18,7 @@ class LoginRequestController extends GetxController {
   var allLoginRequestList = <LoginRequest>[].obs;
   var loginRequestList = <LoginRequest>[].obs;
   var loanStatusList = <LoanStatus>[].obs;
-  List<RemarkList> remarks = []; // Observable list for reactive UI
+  List<RemarkList> remarks = [];
   var isLoading = false.obs;
   var iseditLoading = false.obs;
   var currentId = ''.obs;
@@ -33,7 +33,7 @@ class LoginRequestController extends GetxController {
   var bankId = ''.obs;
   var loanAmount = ''.obs;
   var commonRemark = ''.obs;
-  var remarksList = <String>[].obs; // To hold multiple remarks
+  var remarksList = <String>[].obs;
 //  var id = ''.obs; // For existing records
 
   var allBankNamesList = <LoginRequestBankList>[].obs;
@@ -44,6 +44,8 @@ class LoginRequestController extends GetxController {
   final searchController = TextEditingController();
   var selectedFilter = 0.obs;
   var filters = <String>[].obs;
+  RxList<dynamic> todayCount = <dynamic>[].obs;
+  RxList<dynamic> monthlyCount = <dynamic>[].obs;
 
   @override
   void onInit() async {
@@ -75,6 +77,7 @@ class LoginRequestController extends GetxController {
 
   // Fetch the login request list
   Future<void> getLoginRequestList() async {
+    final today = DateTime.now();
     try {
       isLoading(true);
       var body = {
@@ -92,14 +95,27 @@ class LoginRequestController extends GetxController {
               .toList();
 
           // log('raw -->>> ${resData['data'] }');
-
           allLoginRequestList.value = loginData; // store original
           loginRequestList.value = loginData;
-          //     currentId.value = loginRequestList[0].id;
+
+          monthlyCount.value = allLoginRequestList
+              .where((e) => e.loginRequestDate.month == today.month)
+              .map((e) => e.telecallerId)
+              .toList();
+
+          todayCount.value = allLoginRequestList
+              .where((e) =>
+                  // e.loginRequestDate.year == today.year &&
+                  e.loginRequestDate.day == today.day)
+              //&&
+              //e.loginRequestDate.day == today.day)
+              .map((e) => e.telecallerId)
+              .toList();
+
+          print('month count$monthlyCount');
+          print('today count$todayCount');
+
           await getRemarks();
-
-          // log('pppp -->>> ${loginRequestList.map((e) => e.toJson()).toList()}');
-
           isLoading(false);
         } else {
           logOutput("No data found");

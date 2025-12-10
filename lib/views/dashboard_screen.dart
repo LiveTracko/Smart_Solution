@@ -6,18 +6,27 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/admin/admin_disbursement.dart';
+import 'package:smart_solutions/controllers/admin/call_back_controller.dart';
+import 'package:smart_solutions/controllers/admin/call_log_controller.dart';
 import 'package:smart_solutions/controllers/chartCard_controller.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/notification_controller.dart';
 import 'package:smart_solutions/controllers/profile_controller.dart';
 import 'package:smart_solutions/feature/views/callback/today_callback.dart';
 import 'package:smart_solutions/models/dashBoardToday_model.dart';
+import 'package:smart_solutions/models/incentive_model.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/views/active_files.dart';
+import 'package:smart_solutions/views/admin/admin_call_back.dart';
+import 'package:smart_solutions/views/admin/admin_call_log.dart';
+import 'package:smart_solutions/views/admin/admin_disbursement.dart';
+import 'package:smart_solutions/views/admin/daily_monthly_count.dart';
 import 'package:smart_solutions/views/chart_card_toggle.dart';
 import 'package:smart_solutions/views/notification_screen.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
@@ -42,16 +51,29 @@ class _DashboardScreenState extends State<DashboardScreen>
     with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final DashboardController controller = Get.put(DashboardController());
+  final DashboardController controller = Get.find<DashboardController>();
   final FollowBackFormController followBackFormController =
-      Get.put(FollowBackFormController());
+      Get.find<FollowBackFormController>();
 
-  final DialerController _dialerController = Get.put(DialerController());
-  final DataController dataController = Get.put(DataController());
+  final DialerController _dialerController = Get.find<DialerController>();
+  final DataController dataController = Get.find<DataController>();
 
-  final ProfileController profileController = Get.put(ProfileController());
+  final ProfileController profileController = Get.find<ProfileController>();
   final ChartCardsController chartCardsController =
-      Get.put(ChartCardsController());
+      Get.find<ChartCardsController>();
+  final AdminCallBackController _callBackController =
+      Get.find<AdminCallBackController>();
+
+  final AdminCallLogController _callLogController =
+      Get.find<AdminCallLogController>();
+
+  final DisbursementController _disbursementController =
+      Get.find<DisbursementController>();
+
+  final LoginRequestController _loginRequestController =
+      Get.find<LoginRequestController>();
+
+  final DataController _dataController = Get.find<DataController>();
 
   @override
   void initState() {
@@ -107,10 +129,8 @@ class _DashboardScreenState extends State<DashboardScreen>
 
     String role = StaticStoredData.roleName; // example role
 
-    final List<String> labels = role == "telecaller"
-        ? []
-        // ["Select Date"]
-        : ["Select Date", "Filter"];
+    final List<String> labels = role == "telecaller" ? [] : ["Select Date"];
+    // : ["Select Date", "Filter"];
 
     final String tellecallerLabels = role == "telecaller"
         ? "Call Back & Incentive"
@@ -184,9 +204,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                       ? Positioned(
                           right: 0,
                           top: 0,
-                          bottom: 5,
+                          bottom: 25,
                           child: Container(
-                            padding: const EdgeInsets.all(0),
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
                             decoration: BoxDecoration(
                               color: Colors.red,
                               borderRadius: BorderRadius.circular(10),
@@ -267,6 +287,137 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 )
                               ],
                             ),
+                            StaticStoredData.roleName != 'telecaller'
+                                ? Container(
+                                    height: 30,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        if (controller
+                                            .dateRangeList.isNotEmpty) ...[
+                                          const SizedBox(width: 15),
+                                          Text(
+                                            controller.formattedDate.value,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              controller.dateRangeList.clear();
+                                              controller.totalContact.clear();
+                                              controller.totalNoContact.clear();
+                                              controller.totalAttempt.clear();
+                                              controller.activeCallMap.clear();
+                                              controller.activeNoCallMap
+                                                  .clear();
+                                              controller.activeAttemptMap
+                                                  .clear();
+                                              controller.finalActiveNoCallList
+                                                  .clear();
+                                              controller.finalActiveCallList
+                                                  .clear();
+                                              controller
+                                                  .finalTotalAttemptCallList
+                                                  .clear();
+                                              DateTime now = DateTime.now();
+                                              controller.dateRange.value =
+                                                  "${now.day}-${now.month}-${now.year},${now.day}-${now.month}-${now.year}";
+                                              controller.getTimeGraph();
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.all(5.0.w),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.grid1
+                                                    .withOpacity(0.3),
+                                                borderRadius:
+                                                    BorderRadius.circular(25),
+                                              ),
+                                              child: Icon(
+                                                Icons.close,
+                                                size: 20.sp,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                        Expanded(
+                                          child: ListView.builder(
+                                            scrollDirection: Axis.horizontal,
+                                            itemCount: labels.length,
+                                            reverse:
+                                                true, // ← Moves items to the RIGHT
+                                            itemBuilder: (context, index) {
+                                              return Obx(() {
+                                                final isSelected = controller
+                                                        .selectedTab.value ==
+                                                    index;
+                                                return GestureDetector(
+                                                  onTap: () async {
+                                                    controller.selectedTab
+                                                        .value = index;
+                                                    // await followBackFormController
+                                                    //     .getteamLeaderData();
+                                                    callbacks[index]();
+                                                  },
+                                                  child: Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 5),
+                                                    child: Container(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 5),
+                                                      decoration: BoxDecoration(
+                                                          color: isSelected
+                                                              ? AppColors
+                                                                  .primaryColor
+                                                              : AppColors
+                                                                  .backgroundColor,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          border: Border.all(
+                                                              color: AppColors
+                                                                  .primaryColor)),
+                                                      child: Icon(
+                                                        Icons.calendar_month,
+                                                        size: 18,
+                                                        color: isSelected
+                                                            ? AppColors
+                                                                .backgroundColor
+                                                            : AppColors
+                                                                .primaryColor,
+                                                      ),
+
+                                                      // Text(
+                                                      //   textAlign:
+                                                      //       TextAlign.center,
+                                                      //   labels[index],
+                                                      //   style: TextStyle(
+                                                      //       fontSize: 15,
+                                                      //       color: isSelected
+                                                      //           ? AppColors
+                                                      //               .backgroundColor
+                                                      //           : AppColors
+                                                      //               .primaryColor),
+                                                      // ),
+                                                    ),
+                                                  ),
+                                                );
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : const SizedBox.shrink(),
                             Visibility(
                               visible: (chartCardsController.selectedIndex == 0)
                                   ? true
@@ -300,63 +451,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 },
                               ),
                             ),
-                            StaticStoredData.roleName != 'telecaller'
-                                ? Container(
-                                    height: 40,
-                                    padding: const EdgeInsets.all(5),
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: labels.length,
-                                      itemBuilder: (context, index) {
-                                        return Obx(() {
-                                          final isSelected =
-                                              controller.selectedTab.value ==
-                                                  index;
-                                          return GestureDetector(
-                                            onTap: () async {
-                                              controller.selectedTab.value =
-                                                  index;
-                                              await followBackFormController
-                                                  .getteamLeaderData();
-                                              callbacks[index]();
-                                            },
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5),
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(5),
-                                                decoration: BoxDecoration(
-                                                    color: isSelected
-                                                        ? AppColors.primaryColor
-                                                        : AppColors
-                                                            .backgroundColor,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    border: Border.all(
-                                                        color: AppColors
-                                                            .primaryColor)),
-                                                child: Text(
-                                                  textAlign: TextAlign.center,
-                                                  labels[index],
-                                                  style: TextStyle(
-                                                      fontSize: 15,
-                                                      color: isSelected
-                                                          ? AppColors
-                                                              .backgroundColor
-                                                          : AppColors
-                                                              .primaryColor),
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        });
-                                      },
-                                    ),
-                                  )
-                                : const SizedBox.shrink(),
                             followBackFormController
                                     .selectedtellecaller.isNotEmpty
                                 ? Row(
@@ -517,7 +611,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                                       yValueMapper: (CallGraphModel data, _) =>
                                           data.data ?? 0,
                                       name: 'Attempted',
-
                                       legendIconType: LegendIconType.circle,
                                       dataLabelSettings:
                                           const DataLabelSettings(
@@ -664,7 +757,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             return Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 7.w),
                                 child:
-                                    disbursementCard('Jan 2025', '2,50,000'));
+                                    disbursementCard('Jan 2025', '99,99,00,0'));
                           },
                         ),
                       ),
@@ -716,7 +809,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             FileStatusCard(
                               title: "Active Files",
@@ -753,59 +846,213 @@ class _DashboardScreenState extends State<DashboardScreen>
                       verticalSpace(15.h),
                       customContainer(20.h),
                       verticalSpace(15.h),
-                      headerTitleWithContainer('Call Back & Incentives'),
+                      StaticStoredData.roleName == 'telecaller'
+                          ? headerTitleWithContainer('Call Back & Incentives')
+                          : headerTitleWithContainer('Performance Insights'),
+
                       verticalSpace(15.h),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                FileStatusCard(
-                                  title: "Today",
-                                  fileCount: followBackFormController
-                                      .dailycallbackData.length
-                                      .toString(),
-                                  statusColor: Colors.green,
-                                  onPress: () {
-                                    Get.to(CallBackData(
-                                        title: 'Today',
-                                        headerTitle: 'Today',
-                                        controller: followBackFormController,
-                                        getDataList: () =>
-                                            followBackFormController
-                                                .dailycallbackData));
-                                  },
-                                ),
-                                FileStatusCard(
-                                  title: "Monthly",
-                                  fileCount: followBackFormController
-                                      .monthlybackData.length
-                                      .toString(),
-                                  statusColor: Colors.blue,
-                                  onPress: () {
-                                    Get.to(CallBackData(
-                                        title: 'Monthly Callback',
-                                        headerTitle: 'Monthly',
-                                        controller: followBackFormController,
-                                        getDataList: () =>
-                                            followBackFormController
-                                                .monthlybackData));
-                                  },
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 10.h),
-                            const IncentiveCard(
-                                title: 'Incentives',
-                                target: '10,00,000',
-                                achievement: '15,00,000',
-                                incentive: '3,000',
-                                statusColor: AppColors.greenCOlor)
-                          ],
-                        ),
-                      ),
+                      StaticStoredData.roleName == 'telecaller'
+                          ? Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      FileStatusCard(
+                                        title: "Today",
+                                        fileCount: followBackFormController
+                                            .dailycallbackData.length
+                                            .toString(),
+                                        statusColor: Colors.green,
+                                        onPress: () {
+                                          Get.to(CallBackData(
+                                              title: 'Today',
+                                              headerTitle: 'Today',
+                                              controller:
+                                                  followBackFormController,
+                                              getDataList: () =>
+                                                  followBackFormController
+                                                      .dailycallbackData));
+                                        },
+                                      ),
+                                      FileStatusCard(
+                                        title: "Monthly",
+                                        fileCount: followBackFormController
+                                            .monthlybackData.length
+                                            .toString(),
+                                        statusColor: Colors.blue,
+                                        onPress: () {
+                                          Get.to(CallBackData(
+                                              title: 'Monthly Callback',
+                                              headerTitle: 'Monthly',
+                                              controller:
+                                                  followBackFormController,
+                                              getDataList: () =>
+                                                  followBackFormController
+                                                      .monthlybackData));
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10.h),
+                                  IncentiveCard(
+                                      title: 'Incentives',
+                                      items: [
+                                        IncentiveItem("Target", "₹10,00,000"),
+                                        IncentiveItem(
+                                            "Achievement", "7,50,000"),
+                                        IncentiveItem("Incentive", "₹7,50,000"),
+                                      ],
+                                      statusColor: AppColors.greenCOlor)
+                                ],
+                              ),
+                            )
+                          : Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      SizedBox(
+                                        width: 175.w,
+                                        child: IncentiveCard(
+                                            title: 'Login Request',
+                                            isNextPage: true,
+                                            onTap: () => Get.to(
+                                                const DailyMonthlyCount(
+                                                    title: 'Login Request')),
+                                            items: [
+                                              IncentiveItem(
+                                                  "Today",
+                                                  _loginRequestController
+                                                      .todayCount.length
+                                                      .toString()),
+                                              IncentiveItem(
+                                                  "Monthly",
+                                                  _loginRequestController
+                                                      .monthlyCount.length
+                                                      .toString()),
+                                            ],
+                                            statusColor: AppColors.greenCOlor),
+                                      ),
+                                      SizedBox(
+                                        width: 174.w,
+                                        child: IncentiveCard(
+                                            title: 'Login Files',
+                                            isNextPage: true,
+                                            onTap: () => Get.to(
+                                                const DailyMonthlyCount(
+                                                    title: 'Login Files')
+                                                // ActiveFiles(
+                                                //     title: 'Login Files',
+                                                //     status: 0,
+                                                //     isShowBack: true,
+                                                //     isDrawer: false,
+                                                //   )
+                                                ),
+                                            items: [
+                                              IncentiveItem(
+                                                  "Today",
+                                                  _dataController
+                                                      .todayCount.length
+                                                      .toString()),
+                                              IncentiveItem(
+                                                  "Monthly",
+                                                  _dataController
+                                                      .monthlyCount.length
+                                                      .toString()),
+                                            ],
+                                            statusColor: AppColors.greenCOlor),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(width: 10.h),
+                                  SizedBox(height: 10.h),
+                                  GestureDetector(
+                                    onTap: () => Get.to(const AdminCallBack(
+                                        title: 'Call Back')),
+                                    child: IncentiveCard(
+                                        title: 'Call Back',
+                                        isNextPage: true,
+                                        items: [
+                                          IncentiveItem(
+                                              "Today",
+                                              _callBackController
+                                                  .callBackTotalData
+                                                  .first
+                                                  .todayCallbackTotal
+                                                  .toString()),
+                                          IncentiveItem(
+                                              "Monthly",
+                                              _callBackController
+                                                  .callBackTotalData
+                                                  .first
+                                                  .monthlyCallbackTotal
+                                                  .toString()),
+                                        ],
+                                        statusColor: AppColors.greenCOlor),
+                                  ),
+                                  SizedBox(height: 10.h),
+                                  IncentiveCard(
+                                      title: 'Call Log',
+                                      duration: _callLogController
+                                          .callLogData.first.totalCallTime,
+                                      isNextPage: true,
+                                      onTap: () => Get.to(const AdminCallLog(
+                                          title: 'Call Log')),
+                                      items: [
+                                        IncentiveItem(
+                                            "Attempted",
+                                            _callLogController
+                                                .callLogData.first.callAttempt),
+                                        IncentiveItem(
+                                            "Connected",
+                                            _callLogController.callLogData.first
+                                                .callContacted),
+                                        IncentiveItem(
+                                            "Not Connected",
+                                            _callLogController.callLogData.first
+                                                .callNotcontact),
+                                      ],
+                                      statusColor: AppColors.greenCOlor),
+                                  verticalSpace(10.h),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      FileStatusCard(
+                                        title: "Disbursement",
+                                        fileCount: _disbursementController
+                                            .disbursementTotal
+                                            .first
+                                            .disbursedCountTotal
+                                            .toString(),
+                                        amount: _disbursementController
+                                            .disbursementTotal.first.amountTotal
+                                            .toString(),
+                                        statusColor: Colors.blue,
+                                        onPress: () {
+                                          Get.to(const AdminDisbursement(
+                                            title: 'Disbursement',
+                                          ));
+                                        },
+                                      ),
+                                      FileStatusCard(
+                                        title: "Incentive",
+                                        fileCount: '0',
+                                        amount: '0',
+                                        statusColor: Colors.yellow,
+                                        onPress: () {},
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )),
                       verticalSpace(15.h),
                       customContainer(40.h),
                       // unused designs

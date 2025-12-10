@@ -18,7 +18,6 @@ class AppRoutes {
       page: () {
         final args = Get.arguments as Map<String, dynamic>? ?? {};
         final int pageIndex = args['pageIndex'] ?? 0;
-        final String phone = args['phone']?.toString() ?? '';
 
         return InternetChecker(
           child: MainScreen(
@@ -27,7 +26,9 @@ class AppRoutes {
         );
       },
     ),
-    GetPage(name: login, page: () =>  InternetChecker(child: LoginView())),
-    GetPage(name: home, page: () => InternetChecker(child: DashboardScreen())),
+    GetPage(name: login, page: () => InternetChecker(child: LoginView())),
+    GetPage(
+        name: home,
+        page: () => const InternetChecker(child: DashboardScreen())),
   ];
 }

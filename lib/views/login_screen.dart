@@ -49,9 +49,10 @@ class _LoginViewState extends State<LoginView> {
                 child: Image.asset(
                   'assets/images/app_logo_with_name.png',
                   fit: BoxFit.contain,
+                  height: 80,
                 ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 15),
 
               /// WELCOME TEXT
               const Column(
@@ -142,7 +143,7 @@ class _LoginViewState extends State<LoginView> {
                             hintText: "Enter Password",
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12)),
-                            suffixIcon: Icon(Icons.visibility_off)),
+                            suffixIcon: const Icon(Icons.visibility_off)),
                         validator: (value) {
                           if (value!.isEmpty) return "Enter Password";
                           return null;
@@ -170,7 +171,7 @@ class _LoginViewState extends State<LoginView> {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : Text("Login"),
+                                : const Text("Login"),
                           );
                         }),
                       )
@@ -1122,72 +1123,89 @@ class LoanTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        // PERSONAL LOAN
-        Expanded(
-          child: InkWell(
-            onTap: () => controller.secureType.value = 0,
-            child: Obx(() {
-              final isSelected = controller.secureType.value == 0;
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 12,
+            offset: Offset(0, 3),
+            spreadRadius: 0,
+            color: Colors.black.withOpacity(.08),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // PERSONAL LOAN
+          Expanded(
+            child: InkWell(
+              onTap: () => controller.secureType.value = 0,
+              child: Obx(() {
+                final isSelected = controller.secureType.value == 0;
 
-              return Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected ? Colors.blue : Colors.grey,
+                return Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isSelected ? Colors.blue : Colors.grey,
+                    ),
+                    color: isSelected
+                        ? Colors.blue.withOpacity(.12)
+                        : Colors.white,
                   ),
-                  color:
-                      isSelected ? Colors.blue.withOpacity(.12) : Colors.white,
-                ),
-                child: Center(
-                  child: Text(
-                    "Unsecure",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: isSelected ? Colors.blue : Colors.black,
+                  child: Center(
+                    child: Text(
+                      "Unsecure",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: isSelected ? Colors.blue : Colors.black,
+                      ),
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
           ),
-        ),
 
-        const SizedBox(width: 10),
+          const SizedBox(width: 10),
 
-        // HOME LOAN
-        Expanded(
-          child: InkWell(
-            onTap: () => controller.secureType.value = 1,
-            child: Obx(() {
-              final isSelected = controller.secureType.value == 1;
+          // HOME LOAN
+          Expanded(
+            child: InkWell(
+              onTap: () => controller.secureType.value = 1,
+              child: Obx(() {
+                final isSelected = controller.secureType.value == 1;
 
-              return Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected ? Colors.blue : Colors.grey,
+                return Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isSelected ? Colors.blue : Colors.grey,
+                    ),
+                    color: isSelected
+                        ? Colors.blue.withOpacity(.12)
+                        : Colors.white,
                   ),
-                  color:
-                      isSelected ? Colors.blue.withOpacity(.12) : Colors.white,
-                ),
-                child: Center(
-                  child: Text(
-                    "Secure",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: isSelected ? Colors.blue : Colors.black,
+                  child: Center(
+                    child: Text(
+                      "Secure",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: isSelected ? Colors.blue : Colors.black,
+                      ),
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

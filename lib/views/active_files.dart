@@ -5,12 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/active_files_controller.dart';
 import 'package:smart_solutions/controllers/chartCard_controller.dart';
-import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
+import 'package:smart_solutions/utils/scroll_utils.dart';
 import 'package:smart_solutions/views/chart_card_toggle.dart';
 import 'package:smart_solutions/views/data_entry_form.dart';
 import 'package:smart_solutions/views/notification_screen.dart';
@@ -41,26 +41,21 @@ class ActiveFiles extends StatefulWidget {
 }
 
 class _ActiveFilesState extends State<ActiveFiles> {
-  final DataController dataController = Get.put(DataController());
+  final DataController dataController = Get.find<DataController>();
   final ActiveFilesController _activeFilesController =
-      Get.put(ActiveFilesController());
-  final DialerController _dialerController = Get.put(DialerController());
+      Get.find<ActiveFilesController>();
+  final DialerController _dialerController = Get.find<DialerController>();
   final FollowBackFormController _formController =
-      Get.put(FollowBackFormController());
+      Get.find<FollowBackFormController>();
 
   final ChartCardsController _chartCardsController =
       Get.find<ChartCardsController>();
-  final CommonFilterController filterController =
-      Get.put(CommonFilterController());
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
-    // _dashboardController.getActiveData(status: widget.status);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //    _activeFilesController.setupFilters(widget.status);
       _activeFilesController.currentStatus.value = widget.status;
       _activeFilesController.updateFilteredList();
     });
@@ -72,7 +67,6 @@ class _ActiveFilesState extends State<ActiveFiles> {
   void dispose() {
     _chartCardsController.selectedIndex.value = 0;
     _activeFilesController.filterController.clearFilters();
-    print('🔴 ActiveFiles disposed - controllers reset');
     super.dispose();
   }
 
@@ -82,15 +76,15 @@ class _ActiveFilesState extends State<ActiveFiles> {
       title: widget.title,
       isDrawer: widget.isDrawer,
       showBack: widget.isShowBack,
-      actions: [
-        Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: IconButton(
-            onPressed: () => Get.to(() => const NotificationSCreen()),
-            icon: SvgPicture.asset('assets/images/notification.svg'),
-          ),
-        ),
-      ],
+      // actions: [
+      //   Padding(
+      //     padding: const EdgeInsets.all(5.0),
+      //     child: IconButton(
+      //       onPressed: () => Get.to(() => const NotificationSCreen()),
+      //       icon: SvgPicture.asset('assets/images/notification.svg'),
+      //     ),
+      //   ),
+      // ],
       key: _scaffoldKey,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,6 +113,9 @@ class _ActiveFilesState extends State<ActiveFiles> {
                   },
                   onClear: () {
                     _activeFilesController.filterController.clearFilters();
+                    ScrollUtils.scrollToStart(
+                        _activeFilesController.filterScrollController);
+
                     _activeFilesController.updateFilteredList();
                   }),
               kVerticalSpace(10),
@@ -134,24 +131,12 @@ class _ActiveFilesState extends State<ActiveFiles> {
 
                 return FilterChipList(
                   filters: filterList,
+                  controller: _activeFilesController.filterScrollController,
                   selectedIndex: safeIndex,
                   onSelected:
                       _activeFilesController.filterController.selectFilter,
                 );
               })
-
-              // Obx(() {
-              //   final filterList =
-              //       _activeFilesController.filterController.filters;
-
-              //   return FilterChipList(
-              //     filters: filterList,
-              //     selectedIndex: _activeFilesController
-              //         .filterController.selectedFilter.value,
-              //     onSelected:
-              //         _activeFilesController.filterController.selectFilter,
-              //   );
-              // }),
             ]),
           ),
           Expanded(child: Obx(() {

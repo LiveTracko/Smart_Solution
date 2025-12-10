@@ -27,7 +27,7 @@ class DataEntryForm extends StatefulWidget {
 }
 
 class _DataEntryFormState extends State<DataEntryForm> {
-  final DataController controller = Get.put(DataController());
+  final DataController controller = Get.find<DataController>();
 
   final _formKey = GlobalKey<FormState>();
 

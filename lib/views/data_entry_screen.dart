@@ -29,7 +29,7 @@ class DataEntryViewScreen extends StatefulWidget {
 }
 
 class _DataEntryViewScreenState extends State<DataEntryViewScreen> {
-  final DataController dataController = Get.put(DataController());
+  final DataController dataController = Get.find<DataController>();
 
   final DialerController _dialerController = Get.put(DialerController());
 

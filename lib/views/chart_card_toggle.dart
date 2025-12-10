@@ -16,7 +16,7 @@ class ChartCardsToggle extends StatelessWidget {
   final double verticalPadding;
   final double borderRadius;
 
-  final ChartCardsController controller = Get.put(ChartCardsController());
+  final ChartCardsController controller = Get.find<ChartCardsController>();
 
   ChartCardsToggle({
     super.key,

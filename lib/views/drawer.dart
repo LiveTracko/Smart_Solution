@@ -117,7 +117,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   ListTile(
                     leading: const Icon(Icons.list_alt),
                     title: const Text('Listing'),
-                    onTap: () => Get.to(() => const ListingScreen()),
+                    onTap: () => Get.to(() => ListingScreen(
+                          title: 'Listing',
+                          isShowBack: true,
+                          isDrawer: false,
+                        )),
                   ),
                   // ListTile(
                   //   leading: const Icon(Icons.list),

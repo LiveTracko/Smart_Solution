@@ -17,7 +17,6 @@ class SearchBarWithClear extends StatelessWidget {
     this.focusNode,
   }) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -45,20 +44,32 @@ class SearchBarWithClear extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 8),
-          // Clear Filters Text
-          GestureDetector(
-            onTap: onClear,
-            child: const Text(
-              'Clear Filters',
-              style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.w500,
-                  decoration: TextDecoration.underline,
-                  decorationColor: Colors.red,
-                  decorationThickness: 2),
+
+          TextButton(
+            onPressed: onClear,
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+              textStyle: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                decoration: TextDecoration.underline,
+              ),
             ),
-          ),
+            child: const Text('Clear Filters'),
+          )
+
+          // GestureDetector(
+          //   onTap: onClear,
+          //   child: const Text(
+          //     'Clear Filters',
+          //     style: TextStyle(
+          //         color: Colors.red,
+          //         fontWeight: FontWeight.w500,
+          //         decoration: TextDecoration.underline,
+          //         decorationColor: Colors.red,
+          //         decorationThickness: 2),
+          //   ),
+          // ),
         ],
       ),
     );

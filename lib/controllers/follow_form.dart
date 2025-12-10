@@ -14,6 +14,7 @@ import 'package:smart_solutions/models/call_log_model.dart';
 import 'package:smart_solutions/models/disbursement_model.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
 import 'package:smart_solutions/services/call_state_service.dart';
+import 'package:smart_solutions/utils/scroll_utils.dart';
 import '../constants/services.dart';
 import '../services/api_service.dart';
 import '../constants/api_urls.dart';
@@ -26,6 +27,10 @@ class FollowBackFormController extends GetxController
 
   var allBankNamesList = <AllBankNamesData>[].obs;
   var followBackList = <Data>[].obs;
+
+  var startDate = Rxn<DateTime>();
+  var endDate = Rxn<DateTime>();
+
   var monthlybackData = <Data>[].obs;
   var dailycallbackData = <Data>[].obs;
   var callLogData = <Datum>[].obs;
@@ -62,10 +67,15 @@ class FollowBackFormController extends GetxController
   final customerNumberController = TextEditingController();
 
   // Pagination variables
-  final RxInt currentPage = 1.obs;
+  RxInt currentPage = 1.obs;
   final RxBool hasMore = true.obs;
-  final int limit = 20; // Fixed limit
-  final RxBool isInitialLoad = true.obs;
+  final int limit = 20;
+
+// scroll chiplist
+  final ScrollController filterScrollController = ScrollController();
+
+  final RxBool isInitialLoading = true.obs;
+  final RxBool isMoreLoading = true.obs;
 
   final TextEditingController searchController = TextEditingController();
 
@@ -73,14 +83,11 @@ class FollowBackFormController extends GetxController
       Get.put(CommonFilterController());
 
   @override
-  void onInit() {
-    // ever(mobile, (number) => customerNumberController.text = number);
-
-    fetchFollowBackList();
-
+  void onInit() async {
     ever(followBackList, (_) => updateFilteredList());
     ever(selectedFilter, (_) => updateFilteredList());
 
+    await fetchFollowBackList();
     // 1️⃣ When text changes, update observable
     customerNumberController.addListener(() {
       mobile.value = customerNumberController.text;
@@ -191,29 +198,24 @@ class FollowBackFormController extends GetxController
   }
 
   Future<void> fetchFollowBackList({bool loadMore = false}) async {
-    // If loading more, don't show loading indicator for initial load
-    isLoading.value = true;
-    // if (!loadMore) {
-    //   isLoading.value = true;
-    // }
-
-    if (!loadMore) {
+    if (loadMore) {
+      isMoreLoading.value = true;
+    } else {
+      isInitialLoading.value = true;
       currentPage.value = 1;
       hasMore.value = true;
       followBackList.clear();
       allCustomerName.clear();
     }
-    //  isLoading.value = true;
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final int? secureType = prefs.getInt('secureType');
+    final secureType = prefs.getInt('secureType');
     final String dateRage = dateRangeList.isNotEmpty &&
             dateRangeList.first != null &&
             dateRangeList.last != null
         ? "${dateRangeList.first},${dateRangeList.last}"
         : "";
 
-    // Create form data with required telecaller_id
     final Map<String, dynamic> formData = {
       "telecaller_id": StaticStoredData.userId,
       "daterange": dateRage,
@@ -221,12 +223,10 @@ class FollowBackFormController extends GetxController
       "secure_type": secureType.toString(),
     };
 
-    // ✅ Add search filter
     if (searchText.value.isNotEmpty) {
       formData['search'] = searchText.value.trim();
     }
 
-    // ✅ Add dynamic status list using loop
     if (selectedStatuses.isNotEmpty) {
       for (var i = 0; i < selectedStatuses.length; i++) {
         formData["status[$i]"] = selectedStatuses[i];
@@ -234,59 +234,33 @@ class FollowBackFormController extends GetxController
     }
 
     try {
-      var response =
-          await _apiService.postRequest(APIUrls.updatedcalllog, formData);
-
-      debugPrint(" data -->  ${response.statusCode} ${response.body}");
+      var response = await _apiService.postRequest(
+        APIUrls.updatedcalllog,
+        formData,
+      );
 
       if (response.statusCode == 200) {
-        var responseData = jsonDecode(response.body);
-
-        var followBackData = FollowUpSubmitedList.fromJson(responseData);
-
-        final newItems = followBackData.data ?? [];
+        var data = jsonDecode(response.body);
+        var model = FollowUpSubmitedList.fromJson(data);
+        var newItems = model.data ?? [];
 
         if (loadMore) {
-          // Append to existing list for load more
           followBackList.addAll(newItems);
-          allCustomerName.addAll(newItems);
         } else {
-          // Replace list for initial load/search
           followBackList.assignAll(newItems);
-          allCustomerName.assignAll(newItems);
         }
 
-        // Check if there are more pages
         hasMore.value = newItems.length >= limit;
-
-        // Increment page for next load
-        if (newItems.isNotEmpty) {
-          currentPage.value++;
-        }
-
-        // allCustomerName.assignAll(followBackData.data!);
-
-        // followBackList.value = followBackData.data ?? [];
-      } else if (response.statusCode == 204) {
-        if (!loadMore) {
-          followBackList.clear();
-          allCustomerName.clear();
-        }
-        hasMore.value = false;
+        if (newItems.isNotEmpty) currentPage++;
       } else {
-        // logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
+        hasMore.value = false;
       }
-    } catch (e) {
-      debugPrint("Exception fetching follow-back list: $e");
-
-      if (loadMore) {
-        currentPage.value--; // Revert page increment on error
-      }
-    } finally {
-      isLoading.value = false;
-
-      isInitialLoad.value = false;
+    } catch (_) {
+      hasMore.value = false;
     }
+
+    isInitialLoading.value = false;
+    isMoreLoading.value = false;
   }
 
   // Method to load more data
@@ -532,6 +506,9 @@ class FollowBackFormController extends GetxController
           tellecallerList.assignAll(teamleader.data);
         } else {
           teamleaderList.assignAll(teamleader.data);
+          commonFilterController.setFilters(
+            teamleaderList.map((e) => e.name).toList(),
+          );
         }
       } else {
         logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
@@ -810,6 +787,7 @@ class FollowBackFormController extends GetxController
   void clearFilters() {
     selectedFilter.value = 0;
 
+    ScrollUtils.scrollToStart(filterScrollController);
     searchController.clear();
   }
 

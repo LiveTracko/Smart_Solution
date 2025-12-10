@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
@@ -24,6 +25,17 @@ class CallLogPage extends StatefulWidget {
 }
 
 class _CallLogPageState extends State<CallLogPage> {
+  String formatDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return '';
+
+    try {
+      final date = DateTime.parse(dateString);
+      return DateFormat('dd-MM-yyyy').format(date);
+    } catch (e) {
+      return dateString; // if parsing fails, show original
+    }
+  }
+
   final _followBackController = Get.find<FollowBackFormController>();
   final _diallerController = Get.find<DialerController>();
   final CommonRows _commonRows = CommonRows();
@@ -75,19 +87,101 @@ class _CallLogPageState extends State<CallLogPage> {
                     SearchBarWithClear(
                         controller: _followBackController.searchController,
                         onClear: () {
-                          //_followBackController.filteredFollowBackList.clear();
-                          _followBackController.searchController.clear();
+                          _followBackController.clearFilters();
                           _followBackController.updateFilteredList();
                         },
                         onChanged: (value) {
                           _followBackController.updateFilteredList();
                         }),
                     kVerticalSpace(10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () async {
+                              DateTime? picked = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime.now(),
+                              );
+
+                              if (picked != null) {
+                                _followBackController.startDate.value = picked;
+                                _followBackController.updateFilteredList();
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.white,
+                              ),
+                              child: Obx(() => Text(
+                                    _followBackController.startDate.value ==
+                                            null
+                                        ? "Start Date"
+                                        : DateFormat("dd-MM-yyyy").format(
+                                            _followBackController
+                                                .startDate.value!),
+                                    style: const TextStyle(fontSize: 14),
+                                  )),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () async {
+                              DateTime? picked = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime.now(),
+                              );
+
+                              if (picked != null) {
+                                _followBackController.endDate.value = picked;
+                                _followBackController.updateFilteredList();
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.white,
+                              ),
+                              child: Obx(() => Text(
+                                    _followBackController.endDate.value == null
+                                        ? "End Date"
+                                        : DateFormat("dd-MM-yyyy").format(
+                                            _followBackController
+                                                .endDate.value!),
+                                    style: const TextStyle(fontSize: 14),
+                                  )),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            _followBackController.startDate.value = null;
+                            _followBackController.endDate.value = null;
+                            _followBackController.updateFilteredList();
+                          },
+                          icon: const Icon(Icons.clear, color: Colors.white),
+                        )
+                      ],
+                    ),
+                    kVerticalSpace(10),
                     Obx(() {
                       final filterList = _followBackController.filters;
 
                       return FilterChipList(
                         filters: filterList,
+                        controller:
+                            _followBackController.filterScrollController,
                         selectedIndex:
                             _followBackController.selectedFilter.value,
                         onSelected: _followBackController.selectFilter,
@@ -96,8 +190,7 @@ class _CallLogPageState extends State<CallLogPage> {
                     kVerticalSpace(10),
                   ])),
           Expanded(child: Obx(() {
-            if (_followBackController.isInitialLoad.value &&
-                _followBackController.isLoading.value) {
+            if (_followBackController.isInitialLoading.value) {
               return const Center(child: LoadingPage());
             }
             if (_followBackController.filteredFollowBackList.isEmpty) {
@@ -114,21 +207,17 @@ class _CallLogPageState extends State<CallLogPage> {
               );
             }
             return RefreshIndicator(
-              onRefresh: () => _followBackController.loadData(widget.isRefresh),
+              onRefresh: () => _followBackController.fetchFollowBackList(),
               child: ListView.builder(
                   controller: _scrollController,
                   padding: const EdgeInsets.all(10),
                   itemCount:
                       _followBackController.filteredFollowBackList.length +
                           (_followBackController.hasMore.value ? 1 : 0),
-                  // _followBackController.filteredFollowBackList.length,
                   itemBuilder: (context, index) {
-                    //  var data = dataController.dataList[index];
-
                     if (index ==
                         _followBackController.filteredFollowBackList.length) {
-                      // Loading indicator at the bottom
-                      return _followBackController.isLoading.value
+                      return _followBackController.isMoreLoading.value
                           ? const Padding(
                               padding: EdgeInsets.all(16.0),
                               child: Center(child: CircularProgressIndicator()),
@@ -158,7 +247,7 @@ class _CallLogPageState extends State<CallLogPage> {
                         _diallerController.excel_id.value = '';
                       },
                       title: data.customerName ?? '',
-                      subtitle: data.entryDate ?? '',
+                      subtitle: formatDate(data.entryDate),
                       status: data.remarkStatus ?? '',
                       statusColor: data.contactStatus == '1'
                           ? Colors.green.shade400

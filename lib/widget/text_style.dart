@@ -30,6 +30,9 @@ class AppTextStyle {
 
   static const headerTitle = TextStyle(
       fontSize: 16, color: Colors.black87, fontWeight: FontWeight.bold);
+
+  static const smallbodyTxt =
+      TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
   static const body = TextStyle(
     fontSize: 14,
     color: Colors.black87,
@@ -37,6 +40,7 @@ class AppTextStyle {
 
   static const label = TextStyle(
     fontSize: 12,
+    fontWeight: FontWeight.bold,
     color: Colors.grey,
   );
 

@@ -175,6 +175,9 @@ class _DialerScreenState extends State<DialerScreen> {
                       child: Center(
                         child: TextField(
                           textAlign: TextAlign.center,
+                          readOnly: true,
+                          maxLength: 10,
+
                           controller: TextEditingController(
                               text:
                                   // dialerController.phoneNumber.value.isEmpty
@@ -186,7 +189,7 @@ class _DialerScreenState extends State<DialerScreen> {
                           },
                           decoration: InputDecoration(
                             border: InputBorder.none, // looks like plain Text
-
+                            counterText: '',
                             hintText: "Enter number",
                             hintStyle: TextStyle(
                               fontSize: 20.sp,

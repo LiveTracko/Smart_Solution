@@ -38,8 +38,7 @@ class LoginRequest {
   factory LoginRequest.fromJson(Map<String, dynamic> json) {
     return LoginRequest(
       id: json['id'] as String,
-      loginRequestDate:
-          DateFormat("dd-MM-yyyy HH:mm").parse(json['login_request_date']),
+      loginRequestDate: parseLoginDate(json['login_request_date']),
       telecallerId: json['telecaller_id'] as String,
       customerName: json['customer_name'] as String,
       contactNumber: json['contact_number'] as String,
@@ -49,8 +48,8 @@ class LoginRequest {
       commonRemark: json['common_remark'] as String,
       remark: json['remark'] as String,
       created: DateTime.parse(json['created']),
-      title: json['title'] ?? '', // Nullable field
-      bankName: json['bank_name'] ?? '', // Nullable field
+      title: json['title'] ?? '',
+      bankName: json['bank_name'] ?? '',
       sourcing: (json['sourcing'] ?? '') as String,
       sourcingTitle: (json['sourcing_title'] ?? '') as String,
     );
@@ -59,8 +58,7 @@ class LoginRequest {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'login_request_date':
-          DateFormat("dd-MM-yyyy HH:mm").format(loginRequestDate),
+      'login_request_date': loginRequestDate,
       'telecaller_id': telecallerId,
       'customer_name': customerName,
       'contact_number': contactNumber,
@@ -75,5 +73,15 @@ class LoginRequest {
       'sourcing': sourcing,
       'sourcing_title': sourcingTitle,
     };
+  }
+
+  static DateTime parseLoginDate(String dateStr) {
+    try {
+      // Try full format with seconds
+      return DateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
+    } catch (e) {
+      // Try without seconds
+      return DateFormat("yyyy-MM-dd HH:mm").parse(dateStr);
+    }
   }
 }

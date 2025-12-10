@@ -26,8 +26,8 @@ class LoginRequestScreen extends StatelessWidget {
       required this.title,
       required this.isShowBack,
       required this.isDrawer});
-  final LoginRequestController controller = Get.put(LoginRequestController());
-  final DataController dataEntryController = Get.put(DataController());
+  final LoginRequestController controller = Get.find<LoginRequestController>();
+  final DataController dataEntryController = Get.find<DataController>();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -44,7 +44,6 @@ class LoginRequestScreen extends StatelessWidget {
               controller.isEdit.value = true;
               controller.isNew.value = true;
               Get.to(() => LoginRequestForm());
-              // handle click
             },
           )
         ],
@@ -59,7 +58,7 @@ class LoginRequestScreen extends StatelessWidget {
                   controller: controller.searchController,
                   onChanged: (value) => controller.filterLoginRequests(),
                   onClear: () {
-                    controller.searchController.clear();
+                    controller.clearFilters();
                     controller.filterLoginRequests();
                   }),
               kVerticalSpace(10),

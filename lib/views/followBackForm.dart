@@ -23,7 +23,7 @@ class FollowBackForm extends StatelessWidget {
   final RemarkStatusController _remarkController =
       Get.put(RemarkStatusController());
   final LoginRequestController _loginRequestController =
-      Get.put(LoginRequestController());
+      Get.find<LoginRequestController>();
   final _formKey = GlobalKey<FormState>();
   var selectedDate = DateTime.now().obs;
 
@@ -269,7 +269,12 @@ class FollowBackForm extends StatelessWidget {
                         SizedBox(height: 16.h),
 
                         Obx(() => _remarkController.isCallback.value
-                            ? _buildDatePicker(context, true)
+                            ? Column(
+                                children: [
+                                  _buildDatePicker(context, true),
+                                  SizedBox(height: 16.h),
+                                ],
+                              )
                             : const SizedBox.shrink()),
 
                         // Remark Field

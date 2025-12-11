@@ -368,7 +368,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                   child: Padding(
                                                     padding: const EdgeInsets
                                                         .symmetric(
-                                                        horizontal: 5),
+                                                        horizontal: 15),
                                                     child: Container(
                                                       padding: const EdgeInsets
                                                           .symmetric(
@@ -533,55 +533,55 @@ class _DashboardScreenState extends State<DashboardScreen>
                                     ],
                                   )
                                 : const SizedBox.shrink(),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                if (controller.dateRangeList.isNotEmpty) ...[
-                                  const Spacer(),
-                                  Text(
-                                    controller.formattedDate.value,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      controller.dateRangeList.clear();
-                                      controller.totalContact.clear();
-                                      controller.totalNoContact.clear();
-                                      controller.totalAttempt.clear();
-                                      controller.activeCallMap.clear();
-                                      controller.activeNoCallMap.clear();
-                                      controller.activeAttemptMap.clear();
-                                      controller.finalActiveNoCallList.clear();
-                                      controller.finalActiveCallList.clear();
-                                      controller.finalTotalAttemptCallList
-                                          .clear();
-                                      DateTime now = DateTime.now();
-                                      controller.dateRange.value =
-                                          "${now.day}-${now.month}-${now.year},${now.day}-${now.month}-${now.year}";
-                                      controller.getTimeGraph();
-                                    },
-                                    child: Container(
-                                      padding: EdgeInsets.all(5.0.w),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.grid1.withOpacity(0.3),
-                                        borderRadius: BorderRadius.circular(25),
-                                      ),
-                                      child: Icon(
-                                        Icons.close,
-                                        size: 20.sp,
-                                      ),
-                                    ),
-                                  ),
-                                ]
-                              ],
-                            ),
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.end,
+                            //   children: [
+                            //     if (controller.dateRangeList.isNotEmpty) ...[
+                            //       const Spacer(),
+                            //       Text(
+                            //         controller.formattedDate.value,
+                            //         style: const TextStyle(
+                            //           fontSize: 16,
+                            //           fontWeight: FontWeight.w500,
+                            //           color: Colors.black,
+                            //         ),
+                            //       ),
+                            //       const SizedBox(
+                            //         width: 10,
+                            //       ),
+                            //       InkWell(
+                            //         onTap: () {
+                            //           controller.dateRangeList.clear();
+                            //           controller.totalContact.clear();
+                            //           controller.totalNoContact.clear();
+                            //           controller.totalAttempt.clear();
+                            //           controller.activeCallMap.clear();
+                            //           controller.activeNoCallMap.clear();
+                            //           controller.activeAttemptMap.clear();
+                            //           controller.finalActiveNoCallList.clear();
+                            //           controller.finalActiveCallList.clear();
+                            //           controller.finalTotalAttemptCallList
+                            //               .clear();
+                            //           DateTime now = DateTime.now();
+                            //           controller.dateRange.value =
+                            //               "${now.day}-${now.month}-${now.year},${now.day}-${now.month}-${now.year}";
+                            //           controller.getTimeGraph();
+                            //         },
+                            //         child: Container(
+                            //           padding: EdgeInsets.all(5.0.w),
+                            //           decoration: BoxDecoration(
+                            //             color: AppColors.grid1.withOpacity(0.3),
+                            //             borderRadius: BorderRadius.circular(25),
+                            //           ),
+                            //           child: Icon(
+                            //             Icons.close,
+                            //             size: 20.sp,
+                            //           ),
+                            //         ),
+                            //       ),
+                            //     ]
+                            //   ],
+                            // ),
                             Visibility(
                               visible: (chartCardsController.selectedIndex == 1)
                                   ? true

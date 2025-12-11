@@ -140,13 +140,13 @@ class LoginRequestScreen extends StatelessWidget {
                             },
                             children: [
                               _buildDoubleRow(
-                                iconLeft: 'assets/images/call.svg',
-                                valueLeft: maskFirst6Digits(data.contactNumber),
-                                iconRight: 'assets/images/calendar.svg',
-                                valueRight: DateFormat('dd-MM-yyyy').format(
-                                    DateTime.parse(
-                                        data.loginRequestDate.toString())),
-                              ),
+                                  iconLeft: 'assets/images/call.svg',
+                                  valueLeft:
+                                      maskFirst6Digits(data.contactNumber),
+                                  iconRight: 'assets/images/calendar.svg',
+                                  valueRight: DateFormat('dd-MM-yyyy').format(
+                                      DateTime.parse(
+                                          data.loginRequestDate.toString()))),
                               _buildSingleRow(
                                   'assets/images/message_dots_circle.svg',
                                   data.remark.isEmpty
@@ -605,7 +605,7 @@ Widget _buildDoubleRow({
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildIcon(iconLeft),
+              _buildIcon(iconRight),
               //  Icon(iconRight, size: 14, color: Colors.grey[700]),
               const SizedBox(width: 4),
               Text(

@@ -236,7 +236,7 @@ class _DataEntryViewScreenState extends State<DataEntryViewScreen> {
               return RefreshIndicator(
                 onRefresh: () => dataController.refreshData(),
                 child: ListView.builder(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(0),
                     itemCount: dataController.dataList.length,
                     itemBuilder: (context, index) {
                       var data = dataController.dataList[index];
@@ -263,9 +263,9 @@ class _DataEntryViewScreenState extends State<DataEntryViewScreen> {
                           ],
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(4.0),
+                          padding: const EdgeInsets.all(3.0),
                           child: ExpansionTile(
-                              minTileHeight: 60,
+                              minTileHeight: 20,
                               tilePadding: const EdgeInsets.symmetric(
                                   horizontal: 0.0, vertical: 0.0),
                               shape: const RoundedRectangleBorder(
@@ -312,7 +312,7 @@ class _DataEntryViewScreenState extends State<DataEntryViewScreen> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                    color: Colors.black, fontSize: 15),
+                                    color: Colors.black, fontSize: 13),
                               ),
                               subtitle: Text(data.loginBank.toString(),
                                   maxLines: 1,

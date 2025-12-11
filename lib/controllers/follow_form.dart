@@ -678,7 +678,7 @@ class FollowBackFormController extends GetxController
 
         if (response.statusCode == 200) {
           var responseData = jsonDecode(response.body);
-          print(responseData);
+
           var followBackData = FollowUpSubmitedList.fromJson(responseData);
           followBackList.value = followBackData.data ?? [];
         } else if (response.statusCode == 204) {
@@ -711,58 +711,41 @@ class FollowBackFormController extends GetxController
     });
   }
 
-  // set filterlist
-
-  // void updateFilteredList() {
-  //   final names = followBackList.map((e) => e.remarkStatus ?? '').toList();
-
-  //   commonFilterController.setFilters(names);
-  // }
-
   void updateFilteredList({String query = ''}) {
-    // 1️⃣ Update filter chip list (remarkStatus)
+    // 1️⃣ Build filter names for chips
     final names = followBackList
         .map((e) => e.remarkStatus ?? '')
         .where((e) => e.isNotEmpty)
         .toSet()
         .toList();
-
     setFilters(names);
 
-    // 2️⃣ Apply search + chip filter
+    // 2️⃣ Filter by chip + search
     final search = query.toLowerCase();
     final selected = selectedFilter.value;
 
-    filteredFollowBackList.assignAll(
-      followBackList.where((item) {
-        final name = item.customerName?.toLowerCase() ?? '';
-        final mobile = item.contactNumber?.toLowerCase() ?? '';
-        final bank = item.bankName?.toLowerCase() ?? '';
-        final remark = item.remarkStatus?.toLowerCase() ?? '';
+    // 🔥 Clear old list before filtering
+    filteredFollowBackList.clear();
 
-        // Search filter
-        final searchMatch = search.isEmpty ||
-            name.contains(search) ||
-            mobile.contains(search) ||
-            bank.contains(search);
+    filteredFollowBackList.assignAll(followBackList.where((item) {
+      final name = item.customerName?.toLowerCase() ?? '';
+      final mobile = item.contactNumber?.toLowerCase() ?? '';
+      //  final bank = item.bankName?.toLowerCase() ?? '';
+      final remark = item.remarkStatus?.toLowerCase() ?? '';
 
-        // Chip filter
-        final chipMatch =
-            selected == 0 ? true : remark == names[selected - 1].toLowerCase();
+      // Search filter
+      final searchMatch =
+          search.isEmpty || name.contains(search) || mobile.contains(search);
+      //|| bank.contains(search);
 
-        return searchMatch && chipMatch;
-      }).toList(),
-    );
+      // Chip filter
+      final chipMatch =
+          selected == 0 ? true : remark == names[selected - 1].toLowerCase();
 
-    final searchText = searchController.text.trim().toLowerCase();
-
-    if (searchText.isNotEmpty) {
-      filteredFollowBackList.value = filteredFollowBackList.where((item) {
-        return (item.customerName ?? '').toLowerCase().contains(searchText) ||
-            (item.contactNumber ?? '').toLowerCase().contains(searchText) ||
-            (item.bankName ?? '').toLowerCase().contains(searchText);
-      }).toList();
-    }
+      return searchMatch && chipMatch;
+      //&& dateMatch;
+    }).toList());
+    print(filteredFollowBackList.length);
   }
 
   // Method to refresh data (pull to refresh)

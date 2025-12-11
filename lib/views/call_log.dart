@@ -30,7 +30,7 @@ class _CallLogPageState extends State<CallLogPage> {
 
     try {
       final date = DateTime.parse(dateString);
-      return DateFormat('dd-MM-yyyy').format(date);
+      return DateFormat('dd-MM-yyyy hh:mm:ss').format(date);
     } catch (e) {
       return dateString; // if parsing fails, show original
     }
@@ -82,8 +82,47 @@ class _CallLogPageState extends State<CallLogPage> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    HeaderTitle(
-                        title: widget.title, style: AppTextStyle.headerTitle),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          HeaderTitle(
+                              title: widget.title,
+                              style: AppTextStyle.headerTitle),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5),
+                              decoration: BoxDecoration(
+                                  color: AppColors.primaryColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                      color: AppColors.primaryColor)),
+                              child: const Icon(
+                                Icons.calendar_month,
+                                size: 18,
+                                color: AppColors.whiteColor,
+                              ),
+
+                              // Text(
+                              //   textAlign:
+                              //       TextAlign.center,
+                              //   labels[index],
+                              //   style: TextStyle(
+                              //       fontSize: 15,
+                              //       color: isSelected
+                              //           ? AppColors
+                              //               .backgroundColor
+                              //           : AppColors
+                              //               .primaryColor),
+                              // ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     SearchBarWithClear(
                         controller: _followBackController.searchController,
                         onClear: () {
@@ -91,89 +130,9 @@ class _CallLogPageState extends State<CallLogPage> {
                           _followBackController.updateFilteredList();
                         },
                         onChanged: (value) {
-                          _followBackController.updateFilteredList();
+                          _followBackController.updateFilteredList(
+                              query: value);
                         }),
-                    kVerticalSpace(10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () async {
-                              DateTime? picked = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(2000),
-                                lastDate: DateTime.now(),
-                              );
-
-                              if (picked != null) {
-                                _followBackController.startDate.value = picked;
-                                _followBackController.updateFilteredList();
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 12),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.white,
-                              ),
-                              child: Obx(() => Text(
-                                    _followBackController.startDate.value ==
-                                            null
-                                        ? "Start Date"
-                                        : DateFormat("dd-MM-yyyy").format(
-                                            _followBackController
-                                                .startDate.value!),
-                                    style: const TextStyle(fontSize: 14),
-                                  )),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () async {
-                              DateTime? picked = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(2000),
-                                lastDate: DateTime.now(),
-                              );
-
-                              if (picked != null) {
-                                _followBackController.endDate.value = picked;
-                                _followBackController.updateFilteredList();
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 12),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.white,
-                              ),
-                              child: Obx(() => Text(
-                                    _followBackController.endDate.value == null
-                                        ? "End Date"
-                                        : DateFormat("dd-MM-yyyy").format(
-                                            _followBackController
-                                                .endDate.value!),
-                                    style: const TextStyle(fontSize: 14),
-                                  )),
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            _followBackController.startDate.value = null;
-                            _followBackController.endDate.value = null;
-                            _followBackController.updateFilteredList();
-                          },
-                          icon: const Icon(Icons.clear, color: Colors.white),
-                        )
-                      ],
-                    ),
                     kVerticalSpace(10),
                     Obx(() {
                       final filterList = _followBackController.filters;

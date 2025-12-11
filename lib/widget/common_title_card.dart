@@ -53,41 +53,8 @@ class CommonTitleCard extends StatelessWidget {
         padding: const EdgeInsets.all(4.0),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                if (status != null && status!.isNotEmpty)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: statusColor,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-                    child: Text(
-                      status ?? '',
-                      style: const TextStyle(
-                        fontSize: 10,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                showEdit
-                    ? GestureDetector(
-                        onTap: onEdit,
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8),
-                          child: Icon(Icons.edit, size: 18),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-              ],
-            ),
             ExpansionTile(
               minTileHeight: 40,
-
-              
               tilePadding: EdgeInsets.zero,
               childrenPadding: EdgeInsets.zero,
               expandedCrossAxisAlignment: CrossAxisAlignment.start,
@@ -107,10 +74,10 @@ class CommonTitleCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    maxLines: null,
+                    overflow: TextOverflow.visible,
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.black,
                     ),
@@ -118,8 +85,8 @@ class CommonTitleCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    maxLines: null,
+                    overflow: TextOverflow.visible,
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey.shade600,
@@ -141,6 +108,37 @@ class CommonTitleCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.end,
+                  //   children: [
+                  //     if (status != null && status!.isNotEmpty)
+                  //       Container(
+                  //         decoration: BoxDecoration(
+                  //           color: statusColor,
+                  //           borderRadius: BorderRadius.circular(6),
+                  //         ),
+                  //         padding: const EdgeInsets.symmetric(
+                  //             horizontal: 5, vertical: 3),
+                  //         child: Text(
+                  //           status ?? '',
+                  //           style: const TextStyle(
+                  //             fontSize: 10,
+                  //             color: Colors.white,
+                  //             fontWeight: FontWeight.bold,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     showEdit
+                  //         ? GestureDetector(
+                  //             onTap: onEdit,
+                  //             child: const Padding(
+                  //               padding: EdgeInsets.symmetric(horizontal: 8),
+                  //               child: Icon(Icons.edit, size: 18),
+                  //             ),
+                  //           )
+                  //         : const SizedBox.shrink(),
+                  //   ],
+                  // ),
                   // Row(
                   //   mainAxisSize: MainAxisSize.min,
                   //   children: [
@@ -199,6 +197,33 @@ class CommonTitleCard extends StatelessWidget {
                   //     ),
                   //   ),
 
+                  if (status != null && status!.isNotEmpty)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 3),
+                      child: Text(
+                        status ?? '',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  showEdit
+                      ? GestureDetector(
+                          onTap: onEdit,
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: Icon(Icons.edit, size: 18),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+
                   kVerticalSpace(4.h),
                   Row(
                     mainAxisSize: MainAxisSize.min,
@@ -222,7 +247,7 @@ class CommonTitleCard extends StatelessWidget {
               children: [
                 const Divider(height: 20, color: Colors.black12),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: children,
                 )
               ],

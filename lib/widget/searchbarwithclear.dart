@@ -44,7 +44,6 @@ class SearchBarWithClear extends StatelessWidget {
               ),
             ),
           ),
-
           TextButton(
             onPressed: onClear,
             style: TextButton.styleFrom(
@@ -56,8 +55,7 @@ class SearchBarWithClear extends StatelessWidget {
               ),
             ),
             child: const Text('Clear Filters'),
-          )
-
+          ),
           // GestureDetector(
           //   onTap: onClear,
           //   child: const Text(

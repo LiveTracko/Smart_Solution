@@ -180,6 +180,10 @@ class _DashboardScreenState extends State<DashboardScreen>
           })
     ];
 
+    String today = "${DateTime.now().day.toString().padLeft(2, '0')} "
+        "${DateFormat('MMM').format(DateTime.now()).toUpperCase()} "
+        "${DateTime.now().year}";
+
     return CommonScaffold(
       title: "Dashboard",
       isDrawer: true,
@@ -288,125 +292,174 @@ class _DashboardScreenState extends State<DashboardScreen>
                               ],
                             ),
                             StaticStoredData.roleName != 'telecaller'
-                                ? Container(
-                                    height: 30,
+                                ? SizedBox(
+                                    height: 32,
                                     child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         if (controller
                                             .dateRangeList.isNotEmpty) ...[
-                                          const SizedBox(width: 15),
-                                          Text(
-                                            controller.formattedDate.value,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.black,
+                                          const SizedBox(width: 10),
+
+                                          // Simple Selected Date Text
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.greyColor
+                                                  .withOpacity(0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: AppColors
+                                                    .diallerContainerColor,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                const Icon(Icons.calendar_month,
+                                                    size: 16,
+                                                    color: Colors.grey),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  controller
+                                                      .formattedDate.value,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 6),
+
+                                                // Simple Close Icon
+                                                InkWell(
+                                                  onTap: () {
+                                                    controller.dateRangeList
+                                                        .clear();
+                                                    controller.totalContact
+                                                        .clear();
+                                                    controller.totalNoContact
+                                                        .clear();
+                                                    controller.totalAttempt
+                                                        .clear();
+                                                    controller.activeCallMap
+                                                        .clear();
+                                                    controller.activeNoCallMap
+                                                        .clear();
+                                                    controller.activeAttemptMap
+                                                        .clear();
+                                                    controller
+                                                        .finalActiveNoCallList
+                                                        .clear();
+                                                    controller
+                                                        .finalActiveCallList
+                                                        .clear();
+                                                    controller
+                                                        .finalTotalAttemptCallList
+                                                        .clear();
+
+                                                    DateTime now =
+                                                        DateTime.now();
+                                                    controller.dateRange.value =
+                                                        "${now.day}-${now.month}-${now.year},${now.day}-${now.month}-${now.year}";
+                                                    controller.getTimeGraph();
+                                                  },
+                                                  child: const Icon(
+                                                    Icons.close,
+                                                    size: 16,
+                                                    color: Colors.black54,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          InkWell(
-                                            onTap: () {
-                                              controller.dateRangeList.clear();
-                                              controller.totalContact.clear();
-                                              controller.totalNoContact.clear();
-                                              controller.totalAttempt.clear();
-                                              controller.activeCallMap.clear();
-                                              controller.activeNoCallMap
-                                                  .clear();
-                                              controller.activeAttemptMap
-                                                  .clear();
-                                              controller.finalActiveNoCallList
-                                                  .clear();
-                                              controller.finalActiveCallList
-                                                  .clear();
-                                              controller
-                                                  .finalTotalAttemptCallList
-                                                  .clear();
-                                              DateTime now = DateTime.now();
-                                              controller.dateRange.value =
-                                                  "${now.day}-${now.month}-${now.year},${now.day}-${now.month}-${now.year}";
-                                              controller.getTimeGraph();
-                                            },
-                                            child: Container(
-                                              padding: EdgeInsets.all(5.0.w),
-                                              decoration: BoxDecoration(
-                                                color: AppColors.grid1
-                                                    .withOpacity(0.3),
-                                                borderRadius:
-                                                    BorderRadius.circular(25),
+                                        ] else ...[
+                                          // --- NO DATE SELECTED PLACEHOLDER ---
+                                          const SizedBox(width: 10),
+
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: Colors.grey.shade400,
+                                                width: 1,
                                               ),
-                                              child: Icon(
-                                                Icons.close,
-                                                size: 20.sp,
-                                              ),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                const Icon(Icons.calendar_month,
+                                                    size: 16,
+                                                    color: Colors.grey),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  today,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ],
+
+                                        const SizedBox(width: 10),
+
+                                        // Tabs (Simple Boxes with Icon)
                                         Expanded(
                                           child: ListView.builder(
                                             scrollDirection: Axis.horizontal,
                                             itemCount: labels.length,
-                                            reverse:
-                                                true, // ← Moves items to the RIGHT
+                                            reverse: true,
                                             itemBuilder: (context, index) {
                                               return Obx(() {
                                                 final isSelected = controller
                                                         .selectedTab.value ==
                                                     index;
+
                                                 return GestureDetector(
-                                                  onTap: () async {
+                                                  onTap: () {
                                                     controller.selectedTab
                                                         .value = index;
-                                                    // await followBackFormController
-                                                    //     .getteamLeaderData();
                                                     callbacks[index]();
                                                   },
-                                                  child: Padding(
+                                                  child: Container(
+                                                    margin: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 20),
                                                     padding: const EdgeInsets
                                                         .symmetric(
-                                                        horizontal: 15),
-                                                    child: Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 5),
-                                                      decoration: BoxDecoration(
-                                                          color: isSelected
-                                                              ? AppColors
-                                                                  .primaryColor
-                                                              : AppColors
-                                                                  .backgroundColor,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
-                                                          border: Border.all(
-                                                              color: AppColors
-                                                                  .primaryColor)),
-                                                      child: Icon(
-                                                        Icons.calendar_month,
-                                                        size: 18,
+                                                        horizontal: 10,
+                                                        vertical: 5),
+                                                    decoration: BoxDecoration(
+                                                      color: isSelected
+                                                          ? AppColors.greyColor
+                                                              .withOpacity(0.15)
+                                                          : Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                      border: Border.all(
                                                         color: isSelected
                                                             ? AppColors
-                                                                .backgroundColor
-                                                            : AppColors
-                                                                .primaryColor,
+                                                                .greyColor
+                                                            : Colors
+                                                                .grey.shade400,
+                                                        width: 1,
                                                       ),
-
-                                                      // Text(
-                                                      //   textAlign:
-                                                      //       TextAlign.center,
-                                                      //   labels[index],
-                                                      //   style: TextStyle(
-                                                      //       fontSize: 15,
-                                                      //       color: isSelected
-                                                      //           ? AppColors
-                                                      //               .backgroundColor
-                                                      //           : AppColors
-                                                      //               .primaryColor),
-                                                      // ),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.calendar_month,
+                                                      size: 18,
+                                                      color: isSelected
+                                                          ? AppColors
+                                                              .primaryColor
+                                                          : Colors
+                                                              .grey.shade600,
                                                     ),
                                                   ),
                                                 );
@@ -738,9 +791,131 @@ class _DashboardScreenState extends State<DashboardScreen>
                               children: [
                                 subHeaderTitle(durationTitle),
                                 headerTitle(controller.totalDuration.toString(),
-                                    AppTextStyle.blueHeaderTitletStyle)
+                                    AppTextStyle.blueHeaderTitletStyle),
                               ],
                             ),
+                            // Container(
+                            //   height: 30,
+                            //   child: Row(
+                            //     mainAxisAlignment:
+                            //         MainAxisAlignment.spaceBetween,
+                            //     children: [
+                            //       if (controller.dateRangeList.isNotEmpty) ...[
+                            //         const SizedBox(width: 15),
+                            //         Text(
+                            //           controller.formattedDate.value,
+                            //           style: const TextStyle(
+                            //             fontSize: 16,
+                            //             fontWeight: FontWeight.w500,
+                            //             color: Colors.black,
+                            //           ),
+                            //         ),
+                            //         const SizedBox(
+                            //           width: 10,
+                            //         ),
+                            //         InkWell(
+                            //           onTap: () {
+                            //             controller.dateRangeList.clear();
+                            //             controller.totalContact.clear();
+                            //             controller.totalNoContact.clear();
+                            //             controller.totalAttempt.clear();
+                            //             controller.activeCallMap.clear();
+                            //             controller.activeNoCallMap.clear();
+                            //             controller.activeAttemptMap.clear();
+                            //             controller.finalActiveNoCallList
+                            //                 .clear();
+                            //             controller.finalActiveCallList.clear();
+                            //             controller.finalTotalAttemptCallList
+                            //                 .clear();
+                            //             DateTime now = DateTime.now();
+                            //             controller.dateRange.value =
+                            //                 "${now.day}-${now.month}-${now.year},${now.day}-${now.month}-${now.year}";
+                            //             controller.getTimeGraph();
+                            //           },
+                            //           child: Container(
+                            //             padding: EdgeInsets.all(5.0.w),
+                            //             decoration: BoxDecoration(
+                            //               color:
+                            //                   AppColors.grid1.withOpacity(0.3),
+                            //               borderRadius:
+                            //                   BorderRadius.circular(25),
+                            //             ),
+                            //             child: Icon(
+                            //               Icons.close,
+                            //               size: 20.sp,
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       ],
+                            //       Expanded(
+                            //         child: ListView.builder(
+                            //           scrollDirection: Axis.horizontal,
+                            //           itemCount: labels.length,
+                            //           reverse:
+                            //               true, // ← Moves items to the RIGHT
+                            //           itemBuilder: (context, index) {
+                            //             return Obx(() {
+                            //               final isSelected =
+                            //                   controller.selectedTab.value ==
+                            //                       index;
+                            //               return GestureDetector(
+                            //                 onTap: () async {
+                            //                   controller.selectedTab.value =
+                            //                       index;
+                            //                   // await followBackFormController
+                            //                   //     .getteamLeaderData();
+                            //                   callbacks[index]();
+                            //                 },
+                            //                 child: Padding(
+                            //                   padding:
+                            //                       const EdgeInsets.symmetric(
+                            //                           horizontal: 15),
+                            //                   child: Container(
+                            //                     padding:
+                            //                         const EdgeInsets.symmetric(
+                            //                             horizontal: 5),
+                            //                     decoration: BoxDecoration(
+                            //                         color: isSelected
+                            //                             ? AppColors.primaryColor
+                            //                             : AppColors
+                            //                                 .backgroundColor,
+                            //                         borderRadius:
+                            //                             BorderRadius.circular(
+                            //                                 10),
+                            //                         border: Border.all(
+                            //                             color: AppColors
+                            //                                 .primaryColor)),
+                            //                     child: Icon(
+                            //                       Icons.calendar_month,
+                            //                       size: 18,
+                            //                       color: isSelected
+                            //                           ? AppColors
+                            //                               .backgroundColor
+                            //                           : AppColors.primaryColor,
+                            //                     ),
+
+                            //                     // Text(
+                            //                     //   textAlign:
+                            //                     //       TextAlign.center,
+                            //                     //   labels[index],
+                            //                     //   style: TextStyle(
+                            //                     //       fontSize: 15,
+                            //                     //       color: isSelected
+                            //                     //           ? AppColors
+                            //                     //               .backgroundColor
+                            //                     //           : AppColors
+                            //                     //               .primaryColor),
+                            //                     // ),
+                            //                   ),
+                            //                 ),
+                            //               );
+                            //             });
+                            //           },
+                            //         ),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // )
                           ],
                         ),
                       ),

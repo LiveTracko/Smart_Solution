@@ -115,21 +115,55 @@ class FollowBackFormController extends GetxController
     super.onInit();
   }
 
-  Future<void> loadData(bool isRefresh) async {
-    isBankAndStatusLoading(true);
-    try {
+ Future<void> loadData(bool isRefresh) async {
+  isBankAndStatusLoading(true);
+  try {
+    if (isRefresh) {
+      // Save current form values BEFORE refresh
+      final savedCustomerName = _dialerController.customerName.value;
+      final savedMobile = mobile.value;
+      final savedSalary = _dialerController.salary.value;
+      final savedLoanAmount = _dialerController.customerLoan.value;
+      final savedBankName = bankName.value;
+      final savedDataType = dataType.value; // ✅ Save dataType
+      final savedContacted = contacted.value;
+      final savedRemark = remark.value;
+      final savedRemarkStatus = remarkStatus.value;
+      
+      // Reload essential data
       await getAllBanks();
       await getDisbursementData();
-      if (isRefresh) {
-        await CallStateService.getLastCallInfo();
+      await CallStateService.getLastCallInfo();
+      
+      // RESTORE form values AFTER refresh
+      _dialerController.customerName.value = savedCustomerName;
+      mobile.value = savedMobile;
+      _dialerController.salary.value = savedSalary;
+      _dialerController.customerLoan.value = savedLoanAmount;
+      bankName.value = savedBankName;
+      dataType.value = savedDataType; // ✅ Restore dataType
+      contacted.value = savedContacted;
+      remark.value = savedRemark;
+      remarkStatus.value = savedRemarkStatus;
+      
+      // Also update controllers if needed
+      if (savedCustomerName.isNotEmpty) {
+        _dialerController.customerNameController.text = savedCustomerName;
       }
-    } catch (e) {
-      print("Error while loading data: $e");
-    } finally {
-      isBankAndStatusLoading(false);
+      if (savedMobile.isNotEmpty) {
+        customerNumberController.text = savedMobile;
+      }
+    } else {
+      // For initial load (not refresh)
+      await getAllBanks();
+      await getDisbursementData();
     }
+  } catch (e) {
+    print("Error while loading data: $e");
+  } finally {
+    isBankAndStatusLoading(false);
   }
-
+}
   void toggleSearch() {
     showSearchField.value = !showSearchField.value;
   }
@@ -626,22 +660,24 @@ class FollowBackFormController extends GetxController
     } finally {}
   }
 
-  void clearForm() {
-    customerName.value = '';
-    mobile.value = '';
-    bankName.value = '';
-    dataType.value = '';
-    _dialerController.datatype.value = '';
-    contacted.value = 'No';
-    remarkStatus.value = '';
-    remark.value = '';
-    // followupDate.value = DateTime.now();
-    // followupDate.value = null;
-
-    _dialerController.elapsedTimeInSeconds.value = 0;
-    // _dialerController.excel_id.value = '';
-    _dialerController.followup_id.value = '';
-  }
+ void clearForm() {
+  // This should only be called on successful form submit
+  customerName.value = '';
+  mobile.value = '';
+  bankName.value = '';
+  dataType.value = '';
+  contacted.value = 'No';
+  remarkStatus.value = '';
+  remark.value = '';
+  followupDate.value = null;
+  
+  customerNumberController.clear();
+  
+  // Clear dialer data
+  _dialerController.datatype.value = '';
+  _dialerController.elapsedTimeInSeconds.value = 0;
+  _dialerController.followup_id.value = '';
+}
 
   void setFromDate(DateTime date) {
     fromDate.value = date;

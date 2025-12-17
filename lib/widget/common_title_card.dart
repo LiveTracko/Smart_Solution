@@ -139,37 +139,37 @@ class CommonTitleCard extends StatelessWidget {
                   //         : const SizedBox.shrink(),
                   //   ],
                   // ),
-                  // Row(
-                  //   mainAxisSize: MainAxisSize.min,
-                  //   children: [
-                  //     if (status != null && status!.isNotEmpty)
-                  //       Container(
-                  //         decoration: BoxDecoration(
-                  //           color: statusColor,
-                  //           borderRadius: BorderRadius.circular(6),
-                  //         ),
-                  //         padding: const EdgeInsets.symmetric(
-                  //             horizontal: 5, vertical: 3),
-                  //         child: Text(
-                  //           status ?? '',
-                  //           style: const TextStyle(
-                  //             fontSize: 10,
-                  //             color: Colors.white,
-                  //             fontWeight: FontWeight.bold,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     showEdit
-                  //         ? GestureDetector(
-                  //             onTap: onEdit,
-                  //             child: const Padding(
-                  //               padding: EdgeInsets.symmetric(horizontal: 8),
-                  //               child: Icon(Icons.edit, size: 18),
-                  //             ),
-                  //           )
-                  //         : const SizedBox.shrink(),
-                  //   ],
-                  // ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (status != null && status!.isNotEmpty)
+                        Container(
+                          decoration: BoxDecoration(
+                            color: statusColor,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 3),
+                          child: Text(
+                            status ?? '',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      showEdit
+                          ? GestureDetector(
+                              onTap: onEdit,
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Icon(Icons.edit, size: 18),
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ],
+                  ),
                   // showEdit
                   //     ? GestureDetector(
                   //         onTap: onEdit,
@@ -185,8 +185,8 @@ class CommonTitleCard extends StatelessWidget {
                   //       color: statusColor,
                   //       borderRadius: BorderRadius.circular(6),
                   //     ),
-                  //     padding:
-                  //         const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                  //     padding: const EdgeInsets.symmetric(
+                  //         horizontal: 5, vertical: 3),
                   //     child: Text(
                   //       status ?? '',
                   //       style: const TextStyle(
@@ -197,32 +197,32 @@ class CommonTitleCard extends StatelessWidget {
                   //     ),
                   //   ),
 
-                  if (status != null && status!.isNotEmpty)
-                    Container(
-                      decoration: BoxDecoration(
-                        color: statusColor,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 5, vertical: 3),
-                      child: Text(
-                        status ?? '',
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  showEdit
-                      ? GestureDetector(
-                          onTap: onEdit,
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8),
-                            child: Icon(Icons.edit, size: 18),
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+                  // if (status != null && status!.isNotEmpty)
+                  //   Container(
+                  //     decoration: BoxDecoration(
+                  //       color: statusColor,
+                  //       borderRadius: BorderRadius.circular(6),
+                  //     ),
+                  //     padding: const EdgeInsets.symmetric(
+                  //         horizontal: 5, vertical: 3),
+                  //     child: Text(
+                  //       status ?? '',
+                  //       style: const TextStyle(
+                  //         fontSize: 10,
+                  //         color: Colors.white,
+                  //         fontWeight: FontWeight.bold,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // showEdit
+                  //     ? GestureDetector(
+                  //         onTap: onEdit,
+                  //         child: const Padding(
+                  //           padding: EdgeInsets.symmetric(horizontal: 8),
+                  //           child: Icon(Icons.edit, size: 18),
+                  //         ),
+                  //       )
+                  //     : const SizedBox.shrink(),
 
                   kVerticalSpace(4.h),
                   Row(

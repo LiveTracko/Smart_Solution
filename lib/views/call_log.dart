@@ -82,127 +82,45 @@ class _CallLogPageState extends State<CallLogPage> {
       body: Column(
         children: [
           Container(
-              color: AppColors.appBarTextColor,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          HeaderTitle(
-                              title: widget.title,
-                              style: AppTextStyle.headerTitle),
-                          // Padding(
-                          //   padding: const EdgeInsets.symmetric(horizontal: 15),
-                          //   child: Container(
-                          //     padding:
-                          //         const EdgeInsets.symmetric(horizontal: 5),
-                          //     decoration: BoxDecoration(
-                          //         color: AppColors.primaryColor,
-                          //         borderRadius: BorderRadius.circular(10),
-                          //         border: Border.all(
-                          //             color: AppColors.primaryColor)),
-                          //     child: const Icon(
-                          //       Icons.calendar_month,
-                          //       size: 18,
-                          //       color: AppColors.whiteColor,
-                          //     ),
+            color: AppColors.appBarTextColor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title and Date Filter Row
+                HeaderTitle(
+                  title: widget.title,
+                  style: AppTextStyle.headerTitle,
+                ),
 
-                          //     // Text(
-                          //     //   textAlign:
-                          //     //       TextAlign.center,
-                          //     //   labels[index],
-                          //     //   style: TextStyle(
-                          //     //       fontSize: 15,
-                          //     //       color: isSelected
-                          //     //           ? AppColors
-                          //     //               .backgroundColor
-                          //     //           : AppColors
-                          //     //               .primaryColor),
-                          //     // ),
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 4),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: Colors.grey.shade400,
-                                width: 1,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Icon(Icons.calendar_month,
-                                    size: 16, color: Colors.grey),
-                                SizedBox(width: 6),
-                                Text(
-                                  today,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 20),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: AppColors.greyColor.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: Colors.grey.shade400,
-                                width: 1,
-                              ),
-                            ),
-                            child: const Icon(Icons.calendar_month,
-                                size: 18, color: AppColors.primaryColor),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    SearchBarWithClear(
-                        controller: _followBackController.searchController,
-                        onClear: () {
-                          _followBackController.clearFilters();
-                          _followBackController.updateFilteredList();
-                        },
-                        onChanged: (value) {
-                          _followBackController.updateFilteredList(
-                              query: value);
-                        }),
-                    kVerticalSpace(10),
-                    Obx(() {
-                      final filterList = _followBackController.filters;
+                // Search bar
+                SearchBarWithClear(
+                  controller: _followBackController.searchController,
+                  onClear: () {
+                    _followBackController.clearFilters();
+                    _followBackController.updateFilteredList();
+                  },
+                  onChanged: (value) {
+                    _followBackController.updateFilteredList(query: value);
+                  },
+                ),
 
-                      return FilterChipList(
-                        filters: filterList,
-                        controller:
-                            _followBackController.filterScrollController,
-                        selectedIndex:
-                            _followBackController.selectedFilter.value,
-                        onSelected: _followBackController.selectFilter,
-                      );
-                    }),
-                    kVerticalSpace(10),
-                  ])),
+                kVerticalSpace(10),
+
+                // Filter chips
+                Obx(() {
+                  final filterList = _followBackController.filters;
+                  return FilterChipList(
+                    filters: filterList,
+                    controller: _followBackController.filterScrollController,
+                    selectedIndex: _followBackController.selectedFilter.value,
+                    onSelected: _followBackController.selectFilter,
+                  );
+                }),
+
+                kVerticalSpace(10),
+              ],
+            ),
+          ),
           Expanded(child: Obx(() {
             if (_followBackController.isInitialLoading.value) {
               return const Center(child: LoadingPage());

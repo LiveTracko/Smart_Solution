@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smart_solutions/models/incentive_model.dart';
 import 'package:smart_solutions/views/spacing_constants.dart';
 import 'package:smart_solutions/widget/text_style.dart';
-
 class IncentiveCard extends StatelessWidget {
   final String title;
   // final String target;
@@ -59,7 +58,7 @@ class IncentiveCard extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 2),
                     Text(
                       title,
                       style: const TextStyle(
@@ -76,76 +75,68 @@ class IncentiveCard extends StatelessWidget {
                       Text(duration!, style: AppTextStyle.blueHeaderTitletStyle)
                     ],
                     kHorizontalSpace(15.w),
-                    isNextPage
-                        ? const Icon(Icons.arrow_forward_ios,
-                            size: 12, color: Colors.black45)
-                        : SizedBox.shrink()
+                    if (isNextPage)
+                      const Icon(Icons.arrow_forward_ios,
+                          size: 12, color: Colors.black45),
                   ],
-                )
+                ),
               ],
             ),
             const SizedBox(height: 12),
+            // FIXED ROW LAYOUT
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: List.generate(items.length, (index) {
-                final item = items[index];
+              children: items.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
                 final isLast = index == items.length - 1;
-                return Expanded(
-                    child: Row(
-                  children: [
-                    _buildInfoItem(item.label, item.value),
-                    if (!isLast) _divider(),
-                    // if (isLast)
-                    //   if (isNextPage)
-                    //     const Icon(Icons.arrow_forward_ios,
-                    //         size: 12, color: Colors.black45)
-                  ],
-                ));
-              }),
 
-              // _buildInfoItem("Target", target),
-              // _divider(),
-              // _buildInfoItem("Achievement", achievement),
-              // _divider(),
-              // _buildInfoItem("Incentive", incentive),
+                return Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildInfoItem(item.label, item.value),
+                      ),
+                      if (!isLast) _divider(),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  // Reusable info section
-  Widget _buildInfoItem(String label, String value) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Colors.black54),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-                fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black),
-          ),
-        ],
-      ),
-    );
-  }
+// Reusable info section
+Widget _buildInfoItem(String label, String value) {
+  return Expanded(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+              fontSize: 12, fontWeight: FontWeight.w500, color: Colors.black54),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+              fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black),
+        ),
+      ],
+    ),
+  );
+}
 
-  // Vertical divider between columns
-  Widget _divider() {
-    return Container(
-      height: 28,
-      width: 1,
-      color: Colors.grey.withOpacity(0.3),
-    );
-  }
+// Vertical divider between columns
+Widget _divider() {
+  return Container(
+    height: 28,
+    width: 1,
+    color: Colors.grey.withOpacity(0.3),
+  );
 }

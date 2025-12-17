@@ -59,6 +59,17 @@ class AppTextStyle {
     decoration: TextDecoration.underline,
   );
 
+  static const textfieldheading = TextStyle(
+      fontSize: 14, color: Colors.black87, fontWeight: FontWeight.bold);
+
+  static const bodyBoldTxt = TextStyle(
+      fontSize: 14, color: Colors.black87, fontWeight: FontWeight.bold);
+
+  static const textfieldabove = TextStyle(
+    fontSize: 10,
+    color: Colors.black87,
+  );
+
 // 🟢 Common Padding Constants
   final EdgeInsets kHorizontalPadding = EdgeInsets.symmetric(horizontal: 15.w);
   final EdgeInsets kVerticalPadding = EdgeInsets.symmetric(vertical: 10.h);

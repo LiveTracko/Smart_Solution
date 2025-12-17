@@ -58,6 +58,20 @@ class FollowBackForm extends StatelessWidget {
           _dialerController.customerName.value = '';
           _dialerController.customerLoan.value = '';
           _dialerController.followup_id.value = '';
+
+          // ADD THESE: Clear remark status and data type
+          _formController.remarkStatus.value = '';
+          _formController.dataType.value = '';
+          _formController.remark.value = '';
+          _formController.contacted.value = '';
+
+          // Also clear controllers if they exist
+          _formController.customerNumberController.clear();
+          _dialerController.customerNameController.clear();
+
+          // Clear callback status
+          _remarkController.isCallback.value = false;
+
           navigator.pop();
         }
         logOutput("$canPop and $backPressCounter");
@@ -75,7 +89,42 @@ class FollowBackForm extends StatelessWidget {
           color: AppColors.whiteColor,
           child: RefreshIndicator(
             onRefresh: () async {
-              await _formController.loadData(isRefresh);
+              final Map<String, dynamic> preservedValues = {
+                'customerName': _dialerController.customerName.value,
+                'mobile': _formController.mobile.value,
+                'salary': _dialerController.salary.value,
+                'customerLoan': _dialerController.customerLoan.value,
+                'bankName': _formController.bankName.value,
+                'dataType': _formController.dataType.value,
+                'contacted': _formController.contacted.value,
+                'remarkStatus': _formController.remarkStatus.value,
+                'remark': _formController.remark.value,
+                'followupDate': _formController.followupDate.value,
+              };
+              final preservedContactedStatus = _formController.contacted.value;
+              final preservedRemarkStatus = _formController.remarkStatus.value;
+              await Future.wait([
+                _formController.loadData(isRefresh),
+                // Reload remark status based on current contact status
+                _remarkController.fetchRemarkStatus(
+                    preservedContactedStatus == 'Yes' ? '1' : '2'),
+              ]);
+              
+              if (preservedRemarkStatus.isNotEmpty) {
+                _formController.remarkStatus.value = preservedRemarkStatus;
+
+                // Also check if we need to show date picker
+                final selectedStatus = _remarkController.remarkStatusList
+                    .firstWhereOrNull(
+                        (status) => status.id == preservedRemarkStatus);
+
+                if (selectedStatus?.title?.toLowerCase().contains('callback') ==
+                    true) {
+                  _remarkController.isCallback.value = true;
+                } else {
+                  _remarkController.isCallback.value = false;
+                }
+              }
             },
             child: Obx(() {
               if (_formController.isBankAndStatusLoading.value) {
@@ -618,12 +667,39 @@ class FollowBackForm extends StatelessWidget {
   }
 
   Widget _buildRemarkStatusDropdown() {
-    return Obx(
-      () =>
-          // _remarkController.isLoading.value
-          //     ? const Center(child: LoadingPage())
-          //     :
-          DropdownButtonFormField<String>(
+    return Obx(() {
+      // Check if remark status list is loaded
+      if (_remarkController.remarkStatusList.isEmpty) {
+        return Container(
+          padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.primaryColor),
+            borderRadius: BorderRadius.circular(10.0.r),
+          ),
+          child: Center(
+            child: Text(
+              'Loading remark status...',
+              style: TextStyle(color: AppColors.primaryColor),
+            ),
+          ),
+        );
+      }
+
+      // Get the current selected value
+      String? currentValue;
+
+      // Check if form controller has a selected remark status
+      if (_formController.remarkStatus.value.isNotEmpty) {
+        // Verify if this value exists in the current list
+        final existsInList = _remarkController.remarkStatusList
+            .any((status) => status.id == _formController.remarkStatus.value);
+
+        if (existsInList) {
+          currentValue = _formController.remarkStatus.value;
+        }
+      }
+
+      return DropdownButtonFormField<String>(
         style: AppTextStyle.hintText,
         decoration: InputDecoration(
           hintText: 'Remark Status',
@@ -646,20 +722,35 @@ class FollowBackForm extends StatelessWidget {
           filled: true,
           fillColor: AppColors.whiteColor,
         ),
-        value: null,
-        items: _remarkController.remarkStatusList.map((status) {
-          // _formController.remarkStatus.value =
-          //     _remarkController.remarkStatusList.first.id ?? "";
-          return DropdownMenuItem<String>(
-            value: status.id, // Use the ID as the value
+        // FIX: Set the value from the controller
+        value: currentValue,
+        items: [
+          // Add a placeholder item
+          DropdownMenuItem<String>(
+            value: '',
+            enabled: false,
             child: Text(
-              status.title ?? 'Select remark status',
-              style: const TextStyle(color: AppColors.primaryColor),
+              'Select remark status',
+              style: TextStyle(
+                color: Colors.grey.shade500,
+                fontStyle: FontStyle.italic,
+              ),
             ),
-          );
-        }).toList(),
+          ),
+          ..._remarkController.remarkStatusList.map((status) {
+            return DropdownMenuItem<String>(
+              value: status.id,
+              child: Text(
+                status.title ?? 'Select remark status',
+                style: const TextStyle(color: AppColors.primaryColor),
+              ),
+            );
+          }).toList(),
+        ],
         onChanged: (newValue) {
-          _formController.remarkStatus.value = newValue ?? '';
+          if (newValue == null || newValue.isEmpty) return;
+
+          _formController.remarkStatus.value = newValue;
 
           logOutput("Selected ID: ${_formController.remarkStatus.value}");
 
@@ -669,7 +760,8 @@ class FollowBackForm extends StatelessWidget {
           logOutput('selected status ${selectedStatus?.title}');
 
           // Check if the selected status title is 'CallBack'
-          if (selectedStatus?.title == 'Callback') {
+          if (selectedStatus?.title?.toLowerCase().contains('callback') ==
+              true) {
             logOutput("Setting isCallback to true");
             _remarkController.isCallback.value = true;
           } else {
@@ -678,13 +770,13 @@ class FollowBackForm extends StatelessWidget {
           }
         },
         validator: (value) {
-          if (_formController.remarkStatus.value.isEmpty) {
+          if (value == null || value.isEmpty) {
             return 'Please select a remark status';
           }
           return null;
         },
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildAllBankNamesDropdown() {

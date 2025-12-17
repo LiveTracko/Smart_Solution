@@ -209,32 +209,34 @@ class _DialerScreenState extends State<DialerScreen> {
                       ),
                     ),
 
-                    Obx(
-                      () => Container(
-                        height: 40,
-                        width: double.infinity,
-                        color: themeColor.AppColors.diallerContainerColor,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Visibility(
-                          visible: dialerController.customerName.isEmpty,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CommonRows().buildSingleRowNoExpand(
-                                  'assets/images/user_circle.svg',
-                                  dialerController.customerName.value
-                                  // dialerController.customerName.value,
-                                  ),
-                              Text(
-                                  CurrencyUtils.formatIndianCurrency(
-                                      dialerController.customerLoan.value),
-                                  // dialerController.customerLoan.value),
-                                  style: AppTextStyle.headerTitle),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
+                    dialerController.customerName.isNotEmpty
+                        ? Obx(
+                            () => Container(
+                              height: 40,
+                              width: double.infinity,
+                              // color: themeColor.AppColors.diallerContainerColor,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: Visibility(
+                                visible: dialerController.customerName.isEmpty,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CommonRows().buildSingleRowNoExpand(
+                                        'assets/images/user_circle.svg',
+                                        dialerController.customerName.value),
+                                    Text(
+                                        CurrencyUtils.formatIndianCurrency(
+                                            dialerController
+                                                .customerLoan.value),
+                                        style: AppTextStyle.headerTitle),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        : SizedBox.shrink()
 
                     //  const Divider(color: AppColors.secondaryColor)
                   ],

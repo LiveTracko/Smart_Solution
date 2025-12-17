@@ -23,7 +23,6 @@ import 'package:smart_solutions/models/incentive_model.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/views/active_files.dart';
-import 'package:smart_solutions/views/admin/admin_call_back.dart';
 import 'package:smart_solutions/views/admin/admin_call_log.dart';
 import 'package:smart_solutions/views/admin/admin_disbursement.dart';
 import 'package:smart_solutions/views/admin/daily_monthly_count.dart';
@@ -140,6 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
     final callBackTabFortellecaller = [
       const Tab(text: "Today"),
+
       const Tab(text: "Monthly"),
       //     const Tab(text: "Incentive"),
     ];
@@ -642,21 +642,56 @@ class _DashboardScreenState extends State<DashboardScreen>
                               child: SizedBox(
                                 height: 300,
                                 child: SfCartesianChart(
-                                  primaryXAxis: const CategoryAxis(),
+                                  // Add margin to prevent bars from being cut off
+                                  margin: const EdgeInsets.all(10),
+                                  plotAreaBorderWidth: 0,
+
+                                  primaryXAxis: CategoryAxis(
+                                    labelPlacement: LabelPlacement.onTicks,
+                                    labelRotation: 0,
+                                    labelIntersectAction:
+                                        AxisLabelIntersectAction.rotate45,
+                                    autoScrollingDelta: 0,
+                                    majorGridLines:
+                                        const MajorGridLines(width: 0),
+                                    // Add edge label placement
+                                    edgeLabelPlacement:
+                                        EdgeLabelPlacement.shift,
+                                    // Add axis line
+                                    axisLine: const AxisLine(
+                                        width: 1, color: Colors.grey),
+                                    // Add padding to ensure first and last bars are visible
+                                    plotOffset:
+                                        15, // This creates space at edges
+                                  ),
+
+                                  primaryYAxis: NumericAxis(
+                                    labelFormat: '{value}',
+                                    majorGridLines:
+                                        const MajorGridLines(width: 0),
+                                    axisLine: const AxisLine(
+                                        width: 1, color: Colors.grey),
+                                    // Add padding to Y axis as well
+                                    plotOffset: 10,
+                                  ),
+
                                   tooltipBehavior:
                                       TooltipBehavior(enable: true),
-                                  legend: const Legend(
-                                      isVisible: true,
-                                      position: LegendPosition.bottom),
+                                  legend: Legend(
+                                    isVisible: true,
+                                    position: LegendPosition.bottom,
+                                    overflowMode: LegendItemOverflowMode.scroll,
+                                  ),
+
                                   series: <CartesianSeries<CallGraphModel,
                                       String>>[
                                     StackedColumnSeries<CallGraphModel, String>(
-                                      width: 0.7,
+                                      width:
+                                          0.6, // Reduce width slightly for better fit
                                       borderColor: Colors.white,
                                       borderWidth: 1,
-                                      spacing: 0.2,
-                                      color: AppColors
-                                          .appBarColor, // Not Connected
+                                      spacing: 0.15, // Reduce spacing
+                                      color: AppColors.appBarColor,
                                       dataSource:
                                           controller.finalTotalAttemptCallList,
                                       xValueMapper: (CallGraphModel data, _) =>
@@ -669,18 +704,18 @@ class _DashboardScreenState extends State<DashboardScreen>
                                           const DataLabelSettings(
                                         isVisible: true,
                                         textStyle: TextStyle(
-                                          fontSize: 10, // font size
+                                          fontSize: 10,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white, // label color
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ),
                                     StackedColumnSeries<CallGraphModel, String>(
-                                      width: 0.7,
+                                      width: 0.6, // Consistent width
                                       color: Colors.green,
                                       borderColor: Colors.white,
                                       borderWidth: 1,
-                                      spacing: 0.2,
+                                      spacing: 0.15,
                                       dataSource:
                                           controller.finalActiveCallList,
                                       xValueMapper: (CallGraphModel data, _) =>
@@ -693,19 +728,18 @@ class _DashboardScreenState extends State<DashboardScreen>
                                           const DataLabelSettings(
                                         isVisible: true,
                                         textStyle: TextStyle(
-                                          fontSize: 10, // font size
+                                          fontSize: 10,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white, // label color
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ),
-
                                     StackedColumnSeries<CallGraphModel, String>(
-                                      width: 0.7,
+                                      width: 0.6, // Consistent width
                                       color: Colors.red,
                                       borderColor: Colors.white,
                                       borderWidth: 1,
-                                      spacing: 0.2,
+                                      spacing: 0.15,
                                       dataSource:
                                           controller.finalActiveNoCallList,
                                       xValueMapper: (CallGraphModel data, _) =>
@@ -718,70 +752,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                                           const DataLabelSettings(
                                         isVisible: true,
                                         textStyle: TextStyle(
-                                          fontSize: 10, // font size
+                                          fontSize: 10,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.white, // label color
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ),
-
-                                    // BarSeries<CallGraphModel, String>(
-                                    //   color: AppColors.primaryColor,
-                                    //   dataSource: controller.finalActiveCallList,
-                                    //   xValueMapper: (CallGraphModel data, _) =>
-                                    //       data.time,
-                                    //   yValueMapper: (CallGraphModel data, _) =>
-                                    //       data.data ?? 0,
-                                    //   name: 'Connected',
-                                    //   dataLabelSettings:
-                                    //       const DataLabelSettings(isVisible: true),
-                                    // ),
-
-                                    // BarSeries<CallGraphModel, String>(
-                                    //   color: Colors.red,
-                                    //   dataSource: controller.finalActiveNoCallList,
-                                    //   xValueMapper: (CallGraphModel data, _) =>
-                                    //       data.time,
-                                    //   yValueMapper: (CallGraphModel data, _) =>
-                                    //       data.data ?? 0,
-                                    //   name: 'Not connected',
-                                    //   dataLabelSettings:
-                                    //       const DataLabelSettings(isVisible: true),
-                                    // ),
-
-                                    // LineSeries<CallGraphModel, String>(
-                                    //   color: AppColors.primaryColor,
-                                    //   dataSource: controller.finalTotalAttemptCallList,
-                                    //   xValueMapper: (CallGraphModel data, _) =>
-                                    //       data.time,
-                                    //   yValueMapper: (CallGraphModel data, _) =>
-                                    //       data.data ?? 0,
-                                    //   name: 'Attempted',
-                                    //   dataLabelSettings:
-                                    //       const DataLabelSettings(isVisible: true),
-                                    // ),
-                                    // LineSeries<CallGraphModel, String>(
-                                    //   color: Colors.green,
-                                    //   dataSource: controller.finalActiveCallList,
-                                    //   xValueMapper: (CallGraphModel data, _) =>
-                                    //       data.time,
-                                    //   yValueMapper: (CallGraphModel data, _) =>
-                                    //       data.data ?? 0,
-                                    //   name: 'Connected',
-                                    //   dataLabelSettings:
-                                    //       const DataLabelSettings(isVisible: true),
-                                    // ),
-                                    // LineSeries<CallGraphModel, String>(
-                                    //   color: Colors.red,
-                                    //   dataSource: controller.finalActiveNoCallList,
-                                    //   xValueMapper: (CallGraphModel data, _) =>
-                                    //       data.time,
-                                    //   yValueMapper: (CallGraphModel data, _) =>
-                                    //       data.data ?? 0,
-                                    //   name: 'Not Connected',
-                                    //   dataLabelSettings:
-                                    //       const DataLabelSettings(isVisible: true),
-                                    // ),
                                   ],
                                 ),
                               ),
@@ -986,34 +962,46 @@ class _DashboardScreenState extends State<DashboardScreen>
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            FileStatusCard(
-                              title: "Active Files",
-                              fileCount: controller.totalActiveCount.toString(),
-                              amount: controller.totalValActive.toString(),
-                              statusColor: Colors.green,
-                              onPress: () {
-                                Get.to(ActiveFiles(
-                                  title: 'Active Files',
-                                  status: 1,
-                                  isShowBack: true,
-                                  isDrawer: false,
-                                ));
-                              },
+                            Expanded(
+                              child: Container(
+                                margin: EdgeInsets.only(right: 8.w),
+                                child: FileStatusCard(
+                                  title: "Active Files",
+                                  fileCount:
+                                      controller.totalActiveCount.toString(),
+                                  amount: controller.totalValActive.toString(),
+                                  statusColor: Colors.green,
+                                  onPress: () {
+                                    Get.to(ActiveFiles(
+                                      title: 'Active Files',
+                                      status: 1,
+                                      isShowBack: true,
+                                      isDrawer: false,
+                                    ));
+                                  },
+                                ),
+                              ),
                             ),
-                            FileStatusCard(
-                              title: "Inactive Files",
-                              fileCount:
-                                  controller.totalInActiveCount.toString(),
-                              amount: controller.totalNoValActive.toString(),
-                              statusColor: Colors.red,
-                              onPress: () {
-                                Get.to(ActiveFiles(
-                                  title: 'InActive Files',
-                                  status: 2,
-                                  isShowBack: true,
-                                  isDrawer: false,
-                                ));
-                              },
+                            Expanded(
+                              child: Container(
+                                margin: EdgeInsets.only(left: 8.w),
+                                child: FileStatusCard(
+                                  title: "Inactive Files",
+                                  fileCount:
+                                      controller.totalInActiveCount.toString(),
+                                  amount:
+                                      controller.totalNoValActive.toString(),
+                                  statusColor: Colors.red,
+                                  onPress: () {
+                                    Get.to(ActiveFiles(
+                                      title: 'InActive Files',
+                                      status: 2,
+                                      isShowBack: true,
+                                      isDrawer: false,
+                                    ));
+                                  },
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -1033,41 +1021,56 @@ class _DashboardScreenState extends State<DashboardScreen>
                               child: Column(
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment
+                                        .spaceBetween, // Changed to match Active/Inactive Files
                                     children: [
-                                      FileStatusCard(
-                                        title: "Today",
-                                        fileCount: followBackFormController
-                                            .dailycallbackData.length
-                                            .toString(),
-                                        statusColor: Colors.green,
-                                        onPress: () {
-                                          Get.to(CallBackData(
-                                              title: 'Today',
-                                              headerTitle: 'Today',
-                                              controller:
-                                                  followBackFormController,
-                                              getDataList: () =>
-                                                  followBackFormController
-                                                      .dailycallbackData));
-                                        },
+                                      // Today card
+                                      SizedBox(
+                                        width:
+                                            (MediaQuery.of(context).size.width -
+                                                    32) /
+                                                2, // Half width minus padding
+                                        child: FileStatusCard(
+                                          title: "Today",
+                                          fileCount: followBackFormController
+                                              .dailycallbackData.length
+                                              .toString(),
+                                          statusColor: Colors.green,
+                                          onPress: () {
+                                            Get.to(CallBackData(
+                                                title: 'Today',
+                                                headerTitle: 'Today',
+                                                controller:
+                                                    followBackFormController,
+                                                getDataList: () =>
+                                                    followBackFormController
+                                                        .dailycallbackData));
+                                          },
+                                        ),
                                       ),
-                                      FileStatusCard(
-                                        title: "Monthly",
-                                        fileCount: followBackFormController
-                                            .monthlybackData.length
-                                            .toString(),
-                                        statusColor: Colors.blue,
-                                        onPress: () {
-                                          Get.to(CallBackData(
-                                              title: 'Monthly Callback',
-                                              headerTitle: 'Monthly',
-                                              controller:
-                                                  followBackFormController,
-                                              getDataList: () =>
-                                                  followBackFormController
-                                                      .monthlybackData));
-                                        },
+                                      // Monthly card
+                                      SizedBox(
+                                        width:
+                                            (MediaQuery.of(context).size.width -
+                                                    32) /
+                                                2, // Half width minus padding
+                                        child: FileStatusCard(
+                                          title: "Monthly",
+                                          fileCount: followBackFormController
+                                              .monthlybackData.length
+                                              .toString(),
+                                          statusColor: Colors.blue,
+                                          onPress: () {
+                                            Get.to(CallBackData(
+                                                title: 'Monthly Callback',
+                                                headerTitle: 'Monthly',
+                                                controller:
+                                                    followBackFormController,
+                                                getDataList: () =>
+                                                    followBackFormController
+                                                        .monthlybackData));
+                                          },
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -1093,8 +1096,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
+                                      // Login Request
                                       SizedBox(
-                                        width: 175.w,
+                                        width:
+                                            (MediaQuery.of(context).size.width -
+                                                    32) /
+                                                2,
                                         child: IncentiveCard(
                                             title: 'Login Request',
                                             isNextPage: true,
@@ -1115,21 +1122,18 @@ class _DashboardScreenState extends State<DashboardScreen>
                                             ],
                                             statusColor: AppColors.greenCOlor),
                                       ),
+                                      // Login Files
                                       SizedBox(
-                                        width: 174.w,
+                                        width:
+                                            (MediaQuery.of(context).size.width -
+                                                    32) /
+                                                2,
                                         child: IncentiveCard(
                                             title: 'Login Files',
                                             isNextPage: true,
                                             onTap: () => Get.to(
                                                 const DailyMonthlyCount(
-                                                    title: 'Login Files')
-                                                // ActiveFiles(
-                                                //     title: 'Login Files',
-                                                //     status: 0,
-                                                //     isShowBack: true,
-                                                //     isDrawer: false,
-                                                //   )
-                                                ),
+                                                    title: 'Login Files')),
                                             items: [
                                               IncentiveItem(
                                                   "Today",
@@ -1145,32 +1149,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                                             statusColor: AppColors.greenCOlor),
                                       ),
                                     ],
-                                  ),
-                                  SizedBox(width: 10.h),
-                                  SizedBox(height: 10.h),
-                                  GestureDetector(
-                                    onTap: () => Get.to(const AdminCallBack(
-                                        title: 'Call Back')),
-                                    child: IncentiveCard(
-                                        title: 'Call Back',
-                                        isNextPage: true,
-                                        items: [
-                                          IncentiveItem(
-                                              "Today",
-                                              _callBackController
-                                                  .callBackTotalData
-                                                  .first
-                                                  .todayCallbackTotal
-                                                  .toString()),
-                                          IncentiveItem(
-                                              "Monthly",
-                                              _callBackController
-                                                  .callBackTotalData
-                                                  .first
-                                                  .monthlyCallbackTotal
-                                                  .toString()),
-                                        ],
-                                        statusColor: AppColors.greenCOlor),
                                   ),
                                   SizedBox(height: 10.h),
                                   IncentiveCard(
@@ -1195,7 +1173,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                 .callNotcontact),
                                       ],
                                       statusColor: AppColors.greenCOlor),
-                                  verticalSpace(10.h),
+                                  verticalSpace(30.h),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -1227,8 +1205,9 @@ class _DashboardScreenState extends State<DashboardScreen>
                                     ],
                                   ),
                                 ],
-                              )),
-                      verticalSpace(15.h),
+                              ))
+                      // : verticalSpace(15.h),
+                      ,
                       customContainer(40.h),
                       // unused designs
 
@@ -1823,7 +1802,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
   }
 
-  Widget LoginStatusCard(
+  Widget loginStatusCard(
     final String title,
     final String fileCount,
     final String amount,

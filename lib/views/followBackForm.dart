@@ -47,11 +47,10 @@ class FollowBackForm extends StatelessWidget {
           canPop = true;
           Future.delayed(const Duration(seconds: 2), () {
             backPressCounter = 0; // Reset counter after 2 seconds
-
             canPop = false;
           });
         } else {
-          // Get.back();
+          // ALWAYS clear data when going back
           _dialerController.salary.value = '';
           _formController.bankName.value = '';
           _formController.mobile.value = '';
@@ -59,9 +58,22 @@ class FollowBackForm extends StatelessWidget {
           _dialerController.customerName.value = '';
           _dialerController.customerLoan.value = '';
           _dialerController.followup_id.value = '';
+
+          // ADD THESE: Clear remark status and data type
+          _formController.remarkStatus.value = '';
+          _formController.dataType.value = '';
+          _formController.remark.value = '';
+          _formController.contacted.value = '';
+
+          // Also clear controllers if they exist
+          _formController.customerNumberController.clear();
+          _dialerController.customerNameController.clear();
+
+          // Clear callback status
+          _remarkController.isCallback.value = false;
+
           navigator.pop();
         }
-
         logOutput("$canPop and $backPressCounter");
       },
       child: CommonScaffold(
@@ -77,7 +89,42 @@ class FollowBackForm extends StatelessWidget {
           color: AppColors.whiteColor,
           child: RefreshIndicator(
             onRefresh: () async {
-              await _formController.loadData(isRefresh);
+              final Map<String, dynamic> preservedValues = {
+                'customerName': _dialerController.customerName.value,
+                'mobile': _formController.mobile.value,
+                'salary': _dialerController.salary.value,
+                'customerLoan': _dialerController.customerLoan.value,
+                'bankName': _formController.bankName.value,
+                'dataType': _formController.dataType.value,
+                'contacted': _formController.contacted.value,
+                'remarkStatus': _formController.remarkStatus.value,
+                'remark': _formController.remark.value,
+                'followupDate': _formController.followupDate.value,
+              };
+              final preservedContactedStatus = _formController.contacted.value;
+              final preservedRemarkStatus = _formController.remarkStatus.value;
+              await Future.wait([
+                _formController.loadData(isRefresh),
+                // Reload remark status based on current contact status
+                _remarkController.fetchRemarkStatus(
+                    preservedContactedStatus == 'Yes' ? '1' : '2'),
+              ]);
+              
+              if (preservedRemarkStatus.isNotEmpty) {
+                _formController.remarkStatus.value = preservedRemarkStatus;
+
+                // Also check if we need to show date picker
+                final selectedStatus = _remarkController.remarkStatusList
+                    .firstWhereOrNull(
+                        (status) => status.id == preservedRemarkStatus);
+
+                if (selectedStatus?.title?.toLowerCase().contains('callback') ==
+                    true) {
+                  _remarkController.isCallback.value = true;
+                } else {
+                  _remarkController.isCallback.value = false;
+                }
+              }
             },
             child: Obx(() {
               if (_formController.isBankAndStatusLoading.value) {
@@ -620,12 +667,39 @@ class FollowBackForm extends StatelessWidget {
   }
 
   Widget _buildRemarkStatusDropdown() {
-    return Obx(
-      () =>
-          // _remarkController.isLoading.value
-          //     ? const Center(child: LoadingPage())
-          //     :
-          DropdownButtonFormField<String>(
+    return Obx(() {
+      // Check if remark status list is loaded
+      if (_remarkController.remarkStatusList.isEmpty) {
+        return Container(
+          padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.primaryColor),
+            borderRadius: BorderRadius.circular(10.0.r),
+          ),
+          child: Center(
+            child: Text(
+              'Loading remark status...',
+              style: TextStyle(color: AppColors.primaryColor),
+            ),
+          ),
+        );
+      }
+
+      // Get the current selected value
+      String? currentValue;
+
+      // Check if form controller has a selected remark status
+      if (_formController.remarkStatus.value.isNotEmpty) {
+        // Verify if this value exists in the current list
+        final existsInList = _remarkController.remarkStatusList
+            .any((status) => status.id == _formController.remarkStatus.value);
+
+        if (existsInList) {
+          currentValue = _formController.remarkStatus.value;
+        }
+      }
+
+      return DropdownButtonFormField<String>(
         style: AppTextStyle.hintText,
         decoration: InputDecoration(
           hintText: 'Remark Status',
@@ -648,20 +722,35 @@ class FollowBackForm extends StatelessWidget {
           filled: true,
           fillColor: AppColors.whiteColor,
         ),
-        value: null,
-        items: _remarkController.remarkStatusList.map((status) {
-          // _formController.remarkStatus.value =
-          //     _remarkController.remarkStatusList.first.id ?? "";
-          return DropdownMenuItem<String>(
-            value: status.id, // Use the ID as the value
+        // FIX: Set the value from the controller
+        value: currentValue,
+        items: [
+          // Add a placeholder item
+          DropdownMenuItem<String>(
+            value: '',
+            enabled: false,
             child: Text(
-              status.title ?? 'Select remark status',
-              style: const TextStyle(color: AppColors.primaryColor),
+              'Select remark status',
+              style: TextStyle(
+                color: Colors.grey.shade500,
+                fontStyle: FontStyle.italic,
+              ),
             ),
-          );
-        }).toList(),
+          ),
+          ..._remarkController.remarkStatusList.map((status) {
+            return DropdownMenuItem<String>(
+              value: status.id,
+              child: Text(
+                status.title ?? 'Select remark status',
+                style: const TextStyle(color: AppColors.primaryColor),
+              ),
+            );
+          }).toList(),
+        ],
         onChanged: (newValue) {
-          _formController.remarkStatus.value = newValue ?? '';
+          if (newValue == null || newValue.isEmpty) return;
+
+          _formController.remarkStatus.value = newValue;
 
           logOutput("Selected ID: ${_formController.remarkStatus.value}");
 
@@ -671,7 +760,8 @@ class FollowBackForm extends StatelessWidget {
           logOutput('selected status ${selectedStatus?.title}');
 
           // Check if the selected status title is 'CallBack'
-          if (selectedStatus?.title == 'Callback') {
+          if (selectedStatus?.title?.toLowerCase().contains('callback') ==
+              true) {
             logOutput("Setting isCallback to true");
             _remarkController.isCallback.value = true;
           } else {
@@ -680,13 +770,13 @@ class FollowBackForm extends StatelessWidget {
           }
         },
         validator: (value) {
-          if (_formController.remarkStatus.value.isEmpty) {
+          if (value == null || value.isEmpty) {
             return 'Please select a remark status';
           }
           return null;
         },
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildAllBankNamesDropdown() {
@@ -769,19 +859,56 @@ class FollowBackForm extends StatelessWidget {
   }
 
   Widget _buildDataSourcingDropdown() {
-    return Obx(
-      () => SizedBox(
+    return Obx(() {
+      // Get the current selected value
+      final selectedValue = _formController.dataType.value.isNotEmpty
+          ? _formController.dataType.value
+          : null;
+
+      // Check if selected value exists in list
+      final selectedItemExists = selectedValue != null &&
+          _loginRequestController.sourcingList
+              .any((item) => item.id == selectedValue);
+
+      // Create dropdown items
+      final List<DropdownMenuItem<String>> dropdownItems = [];
+
+      // Add the current selected item first (even if not in list)
+      if (selectedValue != null && !selectedItemExists) {
+        dropdownItems.add(
+          DropdownMenuItem<String>(
+            value: selectedValue,
+            child: Text(
+              'Selected: $selectedValue',
+              style: const TextStyle(
+                  color: AppColors.primaryColor, fontStyle: FontStyle.italic),
+            ),
+          ),
+        );
+      }
+
+      // Add all items from sourcing list
+      dropdownItems.addAll(_loginRequestController.sourcingList.map((source) {
+        return DropdownMenuItem<String>(
+          value: source.id,
+          child: Text(
+            source.sourcingTitle ?? '',
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyle.textStyle,
+          ),
+        );
+      }).toList());
+
+      return SizedBox(
         width: double.infinity,
         child: DropdownButtonFormField<String>(
           isExpanded: true,
           isDense: true,
           style: AppTextStyle.hintText,
           padding: EdgeInsets.zero,
-
           decoration: InputDecoration(
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-
             prefixIcon: IntrinsicHeight(
               child: Padding(
                 padding: const EdgeInsets.only(left: 12.0, right: 0.0),
@@ -803,7 +930,6 @@ class FollowBackForm extends StatelessWidget {
             ),
             hintText: "Select Source",
             hintStyle: AppTextStyle.hintText,
-            //  labelStyle: const TextStyle(color: AppColors.primaryColor),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0.r),
             ),
@@ -819,10 +945,8 @@ class FollowBackForm extends StatelessWidget {
             filled: true,
             fillColor: AppColors.whiteColor,
           ),
-          value:
-              _getInitialSourceValue(), // Use the method to get the initial value
-          items: _buildSourceDropdownItems(),
-
+          value: selectedValue,
+          items: dropdownItems,
           onChanged: (newValue) {
             _formController.dataType.value = newValue.toString();
           },
@@ -833,8 +957,8 @@ class FollowBackForm extends StatelessWidget {
             return null;
           },
         ),
-      ),
-    );
+      );
+    });
   }
 
   String? _getInitialBankValue() {
@@ -850,6 +974,22 @@ class FollowBackForm extends StatelessWidget {
 
   // Helper method to get the initial bank value
   String? _getInitialSourceValue() {
+    // If formController has a dataType value, use it
+    if (_formController.dataType.value.isNotEmpty) {
+      // First check if this value exists in the current sourcing list
+      final existsInList = _loginRequestController.sourcingList.any(
+        (source) => source.id == _formController.dataType.value,
+      );
+
+      if (existsInList) {
+        return _formController.dataType.value;
+      }
+      // If not found, keep the value anyway - it will show as selected
+      // even if not in the list (better than losing it)
+      return _formController.dataType.value;
+    }
+
+    // Otherwise, fall back to login controller's sourceId
     final existingSource =
         _loginRequestController.sourcingList.firstWhereOrNull(
       (source) =>

@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:smart_solutions/theme/app_theme.dart';
 
-class SearchBarWithClear extends StatelessWidget {
+class SearchBarWithClear extends StatefulWidget {
   final TextEditingController controller;
   final VoidCallback onClear;
   final ValueChanged<String> onChanged;
   final TextInputType textInputType;
   final FocusNode? focusNode;
+  final ValueChanged<DateTime?>? onDateSelected;
+  final DateTime? initialDate;
+  final DateTime? firstDate;
+  final DateTime? lastDate;
+  final String? dateHintText;
+  final bool showDatePickerIcon;
+  final String hintText;
 
   const SearchBarWithClear({
     Key? key,
@@ -15,10 +23,120 @@ class SearchBarWithClear extends StatelessWidget {
     required this.onChanged,
     this.textInputType = TextInputType.text,
     this.focusNode,
+    this.onDateSelected,
+    this.initialDate,
+    this.firstDate,
+    this.lastDate,
+    this.dateHintText = 'Selected Date',
+    this.showDatePickerIcon = true,
+    this.hintText = 'Search Text Here',
   }) : super(key: key);
 
   @override
+  _SearchBarWithClearState createState() => _SearchBarWithClearState();
+}
+
+class _SearchBarWithClearState extends State<SearchBarWithClear> {
+  bool _isDateSelected = false;
+  DateTime? _selectedDate;
+  final FocusNode _internalFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    // Use provided focus node or create internal one
+    final focusNode = widget.focusNode ?? _internalFocusNode;
+
+    // Listen to text changes to update UI
+    widget.controller.addListener(_onTextChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onTextChanged);
+    _internalFocusNode.dispose();
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _showDatePicker() async {
+    final FocusNode focusNode = widget.focusNode ?? _internalFocusNode;
+    focusNode.unfocus(); // Hide keyboard before showing date picker
+
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? widget.initialDate ?? DateTime.now(),
+      firstDate: widget.firstDate ?? DateTime(2000),
+      lastDate: widget.lastDate ?? DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.blueColor,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+            dialogBackgroundColor: Colors.white,
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        _isDateSelected = true;
+        _selectedDate = pickedDate;
+        widget.controller.clear(); // Clear any search text
+        widget.onDateSelected?.call(pickedDate);
+      });
+    } else if (pickedDate == null && _isDateSelected) {
+      setState(() {
+        _isDateSelected = false;
+        _selectedDate = null;
+        widget.onDateSelected?.call(null);
+      });
+    }
+  }
+
+  void _clearDate() {
+    setState(() {
+      _isDateSelected = false;
+      _selectedDate = null;
+      widget.onDateSelected?.call(null);
+    });
+  }
+
+  void _clearSearchText() {
+    widget.controller.clear();
+    widget.onChanged('');
+    final FocusNode focusNode = widget.focusNode ?? _internalFocusNode;
+    focusNode.requestFocus(); // Keep focus on text field
+  }
+
+  void _handleClearAll() {
+    if (_isDateSelected) {
+      _clearDate();
+    }
+    _clearSearchText();
+    widget.onClear();
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final FocusNode focusNode = widget.focusNode ?? _internalFocusNode;
+    final hasSearchText = widget.controller.text.isNotEmpty;
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 15.w),
       child: Row(
@@ -26,50 +144,161 @@ class SearchBarWithClear extends StatelessWidget {
           Expanded(
             child: SizedBox(
               height: 40,
-              child: TextField(
-                controller: controller,
-                focusNode: focusNode,
-                onChanged: onChanged,
-                keyboardType: textInputType,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search),
-                  hintText: 'Search Text Here',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+              child: _isDateSelected
+                  ? Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.grey.shade50,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today,
+                                size: 20,
+                                color: AppColors.blueColor,
+                              ),
+                              SizedBox(width: 8.w),
+                              Text(
+                                _selectedDate != null
+                                    ? _formatDate(_selectedDate!)
+                                    : widget.dateHintText!,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          InkWell(
+                            onTap: _clearDate,
+                            borderRadius: BorderRadius.circular(12),
+                            child: Icon(
+                              Icons.close,
+                              color: Colors.grey.shade600,
+                              size: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : TextField(
+                      controller: widget.controller,
+                      focusNode: focusNode,
+                      onChanged: widget.onChanged,
+                      keyboardType: widget.textInputType,
+                      textInputAction: TextInputAction.search,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: Colors.grey.shade600,
+                        ),
+                        suffixIcon: hasSearchText
+                            ? Padding(
+                                padding: const EdgeInsets.only(right: 4),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    // Animated clear button
+                                    AnimatedOpacity(
+                                      opacity: hasSearchText ? 1.0 : 0.0,
+                                      duration: Duration(milliseconds: 200),
+                                      child: IconButton(
+                                        onPressed: _clearSearchText,
+                                        icon: Icon(
+                                          Icons.cancel,
+                                          color: Colors.grey.shade600,
+                                          size: 20,
+                                        ),
+                                        padding: EdgeInsets.zero,
+                                        constraints: BoxConstraints(
+                                          minWidth: 36,
+                                          minHeight: 36,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : null,
+                        hintText: widget.hintText,
+                        hintStyle: TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 14.sp,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade300,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade300,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: AppColors.blueColor,
+                            width: 1.5,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 10.h,
+                        ),
+                      ),
+                    ),
+            ),
+          ),
+          SizedBox(width: 10.w),
+          if (widget.showDatePickerIcon) ...[
+            GestureDetector(
+              onTap: _showDatePicker,
+              child: Container(
+                padding: EdgeInsets.all(6.w),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: _isDateSelected
+                        ? AppColors.blueColor
+                        : Colors.grey.shade400,
+                    width: 1,
                   ),
-                  isDense: true,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  color: _isDateSelected
+                      ? AppColors.blueColor.withOpacity(0.1)
+                      : Colors.transparent,
+                  boxShadow: _isDateSelected
+                      ? [
+                          BoxShadow(
+                            color: AppColors.blueColor.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          )
+                        ]
+                      : null,
+                ),
+                child: Icon(
+                  Icons.calendar_month,
+                  size: 22.sp,
+                  color: _isDateSelected
+                      ? AppColors.blueColor
+                      : Colors.blue.shade600,
                 ),
               ),
             ),
-          ),
-
-          TextButton(
-            onPressed: onClear,
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-              textStyle: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-            child: const Text('Clear Filters'),
-          )
-
-          // GestureDetector(
-          //   onTap: onClear,
-          //   child: const Text(
-          //     'Clear Filters',
-          //     style: TextStyle(
-          //         color: Colors.red,
-          //         fontWeight: FontWeight.w500,
-          //         decoration: TextDecoration.underline,
-          //         decorationColor: Colors.red,
-          //         decorationThickness: 2),
-          //   ),
-          // ),
+          ],
         ],
       ),
     );

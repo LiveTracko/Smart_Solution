@@ -205,7 +205,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             // icon: const Icon(Icons.co_present_outlined, size: 24),
             // inactiveIcon: const Icon(Icons.co_present_outlined, size: 24),
-            title: "Request ",
+            title: "Request",
             activeForegroundColor: AppColors.primaryColor,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
@@ -286,14 +286,14 @@ class _MainScreenState extends State<MainScreen> {
           ),
           item: ItemConfig(
             icon: SvgPicture.asset(
-              'assets/images/user_plus_grey.svg',
+              'assets/images/drawer.svg',
               colorFilter: const ColorFilter.mode(
                 CupertinoColors.activeBlue,
                 BlendMode.srcIn,
               ),
             ),
             inactiveIcon: SvgPicture.asset(
-              'assets/images/user_plus_grey.svg',
+              'assets/images/drawer.svg',
               colorFilter: ColorFilter.mode(
                 Colors.grey.shade600,
                 BlendMode.srcIn,
@@ -301,7 +301,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             // icon: const Icon(Icons.co_present_outlined, size: 24),
             // inactiveIcon: const Icon(Icons.co_present_outlined, size: 24),
-            title: "Request ",
+            title: "Listing ",
             activeForegroundColor: AppColors.primaryColor,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(

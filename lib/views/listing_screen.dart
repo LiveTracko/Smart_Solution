@@ -34,7 +34,6 @@ class _ListingScreenState extends State<ListingScreen> {
 
   final ScrollController scrollController = ScrollController();
 
-
   final ScrollController companyScrollController = ScrollController();
   final TextEditingController searchController = TextEditingController();
   final ChartCardsController _chartCardsController =
@@ -110,36 +109,55 @@ class _ListingScreenState extends State<ListingScreen> {
                     horizontalPadding: 0,
                     data: const ['Company Listing ', 'Pincode Listing']),
                 kVerticalSpace(10),
-                Obx(
-                  () => SearchBarWithClear(
-                      key: ValueKey(_chartCardsController.selectedIndex.value),
-                      controller: searchController,
-                      focusNode: FocusNode(),
-                      textInputType:
-                          _chartCardsController.selectedIndex.value == 0
-                              ? TextInputType.text
-                              : TextInputType.number,
-                      onClear: () {},
-                      onChanged: (value) {
-                        if (_debounce?.isActive ?? false) _debounce!.cancel();
+                Obx(() {
+                  // 🔥 Clear search when toggling
+                  searchController.clear();
+                  _debounce?.cancel();
 
-                        _debounce =
-                            Timer(const Duration(milliseconds: 400), () {
-                          searchController.clear();
-                          final trimmed = value.trim(); // use trimmed if needed
+                  return SearchBarWithClear(
+                    key: ValueKey(_chartCardsController.selectedIndex.value),
+                    controller: searchController,
+                    focusNode: FocusNode(),
+                    textInputType:
+                        _chartCardsController.selectedIndex.value == 0
+                            ? TextInputType.text
+                            : TextInputType.number,
+                    onClear: () {
+                      searchController.clear();  
+                      _debounce?.cancel();  
 
-                          if (_chartCardsController.selectedIndex.value == 0) {
-                            pincodeController.companyPage.value = 1;
-                            pincodeController.companyhasMore.value = true;
-                            pincodeController.fetchCompany(search: trimmed);
-                          } else {
-                            pincodeController.page.value = 1;
-                            pincodeController.hasMore.value = true;
-                            pincodeController.fetchPincodes(search: trimmed);
-                          }
-                        });
-                      }),
-                ),
+                      if (_chartCardsController.selectedIndex.value == 0) {
+                        pincodeController.companyPage.value = 1;
+                        pincodeController.companyhasMore.value = true;
+                        pincodeController.companyList.clear();
+                        pincodeController.fetchCompany(search: "");
+                      } else {
+                        pincodeController.page.value = 1;
+                        pincodeController.hasMore.value = true;
+                        pincodeController.pincodes.clear();
+                        pincodeController.fetchPincodes(search: "");
+                      }
+                    },
+                    onChanged: (value) {
+                      if (_debounce?.isActive ?? false) _debounce!.cancel();
+                      _debounce = Timer(const Duration(milliseconds: 400), () {
+                        final trimmed = value.trim();
+
+                        if (_chartCardsController.selectedIndex.value == 0) {
+                          pincodeController.companyPage.value = 1;
+                          pincodeController.companyhasMore.value = true;
+                          pincodeController.companyList.clear(); 
+                          pincodeController.fetchCompany(search: trimmed);
+                        } else {
+                          pincodeController.page.value = 1;
+                          pincodeController.hasMore.value = true;
+                          pincodeController.pincodes.clear();  
+                          pincodeController.fetchPincodes(search: trimmed);
+                        }
+                      });
+                    },
+                  );
+                }),
                 kVerticalSpace(15)
               ],
             ),

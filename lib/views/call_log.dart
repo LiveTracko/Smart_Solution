@@ -68,6 +68,10 @@ class _CallLogPageState extends State<CallLogPage> {
     super.dispose();
   }
 
+  String today = "${DateTime.now().day.toString().padLeft(2, '0')} "
+      "${DateFormat('MMM').format(DateTime.now()).toUpperCase()} "
+      "${DateTime.now().year}";
+
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
@@ -78,76 +82,45 @@ class _CallLogPageState extends State<CallLogPage> {
       body: Column(
         children: [
           Container(
-              color: AppColors.appBarTextColor,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          HeaderTitle(
-                              title: widget.title,
-                              style: AppTextStyle.headerTitle),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 5),
-                              decoration: BoxDecoration(
-                                  color: AppColors.primaryColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                      color: AppColors.primaryColor)),
-                              child: const Icon(
-                                Icons.calendar_month,
-                                size: 18,
-                                color: AppColors.whiteColor,
-                              ),
+            color: AppColors.appBarTextColor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title and Date Filter Row
+                HeaderTitle(
+                  title: widget.title,
+                  style: AppTextStyle.headerTitle,
+                ),
 
-                              // Text(
-                              //   textAlign:
-                              //       TextAlign.center,
-                              //   labels[index],
-                              //   style: TextStyle(
-                              //       fontSize: 15,
-                              //       color: isSelected
-                              //           ? AppColors
-                              //               .backgroundColor
-                              //           : AppColors
-                              //               .primaryColor),
-                              // ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SearchBarWithClear(
-                        controller: _followBackController.searchController,
-                        onClear: () {
-                          _followBackController.clearFilters();
-                          _followBackController.updateFilteredList();
-                        },
-                        onChanged: (value) {
-                          _followBackController.updateFilteredList(
-                              query: value);
-                        }),
-                    kVerticalSpace(10),
-                    Obx(() {
-                      final filterList = _followBackController.filters;
+                // Search bar
+                SearchBarWithClear(
+                  controller: _followBackController.searchController,
+                  onClear: () {
+                    _followBackController.clearFilters();
+                    _followBackController.updateFilteredList();
+                  },
+                  onChanged: (value) {
+                    _followBackController.updateFilteredList(query: value);
+                  },
+                ),
 
-                      return FilterChipList(
-                        filters: filterList,
-                        controller:
-                            _followBackController.filterScrollController,
-                        selectedIndex:
-                            _followBackController.selectedFilter.value,
-                        onSelected: _followBackController.selectFilter,
-                      );
-                    }),
-                    kVerticalSpace(10),
-                  ])),
+                kVerticalSpace(10),
+
+                // Filter chips
+                Obx(() {
+                  final filterList = _followBackController.filters;
+                  return FilterChipList(
+                    filters: filterList,
+                    controller: _followBackController.filterScrollController,
+                    selectedIndex: _followBackController.selectedFilter.value,
+                    onSelected: _followBackController.selectFilter,
+                  );
+                }),
+
+                kVerticalSpace(10),
+              ],
+            ),
+          ),
           Expanded(child: Obx(() {
             if (_followBackController.isInitialLoading.value) {
               return const Center(child: LoadingPage());

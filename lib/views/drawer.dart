@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
 import 'package:smart_solutions/controllers/profile_controller.dart';
+import 'package:smart_solutions/views/hrms/hrm_screen.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
 import 'package:smart_solutions/views/update_profile_screen.dart';
@@ -141,6 +142,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       leading: const Icon(Icons.supervisor_account_rounded),
                       title: const Text('Profile'),
                       onTap: () => Get.to(() => ProfilePage()),
+                    ),
+
+                  if (StaticStoredData.roleName == 'telecaller')
+                    ListTile(
+                      leading: const Icon(Icons.supervisor_account_rounded),
+                      title: const Text('Attendence'),
+                      onTap: () => Get.to(() => const HrmScreen()),
                     ),
 
                   // if (StaticStoredData.roleName == 'telecaller')

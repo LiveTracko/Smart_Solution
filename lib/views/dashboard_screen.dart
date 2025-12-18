@@ -1961,7 +1961,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                             width: 25.w,
                           ),
                           Expanded(
-                            child: Container(
+                            child: SizedBox(
                               width: 35.w,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -2063,7 +2063,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   child: ListView.builder(
                       padding: EdgeInsets.zero,
                       itemCount: uniqueTcNames.length,
-                      physics: BouncingScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       itemBuilder: (context, index) {
                         final disbursementData =
                             followBackFormController.disbursementList;

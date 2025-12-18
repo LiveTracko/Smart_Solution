@@ -16,11 +16,11 @@ class ProfileListPage extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 30),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
                   colors: [AppColors.primaryColor, AppColors.primaryColor],
                 ),
-                borderRadius: const BorderRadius.only(
+                borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30),
                 ),
@@ -120,7 +120,7 @@ class ProfileListPage extends StatelessWidget {
       shadowColor: Colors.blue.shade800,
       child: ListTile(
         leading: Container(
-          padding: EdgeInsets.all(12),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: AppColors.primaryColor,
             shape: BoxShape.circle,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:smart_solutions/views/login_request_form.dart';
 
 class NoDataAvailable extends StatelessWidget {
+  const NoDataAvailable({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const Scaffold(

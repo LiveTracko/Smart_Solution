@@ -34,10 +34,22 @@ class AppTextStyle {
     fontSize: 14,
     color: Colors.black87,
   );
+  static const textfieldheading = TextStyle(
+    fontSize: 14,
+    color: Colors.black87,
+    fontWeight: FontWeight.bold
+  );
+
+  static const bodyBoldTxt = TextStyle(
+      fontSize: 12, color: Colors.black87, fontWeight: FontWeight.bold);
 
   static const label = TextStyle(
     fontSize: 12,
     color: Colors.grey,
+  );
+  static const textfieldabove = TextStyle(
+    fontSize: 10,
+    color: Colors.black87,
   );
 
   static const normalHeadingTxt = TextStyle(

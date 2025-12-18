@@ -7,13 +7,13 @@ class AllBankNames {
     if (json['data'] != null) {
       data = <AllBankNamesData>[];
       json['data'].forEach((v) {
-        data!.add(new AllBankNamesData.fromJson(v));
+        data!.add(AllBankNamesData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -65,7 +65,7 @@ class AllBankNamesData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['bank_name'] = bankName;
     data['banker_name'] = bankerName;

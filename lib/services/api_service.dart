@@ -60,7 +60,7 @@ class ApiService {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(
-            "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}${companyName}/api/index.php/"}$endpoint"));
+            "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}$companyName/api/index.php/"}$endpoint"));
     request.headers.addAll(header);
 
     // Add fields
@@ -89,7 +89,7 @@ class ApiService {
     final companyName = shared.get("companyname");
     final response = await http.put(
       Uri.parse(
-          "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}${companyName}/api/index.php/"}$endpoint"),
+          "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}$companyName/api/index.php/"}$endpoint"),
       headers: {
         "Content-Type": "application/json",
         "x-api-key": "Surplus_apikey@",
@@ -105,7 +105,7 @@ class ApiService {
     final companyName = shared.get("companyname");
     final response = await http.delete(
       Uri.parse(
-          "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}${companyName}/api/index.php/"}$endpoint"),
+          "${companyName == null ? APIUrls.baseUrl : "${APIUrls.newBaseUrl}$companyName/api/index.php/"}$endpoint"),
     );
     return _handleResponse(response);
   }

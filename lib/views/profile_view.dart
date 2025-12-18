@@ -4,7 +4,6 @@ import 'package:smart_solutions/models/profile_model.dart';
 import 'package:smart_solutions/views/holiday_screen.dart';
 import 'package:smart_solutions/views/profile.dart';
 import 'package:smart_solutions/views/sallary_slip.dart';
-import 'package:smart_solutions/views/update_profile_screen.dart';
 import 'package:smart_solutions/views/request_leave.dart';
 import 'package:smart_solutions/views/view_attendance.dart';
 import 'package:smart_solutions/widget/profile_scaffold.dart';

@@ -16,7 +16,7 @@ class ProfileScaffold extends StatefulWidget {
   final double height;
   final double bodyPadding;
 
-  ProfileScaffold({
+  const ProfileScaffold({
     super.key,
     required this.title,
     required this.body,

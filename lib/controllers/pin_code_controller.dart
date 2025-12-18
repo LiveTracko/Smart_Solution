@@ -58,15 +58,10 @@ class PincodeController extends GetxController {
       final jsonData = json.decode(response.body);
       final List<dynamic> data = jsonData['data'];
 
-      if (data is List) {
-        final List<Datum> result = data.map((e) => Datum.fromJson(e)).toList();
-        pincodes.addAll(result);
-        page++;
-      } else {
-        print("Unexpected response structure: $data");
-        hasMore.value = false;
-      }
-    } else {
+      final List<Datum> result = data.map((e) => Datum.fromJson(e)).toList();
+      pincodes.addAll(result);
+      page++;
+        } else {
       //   Get.snackbar('Error', 'Failed to fetch data');
     }
 
@@ -98,15 +93,11 @@ class PincodeController extends GetxController {
       final jsonData = json.decode(response.body);
       final List<dynamic> data = jsonData['data'];
 
-      if (data is List) {
-        final List<companyData> result =
-            data.map((e) => companyData.fromJson(e)).toList();
-        companyList.addAll(result);
-        companyPage++;
-      } else {
-        companyhasMore.value = false;
-      }
-    } else {
+      final List<companyData> result =
+          data.map((e) => companyData.fromJson(e)).toList();
+      companyList.addAll(result);
+      companyPage++;
+        } else {
       //  Get.snackbar('Error', 'Failed to fetch data');
     }
 

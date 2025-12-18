@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CustomTabBarExample extends StatefulWidget {
+  const CustomTabBarExample({super.key});
+
   @override
   _CustomTabBarExampleState createState() => _CustomTabBarExampleState();
 }
@@ -42,7 +44,7 @@ class _CustomTabBarExampleState extends State<CustomTabBarExample>
                 ),
                 labelColor: Colors.white,
                 unselectedLabelColor: Colors.black,
-                tabs: [
+                tabs: const [
                   Tab(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -71,13 +73,13 @@ class _CustomTabBarExampleState extends State<CustomTabBarExample>
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             /// TabBarView Content
             Expanded(
               child: TabBarView(
                 controller: _tabController,
-                children: [
+                children: const [
                   Center(child: Text("Active Cases Details")),
                   Center(child: Text("Inactive Cases Details")),
                 ],

@@ -37,7 +37,7 @@ class DocumentsPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 return GestureDetector(
                     onTap: () {
-                      Get.to(SalarySlipPdfPage(
+                      Get.to(const SalarySlipPdfPage(
                         month: 'sele',
                       ));
                     },
@@ -70,10 +70,10 @@ class DocumentsPage extends StatelessWidget {
                                 color: Colors.red, size: 28),
                           ),
                           const SizedBox(width: 14),
-                          Expanded(
+                          const Expanded(
                             child: Text(
                               "Salary Slip - October 2025",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.blueAccent,

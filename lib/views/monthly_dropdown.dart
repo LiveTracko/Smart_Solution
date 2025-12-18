@@ -46,13 +46,13 @@ class MonthDropdown extends StatelessWidget {
   };
   final Function(String value) onChanged;
   final DropdownController controller = Get.put(DropdownController());
-  MonthDropdown({required this.onChanged});
+  MonthDropdown({super.key, required this.onChanged});
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Obx(() {
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
             border: Border.all(
               color: Colors.grey, // Border color
@@ -62,15 +62,15 @@ class MonthDropdown extends StatelessWidget {
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              padding: EdgeInsets.symmetric(vertical: 0),
+              padding: const EdgeInsets.symmetric(vertical: 0),
               elevation: 2,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 15,
                 color: Colors.black,
               ),
               // menuMaxHeight: 30,
               value: controller.selectedMonth.value,
-              hint: Text('Month'), // Display "Select" when nothing is selected
+              hint: const Text('Month'), // Display "Select" when nothing is selected
               onChanged: (value) {
                 controller.setMonth(value);
                 onChanged(monthMap[value] ?? "");
@@ -81,7 +81,7 @@ class MonthDropdown extends StatelessWidget {
                   value: month,
                   child: Text(
                     month,
-                    strutStyle: StrutStyle(
+                    strutStyle: const StrutStyle(
                       fontSize: 14,
                       // height: 1.5,
                     ),

@@ -210,7 +210,7 @@ class FollowBackForm extends StatelessWidget {
                               ),
                             ),
 
-                            SizedBox(width: 12), // space between fields
+                            const SizedBox(width: 12), // space between fields
 
                             // ------- Loan Amount Field -------
                             Expanded(

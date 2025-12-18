@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
 import 'package:smart_solutions/controllers/profile_controller.dart';
+import 'package:smart_solutions/views/hrms/hrm_screen.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
 import 'package:smart_solutions/views/update_profile_screen.dart';
@@ -138,6 +139,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       title: const Text('Profile'),
                       onTap: () => Get.to(() => ProfilePage()),
                     ),
+                  if (StaticStoredData.roleName == 'telecaller')
+                    ListTile(
+                      leading: const Icon(Icons.supervisor_account_rounded),
+                      title: const Text('HRM'),
+                      onTap: () => Get.to(() => const HrmScreen()),
+                    ),
 
                   // if (StaticStoredData.roleName == 'telecaller')
                   //   ListTile(
@@ -208,7 +215,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }) {
     return ListTile(
       dense: true,
-      visualDensity: VisualDensity(vertical: -2),
+      visualDensity: const VisualDensity(vertical: -2),
       leading: Icon(
         icon,
         size: isBottomTile ? 28 : 22, // bigger icon for bottom tiles

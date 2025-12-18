@@ -15,7 +15,7 @@ class ResetPasswordController extends GetxController {
 
   Future<void> resetPassword() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String tellercaller_id = prefs.getString('t') ?? "User";
+    String tellercallerId = prefs.getString('t') ?? "User";
     String password = passwordController.text.trim();
 
     if (password.isEmpty) {

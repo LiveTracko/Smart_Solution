@@ -5,7 +5,6 @@ import 'package:smart_solutions/services/firbase_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import '../components/button_component.dart';
-import '../controllers/login_controllers.dart';
 
 class ForgetView extends StatefulWidget {
   const ForgetView({super.key});

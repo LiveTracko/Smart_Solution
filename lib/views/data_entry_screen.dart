@@ -84,8 +84,9 @@ class _DataEntryViewScreenState extends State<DataEntryViewScreen> {
                               ),
                             ),
                             onChanged: (value) {
-                              if (_debounce?.isActive ?? false)
+                              if (_debounce?.isActive ?? false) {
                                 _debounce!.cancel();
+                              }
 
                               _debounce =
                                   Timer(const Duration(milliseconds: 400), () {
@@ -602,9 +603,9 @@ class _DataEntryViewScreenState extends State<DataEntryViewScreen> {
           ),
         ),
         const SizedBox(width: 4),
-        Text(
+        const Text(
           ':', // Add colon here
-          style: const TextStyle(fontSize: 12, color: Colors.grey),
+          style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
         const SizedBox(width: 4),
         Expanded(
@@ -639,9 +640,9 @@ class _DataEntryViewScreenState extends State<DataEntryViewScreen> {
           ),
         ),
         const SizedBox(width: 4),
-        Text(
+        const Text(
           ':', // Add colon here
-          style: const TextStyle(fontSize: 12, color: Colors.grey),
+          style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
         const SizedBox(width: 4),
         Expanded(

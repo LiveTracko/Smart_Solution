@@ -51,13 +51,13 @@ class StatusGroupModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = this.id;
-    data['status_group_name'] = this.StatusGroupModelName;
-    data['status'] = this.status;
-    data['sequence_no'] = this.sequenceNo;
-    data['seq_no_numeric'] = this.seqNoNumeric;
-    data['totalLoanAmount'] = this.totalLoanAmount;
-    data['filecount'] = this.filecount;
+    data['id'] = id;
+    data['status_group_name'] = StatusGroupModelName;
+    data['status'] = status;
+    data['sequence_no'] = sequenceNo;
+    data['seq_no_numeric'] = seqNoNumeric;
+    data['totalLoanAmount'] = totalLoanAmount;
+    data['filecount'] = filecount;
     return data;
   }
 }

@@ -62,6 +62,7 @@ class ProfileController extends GetxController {
       ),
     );
   }
+  
 
   // Save login request
   Future<void> saveProfile(

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:smart_solutions/views/hrms/document_page.dart';
+import 'package:smart_solutions/views/hrms/holidaylist_page.dart';
 import 'package:smart_solutions/views/hrms/hrm_items.dart';
 import 'package:smart_solutions/views/hrms/mark_attendence_page.dart';
 import 'package:smart_solutions/views/hrms/profile_screen.dart';
+import 'package:smart_solutions/views/hrms/request_leave_page.dart';
+import 'package:smart_solutions/views/hrms/view_attendence_page.dart';
+import 'package:smart_solutions/views/view_attendance.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/hrm_card.dart';
 
@@ -20,29 +25,27 @@ class HrmScreen extends StatelessWidget {
         page: const ProfileScreen(),
       ),
       HrmItem(
-        icon: "assets/hrms/mark_attendance.svg",
-        title: "Mark Attendance",
-        page: MarkAttendancePage()
-      ),
+          icon: "assets/hrms/mark_attendance.svg",
+          title: "Mark Attendance",
+          page: MarkAttendancePage()),
       HrmItem(
           icon: "assets/hrms/view_attendance.svg",
           title: "View Attendance",
-          page: const Scaffold(
-              body: Center(child: Text("View Attendance Page")))),
+          page: ViewAttendancePage()),
       HrmItem(
         icon: "assets/hrms/request_leave.svg",
         title: "Request Leave",
-        page: const Scaffold(body: Center(child: Text("Request Leave Page"))),
+        page: RequestLeavePage(),
       ),
       HrmItem(
         icon: "assets/hrms/documents.svg",
         title: "Documents",
-        page: const Scaffold(body: Center(child: Text("Documents Page"))),
+        page: DocumentsPage(),
       ),
       HrmItem(
         icon: "assets/hrms/holiday_list.svg",
         title: "Holiday List",
-        page: const Scaffold(body: Center(child: Text("Holiday List Page"))),
+        page: const HolidayListPage(),
       ),
     ];
 

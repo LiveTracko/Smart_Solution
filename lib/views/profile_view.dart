@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/models/profile_model.dart';
 import 'package:smart_solutions/views/holiday_screen.dart';
+import 'package:smart_solutions/views/hrms/view_attendence_page.dart';
 import 'package:smart_solutions/views/profile.dart';
 import 'package:smart_solutions/views/sallary_slip.dart';
 import 'package:smart_solutions/views/update_profile_screen.dart';

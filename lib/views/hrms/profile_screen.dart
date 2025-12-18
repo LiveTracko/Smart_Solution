@@ -85,7 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       bottom: 0,
                       right: 0,
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: _openProfileImageBottomSheet,
                         child: CircleAvatar(
                           radius: 16,
                           backgroundColor: Colors.transparent,
@@ -104,7 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Shubham Hande",
+                      "Ashwini",
                       style: AppTextStyle.headerTitle,
                     ),
                     SizedBox(height: 6),
@@ -164,6 +164,75 @@ class _ProfileScreenState extends State<ProfileScreen> {
           )
         ],
       ),
+    );
+  }
+
+  void _openProfileImageBottomSheet() {
+    if (Get.isBottomSheetOpen == true) return;
+
+    Get.bottomSheet(
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag Handle
+            Container(
+              height: 4,
+              width: 40,
+              margin: const EdgeInsets.only(bottom: 15),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade400,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    "Upload Profile Photo",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => Get.back(),
+                  child: const Icon(Icons.close, color: Colors.grey),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 15),
+
+            ListTile(
+              leading: SvgPicture.asset("assets/hrms/gallery.svg"),
+              title: const Text("Gallery"),
+              onTap: () {
+                Get.back();
+                controller.pickImage();
+              },
+            ),
+
+            ListTile(
+              leading: SvgPicture.asset("assets/hrms/camera.svg"),
+              title: const Text("Camera"),
+              onTap: () {
+                Get.back();
+                controller.pickImage();
+              },
+            ),
+          ],
+        ),
+      ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isDismissible: true,
+      enableDrag: true,
+      backgroundColor: Colors.white,
     );
   }
 }

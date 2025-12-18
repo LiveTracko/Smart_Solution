@@ -177,6 +177,10 @@ class _DialerScreenState extends State<DialerScreen> {
                           textAlign: TextAlign.center,
                           readOnly: true,
                           maxLength: 10,
+                          // ✅ disables keyboard
+                          enableInteractiveSelection:
+                              true, // ✅ enables copy/paste
+                          showCursor: false, // optional (clean UI)
 
                           controller: TextEditingController(
                               text:
@@ -197,8 +201,6 @@ class _DialerScreenState extends State<DialerScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          enableInteractiveSelection:
-                              true, // enables copy/paste menu
 
                           style: TextStyle(
                             fontSize: 20.sp,

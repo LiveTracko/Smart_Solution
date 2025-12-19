@@ -6,12 +6,14 @@ class FilterChipList extends StatelessWidget {
   final List<String> filters;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
+   final ScrollController? controller;
 
   const FilterChipList({
     Key? key,
     required this.filters,
     required this.selectedIndex,
     required this.onSelected,
+     this.controller,
   }) : super(key: key);
 
   @override
@@ -20,6 +22,7 @@ class FilterChipList extends StatelessWidget {
         'FilterChipList BUILDING - Filters: $filters, Count: ${filters.length}');
     return Obx(
       () => SingleChildScrollView(
+        controller: controller,
         scrollDirection: Axis.horizontal,
         child: Row(
           children: List.generate(filters.length, (index) {

@@ -30,6 +30,9 @@ class AppTextStyle {
 
   static const headerTitle = TextStyle(
       fontSize: 16, color: Colors.black87, fontWeight: FontWeight.bold);
+
+  static const smallbodyTxt =
+      TextStyle(fontSize: 12, fontWeight: FontWeight.bold);
   static const body = TextStyle(
     fontSize: 14,
     color: Colors.black87,
@@ -45,6 +48,7 @@ class AppTextStyle {
 
   static const label = TextStyle(
     fontSize: 12,
+    fontWeight: FontWeight.bold,
     color: Colors.grey,
   );
   static const textfieldabove = TextStyle(
@@ -66,6 +70,17 @@ class AppTextStyle {
     color: Colors.indigo,
     decoration: TextDecoration.underline,
   );
+
+  // static const textfieldheading = TextStyle(
+  //     fontSize: 14, color: Colors.black87, fontWeight: FontWeight.bold);
+
+  // static const bodyBoldTxt = TextStyle(
+  //     fontSize: 14, color: Colors.black87, fontWeight: FontWeight.bold);
+
+  // static const textfieldabove = TextStyle(
+  //   fontSize: 10,
+  //   color: Colors.black87,
+  // );
 
 // 🟢 Common Padding Constants
   final EdgeInsets kHorizontalPadding = EdgeInsets.symmetric(horizontal: 15.w);

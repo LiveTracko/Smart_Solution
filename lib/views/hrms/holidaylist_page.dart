@@ -1,0 +1,144 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:smart_solutions/widget/common_scaffold.dart';
+
+class HolidayListPage extends StatelessWidget {
+  const HolidayListPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CommonScaffold(
+      title: "Holiday List",
+      body: ListView(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        children: const [
+          // ========== January ==========
+          _SectionTitle('January'),
+          SizedBox(height: 8),
+          _HolidayCard(
+            title: 'New Years',
+            weekday: 'Sunday',
+            dateText: '1st Jan 2025',
+          ),
+          SizedBox(height: 10),
+          _HolidayCard(
+            title: 'Republic Day',
+            weekday: 'Monday',
+            dateText: '26th Jan 2025',
+          ),
+
+          SizedBox(height: 24),
+
+          // ========== March ==========
+          _SectionTitle('March'),
+          SizedBox(height: 8),
+          _HolidayCard(
+            title: 'Holi',
+            weekday: 'Sunday',
+            dateText: '08th Mar 2025',
+          ),
+
+          SizedBox(height: 24),
+
+          // ========== August ==========
+          _SectionTitle('August'),
+          SizedBox(height: 8),
+          _HolidayCard(
+            title: 'Independence Day',
+            weekday: 'Monday',
+            dateText: '15th Aug 2025',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------- Section heading ----------
+class _SectionTitle extends StatelessWidget {
+  final String text;
+  const _SectionTitle(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w500,
+        color: Colors.black87,
+      ),
+    );
+  }
+}
+
+// ---------- Holiday card ----------
+class _HolidayCard extends StatelessWidget {
+  final String title;
+  final String weekday;
+  final String dateText;
+
+  const _HolidayCard({
+    required this.title,
+    required this.weekday,
+    required this.dateText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 70.h,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: const Color(0xFFD0E3FF)),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFE8F2FF), Color(0xFFFFFFFF)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+      ),
+      child: Row(
+        children: [
+          // LEFT SIDE
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  weekday,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // RIGHT DATE
+          Text(
+            dateText,
+            style: TextStyle(
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+
 import 'package:smart_solutions/controllers/chartCard_controller.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
@@ -15,7 +16,7 @@ class ChartCardsToggle extends StatelessWidget {
   final double verticalPadding;
   final double borderRadius;
 
-  final ChartCardsController controller = Get.put(ChartCardsController());
+  final ChartCardsController controller = Get.find<ChartCardsController>();
 
   ChartCardsToggle({
     super.key,
@@ -44,6 +45,7 @@ class ChartCardsToggle extends StatelessWidget {
           ],
           onPressed: (index) {
             controller.selectedIndex.value = index;
+            FocusManager.instance.primaryFocus?.unfocus();
           },
           color: Colors.grey.shade700,
           selectedColor: Colors.black,

@@ -27,7 +27,7 @@ class DataEntryForm extends StatefulWidget {
 }
 
 class _DataEntryFormState extends State<DataEntryForm> {
-  final DataController controller = Get.put(DataController());
+  final DataController controller = Get.find<DataController>();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -286,17 +286,15 @@ class _DataEntryFormState extends State<DataEntryForm> {
                         ),
 
                         _buildTextField(
-                          label: 'Banker Email',
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/email.svg',
-                            height: 20,
-                            width: 20,
-                          ),
-                          content: controller.bankerEmail,
-                          onChanged: (value) =>
-                              controller.bankerEmail.value = value,
-                          // validator: _validateNotEmpty,
-                        ),
+                            label: 'Banker Email',
+                            prefixIcon: SvgPicture.asset(
+                              'assets/images/email.svg',
+                              height: 20,
+                              width: 20,
+                            ),
+                            content: controller.bankerEmail,
+                            onChanged: (value) =>
+                                controller.bankerEmail.value = value),
                         const SizedBox(height: 10),
 
                         _buildTextField(

@@ -27,6 +27,7 @@ class DataController extends GetxController {
 
   var iseditLoading = true.obs;
   var dataList = <Data>[].obs;
+  var disbursementdata = <Data>[].obs;
   var errorMessage = ''.obs;
   bool granted = false;
 
@@ -87,6 +88,9 @@ class DataController extends GetxController {
 // search variables
   var showSearchField = false.obs; // 👈 observable toggle
   var searchText = "".obs;
+
+  RxList<dynamic> todayCount = <dynamic>[].obs;
+  RxList<dynamic> monthlyCount = <dynamic>[].obs;
 
   @override
   void onInit() {
@@ -217,10 +221,40 @@ class DataController extends GetxController {
         final dataEntryModel = DataEntryModel.fromJson(responseData);
         if (dataEntryModel.data != null) {
           dataList.assignAll(dataEntryModel.data!);
+          disbursementdata.value = dataList
+              .where((e) => e.dataEntryStatus == 'DISBURSED')
+              .toSet()
+              .toList();
 
-          // filterLeadStatus.assignAll(
-          //   dataList.map((e) => e.dataEntryStatus).toSet().toList(),
-          // );
+          DateTime today = DateTime.now();
+
+// FILTER LOGIN USERS
+          // var loginList =
+          //     dataList.where((e) => e.dataEntryStatus == 'LOGIN').toList();
+
+// TODAY COUNT (from loginList)
+          todayCount.value = dataList
+              .where((e) {
+                DateTime dt = DateTime.parse(
+                    e.date.toString()); // parse string to DateTime
+                return dt.year == today.year &&
+                    dt.month == today.month &&
+                    dt.day == today.day;
+              })
+              .map((e) => e.teleCallerId)
+              .toList();
+
+// MONTHLY COUNT (from loginList)
+          monthlyCount.value = dataList
+              .where((e) {
+                DateTime dt = DateTime.parse(e.date.toString());
+                return dt.year == today.year && dt.month == today.month;
+              })
+              .map((e) => e.teleCallerId)
+              .toList();
+
+          print('TodayList$todayCount');
+          print('TodayList$monthlyCount');
         }
       } else if (response.statusCode == 204) {
         logOutput('Data Entry Not Available');

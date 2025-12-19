@@ -5,6 +5,9 @@ import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/active_files_controller.dart';
+import 'package:smart_solutions/controllers/dashboard_controller.dart';
+import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/core/app_bindings.dart';
 import 'package:smart_solutions/services/api_service.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
@@ -187,20 +190,22 @@ class _MainScreenState extends State<MainScreen> {
           ),
           item: ItemConfig(
             icon: SvgPicture.asset(
-              'assets/images/fingerprint.svg',
+              'assets/images/user_plus_grey.svg',
               colorFilter: const ColorFilter.mode(
                 CupertinoColors.activeBlue,
                 BlendMode.srcIn,
               ),
             ),
             inactiveIcon: SvgPicture.asset(
-              'assets/images/fingerprint.svg',
+              'assets/images/user_plus_grey.svg',
               colorFilter: ColorFilter.mode(
                 Colors.grey.shade600,
                 BlendMode.srcIn,
               ),
             ),
-            title: "HRM",
+            // icon: const Icon(Icons.co_present_outlined, size: 24),
+            // inactiveIcon: const Icon(Icons.co_present_outlined, size: 24),
+            title: "Request",
             activeForegroundColor: AppColors.primaryColor,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
@@ -213,10 +218,22 @@ class _MainScreenState extends State<MainScreen> {
     } else {
       return [
         PersistentTabConfig(
-          screen: const DashboardScreen(key: ValueKey('dashboard_screen')),
+          screen: const DashboardScreen(),
           item: ItemConfig(
-            icon: const Icon(Icons.dashboard_outlined, size: 24),
-            inactiveIcon: const Icon(Icons.dashboard_outlined, size: 24),
+            icon: SvgPicture.asset(
+              'assets/images/dashboard.svg',
+              colorFilter: const ColorFilter.mode(
+                CupertinoColors.activeBlue,
+                BlendMode.srcIn,
+              ),
+            ),
+            inactiveIcon: SvgPicture.asset(
+              'assets/images/dashboard.svg',
+              colorFilter: ColorFilter.mode(
+                Colors.grey.shade600,
+                BlendMode.srcIn,
+              ),
+            ),
             title: "Dashboard",
             activeForegroundColor: AppColors.primaryColor,
             inactiveForegroundColor: Colors.grey.shade600,
@@ -235,8 +252,20 @@ class _MainScreenState extends State<MainScreen> {
             isDrawer: true,
           ),
           item: ItemConfig(
-            icon: const Icon(Icons.assignment_ind_outlined, size: 24),
-            inactiveIcon: const Icon(Icons.assignment_ind_outlined, size: 24),
+            icon: SvgPicture.asset(
+              'assets/images/leads.svg',
+              colorFilter: const ColorFilter.mode(
+                CupertinoColors.activeBlue,
+                BlendMode.srcIn,
+              ),
+            ),
+            inactiveIcon: SvgPicture.asset(
+              'assets/images/leads.svg',
+              colorFilter: ColorFilter.mode(
+                Colors.grey.shade600,
+                BlendMode.srcIn,
+              ),
+            ),
             title: "Leads",
             activeForegroundColor: AppColors.primaryColor,
             inactiveForegroundColor: Colors.grey.shade600,
@@ -247,11 +276,32 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
         PersistentTabConfig(
-          screen: const ListingScreen(key: ValueKey('listing_screen')),
+          screen: ListingScreen(
+            key: const ValueKey('listing_screen '),
+            title: 'Listing',
+
+            isShowBack: false,
+            isDrawer: true,
+            //key: const ValueKey('hrm_screen')
+          ),
           item: ItemConfig(
-            icon: const Icon(Icons.list_alt_outlined, size: 24),
-            inactiveIcon: const Icon(Icons.list_alt_outlined, size: 24),
-            title: "Listing",
+            icon: SvgPicture.asset(
+              'assets/images/drawer.svg',
+              colorFilter: const ColorFilter.mode(
+                CupertinoColors.activeBlue,
+                BlendMode.srcIn,
+              ),
+            ),
+            inactiveIcon: SvgPicture.asset(
+              'assets/images/drawer.svg',
+              colorFilter: ColorFilter.mode(
+                Colors.grey.shade600,
+                BlendMode.srcIn,
+              ),
+            ),
+            // icon: const Icon(Icons.co_present_outlined, size: 24),
+            // inactiveIcon: const Icon(Icons.co_present_outlined, size: 24),
+            title: "Listing ",
             activeForegroundColor: AppColors.primaryColor,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
@@ -270,9 +320,23 @@ class _MainScreenState extends State<MainScreen> {
             //key: const ValueKey('hrm_screen')
           ),
           item: ItemConfig(
-            icon: const Icon(Icons.co_present_outlined, size: 24),
-            inactiveIcon: const Icon(Icons.co_present_outlined, size: 24),
-            title: "HRM",
+            icon: SvgPicture.asset(
+              'assets/images/user_plus_grey.svg',
+              colorFilter: const ColorFilter.mode(
+                CupertinoColors.activeBlue,
+                BlendMode.srcIn,
+              ),
+            ),
+            inactiveIcon: SvgPicture.asset(
+              'assets/images/user_plus_grey.svg',
+              colorFilter: ColorFilter.mode(
+                Colors.grey.shade600,
+                BlendMode.srcIn,
+              ),
+            ),
+            // icon: const Icon(Icons.co_present_outlined, size: 24),
+            // inactiveIcon: const Icon(Icons.co_present_outlined, size: 24),
+            title: "Request ",
             activeForegroundColor: AppColors.primaryColor,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
@@ -287,35 +351,52 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: PersistentTabView(
-        tabs: tabs,
-        controller: _controller,
-        navBarBuilder: (navBarConfig) => Style15BottomNavBar(
-          navBarConfig: navBarConfig,
-          height: 70,
-          navBarDecoration: const NavBarDecoration(
-            padding: EdgeInsets.zero,
-            color: Colors.white12,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15),
-            ),
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: PersistentTabView(
+          tabs: tabs,
+          controller: _controller,
+
+          navBarBuilder: (navBarConfig) => StaticStoredData.roleName == 'admin'
+              ? Style4BottomNavBar(
+                  navBarConfig: navBarConfig,
+                  height: 70,
+                  navBarDecoration: const NavBarDecoration(
+                    padding: EdgeInsets.zero,
+                    color: Colors.white12,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15),
+                    ),
+                  ),
+                )
+              : Style15BottomNavBar(
+                  navBarConfig: navBarConfig,
+                  height: 70,
+                  navBarDecoration: const NavBarDecoration(
+                    padding: EdgeInsets.zero,
+                    color: Colors.white12,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15),
+                    ),
+                  ),
+                ),
+          backgroundColor: Colors.white,
+          onTabChanged: _onTabChanged,
+          keepNavigatorHistory: false,
+          stateManagement: true, // ⚠️ Changed to true for better state handling
+          navBarOverlap: const NavBarOverlap.custom(),
+          handleAndroidBackButtonPress: true,
+          avoidBottomPadding: false,
+          //     confineInSafeArea: true, // ⚠️ ADD THIS for safety
+          screenTransitionAnimation: const ScreenTransitionAnimation(
+            //     animateTabTransition: true,
+            curve: Curves.ease,
+            duration: Duration(milliseconds: 200),
           ),
-        ),
-        backgroundColor: Colors.white,
-        onTabChanged: _onTabChanged,
-        keepNavigatorHistory: false,
-        stateManagement: true, // ⚠️ Changed to true for better state handling
-        navBarOverlap: const NavBarOverlap.custom(),
-        handleAndroidBackButtonPress: true,
-        avoidBottomPadding: false,
-        //     confineInSafeArea: true, // ⚠️ ADD THIS for safety
-        screenTransitionAnimation: const ScreenTransitionAnimation(
-          //     animateTabTransition: true,
-          curve: Curves.ease,
-          duration: Duration(milliseconds: 200),
         ),
       ),
     );
@@ -333,6 +414,15 @@ class _MainScreenState extends State<MainScreen> {
         }
       });
       return;
+    }
+    if (newIndex == 0) {
+      Get.find<DashboardController>().onInit();
+    }
+    if (newIndex == 1) {
+      Get.find<ActiveFilesController>().loadData();
+    }
+    if (newIndex == 3) {
+      Get.find<FollowBackFormController>().fetchFollowBackList();
     }
     _previousIndex = newIndex;
   }

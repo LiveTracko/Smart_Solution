@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
@@ -49,12 +48,7 @@ class CommonScaffold extends StatelessWidget {
                         ? _scaffoldKey.currentState!.openDrawer()
                         : _scaffoldKey.currentState!.closeDrawer();
                   },
-                  icon: SvgPicture.asset('assets/images/menu.svg')
-                  // const Icon(
-                  //   Icons.menu,
-                  //   color: Colors.white,
-                  // )
-                  )
+                  icon: SvgPicture.asset('assets/images/menu.svg'))
               : null),
       key: _scaffoldKey,
       body: SafeArea(child: body),

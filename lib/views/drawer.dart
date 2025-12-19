@@ -78,7 +78,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             InkWell(
-                              onTap: () => Get.to(() => UpdateProfilePage()),
+                              onTap: () => Get.to(() => ProfilePage()),
                               child: CircleAvatar(
                                 radius: 45,
                                 backgroundColor: Colors.indigo.shade700,
@@ -118,7 +118,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   ListTile(
                     leading: const Icon(Icons.list_alt),
                     title: const Text('Listing'),
-                    onTap: () => Get.to(() => const ListingScreen()),
+                    onTap: () => Get.to(() => ListingScreen(
+                          title: 'Listing',
+                          isShowBack: true,
+                          isDrawer: false,
+                        )),
                   ),
                   // ListTile(
                   //   leading: const Icon(Icons.list),
@@ -143,6 +147,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     ListTile(
                       leading: const Icon(Icons.supervisor_account_rounded),
                       title: const Text('HRM'),
+                      onTap: () => Get.to(() => const HrmScreen()),
+                    ),
+
+                  if (StaticStoredData.roleName == 'telecaller')
+                    ListTile(
+                      leading: const Icon(Icons.supervisor_account_rounded),
+                      title: const Text('Attendence'),
                       onTap: () => Get.to(() => const HrmScreen()),
                     ),
 

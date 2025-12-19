@@ -78,19 +78,16 @@ class MyApp extends StatelessWidget {
             fontFamily: 'Poppins',
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor, // ✅ button background
-                foregroundColor: Colors.white, // ✅ text/icon color
+                backgroundColor: AppColors.primaryColor,
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                    borderRadius: BorderRadius.circular(12)),
                 padding:
                     const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
               ),
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                
-                  // foregroundColor: AppColors.primaryColor,
                   textStyle: const TextStyle(color: Colors.white)),
             ),
           ),

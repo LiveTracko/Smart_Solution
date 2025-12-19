@@ -13,7 +13,14 @@ import 'package:smart_solutions/widget/common_title_card.dart';
 import 'package:smart_solutions/widget/searchbarwithclear.dart';
 
 class ListingScreen extends StatefulWidget {
-  const ListingScreen({super.key});
+  String title;
+  bool isShowBack = false;
+  bool isDrawer = false;
+  ListingScreen(
+      {super.key,
+      required this.title,
+      required this.isShowBack,
+      required this.isDrawer});
 
   @override
   State<ListingScreen> createState() => _ListingScreenState();
@@ -25,9 +32,9 @@ class _ListingScreenState extends State<ListingScreen> {
 
   final PincodeController pincodeController = Get.put(PincodeController());
 
-  // final ScrollController scrollController = ScrollController();
+  final ScrollController scrollController = ScrollController();
 
-  // final ScrollController companyScrollController = ScrollController();
+  final ScrollController companyScrollController = ScrollController();
   final TextEditingController searchController = TextEditingController();
   final ChartCardsController _chartCardsController =
       Get.find<ChartCardsController>();
@@ -46,33 +53,32 @@ class _ListingScreenState extends State<ListingScreen> {
     //   });
 
     //   // 2. Scroll listener for pagination
-    //   scrollController.addListener(() {
-    //     if (scrollController.position.pixels >=
-    //             scrollController.position.maxScrollExtent - 100 &&
-    //         !pincodeController.isLoading.value &&
-    //         pincodeController.hasMore.value) {
-    //       pincodeController.fetchPincodes(search: searchController.text);
-    //     }
-    //   });
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+              scrollController.position.maxScrollExtent - 100 &&
+          !pincodeController.isLoading.value &&
+          pincodeController.hasMore.value) {
+        pincodeController.fetchPincodes(search: searchController.text);
+      }
+    });
 
     //   // 2. Scroll listener for pagination
-    //   companyScrollController.addListener(() {
-    //     if (companyScrollController.position.pixels >=
-    //             companyScrollController.position.maxScrollExtent - 100 &&
-    //         !pincodeController.iscompanyLoading.value &&
-    //         pincodeController.companyhasMore.value) {
-    //       pincodeController.fetchCompany(search: searchController.text);
-    //     }
-    //   });
-    // }
-
-    // onSearchChanged(String value) {
-    //   if (_debounce?.isActive ?? false) _debounce!.cancel();
-
-    //   _debounce = Timer(const Duration(milliseconds: 500), () {
-    //     pincodeController.fetchCompany(search: value.trim());
-    //   });
+    companyScrollController.addListener(() {
+      if (companyScrollController.position.pixels >=
+              companyScrollController.position.maxScrollExtent - 100 &&
+          !pincodeController.iscompanyLoading.value &&
+          pincodeController.companyhasMore.value) {
+        pincodeController.fetchCompany(search: searchController.text);
+      }
+    });
   }
+
+  // onSearchChanged(String value) {
+  //   if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+  //   _debounce = Timer(const Duration(milliseconds: 500), () {
+  //     pincodeController.fetchCompany(search: value.trim());
+  //   });
 
   @override
   void dispose() {
@@ -89,11 +95,6 @@ class _ListingScreenState extends State<ListingScreen> {
     return CommonScaffold(
         title: 'Listing Page',
         showBack: false,
-        // appBar: AppBar(
-        //   centerTitle: true,
-        //   title: const Text('Listing Page'),
-        //   actions: const [],
-        // ),
         key: _scaffoldKey,
         body: Column(children: [
           Container(
@@ -108,26 +109,55 @@ class _ListingScreenState extends State<ListingScreen> {
                     horizontalPadding: 0,
                     data: const ['Company Listing ', 'Pincode Listing']),
                 kVerticalSpace(10),
-                SearchBarWithClear(
+                Obx(() {
+                  // 🔥 Clear search when toggling
+                  searchController.clear();
+                  _debounce?.cancel();
+
+                  return SearchBarWithClear(
+                    key: ValueKey(_chartCardsController.selectedIndex.value),
                     controller: searchController,
-                    onClear: () {},
+                    focusNode: FocusNode(),
+                    textInputType:
+                        _chartCardsController.selectedIndex.value == 0
+                            ? TextInputType.text
+                            : TextInputType.number,
+                    onClear: () {
+                      searchController.clear();  
+                      _debounce?.cancel();  
+
+                      if (_chartCardsController.selectedIndex.value == 0) {
+                        pincodeController.companyPage.value = 1;
+                        pincodeController.companyhasMore.value = true;
+                        pincodeController.companyList.clear();
+                        pincodeController.fetchCompany(search: "");
+                      } else {
+                        pincodeController.page.value = 1;
+                        pincodeController.hasMore.value = true;
+                        pincodeController.pincodes.clear();
+                        pincodeController.fetchPincodes(search: "");
+                      }
+                    },
                     onChanged: (value) {
                       if (_debounce?.isActive ?? false) _debounce!.cancel();
-
                       _debounce = Timer(const Duration(milliseconds: 400), () {
-                        final trimmed = value.trim(); // use trimmed if needed
+                        final trimmed = value.trim();
 
-                        if (toggleController.selectedIndex.value == 0) {
+                        if (_chartCardsController.selectedIndex.value == 0) {
                           pincodeController.companyPage.value = 1;
                           pincodeController.companyhasMore.value = true;
+                          pincodeController.companyList.clear(); 
                           pincodeController.fetchCompany(search: trimmed);
                         } else {
                           pincodeController.page.value = 1;
                           pincodeController.hasMore.value = true;
+                          pincodeController.pincodes.clear();  
                           pincodeController.fetchPincodes(search: trimmed);
                         }
                       });
-                    }),
+                    },
+                  );
+                }),
                 kVerticalSpace(15)
               ],
             ),
@@ -328,11 +358,26 @@ class _ListingScreenState extends State<ListingScreen> {
   Widget _buildCompanyTable() {
     return Obx(() {
       final list = pincodeController.companyList;
+      final loading = pincodeController.iscompanyLoading.value;
+
+      if (loading && list.isEmpty) {
+        return const Center(child: CircularProgressIndicator());
+      }
 
       return ListView.builder(
           padding: const EdgeInsets.all(10),
-          itemCount: list.length,
-          itemBuilder: (context, index) {
+          controller: companyScrollController,
+          itemCount: list.length + 1,
+          itemBuilder: (_, index) {
+            if (index == list.length) {
+              return pincodeController.iscompanyLoading.value
+                  ? const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : const SizedBox();
+            }
+
             final data = list[index];
             return CommonTitleCard(
                 leading: SvgPicture.asset('assets/images/bank.svg'),
@@ -349,12 +394,28 @@ class _ListingScreenState extends State<ListingScreen> {
   Widget _buildPincodeTable() {
     return Obx(() {
       final list = pincodeController.pincodes;
+      final loading = pincodeController.isLoading.value;
+
+      if (loading && list.isEmpty) {
+        return const Center(child: CircularProgressIndicator());
+      }
 
       return ListView.builder(
           padding: const EdgeInsets.all(10),
-          itemCount: list.length,
-          itemBuilder: (context, index) {
-            final data = list[index];
+          controller: scrollController,
+          itemCount: list.length + 1,
+          itemBuilder: (_, i) {
+            if (i == list.length) {
+              return pincodeController.isLoading.value
+                  ? const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : const SizedBox();
+            }
+
+            final data = list[i];
+
             return CommonTitleCard(
                 leading: SvgPicture.asset('assets/images/bank.svg'),
                 title: data.bankName.toString(),

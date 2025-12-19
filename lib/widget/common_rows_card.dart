@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
 class CommonRows {
+  /// ================= SINGLE ROW =================
   Widget buildSingleRow(dynamic icon, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildIcon(icon),
-          const SizedBox(width: 4),
+          const SizedBox(width: 6),
           Expanded(
             child: Text(
               value,
@@ -23,6 +25,7 @@ class CommonRows {
     );
   }
 
+  /// ================= DOUBLE ROW =================
   Widget buildDoubleRow({
     required dynamic iconLeft,
     required String valueLeft,
@@ -33,38 +36,47 @@ class CommonRows {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          /// LEFT SIDE
           Expanded(
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildIcon(iconLeft),
-                const SizedBox(width: 4),
+                const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     valueLeft,
                     style: const TextStyle(fontSize: 12, color: Colors.black),
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
           ),
+
+          const SizedBox(width: 8),
+
+          /// RIGHT SIDE
           Expanded(
             child: Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildIcon(iconLeft),
-                //  Icon(iconRight, size: 14, color: Colors.grey[700]),
-                const SizedBox(width: 4),
-                Text(
-                  valueRight,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: textColorRight ?? Colors.black87,
+                _buildIcon(iconRight),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    valueRight,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: textColorRight ?? Colors.black87,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.right,
                 ),
               ],
             ),
@@ -74,46 +86,47 @@ class CommonRows {
     );
   }
 
-  // New method without Expanded for end alignment
+  /// ================= SINGLE ROW (NO EXPAND) =================
+  /// Use this ONLY when parent width is fixed
   Widget buildSingleRowNoExpand(dynamic icon, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
       child: Row(
-        mainAxisSize: MainAxisSize.max, // ← Important
         children: [
-          _buildIcon(icon),
-          const SizedBox(width: 5),
-          Text(
-            value,
-            style: AppTextStyle.headerTitle,
-            maxLines: 10,
-            overflow: TextOverflow.ellipsis,
+          if (value.isNotEmpty) _buildIcon(icon),
+          if (value.isNotEmpty) const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              value,
+              style: AppTextStyle.headerTitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),
     );
   }
 
-  // Mask mobile digits
+  /// ================= MASK MOBILE =================
   static String mask(String number) {
     if (number.length < 6) return number;
     return "xxxxxx${number.substring(6)}";
   }
 
+  /// ================= ICON BUILDER =================
   Widget _buildIcon(dynamic icon) {
     if (icon is String) {
-      // SVG PATH
       return SvgPicture.asset(
         icon,
-        width: 22,
-        height: 22,
-        // color: Colors.grey[700],
+        width: 20,
+        height: 20,
+        fit: BoxFit.contain,
       );
     } else if (icon is IconData) {
-      // NORMAL ICON
-      return Icon(icon, size: 24, color: Colors.grey[700]);
+      return Icon(icon, size: 20, color: Colors.grey[700]);
     } else {
-      return const SizedBox();
+      return const SizedBox.shrink();
     }
   }
 }

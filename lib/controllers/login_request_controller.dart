@@ -18,7 +18,7 @@ class LoginRequestController extends GetxController {
   var allLoginRequestList = <LoginRequest>[].obs;
   var loginRequestList = <LoginRequest>[].obs;
   var loanStatusList = <LoanStatus>[].obs;
-  List<RemarkList> remarks = []; // Observable list for reactive UI
+  List<RemarkList> remarks = [];
   var isLoading = false.obs;
   var iseditLoading = false.obs;
   var currentId = ''.obs;
@@ -33,7 +33,7 @@ class LoginRequestController extends GetxController {
   var bankId = ''.obs;
   var loanAmount = ''.obs;
   var commonRemark = ''.obs;
-  var remarksList = <String>[].obs; // To hold multiple remarks
+  var remarksList = <String>[].obs;
 //  var id = ''.obs; // For existing records
 
   var allBankNamesList = <LoginRequestBankList>[].obs;
@@ -44,12 +44,14 @@ class LoginRequestController extends GetxController {
   final searchController = TextEditingController();
   var selectedFilter = 0.obs;
   var filters = <String>[].obs;
+  RxList<dynamic> todayCount = <dynamic>[].obs;
+  RxList<dynamic> monthlyCount = <dynamic>[].obs;
 
   @override
   void onInit() async {
     super.onInit();
-    ever(loginRequestList, (_) => updateFilteredList());
-    ever(selectedFilter, (_) => updateFilteredList());
+    ever(allLoginRequestList, (_) => updateFilteredList());
+    ever(selectedFilter, (_) => filterLoginRequests());
 
     await getLoginRequestList();
     await editLoadData();
@@ -75,6 +77,7 @@ class LoginRequestController extends GetxController {
 
   // Fetch the login request list
   Future<void> getLoginRequestList() async {
+    final today = DateTime.now();
     try {
       isLoading(true);
       var body = {
@@ -92,14 +95,27 @@ class LoginRequestController extends GetxController {
               .toList();
 
           // log('raw -->>> ${resData['data'] }');
-
           allLoginRequestList.value = loginData; // store original
           loginRequestList.value = loginData;
-          //     currentId.value = loginRequestList[0].id;
+
+          monthlyCount.value = allLoginRequestList
+              .where((e) => e.loginRequestDate.month == today.month)
+              .map((e) => e.telecallerId)
+              .toList();
+
+          todayCount.value = allLoginRequestList
+              .where((e) =>
+                  // e.loginRequestDate.year == today.year &&
+                  e.loginRequestDate.day == today.day)
+              //&&
+              //e.loginRequestDate.day == today.day)
+              .map((e) => e.telecallerId)
+              .toList();
+
+          print('month count$monthlyCount');
+          print('today count$todayCount');
+
           await getRemarks();
-
-          // log('pppp -->>> ${loginRequestList.map((e) => e.toJson()).toList()}');
-
           isLoading(false);
         } else {
           logOutput("No data found");
@@ -270,17 +286,44 @@ class LoginRequestController extends GetxController {
   }
 
 //filter
-  void filterLoginRequests(String query) {
-    if (query.isEmpty) {
-      loginRequestList.value = allLoginRequestList;
-      return;
-    }
+  // void filterLoginRequests({String query = ''}) {
+  //   if (query.isNotEmpty) {
+  //     loginRequestList.value = allLoginRequestList;
+  //     return;
+  //   }
 
-    query = query.toLowerCase();
+  //   query = filters[selectedFilter.value].toLowerCase();
+
+  //   loginRequestList.value = allLoginRequestList.where((item) {
+  //     return item.customerName.toLowerCase().contains(query) ||
+  //         item.contactNumber.toLowerCase().contains(query);
+  //   }).toList();
+  // }
+
+  void filterLoginRequests() {
+    final search = searchController.text.trim().toLowerCase();
+
+    // selected chip text
+    final selectedIndex = selectedFilter.value;
+    final hasChipSelected = selectedIndex != 0;
+    final chipText =
+        hasChipSelected ? filters[selectedIndex].toLowerCase() : '';
 
     loginRequestList.value = allLoginRequestList.where((item) {
-      return item.customerName.toLowerCase().contains(query) ||
-          item.contactNumber.toLowerCase().contains(query);
+      final name = item.customerName.toLowerCase();
+      final mobile = item.contactNumber.toLowerCase();
+      final title = (item.title ?? '').toLowerCase();
+
+      // 🔍 Search check
+      final searchMatch = search.isEmpty ||
+          name.contains(search) ||
+          mobile.contains(search) ||
+          title.contains(search);
+
+      // 🟦 Chip check
+      final chipMatch = !hasChipSelected || title == chipText;
+
+      return searchMatch && chipMatch;
     }).toList();
   }
 
@@ -290,7 +333,6 @@ class LoginRequestController extends GetxController {
 
   void clearFilters() {
     selectedFilter.value = 0;
-
     searchController.clear();
   }
 
@@ -299,16 +341,9 @@ class LoginRequestController extends GetxController {
     update();
   }
 
-  void updateFilteredList() {
-    // final names = dataList
-    //     .where((item) => currentStatus.value == 1
-    //         ? item.dataStatus?.toLowerCase() == 'active'
-    //         : item.dataStatus?.toLowerCase() == 'inactive')
-    //     .map((item) => item.dataEntryStatus ?? 'Unknown')
-    //     .toList();
-
+  void updateFilteredList({String query = ''}) {
     final names =
-        loginRequestList.map((item) => item.title ?? 'Unknown').toList();
+        allLoginRequestList.map((item) => item.title ?? 'Unknown').toList();
 
     setFilters(names);
   }

@@ -7,6 +7,7 @@ import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/services/api_service.dart';
+import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/utils/error_utils.dart';
 import 'package:smart_solutions/views/navigationbar.dart';
 import 'package:smart_solutions/utils/snackbar_utils.dart';
@@ -109,7 +110,7 @@ class LoginViewModel extends GetxController {
                           child: ElevatedButton(
                             style: ButtonStyle(
                                 backgroundColor: WidgetStateProperty.all(
-                                    Theme.of(context).primaryColor)),
+                                    AppColors.primaryColor)),
                             onPressed: () {
                               Get.back();
                             },

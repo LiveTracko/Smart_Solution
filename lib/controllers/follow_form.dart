@@ -14,6 +14,7 @@ import 'package:smart_solutions/models/call_log_model.dart';
 import 'package:smart_solutions/models/disbursement_model.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
 import 'package:smart_solutions/services/call_state_service.dart';
+import 'package:smart_solutions/utils/scroll_utils.dart';
 import '../constants/services.dart';
 import '../services/api_service.dart';
 import '../constants/api_urls.dart';
@@ -26,6 +27,10 @@ class FollowBackFormController extends GetxController
 
   var allBankNamesList = <AllBankNamesData>[].obs;
   var followBackList = <Data>[].obs;
+
+  var startDate = Rxn<DateTime>();
+  var endDate = Rxn<DateTime>();
+
   var monthlybackData = <Data>[].obs;
   var dailycallbackData = <Data>[].obs;
   var callLogData = <Datum>[].obs;
@@ -62,23 +67,27 @@ class FollowBackFormController extends GetxController
   final customerNumberController = TextEditingController();
 
   // Pagination variables
-  final RxInt currentPage = 1.obs;
+  RxInt currentPage = 1.obs;
   final RxBool hasMore = true.obs;
-  final int limit = 20; // Fixed limit
-  final RxBool isInitialLoad = true.obs;
+  final int limit = 20;
+
+// scroll chiplist
+  final ScrollController filterScrollController = ScrollController();
+
+  final RxBool isInitialLoading = true.obs;
+  final RxBool isMoreLoading = true.obs;
+
+  final TextEditingController searchController = TextEditingController();
 
   final CommonFilterController commonFilterController =
       Get.put(CommonFilterController());
 
   @override
-  void onInit() {
-    // ever(mobile, (number) => customerNumberController.text = number);
-
-    fetchFollowBackList();
-
+  void onInit() async {
     ever(followBackList, (_) => updateFilteredList());
-    ever(commonFilterController.selectedFilter, (_) => updateFilteredList());
+    ever(selectedFilter, (_) => updateFilteredList());
 
+    await fetchFollowBackList();
     // 1️⃣ When text changes, update observable
     customerNumberController.addListener(() {
       mobile.value = customerNumberController.text;
@@ -106,21 +115,55 @@ class FollowBackFormController extends GetxController
     super.onInit();
   }
 
-  Future<void> loadData(bool isRefresh) async {
-    isBankAndStatusLoading(true);
-    try {
+ Future<void> loadData(bool isRefresh) async {
+  isBankAndStatusLoading(true);
+  try {
+    if (isRefresh) {
+      // Save current form values BEFORE refresh
+      final savedCustomerName = _dialerController.customerName.value;
+      final savedMobile = mobile.value;
+      final savedSalary = _dialerController.salary.value;
+      final savedLoanAmount = _dialerController.customerLoan.value;
+      final savedBankName = bankName.value;
+      final savedDataType = dataType.value; // ✅ Save dataType
+      final savedContacted = contacted.value;
+      final savedRemark = remark.value;
+      final savedRemarkStatus = remarkStatus.value;
+      
+      // Reload essential data
       await getAllBanks();
       await getDisbursementData();
-      if (isRefresh) {
-        await CallStateService.getLastCallInfo();
+      await CallStateService.getLastCallInfo();
+      
+      // RESTORE form values AFTER refresh
+      _dialerController.customerName.value = savedCustomerName;
+      mobile.value = savedMobile;
+      _dialerController.salary.value = savedSalary;
+      _dialerController.customerLoan.value = savedLoanAmount;
+      bankName.value = savedBankName;
+      dataType.value = savedDataType; // ✅ Restore dataType
+      contacted.value = savedContacted;
+      remark.value = savedRemark;
+      remarkStatus.value = savedRemarkStatus;
+      
+      // Also update controllers if needed
+      if (savedCustomerName.isNotEmpty) {
+        _dialerController.customerNameController.text = savedCustomerName;
       }
-    } catch (e) {
-      print("Error while loading data: $e");
-    } finally {
-      isBankAndStatusLoading(false);
+      if (savedMobile.isNotEmpty) {
+        customerNumberController.text = savedMobile;
+      }
+    } else {
+      // For initial load (not refresh)
+      await getAllBanks();
+      await getDisbursementData();
     }
+  } catch (e) {
+    print("Error while loading data: $e");
+  } finally {
+    isBankAndStatusLoading(false);
   }
-
+}
   void toggleSearch() {
     showSearchField.value = !showSearchField.value;
   }
@@ -144,6 +187,11 @@ class FollowBackFormController extends GetxController
       isLoading(false);
     }
   }
+
+  //search controller
+
+  var filters = <String>[].obs;
+  var selectedFilter = 0.obs;
 
   // Form fields
   var loanAmount = ''.obs;
@@ -184,29 +232,24 @@ class FollowBackFormController extends GetxController
   }
 
   Future<void> fetchFollowBackList({bool loadMore = false}) async {
-    // If loading more, don't show loading indicator for initial load
-    isLoading.value = true;
-    // if (!loadMore) {
-    //   isLoading.value = true;
-    // }
-
-    if (!loadMore) {
+    if (loadMore) {
+      isMoreLoading.value = true;
+    } else {
+      isInitialLoading.value = true;
       currentPage.value = 1;
       hasMore.value = true;
       followBackList.clear();
       allCustomerName.clear();
     }
-    //  isLoading.value = true;
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final int? secureType = prefs.getInt('secureType');
+    final secureType = prefs.getInt('secureType');
     final String dateRage = dateRangeList.isNotEmpty &&
             dateRangeList.first != null &&
             dateRangeList.last != null
         ? "${dateRangeList.first},${dateRangeList.last}"
         : "";
 
-    // Create form data with required telecaller_id
     final Map<String, dynamic> formData = {
       "telecaller_id": StaticStoredData.userId,
       "daterange": dateRage,
@@ -214,12 +257,10 @@ class FollowBackFormController extends GetxController
       "secure_type": secureType.toString(),
     };
 
-    // ✅ Add search filter
     if (searchText.value.isNotEmpty) {
       formData['search'] = searchText.value.trim();
     }
 
-    // ✅ Add dynamic status list using loop
     if (selectedStatuses.isNotEmpty) {
       for (var i = 0; i < selectedStatuses.length; i++) {
         formData["status[$i]"] = selectedStatuses[i];
@@ -227,59 +268,33 @@ class FollowBackFormController extends GetxController
     }
 
     try {
-      var response =
-          await _apiService.postRequest(APIUrls.updatedcalllog, formData);
-
-      debugPrint(" data -->  ${response.statusCode} ${response.body}");
+      var response = await _apiService.postRequest(
+        APIUrls.updatedcalllog,
+        formData,
+      );
 
       if (response.statusCode == 200) {
-        var responseData = jsonDecode(response.body);
-
-        var followBackData = FollowUpSubmitedList.fromJson(responseData);
-
-        final newItems = followBackData.data ?? [];
+        var data = jsonDecode(response.body);
+        var model = FollowUpSubmitedList.fromJson(data);
+        var newItems = model.data ?? [];
 
         if (loadMore) {
-          // Append to existing list for load more
           followBackList.addAll(newItems);
-          allCustomerName.addAll(newItems);
         } else {
-          // Replace list for initial load/search
           followBackList.assignAll(newItems);
-          allCustomerName.assignAll(newItems);
         }
 
-        // Check if there are more pages
         hasMore.value = newItems.length >= limit;
-
-        // Increment page for next load
-        if (newItems.isNotEmpty) {
-          currentPage.value++;
-        }
-
-        // allCustomerName.assignAll(followBackData.data!);
-
-        // followBackList.value = followBackData.data ?? [];
-      } else if (response.statusCode == 204) {
-        if (!loadMore) {
-          followBackList.clear();
-          allCustomerName.clear();
-        }
-        hasMore.value = false;
+        if (newItems.isNotEmpty) currentPage++;
       } else {
-        // logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
+        hasMore.value = false;
       }
-    } catch (e) {
-      debugPrint("Exception fetching follow-back list: $e");
-
-      if (loadMore) {
-        currentPage.value--; // Revert page increment on error
-      }
-    } finally {
-      isLoading.value = false;
-
-      isInitialLoad.value = false;
+    } catch (_) {
+      hasMore.value = false;
     }
+
+    isInitialLoading.value = false;
+    isMoreLoading.value = false;
   }
 
   // Method to load more data
@@ -525,6 +540,9 @@ class FollowBackFormController extends GetxController
           tellecallerList.assignAll(teamleader.data);
         } else {
           teamleaderList.assignAll(teamleader.data);
+          commonFilterController.setFilters(
+            teamleaderList.map((e) => e.name).toList(),
+          );
         }
       } else {
         logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
@@ -642,22 +660,24 @@ class FollowBackFormController extends GetxController
     } finally {}
   }
 
-  void clearForm() {
-    customerName.value = '';
-    mobile.value = '';
-    bankName.value = '';
-    dataType.value = '';
-    _dialerController.datatype.value = '';
-    contacted.value = 'No';
-    remarkStatus.value = '';
-    remark.value = '';
-    // followupDate.value = DateTime.now();
-    // followupDate.value = null;
-
-    _dialerController.elapsedTimeInSeconds.value = 0;
-    // _dialerController.excel_id.value = '';
-    _dialerController.followup_id.value = '';
-  }
+ void clearForm() {
+  // This should only be called on successful form submit
+  customerName.value = '';
+  mobile.value = '';
+  bankName.value = '';
+  dataType.value = '';
+  contacted.value = 'No';
+  remarkStatus.value = '';
+  remark.value = '';
+  followupDate.value = null;
+  
+  customerNumberController.clear();
+  
+  // Clear dialer data
+  _dialerController.datatype.value = '';
+  _dialerController.elapsedTimeInSeconds.value = 0;
+  _dialerController.followup_id.value = '';
+}
 
   void setFromDate(DateTime date) {
     fromDate.value = date;
@@ -694,7 +714,7 @@ class FollowBackFormController extends GetxController
 
         if (response.statusCode == 200) {
           var responseData = jsonDecode(response.body);
-          print(responseData);
+
           var followBackData = FollowUpSubmitedList.fromJson(responseData);
           followBackList.value = followBackData.data ?? [];
         } else if (response.statusCode == 204) {
@@ -727,47 +747,41 @@ class FollowBackFormController extends GetxController
     });
   }
 
-  // set filterlist
-
-  // void updateFilteredList() {
-  //   final names = followBackList.map((e) => e.remarkStatus ?? '').toList();
-
-  //   commonFilterController.setFilters(names);
-  // }
-
   void updateFilteredList({String query = ''}) {
-    // 1️⃣ Update filter chip list (remarkStatus)
+    // 1️⃣ Build filter names for chips
     final names = followBackList
         .map((e) => e.remarkStatus ?? '')
         .where((e) => e.isNotEmpty)
         .toSet()
         .toList();
-    commonFilterController.setFilters(names);
+    setFilters(names);
 
-    // 2️⃣ Apply search + chip filter
+    // 2️⃣ Filter by chip + search
     final search = query.toLowerCase();
-    final selected = commonFilterController.selectedFilter.value;
+    final selected = selectedFilter.value;
 
-    filteredFollowBackList.assignAll(
-      followBackList.where((item) {
-        final name = item.customerName?.toLowerCase() ?? '';
-        final mobile = item.contactNumber?.toLowerCase() ?? '';
-        final bank = item.bankName?.toLowerCase() ?? '';
-        final remark = item.remarkStatus?.toLowerCase() ?? '';
+    // 🔥 Clear old list before filtering
+    filteredFollowBackList.clear();
 
-        // Search filter
-        final searchMatch = search.isEmpty ||
-            name.contains(search) ||
-            mobile.contains(search) ||
-            bank.contains(search);
+    filteredFollowBackList.assignAll(followBackList.where((item) {
+      final name = item.customerName?.toLowerCase() ?? '';
+      final mobile = item.contactNumber?.toLowerCase() ?? '';
+      //  final bank = item.bankName?.toLowerCase() ?? '';
+      final remark = item.remarkStatus?.toLowerCase() ?? '';
 
-        // Chip filter
-        final chipMatch =
-            selected == 0 ? true : remark == names[selected - 1].toLowerCase();
+      // Search filter
+      final searchMatch =
+          search.isEmpty || name.contains(search) || mobile.contains(search);
+      //|| bank.contains(search);
 
-        return searchMatch && chipMatch;
-      }).toList(),
-    );
+      // Chip filter
+      final chipMatch =
+          selected == 0 ? true : remark == names[selected - 1].toLowerCase();
+
+      return searchMatch && chipMatch;
+      //&& dateMatch;
+    }).toList());
+    print(filteredFollowBackList.length);
   }
 
   // Method to refresh data (pull to refresh)
@@ -783,5 +797,21 @@ class FollowBackFormController extends GetxController
     currentPage.value = 1;
     hasMore.value = true;
     await fetchFollowBackList(loadMore: false);
+  }
+
+  void selectFilter(int index) {
+    selectedFilter.value = index;
+  }
+
+  void clearFilters() {
+    selectedFilter.value = 0;
+
+    ScrollUtils.scrollToStart(filterScrollController);
+    searchController.clear();
+  }
+
+  void setFilters(List<String> names) {
+    filters.value = ["All", ...names.toSet()];
+    update();
   }
 }

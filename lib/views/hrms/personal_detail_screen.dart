@@ -1,368 +1,408 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:smart_solutions/theme/app_theme.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
-import 'package:smart_solutions/widget/text_style.dart';
 
-class PersonalDetailsScreen extends StatefulWidget {
-  const PersonalDetailsScreen({super.key});
+class PersonalDetailScreen extends StatefulWidget {
+  const PersonalDetailScreen({super.key});
+
+  static const Color primaryBlue = Color(0xFF2F6DF6);
+  static const Color borderGrey = Color(0xFFE0E0E0);
+  static const Color textGrey = Color(0xFF757575);
+  static const Color labelColor = Color(0xFF000000);
 
   @override
-  State<PersonalDetailsScreen> createState() => _PersonalDetailsScreenState();
+  State<PersonalDetailScreen> createState() => _PersonalDetailScreenState();
 }
 
-class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
-  final _formKey = GlobalKey<FormState>();
+class _PersonalDetailScreenState extends State<PersonalDetailScreen> {
+  final TextEditingController staffNameController = TextEditingController(
+    text: 'Shashi 5',
+  );
+  final TextEditingController guardianNameController = TextEditingController(
+    text: 'Yash',
+  );
+  final TextEditingController emergencyNameController = TextEditingController(
+    text: 'Shashi 5',
+  );
+  final TextEditingController emergencyAddressController =
+      TextEditingController(text: 'Address Here');
 
-  // Controllers for text fields
-  TextEditingController staffNameController =
-      TextEditingController(text: "Shashi S");
-  TextEditingController mobileController =
-      TextEditingController(text: "9999888832");
-  TextEditingController dobController =
-      TextEditingController(text: "DD/MM/YYYY");
-  TextEditingController genderController = TextEditingController(text: "Male");
-  TextEditingController marriedStatusController =
-      TextEditingController(text: "Married");
-  TextEditingController bloodGroupController =
-      TextEditingController(text: "O+");
-  TextEditingController guardiansHomeController =
-      TextEditingController(text: "Shashi");
+  final TextEditingController mobileController = TextEditingController();
+  final TextEditingController emergencyMobileController =
+      TextEditingController();
 
-  // Emergency contact controllers
-  TextEditingController emergencyNameController =
-      TextEditingController(text: "Shashi S");
-  TextEditingController emergencyRelationshipController =
-      TextEditingController(text: "Male");
-  TextEditingController emergencyMobileController =
-      TextEditingController(text: "9999888832");
-  TextEditingController emergencyAddressController =
-      TextEditingController(text: "Address Here");
+  String gender = 'Male';
+  String maritalStatus = 'Married';
+  String bloodGroup = 'O+';
+  String emergencyRelation = 'Father';
+
+  DateTime? dob;
+
+  String get dobText {
+    if (dob == null) return 'DD/MM/YYYY';
+    return '${dob!.day.toString().padLeft(2, '0')}/'
+        '${dob!.month.toString().padLeft(2, '0')}/'
+        '${dob!.year}';
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: dob ?? DateTime(2000),
+      firstDate: DateTime(1950),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) setState(() => dob = picked);
+  }
 
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: "Update Profile",
+      title: "Update Profiled",
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Personal Details Section
-              Text("Personal Details", style: AppTextStyle.textfieldheading),
-              const SizedBox(height: 16),
-
-              // Staff Name
-              _buildTextFieldWithLabel(
-                "Staff Name",
-                staffNameController,
-                isRequired: true,
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Personal Details',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
               ),
-              const SizedBox(height: 16),
-
-              // Mobile Number
-              _buildTextFieldWithLabel(
-                "Mobile No.",
-                mobileController,
-                isRequired: true,
-                keyboardType: TextInputType.phone,
-                prefixText: "+91 ",
-              ),
-              const SizedBox(height: 16),
-
-              // Date of Birth
-              _buildTextFieldWithLabel(
-                "Date of Birth",
-                dobController,
-                isRequired: true,
-                svgIconPath: "assets/hrms/calander_date.svg",
-                onTap: () => _selectDate(context),
-              ),
-              const SizedBox(height: 16),
-
-              // Gender
-              _buildDropdownField(
-                "Gender",
-                genderController,
-                options: ["Male", "Female", "Other"],
-              ),
-              const SizedBox(height: 16),
-
-              // Married Status
-              _buildDropdownField(
-                "Married Status",
-                marriedStatusController,
-                options: ["Married", "Single", "Divorced", "Widowed"],
-              ),
-              const SizedBox(height: 16),
-
-              // Blood Group
-              _buildDropdownField(
-                "Blood Group",
-                bloodGroupController,
-                options: ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"],
-              ),
-              const SizedBox(height: 16),
-
-              // Guardians Home
-              _buildTextFieldWithLabel(
-                "Guardians Home",
-                guardiansHomeController,
-                isRequired: true,
-              ),
-
-              const SizedBox(height: 24),
-              const Text("Emergency Contact Details",
-                  style: AppTextStyle.textfieldheading),
-              const SizedBox(height: 16),
-
-              // Emergency Contact Name
-              _buildTextFieldWithLabel(
-                "Emergency Contact Name",
-                emergencyNameController,
-                isRequired: true,
-              ),
-              const SizedBox(height: 16),
-
-              // Emergency Contact Relationship
-              _buildDropdownField(
-                "Emergency Contact Relationship",
-                emergencyRelationshipController,
-                options: [
-                  "Father",
-                  "Mother",
-                  "Brother",
-                  "Sister",
-                  "Spouse",
-                  "Other"
+            ),
+            _inputField('Staff Name', staffNameController),
+            CountryPhoneField(
+              label: 'Mobile No.',
+              controller: mobileController,
+            ),
+            _dateField('Date of Birth', dobText, _pickDate),
+            _dropdownField(
+                'Gender',
+                gender,
+                [
+                  'Male',
+                  'Female',
+                  'Other',
                 ],
+                (v) => setState(() => gender = v!)),
+            _dropdownField(
+              'Marital Status',
+              maritalStatus,
+              ['Single', 'Married', 'Divorced', 'Widowed'],
+              (v) => setState(() => maritalStatus = v!),
+            ),
+            _dropdownField(
+                'Blood Group',
+                bloodGroup,
+                [
+                  'O+',
+                  'O-',
+                  'A+',
+                  'B+',
+                  'AB+',
+                ],
+                (v) => setState(() => bloodGroup = v!)),
+            _inputField('Guardian Name', guardianNameController),
+            const Divider(thickness: 10, color: (Color(0xFFE0E0E0))),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Emergency Contact Details',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
               ),
-              const SizedBox(height: 16),
-
-              // Emergency Contact Mobile
-              _buildTextFieldWithLabel(
-                "Emergency Contact Mobile",
-                emergencyMobileController,
-                isRequired: true,
-                keyboardType: TextInputType.phone,
-                prefixText: "+91 ",
-              ),
-              const SizedBox(height: 16),
-
-              // Emergency Contact Address
-              _buildTextFieldWithLabel(
-                "Emergency Contact Address",
-                emergencyAddressController,
-                isRequired: true,
-                maxLines: 3,
-              ),
-
-              const SizedBox(height: 40),
-
-              // Update Button
-              SizedBox(
+            ),
+            _inputField('Emergency Contact Name', emergencyNameController),
+            _dropdownField(
+              'Emergency Relationship',
+              emergencyRelation,
+              ['Father', 'Mother', 'Brother', 'Sister', 'Spouse'],
+              (v) => setState(() => emergencyRelation = v!),
+            ),
+            CountryPhoneField(
+              label: 'Emergency Contact Mobile',
+              controller: emergencyMobileController,
+            ),
+            _addressField('Emergency Address', emergencyAddressController),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
                 width: double.infinity,
+                height: 48,
                 child: ElevatedButton(
-                  onPressed: _updateProfile,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: PersonalDetailScreen.primaryBlue,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                   ),
-                  child: Text(
-                    "Update",
-                    style: AppTextStyle.bodyBoldTxt.copyWith(
-                      color: Colors.white,
-                      fontSize: 16,
+                  onPressed: () {},
+                  child: const Text(
+                    'Save Details',
+                    style: TextStyle(
+                      color: Color(0xffFFFFFF),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
               ),
-
-              const SizedBox(height: 20),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildTextFieldWithLabel(
-    String label,
-    TextEditingController controller, {
-    bool isRequired = false,
-    TextInputType keyboardType = TextInputType.text,
-    String? prefixText,
-    String? svgIconPath,
-    VoidCallback? onTap,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              label,
-              style: AppTextStyle.textfieldabove.copyWith(),
+  // ================= LABEL FONT UPDATED HERE =================
+
+  Widget _label(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 15, //
+        fontWeight: FontWeight.w500,
+        color: PersonalDetailScreen.labelColor,
+      ),
+    );
+  }
+
+  Widget _inputField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _label(label),
+          const SizedBox(height: 8),
+          Container(
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: PersonalDetailScreen.borderGrey),
+              borderRadius: BorderRadius.circular(6),
             ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade300),
+            alignment: Alignment.center,
+            child: TextField(
+              controller: controller,
+              textAlign: TextAlign.start,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isDense: true, // ✅ removes extra height
+                contentPadding: EdgeInsets.zero, // ✅ forces center alignment
+              ),
+            ),
           ),
-          child: TextFormField(
-            controller: controller,
-            keyboardType: keyboardType,
-            maxLines: maxLines,
+        ],
+      ),
+    );
+  }
+
+  Widget _dropdownField(
+    String label,
+    String value,
+    List<String> items,
+    ValueChanged<String?> onChanged,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _label(label),
+          const SizedBox(height: 8),
+          Container(
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: PersonalDetailScreen.borderGrey),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: value,
+                isExpanded: true,
+                icon: const Icon(Icons.keyboard_arrow_down),
+                items: items
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                    .toList(),
+                onChanged: onChanged,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _dateField(String label, String value, VoidCallback onTap) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _label(label),
+          const SizedBox(height: 8),
+          InkWell(
             onTap: onTap,
-            readOnly: onTap != null,
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
+            child: Container(
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: PersonalDetailScreen.borderGrey),
+                borderRadius: BorderRadius.circular(6),
               ),
-              border: InputBorder.none,
-              prefixText: prefixText,
-              prefixStyle: AppTextStyle.bodyBoldTxt.copyWith(
-                color: Colors.black87,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(value, softWrap: true),
+                  SvgPicture.asset("assets/hrms/calander_date.svg")
+                ],
               ),
-              suffixIcon: svgIconPath != null
-                  ? Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: SvgPicture.asset(
-                        svgIconPath,
-                        width: 20,
-                        height: 20,
-                      ),
-                    )
-                  : null,
-            ),
-            style: AppTextStyle.bodyBoldTxt.copyWith(
-              color: Colors.black87,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildDropdownField(
-    String label,
-    TextEditingController controller, {
-    required List<String> options,
-    bool isRequired = false,
-  }) {
-    String? selectedValue = controller.text.isNotEmpty ? controller.text : null;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              label,
-              style: AppTextStyle.textfieldabove.copyWith(),
+  Widget _addressField(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _label(label),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.all(12),
+            height: 90,
+            decoration: BoxDecoration(
+              border: Border.all(color: PersonalDetailScreen.borderGrey),
+              borderRadius: BorderRadius.circular(6),
             ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade300),
+            child: TextField(
+              controller: controller,
+              maxLines: null,
+              decoration: const InputDecoration(border: InputBorder.none),
+            ),
           ),
-          // child: DropdownButtonFormField<String>(
-          //   value: selectedValue,
-          //   items: options.map((String value) {
-          //     return DropdownMenuItem<String>(
-          //       value: value,
-          //       child: Text(
-          //         value,
-          //         style: AppTextStyle.bodyBoldTxt.copyWith(
-          //           color: Colors.black87,
-          //         ),
-          //       ),
-          //     );
-          //   }).toList(),
-          //   onChanged: (String? newValue) {
-          //     setState(() {
-          //       controller.text = newValue ?? '';
-          //     });
-          //   },
-          //   decoration: InputDecoration(
-          //     contentPadding: const EdgeInsets.symmetric(
-          //       horizontal: 16,
-          //       vertical: 12,
-          //     ),
-          //     border: InputBorder.none,
-          //     suffixIcon: Padding(
-          //       padding: const EdgeInsets.all(12.0),
-          //       child: SvgPicture.asset("assets/hrms/dropdown.svg"),
-          //     ),
-          //   ),
-          //   style: AppTextStyle.bodyBoldTxt.copyWith(
-          //     color: Colors.black87,
-          //   ),
-          //   icon: const SizedBox.shrink(), // Hide default dropdown icon
-          //   isExpanded: true,
-          // ),
-        ),
-      ],
+        ],
+      ),
     );
   }
+}
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
+// ================= MOBILE FIELD WITH FLAG =================
 
-    if (picked != null) {
-      setState(() {
-        dobController.text = "${picked.day}/${picked.month}/${picked.year}";
-      });
-    }
-  }
+class CountryPhoneField extends StatefulWidget {
+  final String label;
+  final TextEditingController controller;
 
-  void _updateProfile() {
-    if (_formKey.currentState!.validate()) {
-      // Handle update profile logic here
-      print("Profile updated successfully");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Profile updated successfully"),
-          backgroundColor: Colors.green,
-        ),
-      );
-    }
-  }
+  const CountryPhoneField({
+    super.key,
+    required this.label,
+    required this.controller,
+  });
 
   @override
-  void dispose() {
-    // Dispose all controllers
-    staffNameController.dispose();
-    mobileController.dispose();
-    dobController.dispose();
-    genderController.dispose();
-    marriedStatusController.dispose();
-    bloodGroupController.dispose();
-    guardiansHomeController.dispose();
-    emergencyNameController.dispose();
-    emergencyRelationshipController.dispose();
-    emergencyMobileController.dispose();
-    emergencyAddressController.dispose();
-    super.dispose();
+  State<CountryPhoneField> createState() => _CountryPhoneFieldState();
+}
+
+class _CountryPhoneFieldState extends State<CountryPhoneField> {
+  String selectedCode = '+91';
+
+  final Map<String, String> countries = <String, String>{
+    '+91': '🇮🇳',
+    '+1': '🇺🇸',
+    '+44': '🇬🇧',
+    '+61': '🇦🇺',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.label,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              // LEFT BOX (Country code box)
+              Container(
+                width: 110,
+                height: 40,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: const Color(0xFFE0E0E0)),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    isDense: true,
+                    value: selectedCode,
+                    items: countries.keys.map((code) {
+                      return DropdownMenuItem(
+                        value: code,
+                        child: Row(
+                          children: [
+                            Text(
+                              countries[code]!,
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              code,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (val) => setState(() => selectedCode = val!),
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              // RIGHT BOX (Phone number box)
+              Expanded(
+                child: Container(
+                  height: 40,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color(0xFFE0E0E0)),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: TextField(
+                    controller: widget.controller,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      hintText: '9156046848',
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

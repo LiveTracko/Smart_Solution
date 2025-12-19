@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 
 class FileStatusCard extends StatelessWidget {
@@ -21,8 +22,8 @@ class FileStatusCard extends StatelessWidget {
     return InkWell(
       onTap: onPress,
       child: Container(
-        width: 160,
-        margin: const EdgeInsets.only(right: 12),
+        width: 175.w,
+        // margin: const EdgeInsets.only(right: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: Colors.white,

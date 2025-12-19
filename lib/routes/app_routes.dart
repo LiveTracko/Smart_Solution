@@ -18,7 +18,6 @@ class AppRoutes {
       page: () {
         final args = Get.arguments as Map<String, dynamic>? ?? {};
         final int pageIndex = args['pageIndex'] ?? 0;
-        final String phone = args['phone']?.toString() ?? '';
 
         return InternetChecker(
           child: MainScreen(

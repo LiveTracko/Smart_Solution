@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:smart_solutions/components/commons.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/admin/call_log_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/models/call_time_model.dart';
 import 'package:smart_solutions/models/getGroupStatus.dart';
@@ -19,6 +20,8 @@ class DashboardController extends GetxController
   var dateRangeList = <DateTime?>[].obs;
   final ApiService _apiService = ApiService();
   GetCallTimeModel callTimeModel = GetCallTimeModel();
+  final AdminCallLogController _callLogController =
+      Get.find<AdminCallLogController>();
   var isLoading = true.obs;
   RxString totalValActive = "0".obs;
   RxString totalNoValActive = "0".obs;
@@ -160,14 +163,13 @@ class DashboardController extends GetxController
       isLoading.value = true;
 
       try {
-        // await fetchDashboardData(true); // Fetch monthly data
-        // await fetchDashboardData(false); // Fetch today’s data
         await getTimeGraph();
         await getActiveData(status: 1);
         await getActiveData(status: 2);
         await loadTodayAndMonthlyData();
         await loadtellecallerTabData(0);
         await getTopDisburseUser();
+        await _callLogController.getCallLogData();
       } catch (e) {
         logOutput('Error fetching dashboard data: $e');
       } finally {

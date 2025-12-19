@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
@@ -17,18 +18,23 @@ import 'package:smart_solutions/widget/text_style.dart';
 class CallLogPage extends StatefulWidget {
   final String title;
   final bool isRefresh;
-  const CallLogPage({
-    super.key,
-    this.isRefresh = true,
-    required this.title,
-  });
+  const CallLogPage({super.key, this.isRefresh = true, required this.title});
 
   @override
   State<CallLogPage> createState() => _CallLogPageState();
 }
 
 class _CallLogPageState extends State<CallLogPage> {
-  final TextEditingController searchController = TextEditingController();
+  String formatDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return '';
+
+    try {
+      final date = DateTime.parse(dateString);
+      return DateFormat('dd-MM-yyyy hh:mm:ss').format(date);
+    } catch (e) {
+      return dateString; // if parsing fails, show original
+    }
+  }
 
   final _followBackController = Get.find<FollowBackFormController>();
   final _diallerController = Get.find<DialerController>();
@@ -58,9 +64,13 @@ class _CallLogPageState extends State<CallLogPage> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _followBackController.clearFilters();
     super.dispose();
   }
+
+  String today = "${DateTime.now().day.toString().padLeft(2, '0')} "
+      "${DateFormat('MMM').format(DateTime.now()).toUpperCase()} "
+      "${DateTime.now().year}";
 
   @override
   Widget build(BuildContext context) {
@@ -72,34 +82,47 @@ class _CallLogPageState extends State<CallLogPage> {
       body: Column(
         children: [
           Container(
-              color: AppColors.appBarTextColor,
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    HeaderTitle(
-                        title: widget.title, style: AppTextStyle.headerTitle),
-                    SearchBarWithClear(
-                        controller: searchController,
-                        onClear: () {},
-                        onChanged: (value) {}),
-                    kVerticalSpace(10),
-                    Obx(() {
-                      final filterList =
-                          _followBackController.commonFilterController.filters;
+            color: AppColors.appBarTextColor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title and Date Filter Row
+                HeaderTitle(
+                  title: widget.title,
+                  style: AppTextStyle.headerTitle,
+                ),
 
-                      return FilterChipList(
-                        filters: filterList,
-                        selectedIndex: _followBackController
-                            .commonFilterController.selectedFilter.value,
-                        onSelected: _followBackController
-                            .commonFilterController.selectFilter,
-                      );
-                    }),
-                    kVerticalSpace(10),
-                  ])),
+                // Search bar
+                SearchBarWithClear(
+                  controller: _followBackController.searchController,
+                  onClear: () {
+                    _followBackController.clearFilters();
+                    _followBackController.updateFilteredList();
+                  },
+                  onChanged: (value) {
+                    _followBackController.updateFilteredList(query: value);
+                  },
+                ),
+
+                kVerticalSpace(10),
+
+                // Filter chips
+                Obx(() {
+                  final filterList = _followBackController.filters;
+                  return FilterChipList(
+                    filters: filterList,
+                    controller: _followBackController.filterScrollController,
+                    selectedIndex: _followBackController.selectedFilter.value,
+                    onSelected: _followBackController.selectFilter,
+                  );
+                }),
+
+                kVerticalSpace(10),
+              ],
+            ),
+          ),
           Expanded(child: Obx(() {
-            if (_followBackController.isInitialLoad.value &&
-                _followBackController.isLoading.value) {
+            if (_followBackController.isInitialLoading.value) {
               return const Center(child: LoadingPage());
             }
             if (_followBackController.filteredFollowBackList.isEmpty) {
@@ -116,21 +139,17 @@ class _CallLogPageState extends State<CallLogPage> {
               );
             }
             return RefreshIndicator(
-              onRefresh: () => _followBackController.loadData(widget.isRefresh),
+              onRefresh: () => _followBackController.fetchFollowBackList(),
               child: ListView.builder(
                   controller: _scrollController,
                   padding: const EdgeInsets.all(10),
                   itemCount:
                       _followBackController.filteredFollowBackList.length +
                           (_followBackController.hasMore.value ? 1 : 0),
-                  // _followBackController.filteredFollowBackList.length,
                   itemBuilder: (context, index) {
-                    //  var data = dataController.dataList[index];
-
                     if (index ==
                         _followBackController.filteredFollowBackList.length) {
-                      // Loading indicator at the bottom
-                      return _followBackController.isLoading.value
+                      return _followBackController.isMoreLoading.value
                           ? const Padding(
                               padding: EdgeInsets.all(16.0),
                               child: Center(child: CircularProgressIndicator()),
@@ -160,7 +179,7 @@ class _CallLogPageState extends State<CallLogPage> {
                         _diallerController.excel_id.value = '';
                       },
                       title: data.customerName ?? '',
-                      subtitle: data.entryDate ?? '',
+                      subtitle: formatDate(data.entryDate),
                       status: data.remarkStatus ?? '',
                       statusColor: data.contactStatus == '1'
                           ? Colors.green.shade400
@@ -179,7 +198,7 @@ class _CallLogPageState extends State<CallLogPage> {
                       children: [
                         _commonRows.buildDoubleRow(
                           iconLeft: 'assets/images/call.svg',
-                          valueLeft: data.contactNumber ?? '',
+                          valueLeft: maskFirst6Digits(data.contactNumber ?? ''),
                           iconRight: 'assets/images/clock.svg',
                           valueRight: data.callDuration ?? '',
                         ),
@@ -194,5 +213,10 @@ class _CallLogPageState extends State<CallLogPage> {
         ],
       ),
     );
+  }
+
+  String maskFirst6Digits(String number) {
+    if (number.length < 6) return number; // Handle edge case
+    return 'xxxxxx${number.substring(6)}';
   }
 }

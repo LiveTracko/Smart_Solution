@@ -175,6 +175,13 @@ class _DialerScreenState extends State<DialerScreen> {
                       child: Center(
                         child: TextField(
                           textAlign: TextAlign.center,
+                          readOnly: true,
+                          maxLength: 10,
+                          // ✅ disables keyboard
+                          enableInteractiveSelection:
+                              true, // ✅ enables copy/paste
+                          showCursor: false, // optional (clean UI)
+
                           controller: TextEditingController(
                               text:
                                   // dialerController.phoneNumber.value.isEmpty
@@ -186,7 +193,7 @@ class _DialerScreenState extends State<DialerScreen> {
                           },
                           decoration: InputDecoration(
                             border: InputBorder.none, // looks like plain Text
-
+                            counterText: '',
                             hintText: "Enter number",
                             hintStyle: TextStyle(
                               fontSize: 20.sp,
@@ -194,8 +201,6 @@ class _DialerScreenState extends State<DialerScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          enableInteractiveSelection:
-                              true, // enables copy/paste menu
 
                           style: TextStyle(
                             fontSize: 20.sp,
@@ -206,29 +211,34 @@ class _DialerScreenState extends State<DialerScreen> {
                       ),
                     ),
 
-                    Obx(
-                      () => Container(
-                        height: 40,
-                        width: double.infinity,
-                        color: themeColor.AppColors.diallerContainerColor,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Visibility(
-                          visible: dialerController.customerName.isEmpty,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CommonRows().buildSingleRowNoExpand(
-                                  'assets/images/user_circle.svg', 'Shashi'
-                                  // dialerController.customerName.value,
-                                  ),
-                              Text(CurrencyUtils.formatIndianCurrency(140000),
-                                  // dialerController.customerLoan.value),
-                                  style: AppTextStyle.headerTitle),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
+                    dialerController.customerName.isNotEmpty
+                        ? Obx(
+                            () => Container(
+                              height: 40,
+                              width: double.infinity,
+                              // color: themeColor.AppColors.diallerContainerColor,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: Visibility(
+                                visible: dialerController.customerName.isEmpty,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    CommonRows().buildSingleRowNoExpand(
+                                        'assets/images/user_circle.svg',
+                                        dialerController.customerName.value),
+                                    Text(
+                                        CurrencyUtils.formatIndianCurrency(
+                                            dialerController
+                                                .customerLoan.value),
+                                        style: AppTextStyle.headerTitle),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        : SizedBox.shrink()
 
                     //  const Divider(color: AppColors.secondaryColor)
                   ],

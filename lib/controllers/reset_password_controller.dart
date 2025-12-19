@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'dart:convert';
 import 'package:smart_solutions/constants/static_stored_data.dart';

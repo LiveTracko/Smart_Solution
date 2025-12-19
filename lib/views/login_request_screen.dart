@@ -26,8 +26,8 @@ class LoginRequestScreen extends StatelessWidget {
       required this.title,
       required this.isShowBack,
       required this.isDrawer});
-  final LoginRequestController controller = Get.put(LoginRequestController());
-  final DataController dataEntryController = Get.put(DataController());
+  final LoginRequestController controller = Get.find<LoginRequestController>();
+  final DataController dataEntryController = Get.find<DataController>();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -44,7 +44,6 @@ class LoginRequestScreen extends StatelessWidget {
               controller.isEdit.value = true;
               controller.isNew.value = true;
               Get.to(() => LoginRequestForm());
-              // handle click
             },
           )
         ],
@@ -57,10 +56,10 @@ class LoginRequestScreen extends StatelessWidget {
               HeaderTitle(title: title, style: AppTextStyle.headerTitle),
               SearchBarWithClear(
                   controller: controller.searchController,
-                  onChanged: (value) => controller.filterLoginRequests(value),
+                  onChanged: (value) => controller.filterLoginRequests(),
                   onClear: () {
-                    controller.searchController.clear();
-                    controller.filterLoginRequests("");
+                    controller.clearFilters();
+                    controller.filterLoginRequests();
                   }),
               kVerticalSpace(10),
               Obx(() {
@@ -141,13 +140,13 @@ class LoginRequestScreen extends StatelessWidget {
                             },
                             children: [
                               _buildDoubleRow(
-                                iconLeft: 'assets/images/call.svg',
-                                valueLeft: maskFirst6Digits(data.contactNumber),
-                                iconRight: 'assets/images/calendar.svg',
-                                valueRight: DateFormat('dd-MM-yyyy').format(
-                                    DateTime.parse(
-                                        data.loginRequestDate.toString())),
-                              ),
+                                  iconLeft: 'assets/images/call.svg',
+                                  valueLeft:
+                                      maskFirst6Digits(data.contactNumber),
+                                  iconRight: 'assets/images/calendar.svg',
+                                  valueRight: DateFormat('dd-MM-yyyy').format(
+                                      DateTime.parse(
+                                          data.loginRequestDate.toString()))),
                               _buildSingleRow(
                                   'assets/images/message_dots_circle.svg',
                                   data.remark.isEmpty
@@ -606,7 +605,7 @@ Widget _buildDoubleRow({
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildIcon(iconLeft),
+              _buildIcon(iconRight),
               //  Icon(iconRight, size: 14, color: Colors.grey[700]),
               const SizedBox(width: 4),
               Text(

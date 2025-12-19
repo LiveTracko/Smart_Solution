@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:smart_solutions/views/hrms/document_page.dart';
+import 'package:smart_solutions/views/hrms/holidaylist_page.dart';
 import 'package:smart_solutions/views/hrms/hrm_items.dart';
+import 'package:smart_solutions/views/hrms/mark_attendence_page.dart';
 import 'package:smart_solutions/views/hrms/profile_screen.dart';
+import 'package:smart_solutions/views/hrms/request_leave_page.dart';
+import 'package:smart_solutions/views/hrms/view_attendence_page.dart';
+import 'package:smart_solutions/views/view_attendance.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/hrm_card.dart';
 
@@ -11,7 +17,6 @@ class HrmScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     // Each item contains icon, title, and the screen widget to open
     final List<HrmItem> hrmItems = [
       HrmItem(
@@ -20,29 +25,27 @@ class HrmScreen extends StatelessWidget {
         page: const ProfileScreen(),
       ),
       HrmItem(
-        icon: "assets/hrms/mark_attendance.svg",
-        title: "Mark Attendance",
-        page: Scaffold(body: Center(child: Text("Mark Attendance Page"))),
-      ),
+          icon: "assets/hrms/mark_attendance.svg",
+          title: "Mark Attendance",
+          page: MarkAttendancePage()),
       HrmItem(
-        icon: "assets/hrms/view_attendance.svg",
-        title: "View Attendance",
-        page: Scaffold(body: Center(child: Text("View Attendance Page"))),
-      ),
+          icon: "assets/hrms/view_attendance.svg",
+          title: "View Attendance",
+          page: ViewAttendancePage()),
       HrmItem(
         icon: "assets/hrms/request_leave.svg",
         title: "Request Leave",
-        page: Scaffold(body: Center(child: Text("Request Leave Page"))),
+        page: RequestLeavePage(),
       ),
       HrmItem(
         icon: "assets/hrms/documents.svg",
         title: "Documents",
-        page: Scaffold(body: Center(child: Text("Documents Page"))),
+        page: DocumentsPage(),
       ),
       HrmItem(
         icon: "assets/hrms/holiday_list.svg",
         title: "Holiday List",
-        page: Scaffold(body: Center(child: Text("Holiday List Page"))),
+        page: const HolidayListPage(),
       ),
     ];
 
@@ -59,7 +62,6 @@ class HrmScreen extends StatelessWidget {
             childAspectRatio: 1.1,
           ),
           itemBuilder: (context, index) {
-
             final item = hrmItems[index];
 
             return HrmCard(

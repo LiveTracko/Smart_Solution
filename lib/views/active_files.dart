@@ -5,12 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/active_files_controller.dart';
 import 'package:smart_solutions/controllers/chartCard_controller.dart';
-import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
+import 'package:smart_solutions/utils/scroll_utils.dart';
 import 'package:smart_solutions/views/chart_card_toggle.dart';
 import 'package:smart_solutions/views/data_entry_form.dart';
 import 'package:smart_solutions/views/notification_screen.dart';
@@ -41,26 +41,21 @@ class ActiveFiles extends StatefulWidget {
 }
 
 class _ActiveFilesState extends State<ActiveFiles> {
-  final DataController dataController = Get.put(DataController());
+  final DataController dataController = Get.find<DataController>();
   final ActiveFilesController _activeFilesController =
-      Get.put(ActiveFilesController());
-  final DialerController _dialerController = Get.put(DialerController());
+      Get.find<ActiveFilesController>();
+  final DialerController _dialerController = Get.find<DialerController>();
   final FollowBackFormController _formController =
-      Get.put(FollowBackFormController());
+      Get.find<FollowBackFormController>();
 
   final ChartCardsController _chartCardsController =
       Get.find<ChartCardsController>();
-  final CommonFilterController filterController =
-      Get.put(CommonFilterController());
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
-    // _dashboardController.getActiveData(status: widget.status);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //    _activeFilesController.setupFilters(widget.status);
       _activeFilesController.currentStatus.value = widget.status;
       _activeFilesController.updateFilteredList();
     });
@@ -72,7 +67,6 @@ class _ActiveFilesState extends State<ActiveFiles> {
   void dispose() {
     _chartCardsController.selectedIndex.value = 0;
     _activeFilesController.filterController.clearFilters();
-    print('🔴 ActiveFiles disposed - controllers reset');
     super.dispose();
   }
 
@@ -82,23 +76,23 @@ class _ActiveFilesState extends State<ActiveFiles> {
       title: widget.title,
       isDrawer: widget.isDrawer,
       showBack: widget.isShowBack,
-      actions: [
-        Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: IconButton(
-            onPressed: () => Get.to(() => const NotificationSCreen()),
-            icon: SvgPicture.asset('assets/images/notification.svg'),
-          ),
-        ),
-      ],
+      // actions: [
+      //   Padding(
+      //     padding: const EdgeInsets.all(5.0),
+      //     child: IconButton(
+      //       onPressed: () => Get.to(() => const NotificationSCreen()),
+      //       icon: SvgPicture.asset('assets/images/notification.svg'),
+      //     ),
+      //   ),
+      // ],
       key: _scaffoldKey,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             color: AppColors.appBarTextColor,
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,children: [
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -112,25 +106,37 @@ class _ActiveFilesState extends State<ActiveFiles> {
                 ],
               ),
               SearchBarWithClear(
-                  controller: _activeFilesController
-                      .filterController.searchController, // Use controller's
-                  onChanged: (value) => print('Search text: $value'),
+                  controller:
+                      _activeFilesController.filterController.searchController,
+                  onChanged: (value) {
+                    _activeFilesController.updateFilteredList();
+                  },
                   onClear: () {
-                    _activeFilesController.filterController.clearFilters;
+                    _activeFilesController.filterController.clearFilters();
+                    ScrollUtils.scrollToStart(
+                        _activeFilesController.filterScrollController);
+
+                    _activeFilesController.updateFilteredList();
                   }),
               kVerticalSpace(10),
               Obx(() {
                 final filterList =
                     _activeFilesController.filterController.filters;
 
+                final selectedIndex = _activeFilesController
+                    .filterController.selectedFilter.value;
+
+                final safeIndex =
+                    selectedIndex < filterList.length ? selectedIndex : 0;
+
                 return FilterChipList(
                   filters: filterList,
-                  selectedIndex: _activeFilesController
-                      .filterController.selectedFilter.value,
+                  controller: _activeFilesController.filterScrollController,
+                  selectedIndex: safeIndex,
                   onSelected:
                       _activeFilesController.filterController.selectFilter,
                 );
-              }),
+              })
             ]),
           ),
           Expanded(child: Obx(() {
@@ -153,72 +159,69 @@ class _ActiveFilesState extends State<ActiveFiles> {
             return RefreshIndicator(
               onRefresh: () => dataController.refreshData(),
               child: ListView.builder(
-                    padding: const EdgeInsets.all(10),
-                    itemCount: _activeFilesController.filteredList.length,
-                    itemBuilder: (context, index) {
-                      //  var data = dataController.dataList[index];
-                      var data = _activeFilesController.filteredList[index];
+                  padding: const EdgeInsets.all(10),
+                  itemCount: _activeFilesController.filteredList.length,
+                  itemBuilder: (context, index) {
+                    //  var data = dataController.dataList[index];
+                    var data = _activeFilesController.filteredList[index];
 
-                      return CommonTitleCard(
-                        leading:
-                            SvgPicture.asset('assets/images/phone_call.svg'),
-                        onLeadingTap: () {
-                          _dialerController.makePhoneCall(data.mobileNo ?? '',
-                              followUpId: data.id ?? '');
-                          _formController.mobile.value = data.mobileNo ?? "";
-                          _formController.bankName.value = data.bankName ?? "";
-                          _formController.customerName.value =
-                              data.customerName ?? "";
-                          _dialerController.customerName.value =
-                              data.customerName ?? '';
-                          _dialerController.datatype.value = '';
-                          _formController.remark.value = data.comments ?? '';
-                          _dialerController.followup_id.value = data.id ?? '';
-                          _dialerController.excel_id.value = '';
-                        },
-                        title: data.customerName ?? '',
-                        subtitle: data.loginBank ?? '',
-                        status: data.status ?? '',
-                        statusColor: data.dataStatus?.toLowerCase() == 'active'
-                            ? Colors.green.shade400
-                            : Colors.redAccent.shade200,
-                        amount:
-                            CurrencyUtils.formatIndianCurrency(data.loanAmount),
-                        showEdit: StaticStoredData.roleName != 'telecaller',
-                        onEdit: () {
-                          dataController.editLoadData();
-                          Get.to(DataEntryForm(
-                            id: data.id,
-                            tellecallerId: data.teleCallerId,
-                            dsaId: data.dsaName,
-                            bankerId: data.bankerId,
-                          ));
-                        },
-                        children: [
-                          if (StaticStoredData.roleName == 'teamleader')
-                            _buildSingleRow(
-                                Icons.person_2_outlined, data.tcName ?? 'NA'),
-                          if (StaticStoredData.roleName != 'telecaller')
-                            _buildDoubleRow(
-                              iconLeft: Icons.headphones_outlined,
-                              valueLeft: data.tcName ?? '',
-                              iconRight: Icons.person_2_outlined,
-                              valueRight: data.tlName ?? '',
-                            ),
-                          _buildDoubleRow(
-                            iconLeft: 'assets/images/call.svg',
-                            valueLeft: maskFirst6Digits(data.mobileNo ?? ''),
-                            iconRight: 'assets/images/calendar.svg',
-                            valueRight: DateFormat('dd-MM-yyyy')
-                                .format(DateTime.parse(data.date.toString())),
-                          ),
+                    return CommonTitleCard(
+                      leading: SvgPicture.asset('assets/images/phone_call.svg'),
+                      onLeadingTap: () {
+                        _dialerController.makePhoneCall(data.mobileNo ?? '',
+                            followUpId: data.id ?? '');
+                        _formController.mobile.value = data.mobileNo ?? "";
+                        _formController.bankName.value = data.bankName ?? "";
+                        _formController.customerName.value =
+                            data.customerName ?? "";
+                        _dialerController.customerName.value =
+                            data.customerName ?? '';
+                        _dialerController.datatype.value = '';
+                        _formController.remark.value = data.comments ?? '';
+                        _dialerController.followup_id.value = data.id ?? '';
+                        _dialerController.excel_id.value = '';
+                      },
+                      title: data.customerName ?? '',
+                      subtitle: data.loginBank ?? '',
+                      status: data.status ?? '',
+                      statusColor: data.dataStatus?.toLowerCase() == 'active'
+                          ? Colors.green.shade400
+                          : Colors.redAccent.shade200,
+                      amount:
+                          CurrencyUtils.formatIndianCurrency(data.loanAmount),
+                      showEdit: StaticStoredData.roleName != 'telecaller',
+                      onEdit: () {
+                        dataController.editLoadData();
+                        Get.to(DataEntryForm(
+                          id: data.id,
+                          tellecallerId: data.teleCallerId,
+                          dsaId: data.dsaName,
+                          bankerId: data.bankerId,
+                        ));
+                      },
+                      children: [
+                        if (StaticStoredData.roleName == 'teamleader')
                           _buildSingleRow(
-                              'assets/images/message_dots_circle.svg',
-                              data.comments ?? 'NA'),
-                        ],
-                      );
-                    }),
-              
+                              Icons.person_2_outlined, data.tcName ?? 'NA'),
+                        if (StaticStoredData.roleName != 'telecaller')
+                          _buildDoubleRow(
+                            iconLeft: Icons.headphones_outlined,
+                            valueLeft: data.tcName ?? '',
+                            iconRight: Icons.person_2_outlined,
+                            valueRight: data.tlName ?? '',
+                          ),
+                        _buildDoubleRow(
+                          iconLeft: 'assets/images/call.svg',
+                          valueLeft: maskFirst6Digits(data.mobileNo ?? ''),
+                          iconRight: 'assets/images/calendar.svg',
+                          valueRight: DateFormat('dd-MM-yyyy')
+                              .format(DateTime.parse(data.date.toString())),
+                        ),
+                        _buildSingleRow('assets/images/message_dots_circle.svg',
+                            data.comments ?? 'NA'),
+                      ],
+                    );
+                  }),
             );
           }))
         ],

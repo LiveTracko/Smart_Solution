@@ -5,8 +5,8 @@ import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
 import 'package:smart_solutions/services/firbase_notifications.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
-import 'package:smart_solutions/views/spacing_constants.dart';
-import 'package:smart_solutions/widget/text_style.dart';
+import 'package:smart_solutions/views/forget_password.dart';
+
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -204,7 +204,9 @@ class _LoginViewState extends State<LoginView> {
               const SizedBox(height: 15),
 
               TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.to(() => const ForgetView());
+                  },
                   child: const Text("Forgot Password?",
                       style: TextStyle(
                           fontSize: 15,

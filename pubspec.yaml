@@ -66,6 +66,7 @@ dependencies:
   lucide_icons: ^0.257.0
   persistent_bottom_nav_bar_v2: ^6.2.0
   mobile_scanner: ^7.1.4
+  pinput: ^6.0.1
 
   
 

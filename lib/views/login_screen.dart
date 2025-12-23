@@ -7,7 +7,6 @@ import 'package:smart_solutions/services/firbase_notifications.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/views/forget_password.dart';
 
-
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
@@ -18,6 +17,7 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   final LoginViewModel controller = Get.find();
   final _formKey = GlobalKey<FormState>();
+  bool _isPasswordVisible = false;
 
   String? token;
 
@@ -135,20 +135,38 @@ class _LoginViewState extends State<LoginView> {
                       const SizedBox(height: 6),
                       TextFormField(
                         controller: controller.passwordController,
-                        obscureText: true,
+                        obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
-                            isDense: true,
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 10.w, vertical: 10.h),
-                            hintText: "Enter Password",
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                            suffixIcon: const Icon(Icons.visibility_off)),
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 10.w,
+                            vertical: 10.h,
+                          ),
+                          hintText: "Enter Password",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                          ),
+                        ),
                         validator: (value) {
-                          if (value!.isEmpty) return "Enter Password";
+                          if (value == null || value.isEmpty) {
+                            return "Enter Password";
+                          }
                           return null;
                         },
                       ),
+
                       const SizedBox(height: 22),
 
                       SizedBox(

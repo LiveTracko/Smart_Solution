@@ -19,15 +19,14 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final controller = Get.find<ProfileController>();
+
   ImageProvider profileImage() {
     if (controller.imageFile.value != null) {
       return FileImage(controller.imageFile.value!);
     }
-
     if (controller.profileImageUrl.value.isNotEmpty) {
       return NetworkImage(controller.profileImageUrl.value);
     }
-
     return const AssetImage("assets/images/app_login.png");
   }
 
@@ -47,12 +46,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             SvgPicture.asset(iconPath, height: 24, width: 24),
             const SizedBox(width: 16),
             Expanded(
-  child: Text(
-    title,
-    style: AppTextStyle.headerTitle,
-  ),
-),
-
+              child: Text(
+                title,
+                style: AppTextStyle.headerTitle,
+              ),
+            ),
             const Icon(
               Icons.arrow_forward_ios_rounded,
               size: 16,
@@ -68,100 +66,112 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: "Profile",
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            color: AppColors.appBarTextColor,
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Stack(
-                  children: [
-                    CircleAvatar(radius: 55, backgroundImage: profileImage()),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: _openProfileImageBottomSheet,
-                        child: CircleAvatar(
-                          radius: 16,
-                          backgroundColor: Colors.transparent,
-                          child: SvgPicture.asset(
-                            "assets/hrms/pencil_with_blue_container.svg",
-                            width: 30,
-                            height: 30,
+      body: SingleChildScrollView(
+        // ✅ FIX
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// PROFILE HEADER
+            Container(
+              color: AppColors.appBarTextColor,
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 55,
+                        backgroundImage: profileImage(),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: _openProfileImageBottomSheet,
+                          child: CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Colors.transparent,
+                            child: SvgPicture.asset(
+                              "assets/hrms/pencil_with_blue_container.svg",
+                              width: 30,
+                              height: 30,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 16),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Ashwini",
-                      style: AppTextStyle.headerTitle,
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      "+91 9876543210",
-                      style: AppTextStyle.bodyBoldTxt,
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      "Admin",
-                      style: AppTextStyle.label,
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(width: 16),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Ashwini", style: AppTextStyle.headerTitle),
+                      SizedBox(height: 6),
+                      Text("+91 9876543210", style: AppTextStyle.bodyBoldTxt),
+                      SizedBox(height: 6),
+                      Text("Admin", style: AppTextStyle.label),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Container(
-            width: double.infinity,
-            margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
-            decoration: BoxDecoration(
-              color: AppColors.appBarTextColor,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 6,
-                  offset: const Offset(0, 3),
-                )
-              ],
-            ),
-            child: Column(
-              children: [
-                buildSectionTile("assets/hrms/user.svg", "Personal Details",
-                    () => const PersonalDetailScreen()), // Updated
-                Divider(height: 1, color: Colors.grey.shade300),
-                buildSectionTile(
+
+            const SizedBox(height: 10),
+
+            /// PROFILE SECTIONS
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: AppColors.appBarTextColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  buildSectionTile(
+                    "assets/hrms/user.svg",
+                    "Personal Details",
+                    () => const PersonalDetailScreen(),
+                  ),
+                  Divider(height: 1, color: Colors.grey.shade300),
+                  buildSectionTile(
                     "assets/hrms/current_employement.svg",
                     "Current Employment",
-                    () => const CurrentEmploymentPage()), // Updated
-                Divider(height: 1, color: Colors.grey.shade300),
-                buildSectionTile(
+                    () => const CurrentEmploymentPage(),
+                  ),
+                  Divider(height: 1, color: Colors.grey.shade300),
+                  buildSectionTile(
                     "assets/hrms/attendance_details.svg",
                     "Attendance Details",
-                    () => const AttendanceModesScreen()), // Updated
-                Divider(height: 1, color: Colors.grey.shade300),
-                buildSectionTile("assets/hrms/bank_details.svg", "Bank Details",
-                    () => const BankDetailsPage()), // Updated
-                Divider(height: 1, color: Colors.grey.shade300),
-                buildSectionTile(
+                    () => const AttendanceModesScreen(),
+                  ),
+                  Divider(height: 1, color: Colors.grey.shade300),
+                  buildSectionTile(
+                    "assets/hrms/bank_details.svg",
+                    "Bank Details",
+                    () => const BankDetailsPage(),
+                  ),
+                  Divider(height: 1, color: Colors.grey.shade300),
+                  buildSectionTile(
                     "assets/hrms/user_permission.svg",
                     "User Permission",
-                    () => const CurrentEmploymentPage()), // Updat
-              ],
+                    () => const CurrentEmploymentPage(),
+                  ),
+                ],
+              ),
             ),
-          )
-        ],
+
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -175,7 +185,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Drag Handle
             Container(
               height: 4,
               width: 40,
@@ -185,16 +194,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-
             Row(
               children: [
                 const Expanded(
                   child: Text(
                     "Upload Profile Photo",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
                 GestureDetector(
@@ -203,9 +208,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 15),
-
             ListTile(
               leading: SvgPicture.asset("assets/hrms/gallery.svg"),
               title: const Text("Gallery"),
@@ -214,7 +217,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 controller.pickImage();
               },
             ),
-
             ListTile(
               leading: SvgPicture.asset("assets/hrms/camera.svg"),
               title: const Text("Camera"),
@@ -229,8 +231,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      isDismissible: true,
-      enableDrag: true,
       backgroundColor: Colors.white,
     );
   }

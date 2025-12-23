@@ -21,8 +21,7 @@ class CustomDrawer extends StatefulWidget {
 
 class _CustomDrawerState extends State<CustomDrawer> {
   final ProfileController _profileController = Get.find<ProfileController>();
-  String _userName = ""; // Default text while loading
-
+  String _userName = "";
   @override
   void initState() {
     super.initState();
@@ -150,12 +149,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       onTap: () => Get.to(() => const HrmScreen()),
                     ),
 
-                  if (StaticStoredData.roleName == 'telecaller')
-                    ListTile(
-                      leading: const Icon(Icons.supervisor_account_rounded),
-                      title: const Text('Attendence'),
-                      onTap: () => Get.to(() => const HrmScreen()),
-                    ),
+                  // if (StaticStoredData.roleName == 'telecaller')
+                  //   ListTile(
+                  //     leading: const Icon(Icons.supervisor_account_rounded),
+                  //     title: const Text('Attendence'),
+                  //     onTap: () => Get.to(() => const HrmScreen()),
+                  //   ),
 
                   // if (StaticStoredData.roleName == 'telecaller')
                   //   ListTile(
@@ -243,3 +242,102 @@ class _CustomDrawerState extends State<CustomDrawer> {
     );
   }
 }
+
+// import 'package:flutter/material.dart';
+// import 'package:flutter_svg/svg.dart';
+
+// class CustomDrawer extends StatelessWidget {
+//   const CustomDrawer({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Drawer(
+//       child: Column(
+//         children: [
+//           // ===== HEADER =====
+//           DrawerHeader(
+//             decoration: const BoxDecoration(
+//               color: Colors.blue,
+//             ),
+//             child: Align(
+//               alignment: Alignment.bottomLeft,
+//               child: Text(
+//                 'Smart Solutions',
+//                 style: TextStyle(
+//                   color: Colors.white,
+//                   fontSize: 20,
+//                   fontWeight: FontWeight.bold,
+//                 ),
+//               ),
+//             ),
+//           ),
+
+//           // ===== MENU ITEMS =====
+//           _drawerItem(
+//             svgPath: "assets/images/profile.svg",
+//             title: 'Profile',
+//             onTap: () {
+//               Navigator.pop(context);
+//               // Get.to(() => HomeScreen());
+//             },
+//           ),
+
+//           // _drawerItem(
+//           //   svgPath: "assets/images/drawer/company_and_pincode.svg",
+//           //   title: 'Listing',
+//           //   onTap: () {
+//           //     Navigator.pop(context);
+//           //     // Get.to(() => ListingScreen());
+//           //   },
+//           // ),
+
+//           // _drawerItem(
+//           //   svgPath: "assets/images/drawer/about_us.svg",
+//           //   title: 'AboutUs',
+//           //   onTap: () {
+//           //     Navigator.pop(context);
+//           //     // Get.to(() => ProfilePage());
+//           //   },
+//           // ),
+
+//           const Spacer(),
+
+//           const Divider(),
+
+//           // _drawerItem(
+//           //   icon: Icons.info_outline,
+//           //   title: 'About Us',
+//           //   onTap: () {
+//           //     Navigator.pop(context);
+//           //   },
+//           // ),
+
+//           // _drawerItem(
+//           //   icon: Icons.logout,
+//           //   title: 'Logout',
+//           //   onTap: () {
+//           //     Navigator.pop(context);
+//           //     // logout logic here
+//           //   },
+//           // ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _drawerItem({
+//     required String svgPath,
+//     required String title,
+//     required VoidCallback onTap,
+//   }) {
+//     return ListTile(
+//       leading: SvgPicture.asset(
+//         svgPath,
+//         width: 22,
+//         height: 22,
+//       ),
+//       title: Text(title),
+//       onTap: onTap,
+//     );
+//   }
+// }

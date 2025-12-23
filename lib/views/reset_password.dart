@@ -25,7 +25,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
-  String userName = "User";
+  String userName = "Rinka Chaurasiya";
 
   @override
   void initState() {
@@ -36,7 +36,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Future<void> _loadUserName() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      userName = prefs.getString('userName') ?? "User";
+      userName = prefs.getString('userName') ?? "Rinka Chaurasiya";
     });
   }
 
@@ -60,6 +60,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return SafeArea(
       top: false,
       child: Scaffold(
+        backgroundColor: Colors.white,
         resizeToAvoidBottomInset: true,
 
         bottomNavigationBar: Padding(
@@ -120,14 +121,18 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
                 /// SVG IMAGE
                 Align(
-                  alignment: Alignment.center,
-                  child: SvgPicture.asset(
-                    "assets/images/reset_password.svg",
-                    height: 150.h,
-                  ),
-                ),
+                    alignment: Alignment.center,
+                    child: Image.asset(
+                      'assets/images/reset.png',
+                      height: 200.h,
+                    )
+                    // child: SvgPicture.asset(
+                    //   "assets/images/reset_password.svg",
+                    //   height: 150.h,
+                    // ),
+                    ),
 
-                SizedBox(height: 32.h),
+                SizedBox(height: 15.h),
 
                 Text(
                   "Reset Password",

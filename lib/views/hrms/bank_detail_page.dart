@@ -1,32 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:smart_solutions/widget/common_form_field.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 
 class BankDetailsPage extends StatefulWidget {
   const BankDetailsPage({super.key});
-
-  static const Color primaryBlue = Color(0xFF2F6DF6);
-  static const Color borderGrey = Color(0xFFE0E0E0);
-  static const Color textGrey = Color(0xFF757575);
-  static const Color labelColor = Color(0xFF000000);
 
   @override
   State<BankDetailsPage> createState() => _BankDetailsPageState();
 }
 
 class _BankDetailsPageState extends State<BankDetailsPage> {
-  final TextEditingController holderNameController = TextEditingController(
-    text: 'Rahul Mehta',
-  );
-  final TextEditingController accountNumberController = TextEditingController(
-    text: '235478965412',
-  );
-  final TextEditingController bankNameController = TextEditingController(
-    text: 'HDFC Bank',
-  );
-  final TextEditingController ifscController = TextEditingController(
-    text: 'HDFC0001523',
-  );
+  final holderNameController = TextEditingController();
+  final accountNumberController = TextEditingController();
+  final bankNameController = TextEditingController();
+  final ifscController = TextEditingController();
 
   @override
   void dispose() {
@@ -39,93 +26,73 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: 'Bank Details',
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: Column(
-          children: [
-            const SizedBox(height: 15),
-            _inputField('Bank Holder\'s Name', holderNameController),
-            _inputField('Account Number', accountNumberController,
-                keyboardType: TextInputType.number),
-            _inputField('Bank Name', bankNameController),
-            _inputField('IFSC Code', ifscController),
-            const SizedBox(height: 30),
-            const Spacer(),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: SizedBox(
-                width: 400,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2F6DF6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
-                  ),
-                  onPressed: () {},
-                  child: const Text(
-                    'Save Details',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                    ),
-                  ),
+    return SafeArea(
+      top: false,
+      child: CommonScaffold(
+        title: 'Bank Details',
+
+        /// ✅ FIXED BUTTON AT BOTTOM
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: SizedBox(
+            height: 48,
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2F6DF6),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                elevation: 0,
+              ),
+              onPressed: () {
+                FocusScope.of(context).unfocus();
+                // TODO: Save bank details
+              },
+              child: const Text(
+                'Save Details',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: Colors.white,
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-          ],
+          ),
         ),
-      ),
-    );
-  }
 
-  Widget _label(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontSize: 15,
-        fontWeight: FontWeight.w500,
-        color: BankDetailsPage.labelColor,
-      ),
-    );
-  }
-
-  Widget _inputField(
-    String label,
-    TextEditingController controller, {
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _label(label),
-          const SizedBox(height: 8),
-          Container(
-            height: 40,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              border: Border.all(color: BankDetailsPage.borderGrey),
-              borderRadius: BorderRadius.circular(6),
+        /// ✅ PAGE BODY
+        body: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
             ),
-            child: TextField(
-              controller: controller,
-              keyboardType: keyboardType,
-              decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.all(0),
-                  border: InputBorder.none,
-                  isDense: true),
-              style: const TextStyle(fontSize: 14),
+            child: Column(
+              children: [
+                const SizedBox(height: 15),
+                CommonTextField(
+                  label: "Bank Holder's Name",
+                  controller: holderNameController,
+                ),
+                CommonTextField(
+                  label: "Account Number",
+                  controller: accountNumberController,
+                  keyboardType: TextInputType.number,
+                ),
+                CommonTextField(
+                  label: "Bank Name",
+                  controller: bankNameController,
+                ),
+                CommonTextField(
+                  label: "IFSC Code",
+                  controller: ifscController,
+                ),
+                const SizedBox(height: 20),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

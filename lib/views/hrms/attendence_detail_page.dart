@@ -83,170 +83,199 @@ class _AttendanceModesScreenState extends State<AttendanceModesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: 'Attendance Modes',
-      body: Column(
-        children: [
-          // TOP WHITE SECTION
-          Container(
+    return SafeArea(
+      top: false,
+      child: CommonScaffold(
+        title: 'Attendance Modes',
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: SizedBox(
+            height: 50,
             width: double.infinity,
-            color: const Color(0xffFFFFFF),
-            padding: const EdgeInsets.all(12),
-            child: const Text(
-              'Attendance Modes',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Color.fromARGB(255, 5, 6, 8),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2F6DF6),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () {
+                // save logic
+              },
+              child: const Text(
+                'Save Details',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
-
-          const SizedBox(height: 8),
-
-          // ===================== GREY AREA START =====================
-          Container(
-            width: double.infinity,
-            color: _AutomationRulesScreenState.greyBg,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Column(
-              children: [
-                // 1st CARD
-                Card(
-                  color: Color(0xffFFFFFF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 5,
-                    ),
-                    child: _switchRow(
-                      title: 'Allow Punch in From Staff App',
-                      value: allowPunchFromStaffApp,
-                      onChanged: (v) =>
-                          setState(() => allowPunchFromStaffApp = v),
-                    ),
-                  ),
+        ),
+        body: Column(
+          children: [
+            // TOP WHITE SECTION
+            Container(
+              width: double.infinity,
+              color: const Color(0xffFFFFFF),
+              padding: const EdgeInsets.all(12),
+              child: const Text(
+                'Attendance Modes',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: Color.fromARGB(255, 5, 6, 8),
                 ),
+              ),
+            ),
 
-                const SizedBox(height: 12),
+            const SizedBox(height: 8),
 
-                // 2nd CARD (Selfie + QR + GPS)
-                Card(
-                  color: const Color(0xffFFFFFF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
-                  child: Column(
-                    children: [
-                      _iconSwitchRow(
-                        svgPath: 'assets/hrms/user.svg',
-                        title: 'Selfie Attendance',
-                        value: selfieAttendance,
-                        onChanged: (v) => setState(() => selfieAttendance = v),
+            // ===================== GREY AREA START =====================
+            Container(
+              width: double.infinity,
+              color: _AutomationRulesScreenState.greyBg,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Column(
+                children: [
+                  // 1st CARD
+                  Card(
+                    color: Color(0xffFFFFFF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 5,
                       ),
-                      const Divider(height: 1),
-                      _iconSwitchRow(
-                        svgPath: 'assets/hrms/briefcase-01.svg',
-                        title: 'QR Attendance',
-                        value: qrAttendance,
-                        onChanged: (v) => setState(() => qrAttendance = v),
+                      child: _switchRow(
+                        title: 'Allow Punch in From Staff App',
+                        value: allowPunchFromStaffApp,
+                        onChanged: (v) =>
+                            setState(() => allowPunchFromStaffApp = v),
                       ),
-                      const Divider(height: 1),
-                      _iconSwitchRow(
-                        svgPath: 'assets/hrms/calendar-check-02.svg',
-                        title: 'GPS Attendance',
-                        value: gpsAttendance,
-                        onChanged: (v) => setState(() => gpsAttendance = v),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-                // 3rd CARD (Radio)
-                Card(
-                  color: Color(0xffFFFFFF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
+                  // 2nd CARD (Selfie + QR + GPS)
+                  Card(
+                    color: const Color(0xffFFFFFF),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Mark Attendance From',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF344054),
-                          ),
+                        _iconSwitchRow(
+                          svgPath: 'assets/hrms/user.svg',
+                          title: 'Selfie Attendance',
+                          value: selfieAttendance,
+                          onChanged: (v) =>
+                              setState(() => selfieAttendance = v),
                         ),
-                        const SizedBox(height: 5),
-                        Row(
-                          children: [
-                            Radio(
-                              value: 'office',
-                              //ignore:deprecated_member_use
-                              groupValue: markFrom,
-                              //ignore:deprecated_member_use
-                              onChanged: (v) => setState(() => markFrom = v!),
-                              activeColor: Color(0xFF2F6DF6),
-                            ),
-                            const Text("Office"),
-                            const SizedBox(width: 16),
-                            Radio(
-                              value: 'anywhere',
-                              //ignore:deprecated_member_use
-                              groupValue: markFrom,
-                              //ignore:deprecated_member_use
-                              onChanged: (v) => setState(() => markFrom = v!),
-                              activeColor: Color(0xFF2F6DF6),
-                            ),
-                            const Text("Anywhere"),
-                          ],
+                        const Divider(height: 1),
+                        _iconSwitchRow(
+                          svgPath: 'assets/hrms/briefcase-01.svg',
+                          title: 'QR Attendance',
+                          value: qrAttendance,
+                          onChanged: (v) => setState(() => qrAttendance = v),
+                        ),
+                        const Divider(height: 1),
+                        _iconSwitchRow(
+                          svgPath: 'assets/hrms/calendar-check-02.svg',
+                          title: 'GPS Attendance',
+                          value: gpsAttendance,
+                          onChanged: (v) => setState(() => gpsAttendance = v),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
 
-          SizedBox(height: 100.h),
+                  const SizedBox(height: 12),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2F6DF6),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () {},
-                child: const Text(
-                  'Save Details',
-                  style: TextStyle(
+                  // 3rd CARD (Radio)
+                  Card(
                     color: Color(0xffFFFFFF),
-                    fontWeight: FontWeight.w600,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Mark Attendance From',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF344054),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Radio(
+                                value: 'office',
+                                //ignore:deprecated_member_use
+                                groupValue: markFrom,
+                                //ignore:deprecated_member_use
+                                onChanged: (v) => setState(() => markFrom = v!),
+                                activeColor: Color(0xFF2F6DF6),
+                              ),
+                              const Text(
+                                "Office",
+                              ),
+                              const SizedBox(width: 16),
+                              Radio(
+                                value: 'anywhere',
+                                //ignore:deprecated_member_use
+                                groupValue: markFrom,
+                                //ignore:deprecated_member_use
+                                onChanged: (v) => setState(() => markFrom = v!),
+                                activeColor: Color(0xFF2F6DF6),
+                              ),
+                              const Text("Anywhere"),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
+            // Padding(
+            //   padding: const EdgeInsets.fromLTRB(16, 8, 16, 1),
+            //   child: SizedBox(
+            //     height: 50,
+            //     width: double.infinity,
+            //     child: ElevatedButton(
+            //       style: ElevatedButton.styleFrom(
+            //         backgroundColor: const Color(0xFF2F6DF6),
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(10),
+            //         ),
+            //       ),
+            //       onPressed: () {
+            //         // save logic
+            //       },
+            //       child: const Text(
+            //         'Save Details',
+            //         style: TextStyle(
+            //           color: Colors.white,
+            //           fontWeight: FontWeight.w600,
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+          ],
+        ),
       ),
     );
   }
@@ -259,7 +288,7 @@ class _AttendanceModesScreenState extends State<AttendanceModesScreen> {
     return Row(
       children: [
         Expanded(
-          child: Text(title, style: AppTextStyle.headerTitle),
+          child: Text(title, style: AppTextStyle.bodyBoldTxt),
         ),
         Switch(
           value: value,
@@ -289,7 +318,7 @@ class _AttendanceModesScreenState extends State<AttendanceModesScreen> {
           Expanded(
             child: Text(
               title,
-              style: AppTextStyle.headerTitle,
+              style: AppTextStyle.bodyBoldTxt,
             ),
           ),
           Switch(
@@ -609,35 +638,6 @@ class _AutomationRulesScreenState extends State<AutomationRulesScreen> {
           ),
         ],
       ),
-
-      // Save button correctly placed in bottomNavigationBar
-      // bottomNavigationBar: SafeArea(
-      //   minimum: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      //   child: Padding(
-      //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      //     child: SizedBox(
-      //       width: double.infinity,
-      //       height: 50,
-      //       child: ElevatedButton(
-      //         style: ElevatedButton.styleFrom(
-      //           backgroundColor: primaryBlue,
-      //           shape: RoundedRectangleBorder(
-      //             borderRadius: BorderRadius.circular(10),
-      //           ),
-      //         ),
-      //         onPressed: () {
-      //           // Save action
-      //         },
-      //         child: const Text(
-      //           'Save Details',
-      //           style: TextStyle(
-      //             color: Color(0xffFFFFFF),
-      //             fontWeight: FontWeight.w600,
-      //           ),
-      //         ),
-      //       ),
-      //     ),
-      //   ),
     );
   }
 }
@@ -750,37 +750,6 @@ class LeaveHistoryScreen extends StatelessWidget {
           ],
         ),
       ),
-
-      // pinned bottom button (like screenshot)
-      // bottomNavigationBar: SafeArea(
-      //   top: false,
-      //   child: Container(
-      //     color: const Color.fromARGB(0, 253, 253, 253),
-      //     padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      //     child: SizedBox(
-      //       height: 48,
-      //       width: double.infinity,
-      //       child: ElevatedButton(
-      //         style: ElevatedButton.styleFrom(
-      //           backgroundColor: const Color(0xFF2F6DF6),
-      //           shape: RoundedRectangleBorder(
-      //             borderRadius: BorderRadius.circular(8),
-      //           ),
-      //           elevation: 0,
-      //         ),
-      //         onPressed: () {},
-      //         child: const Text(
-      //           'Request Leave',
-      //           style: TextStyle(
-      //             color: Colors.white,
-      //             fontWeight: FontWeight.w600,
-      //             fontSize: 16,
-      //           ),
-      //         ),
-      //       ),
-      //     ),
-      //   ),
-      // ),
     );
   }
 }
@@ -834,15 +803,6 @@ class _LeaveHistoryCard extends StatelessWidget {
                     backgroundColor: Colors.white,
                     child: SvgPicture.asset(svgPath, fit: BoxFit.contain),
                   ),
-                  //  Center(
-                  //   child: SizedBox(
-                  //     width: 28,
-                  //     height: 28,
-                  //     child: ClipOval(
-                  //       child: SvgPicture.asset(svgPath, fit: BoxFit.fill),
-                  //     ),
-                  //   ),
-                  // ),
                 ),
 
                 const SizedBox(width: 12),

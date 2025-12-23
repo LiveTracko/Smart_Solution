@@ -11,14 +11,16 @@ class DocumentsPage extends StatelessWidget {
     return CommonScaffold(
       title: "Documents",
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
         child: Column(
           children: [
             // Search Box
-            CommonTextFieldWithSuffixIcon(
-                label: "Search Text Here ",
-                controller: SearchController(),
-                suffixIcon: Icon(Icons.search_rounded)),
+            CommonTextFieldWithPrefixIcon(
+              label: "Search Text Here ",
+              controller: SearchController(),
+              prefixIcon: const Icon(Icons.search_rounded),
+              hintText: "Search Text Here",
+            ),
 
             const SizedBox(height: 20),
 

@@ -15,14 +15,11 @@ class PersonalDetailScreen extends StatefulWidget {
 class _PersonalDetailScreenState extends State<PersonalDetailScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController staffNameController =
-      TextEditingController(text: 'Shashi 5');
-  final TextEditingController guardianNameController =
-      TextEditingController(text: 'Yash');
-  final TextEditingController emergencyNameController =
-      TextEditingController(text: 'Shashi 5');
+  final TextEditingController staffNameController = TextEditingController();
+  final TextEditingController guardianNameController = TextEditingController();
+  final TextEditingController emergencyNameController = TextEditingController();
   final TextEditingController emergencyAddressController =
-      TextEditingController(text: 'Address Here');
+      TextEditingController();
 
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController emergencyMobileController =
@@ -54,147 +51,172 @@ class _PersonalDetailScreenState extends State<PersonalDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CommonScaffold(
-      title: "Update Profile",
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Personal Details',
-                    style: AppTextStyle.textfieldheading,
-                  ),
-                ),
-              ),
-
-              /// PERSONAL DETAILS
-              CommonTextField(
-                label: "Staff Name",
-                controller: staffNameController,
-                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-              ),
-
-              CommonCountryPhoneField(
-                label: 'Mobile No.',
-                controller: mobileController,
-                validator: (v) =>
-                    v == null || v.length != 10 ? 'Enter valid number' : null,
-              ),
-
-              CommonDateField(
-                label: "Date Of Birth",
-                value: dobText,
-                onTap: _pickDate,
-              ),
-
-              CommonDropdownField(
-                label: "Gender",
-                value: gender,
-                items: const ["Male", "Female", "Other"],
-                onChanged: (v) => setState(() => gender = v!),
-              ),
-
-              CommonDropdownField(
-                label: "Marital Status",
-                value: maritalStatus,
-                items: const ["Single", "Married", "Divorced", "Widowed"],
-                onChanged: (v) => setState(() => maritalStatus = v!),
-              ),
-
-              CommonDropdownField(
-                label: "Blood Group",
-                value: bloodGroup,
-                items: const ['O+', 'O-', 'A+', 'B+', 'AB+'],
-                onChanged: (v) => setState(() => bloodGroup = v!),
-              ),
-
-              CommonTextField(
-                label: "Guardian Name",
-                controller: guardianNameController,
-              ),
-
-              const Divider(thickness: 10, color: Color(0xFFE0E0E0)),
-
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Emergency Contact Details',
-                    style: AppTextStyle.textfieldheading,
-                  ),
-                ),
-              ),
-
-              /// EMERGENCY DETAILS
-              CommonTextField(
-                label: "Emergency Contact Name",
-                controller: emergencyNameController,
-              ),
-
-              CommonDropdownField(
-                label: "Emergency Relation",
-                value: emergencyRelation,
-                items: const [
-                  'Father',
-                  'Mother',
-                  'Brother',
-                  'Sister',
-                  'Spouse'
-                ],
-                onChanged: (v) => setState(() => emergencyRelation = v!),
-              ),
-
-              CommonCountryPhoneField(
-                label: 'Emergency Contact Mobile',
-                controller: emergencyMobileController,
-              ),
-
-              CommonAddressField(
-                label: 'Emergency Address',
-                controller: emergencyAddressController,
-                validator: (v) =>
-                    v == null || v.isEmpty ? 'Address required' : null,
-              ),
-
-              const SizedBox(height: 20),
-
-              /// SAVE BUTTON
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: PersonalDetailScreen.primaryBlue,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // ✅ submit logic here
-                      }
-                    },
-                    child: const Text(
-                      'Save Details',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
+    return SafeArea(
+      top: false,
+      child: CommonScaffold(
+        title: "Update Profile",
+        body: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Personal Details',
+                      style: AppTextStyle.textfieldheading,
                     ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
-            ],
+                /// PERSONAL DETAILS
+                CommonTextField(
+                  label: "Staff Name",
+                  controller: staffNameController,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                ),
+
+                CommonCountryPhoneField(
+                  label: 'Mobile No.',
+                  controller: mobileController,
+                  validator: (v) =>
+                      v == null || v.length != 10 ? 'Enter valid number' : null,
+                ),
+
+                CommonDateField(
+                  label: "Date Of Birth",
+                  value: dobText,
+                  onTap: _pickDate,
+                ),
+
+                CommonDropdownField(
+                  label: "Gender",
+                  value: gender,
+                  items: const ["Male", "Female", "Other"],
+                  onChanged: (v) => setState(() => gender = v!),
+                ),
+
+                CommonDropdownField(
+                  label: "Marital Status",
+                  value: maritalStatus,
+                  items: const ["Single", "Married", "Divorced", "Widowed"],
+                  onChanged: (v) => setState(() => maritalStatus = v!),
+                ),
+
+                CommonDropdownField(
+                  label: "Blood Group",
+                  value: bloodGroup,
+                  items: const ['O+', 'O-', 'A+', 'B+', 'AB+'],
+                  onChanged: (v) => setState(() => bloodGroup = v!),
+                ),
+
+                CommonTextField(
+                  label: "Guardian Name",
+                  controller: guardianNameController,
+                ),
+
+                const Divider(thickness: 10, color: Color(0xFFE0E0E0)),
+
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Emergency Contact Details',
+                      style: AppTextStyle.textfieldheading,
+                    ),
+                  ),
+                ),
+
+                /// EMERGENCY DETAILS
+                CommonTextField(
+                  label: "Emergency Contact Name",
+                  controller: emergencyNameController,
+                ),
+
+                CommonDropdownField(
+                  label: "Emergency Relation",
+                  value: emergencyRelation,
+                  items: const [
+                    'Father',
+                    'Mother',
+                    'Brother',
+                    'Sister',
+                    'Spouse'
+                  ],
+                  onChanged: (v) => setState(() => emergencyRelation = v!),
+                ),
+
+                CommonCountryPhoneField(
+                  label: 'Emergency Contact Mobile',
+                  controller: emergencyMobileController,
+                ),
+
+                CommonAddressField(
+                  label: 'Emergency Address',
+                  controller: emergencyAddressController,
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Address required' : null,
+                ),
+
+                // const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        //  backgroundColor: CurrentEmploymentPage.primaryBlue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                      onPressed: () {},
+                      child: const Text(
+                        'Save Details',
+                        style: TextStyle(
+                          color: Color(0xffFFFFFF),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                /// SAVE BUTTON
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 16),
+                //   child: SizedBox(
+                //     width: double.infinity,
+                //     height: 48,
+                //     child: ElevatedButton(
+                //       style: ElevatedButton.styleFrom(
+                //         backgroundColor: PersonalDetailScreen.primaryBlue,
+                //         shape: RoundedRectangleBorder(
+                //           borderRadius: BorderRadius.circular(6),
+                //         ),
+                //       ),
+                //       onPressed: () {
+                //         if (_formKey.currentState!.validate()) {
+                //           // ✅ submit logic here
+                //         }
+                //       },
+                //       child: const Text(
+                //         'Save Details',
+                //         style: TextStyle(
+                //           color: Colors.white,
+                //           fontWeight: FontWeight.w600,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
+              ],
+            ),
           ),
         ),
       ),

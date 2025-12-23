@@ -133,58 +133,64 @@ class _MarkAttendancePageState extends State<MarkAttendancePage>
             // -------- Bottom Controls ----------
             Padding(
               padding: const EdgeInsets.only(bottom: 32),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Camera Button (Center)
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _lastCode = null;
-                      });
-                    },
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Color(0xffFFFFFF), width: 2),
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: 56,
-                          height: 56,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xffFFFFFF),
-                          ),
-                          child: Center(
-                            child: SvgPicture.asset(
-                              "assets/hrms/scan_camera.svg",
-                              height: 22,
-                              width: 22,
+              child: SizedBox(
+                height: 80,
+                width: double.infinity,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    /// 🎯 CAMERA BUTTON — ALWAYS CENTER
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _lastCode = null;
+                        });
+                      },
+                      child: Container(
+                        width: 80.w,
+                        height: 80.h,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border:
+                              Border.all(color: Color(0xffFFFFFF), width: 2),
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: 56.w,
+                            height: 56.h,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Color(0xffFFFFFF),
+                            ),
+                            child: Center(
+                              child: SvgPicture.asset(
+                                "assets/hrms/scan_camera.svg",
+                                height: 22.h,
+                                width: 22.w,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: 30.w,
-                  ),
-                  IconButton(
-                    iconSize: 30,
-                    icon: Icon(
-                      _torchOn ? Icons.flash_on : Icons.flash_off,
-                      color: Colors.white,
+
+                    /// 🔦 FLASH BUTTON — FIXED RIGHT
+                    Positioned(
+                      right: 80,
+                      child: IconButton(
+                        iconSize: 30,
+                        icon: Icon(
+                          _torchOn ? Icons.flash_on : Icons.flash_off,
+                          color: Colors.white,
+                        ),
+                        onPressed: () async {
+                          await _controller.toggleTorch();
+                          setState(() => _torchOn = !_torchOn);
+                        },
+                      ),
                     ),
-                    onPressed: () async {
-                      await _controller.toggleTorch();
-                      setState(() => _torchOn = !_torchOn);
-                    },
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

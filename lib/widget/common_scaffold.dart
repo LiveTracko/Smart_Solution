@@ -15,6 +15,9 @@ class CommonScaffold extends StatelessWidget {
   final double height;
   final double bodyPadding;
 
+  
+  final Widget? bottomNavigationBar;
+
   CommonScaffold({
     super.key,
     required this.title,
@@ -24,6 +27,9 @@ class CommonScaffold extends StatelessWidget {
     this.showBack = true,
     this.height = 15,
     this.bodyPadding = 80,
+
+    
+    this.bottomNavigationBar,
   });
 
   final DashboardController controller = Get.put(DashboardController());
@@ -32,26 +38,35 @@ class CommonScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.backgroundColor,
+      resizeToAvoidBottomInset: true,
+
       drawerEnableOpenDragGesture: false,
       drawer: isDrawer ? const CustomDrawer() : null,
+
       appBar: CurvedAppBar(
-          title: title,
-          actions: actions,
-          showBack: showBack,
-          height: height,
-          leading: isDrawer
-              ? IconButton(
-                  onPressed: () async {
-                    controller.toggleDrawer();
-                    controller.isDrawerOpen.value
-                        ? _scaffoldKey.currentState!.openDrawer()
-                        : _scaffoldKey.currentState!.closeDrawer();
-                  },
-                  icon: SvgPicture.asset('assets/images/menu.svg'))
-              : null),
-      key: _scaffoldKey,
+        title: title,
+        actions: actions,
+        showBack: showBack,
+        height: height,
+        leading: isDrawer
+            ? IconButton(
+                onPressed: () async {
+                  controller.toggleDrawer();
+                  controller.isDrawerOpen.value
+                      ? _scaffoldKey.currentState!.openDrawer()
+                      : _scaffoldKey.currentState!.closeDrawer();
+                },
+                icon: SvgPicture.asset('assets/images/menu.svg'),
+              )
+            : null,
+      ),
+
       body: SafeArea(child: body),
+
+      
+      bottomNavigationBar: bottomNavigationBar,
     );
   }
 }

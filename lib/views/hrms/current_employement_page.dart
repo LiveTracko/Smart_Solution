@@ -17,20 +17,20 @@ class CurrentEmploymentPage extends StatefulWidget {
 class _CurrentEmploymentPageState extends State<CurrentEmploymentPage> {
   // Controllers
   final TextEditingController branchController = TextEditingController(
-    text: 'Smart Solution Main Branch',
-  );
+      // text: 'Smart Solution Main Branch',
+      );
   final TextEditingController employeeIdController = TextEditingController(
-    text: 'SS-001',
-  );
+      // text: 'SS-001',
+      );
   final TextEditingController emailController = TextEditingController(
-    text: 'chiragwadhwani29@gmail.com',
-  );
+      // text: 'chiragwadhwani29@gmail.com',
+      );
   final TextEditingController pfController = TextEditingController(
-    text: '63620hc762g',
-  );
+      // text: '63620hc762g',
+      );
   final TextEditingController esiController = TextEditingController(
-    text: '63620hc762g',
-  );
+      // text: '63620hc762g',
+      );
 
   String department = 'All Departments Assigned';
   String employeeType = 'Full Time';
@@ -127,7 +127,7 @@ class _CurrentEmploymentPageState extends State<CurrentEmploymentPage> {
             CommonTextField(label: "ESI A/C No.", controller: esiController),
             const SizedBox(height: 20),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 1),
               child: SizedBox(
                 width: double.infinity,
                 height: 48,

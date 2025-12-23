@@ -22,6 +22,7 @@ class ForgetViewState extends State<ForgetView> {
     return SafeArea(
       top: false,
       child: Scaffold(
+        backgroundColor: Colors.white,
         resizeToAvoidBottomInset: true,
 
         /// 🔽 BUTTON FIXED AT BOTTOM
@@ -48,8 +49,8 @@ class ForgetViewState extends State<ForgetView> {
           padding: EdgeInsets.only(
             bottom: 100.h,
             top: 32.h,
-            left: 16.w,
-            right: 16.w,
+            left: 5.w,
+            right: 5.w,
           ),
           child: Form(
             key: _formKey,
@@ -57,7 +58,6 @@ class ForgetViewState extends State<ForgetView> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(height: 20.h),
-                
                 Align(
                   alignment: Alignment.topCenter,
                   child: SvgPicture.asset(
@@ -66,35 +66,43 @@ class ForgetViewState extends State<ForgetView> {
                     width: 220.w,
                   ),
                 ),
-
                 SizedBox(height: 24.h),
-
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  padding: const EdgeInsets.only(left: 15, right: 15),
                   child: Text(
                     "Forgot Password",
                     style: AppTextStyle.headerTitle1.copyWith(fontSize: 24.sp),
                   ),
                 ),
-
                 SizedBox(height: 8.h),
-
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  padding: const EdgeInsets.only(left: 15, right: 15),
                   child: Text(
                     "Enter your registered email address or mobile number to receive an OTP and reset your password",
-                    style: AppTextStyle.normalHeadingTxt.copyWith(fontSize: 14.sp),
+                    style: AppTextStyle.normalHeadingTxt
+                        .copyWith(fontSize: 12.5.sp),
                   ),
                 ),
-
                 SizedBox(height: 24.h),
-
                 CommonTextField(
                   label: "Enter Email Or Mobile No.",
                   controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
                   validator: (v) {
                     if (v == null || v.isEmpty) {
                       return "This field is required";
+                    }
+                    final value = v.trim();
+                    if (RegExp(r'^\d+$').hasMatch(value)) {
+                      if (value.length != 10) {
+                        return "Mobile Number must be 10 digits";
+                      }
+                      return null;
+                    }
+                    final emailRegex =
+                        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                    if (!emailRegex.hasMatch(value)) {
+                      return "Enter a valid email or 10 digit mobile number";
                     }
                     return null;
                   },

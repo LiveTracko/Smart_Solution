@@ -29,12 +29,14 @@ class CommonTextField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final String? Function(String?)? validator;
+  final TextInputType keyboardType;
 
   const CommonTextField({
     super.key,
     required this.label,
     required this.controller,
     this.validator,
+    this.keyboardType = TextInputType.text,
   });
 
   @override
@@ -57,6 +59,7 @@ class CommonTextField extends StatelessWidget {
             child: TextFormField(
               controller: controller,
               validator: validator,
+              keyboardType: keyboardType,
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
@@ -211,21 +214,23 @@ class CommonAddressField extends StatelessWidget {
 }
 
 /// ================= TEXT FIELD WITH SUFFIX ICON =================
-class CommonTextFieldWithSuffixIcon extends StatelessWidget {
+class CommonTextFieldWithPrefixIcon extends StatelessWidget {
   final String label;
   final TextEditingController controller;
-  final Widget suffixIcon;
-  final VoidCallback? onSuffixTap;
+  final Widget prefixIcon;
+  final VoidCallback? onPrefixTap;
+  final String? hintText; // ✅ FIXED
   final bool readOnly;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
 
-  const CommonTextFieldWithSuffixIcon({
+  const CommonTextFieldWithPrefixIcon({
     super.key,
     required this.label,
     required this.controller,
-    required this.suffixIcon,
-    this.onSuffixTap,
+    required this.prefixIcon,
+    this.onPrefixTap,
+    this.hintText,
     this.readOnly = false,
     this.keyboardType = TextInputType.text,
     this.validator,
@@ -238,8 +243,6 @@ class CommonTextFieldWithSuffixIcon extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CommonLabel(label),
-          const SizedBox(height: 8),
           Container(
             height: 40,
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -249,24 +252,31 @@ class CommonTextFieldWithSuffixIcon extends StatelessWidget {
             ),
             child: Row(
               children: [
+                /// PREFIX ICON
+                InkWell(
+                  onTap: onPrefixTap,
+                  child: prefixIcon,
+                ),
+
+                const SizedBox(width: 8),
+
+                /// TEXT FIELD
                 Expanded(
                   child: TextFormField(
                     controller: controller,
                     validator: validator,
                     readOnly: readOnly,
                     keyboardType: keyboardType,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
+                      hintText: hintText, // ✅ ADDED
+                      hintStyle: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 14,
+                      ),
                       border: InputBorder.none,
                       isDense: true,
                       contentPadding: EdgeInsets.zero,
                     ),
-                  ),
-                ),
-                InkWell(
-                  onTap: onSuffixTap,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: suffixIcon,
                   ),
                 ),
               ],

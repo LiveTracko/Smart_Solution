@@ -21,6 +21,7 @@ class _OtpViewState extends State<OtpView> {
     return SafeArea(
       top: false,
       child: Scaffold(
+        backgroundColor: Colors.white,
         resizeToAvoidBottomInset: true,
 
         // 🔹 BUTTON FIXED AT BOTTOM
@@ -111,7 +112,7 @@ class _OtpViewState extends State<OtpView> {
                 },
                 defaultPinTheme: PinTheme(
                   width: 70.w,
-                  height: 60.h,
+                  height: 70.h,
                   textStyle: TextStyle(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
@@ -123,7 +124,7 @@ class _OtpViewState extends State<OtpView> {
                 ),
                 focusedPinTheme: PinTheme(
                   width: 70.w,
-                  height: 60.h,
+                  height: 70.h,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(
@@ -134,7 +135,7 @@ class _OtpViewState extends State<OtpView> {
                 ),
                 submittedPinTheme: PinTheme(
                   width: 70.w,
-                  height: 60.h,
+                  height: 70.h,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(color: Colors.blue, width: 2.w),

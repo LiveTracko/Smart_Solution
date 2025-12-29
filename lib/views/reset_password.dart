@@ -161,7 +161,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       return "Minimum 6 characters required";
                     }
                     return null;
-                  },
+                  },   
                 ),
 
                 SizedBox(height: 10.h),
@@ -178,7 +178,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       return "Passwords do not match";
                     }
                     return null;
-                  },
+                  },   
                 ),
 
                 SizedBox(height: 120.h),

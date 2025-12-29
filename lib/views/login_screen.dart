@@ -113,7 +113,7 @@ class _LoginViewState extends State<LoginView> {
                         maxLength: 10,
                         decoration: InputDecoration(
                             suffixIcon: const SizedBox(
-                                width: 0), // <-- this FIXES height mismatch
+                                width: 0), 
                             isDense: true,
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 10.w, vertical: 10.h),

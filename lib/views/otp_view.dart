@@ -103,7 +103,7 @@ class _OtpViewState extends State<OtpView> {
               // OTP PIN
               Pinput(
                 length: 4,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 keyboardType: TextInputType.number,
                 onChanged: (value) {
                   setState(() {
@@ -111,8 +111,8 @@ class _OtpViewState extends State<OtpView> {
                   });
                 },
                 defaultPinTheme: PinTheme(
-                  width: 70.w,
-                  height: 70.h,
+                  width: 60.w,
+                  height: 60.h,
                   textStyle: TextStyle(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
@@ -123,8 +123,8 @@ class _OtpViewState extends State<OtpView> {
                   ),
                 ),
                 focusedPinTheme: PinTheme(
-                  width: 70.w,
-                  height: 70.h,
+                  width: 60.w,
+                  height: 60.h,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(
@@ -134,8 +134,8 @@ class _OtpViewState extends State<OtpView> {
                   ),
                 ),
                 submittedPinTheme: PinTheme(
-                  width: 70.w,
-                  height: 70.h,
+                  width: 60.w,
+                  height: 60.h,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(color: Colors.blue, width: 2.w),

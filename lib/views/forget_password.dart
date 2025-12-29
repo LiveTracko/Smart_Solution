@@ -105,7 +105,7 @@ class ForgetViewState extends State<ForgetView> {
                       return "Enter a valid email or 10 digit mobile number";
                     }
                     return null;
-                  },
+                  },  
                 ),
               ],
             ),

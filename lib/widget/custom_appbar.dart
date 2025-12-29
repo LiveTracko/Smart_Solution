@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_solutions/views/login_request_form.dart';
+import 'package:get/get.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
+import 'package:smart_solutions/theme/app_theme.dart';
 
 class CurvedAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -9,7 +11,7 @@ class CurvedAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool? showBack;
   final double height;
 
-  const CurvedAppBar({
+  CurvedAppBar({
     Key? key,
     required this.title,
     this.showBack = true,
@@ -18,10 +20,14 @@ class CurvedAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.height = 30,
   }) : super(key: key);
 
+  final ThemeController themeController = Get.find<ThemeController>();
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-        color: const Color(0xFF356eff),
+    return Obx(() {
+      // 🔁 reactively updates AppBar color
+      return Container(
+        color: themeController.primaryColor.value,
         child: SafeArea(
           bottom: false,
           child: SizedBox(
@@ -31,7 +37,7 @@ class CurvedAppBar extends StatelessWidget implements PreferredSizeWidget {
                 // Leading (menu/back)
                 showBack == true
                     ? IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.arrow_back,
                           color: AppColors.backgroundColor,
                         ),
@@ -60,7 +66,9 @@ class CurvedAppBar extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
           ),
-        ));
+        ),
+      );
+    });
   }
 
   @override

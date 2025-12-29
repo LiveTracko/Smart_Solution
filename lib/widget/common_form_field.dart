@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/src/services/text_formatter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CommonFormStyles {
@@ -48,23 +49,35 @@ class CommonTextField extends StatelessWidget {
         children: [
           CommonLabel(label),
           const SizedBox(height: 8),
-          Container(
-            height: 40,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              border: Border.all(color: CommonFormStyles.borderGrey),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            alignment: Alignment.center,
-            child: TextFormField(
-              controller: controller,
-              validator: validator,
-              keyboardType: keyboardType,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
+          TextFormField(
+            controller: controller,
+            validator: validator,
+            keyboardType: keyboardType,
+            decoration: InputDecoration(
+              // hintText: label,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: const BorderSide(color: Colors.grey),
               ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: const BorderSide(color: Colors.grey),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: const BorderSide(color: Colors.blue),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: const BorderSide(color: Colors.red),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: const BorderSide(color: Colors.red),
+              ),
+              isDense: true,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             ),
           ),
         ],
@@ -287,7 +300,6 @@ class CommonTextFieldWithPrefixIcon extends StatelessWidget {
     );
   }
 }
-
 
 /// ================= COUNTRY PHONE FIELD =================
 class CommonCountryPhoneField extends StatefulWidget {

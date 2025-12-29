@@ -60,7 +60,7 @@ class CommonScaffold extends StatelessWidget {
                 },
                 icon: SvgPicture.asset('assets/images/menu.svg'),
               )
-            : null,
+            : null,  
       ),
 
       body: SafeArea(child: body),
@@ -69,4 +69,4 @@ class CommonScaffold extends StatelessWidget {
       bottomNavigationBar: bottomNavigationBar,
     );
   }
-}
+}  

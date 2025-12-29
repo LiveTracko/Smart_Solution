@@ -17,6 +17,7 @@ import 'package:smart_solutions/controllers/follow_form.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/notification_controller.dart';
 import 'package:smart_solutions/controllers/profile_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/feature/views/callback/today_callback.dart';
 import 'package:smart_solutions/models/dashBoardToday_model.dart';
 import 'package:smart_solutions/models/incentive_model.dart';
@@ -766,7 +767,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 subHeaderTitle(durationTitle),
-                                headerTitle(controller.totalDuration.toString(),
+                                headerTitles(
+                                    controller.totalDuration.toString(),
                                     AppTextStyle.blueHeaderTitletStyle),
                               ],
                             ),
@@ -2596,6 +2598,22 @@ class _DashboardScreenState extends State<DashboardScreen>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
       child: Text(title, style: style),
+    );
+  }
+
+  Widget headerTitles(String title, TextStyle style) {
+    final ThemeController themeController = Get.find<ThemeController>();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+      child: Obx(
+        () => Text(
+          title,
+          style: style.copyWith(
+            color: themeController.primaryColor.value, // 👈 dynamic
+          ),
+        ),
+      ),
     );
   }
 

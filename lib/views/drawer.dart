@@ -1,15 +1,18 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
 import 'package:smart_solutions/controllers/profile_controller.dart';
+import 'package:smart_solutions/views/forget_password.dart';
 import 'package:smart_solutions/views/hrms/hrm_screen.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
+import 'package:smart_solutions/views/login_request_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
-import 'package:smart_solutions/views/update_profile_screen.dart';
+import 'package:smart_solutions/views/theme_change_screen.dart';
 import 'package:smart_solutions/views/profile_view.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -22,6 +25,7 @@ class CustomDrawer extends StatefulWidget {
 class _CustomDrawerState extends State<CustomDrawer> {
   final ProfileController _profileController = Get.find<ProfileController>();
   String _userName = "";
+
   @override
   void initState() {
     super.initState();
@@ -29,315 +33,231 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 
   Future<void> _loadUserName() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _userName = prefs.getString('userName') ?? "name";
+      _userName = prefs.getString('userName') ?? "Name";
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(top: 100.h),
+    final screenHeight = MediaQuery.of(context).size.height;
+    // final statusBarHeight = MediaQuery.of(context).padding.top;
+
+    return SafeArea(
+      top: true,
       child: Drawer(
-        width: MediaQuery.of(context).size.width * 0.6,
+        width: MediaQuery.of(context).size.width *
+            0.65, // slightly wider for better visibility
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomRight: Radius.zero,
-            topRight: Radius.circular(30),
-          ),
+          borderRadius: BorderRadius.only(topRight: Radius.circular(30)),
         ),
         child: Stack(
           children: [
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [
-                    Color(0xFFFFFFFF),
-                    Color(0xFF356EFF),
-                  ],
-                  stops: [0.7788, 1.0],
-                ),
-              ),
-              child: Column(
-                children: [
-                  // ===== HEADER =====
-                  Container(
-                    height: 150,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            InkWell(
-                              onTap: () => Get.to(() => ProfilePage()),
-                              child: CircleAvatar(
-                                radius: 45,
-                                backgroundColor: Colors.indigo.shade700,
-                                backgroundImage: _profileController
-                                            .imageFile.value !=
-                                        null
-                                    ? FileImage(
-                                        _profileController.imageFile.value!)
-                                    : (_profileController
-                                            .profileImageUrl.value.isNotEmpty
-                                        ? NetworkImage(_profileController
-                                            .profileImageUrl.value)
-                                        : const AssetImage(
-                                                "assets/images/app_login.png")
-                                            as ImageProvider),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 11,
-                              height: 5,
-                            ),
-                            Text(
-                              _userName.toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
+            Column(
+              children: [
+                // ================= HEADER =================
+                Container(
+                  height: screenHeight.clamp(500, 900) * 0.25,
+                  width: double.infinity,
+                  padding: EdgeInsets.only(
+                    left: 16.w,
+                    top: 16.h,
+                    right: 16.w,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: () => Get.to(() => ProfilePage()),
+                        child: CircleAvatar(
+                          radius: screenHeight * 0.05, // responsive avatar
+                          backgroundColor: Colors.white,
+                          backgroundImage: _profileController.imageFile.value !=
+                                  null
+                              ? FileImage(_profileController.imageFile.value!)
+                              : (_profileController
+                                      .profileImageUrl.value.isNotEmpty
+                                  ? NetworkImage(
+                                      _profileController.profileImageUrl.value)
+                                  : const AssetImage(
+                                          "assets/images/app_login.png")
+                                      as ImageProvider),
                         ),
                       ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        _userName.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // ================= BODY =================
+                Expanded(
+                  child: Container(
+                    color: Colors.white,
+                    child: Column(
+                      children: [
+                        // if (StaticStoredData.roleName == 'telecaller')
+                        _drawerSvgTile(
+                          'assets/drawer/pin_marker.svg',
+                          'Company & Pincode',
+                          () => Get.to(
+                            () => ListingScreen(
+                              title: 'Listing',
+                              isShowBack: true,
+                              isDrawer: false,
+                            ),
+                          ),
+                        ),
+                        if (StaticStoredData.roleName == 'telecaller')
+                          _drawerSvgTile(
+                            'assets/drawer/login_request.svg',
+                            'Login Request',
+                            () => Get.to(
+                              () => LoginRequestScreen(
+                                title: 'Login Request',
+                                isShowBack: true,
+                                isDrawer: false,
+                              ),
+                            ),
+                          ),
+                        // if (StaticStoredData.roleName == 'telecaller')
+                        //   _drawerSvgTile(
+                        //     'assets/drawer/about_us.svg',
+                        //     'About Us',
+                        //     () {},
+                        //   ),
+                        // if (StaticStoredData.roleName == 'telecaller')
+                        _drawerSvgTile(
+                          'assets/drawer/lock.svg',
+                          'Reset Password',
+                          () => Get.to(() => const ForgetView()),
+                        ),
+                        if (StaticStoredData.roleName == 'telecaller')
+                          _drawerSvgTile(
+                            'assets/drawer/login_request.svg',
+                            'HRM',
+                            () => Get.to(() => HrmScreen()),
+                          ),
+                        // if (StaticStoredData.roleName == 'telecaller')
+                        _drawerSvgTile(
+                          'assets/drawer/theme.svg',
+                          'Theme',
+                          () => Get.to(() => ThemeChangeScreen()),
+                        ),
+                        const Spacer(),
+                        const Divider(),
+                        _drawerTile(
+                          'assets/drawer/log_out.svg',
+                          'Log Out',
+                          () async {
+                            StaticStoredData.userId = '';
+                            StaticStoredData.number = '';
+
+                            _profileController.nameController.clear();
+                            _profileController.usernameController.clear();
+                            _profileController.imageFile.value = null;
+                            _profileController.profileImageUrl.value = '';
+
+                            if (Get.isRegistered<ProfileController>()) {
+                              Get.delete<ProfileController>();
+                            }
+
+                            final prefs = await SharedPreferences.getInstance();
+                            prefs.clear();
+
+                            Get.put(LoginViewModel());
+                            Get.offAll(() => LoginView());
+                          },
+                          isBottomTile: true,
+                        ),
+                      ],
                     ),
                   ),
-
-                  // ===== TOP GROUP =====
-                  ListTile(
-                    leading: const Icon(Icons.list_alt),
-                    title: const Text('Listing'),
-                    onTap: () => Get.to(() => ListingScreen(
-                          title: 'Listing',
-                          isShowBack: true,
-                          isDrawer: false,
-                        )),
-                  ),
-                  // ListTile(
-                  //   leading: const Icon(Icons.list),
-                  //   title: const Text('Reports'),
-
-                  //   onTap: () => Get.to(() => const ReportPage()),
-                  // ),
-                  if (StaticStoredData.roleName == 'telecaller')
-                    ListTile(
-                      leading: const Icon(Icons.supervisor_account_rounded),
-                      title: const Text('Customer'),
-                      onTap: () {},
-                    ),
-                  //
-                  if (StaticStoredData.roleName == 'telecaller')
-                    ListTile(
-                      leading: const Icon(Icons.supervisor_account_rounded),
-                      title: const Text('Profile'),
-                      onTap: () => Get.to(() => ProfilePage()),
-                    ),
-                  if (StaticStoredData.roleName == 'telecaller')
-                    ListTile(
-                      leading: const Icon(Icons.supervisor_account_rounded),
-                      title: const Text('HRM'),
-                      onTap: () => Get.to(() => const HrmScreen()),
-                    ),
-
-                  // if (StaticStoredData.roleName == 'telecaller')
-                  //   ListTile(
-                  //     leading: const Icon(Icons.supervisor_account_rounded),
-                  //     title: const Text('Attendence'),
-                  //     onTap: () => Get.to(() => const HrmScreen()),
-                  //   ),
-
-                  // if (StaticStoredData.roleName == 'telecaller')
-                  //   ListTile(
-                  //       leading: const Icon(Icons.supervisor_account_rounded),
-                  //       title: const Text('Fllow up Record'),
-                  //       onTap: () => Get.to(() => FollowBackListScreen())),
-                  const Spacer(),
-
-                  // ===== BOTTOM GROUP =====
-                  const Divider(),
-                  // _drawerTile(Icons.home, 'Home', () async {
-                  //   SharedPreferences prefs =
-                  //       await SharedPreferences.getInstance();
-                  //   prefs.clear();
-                  //   StaticStoredData.userId = '';
-                  //   Get.put(DashboardTodayModel());
-                  //   Get.offAll(() => DashboardScreen());
-                  // }),
-                  _drawerTile(Icons.info_rounded, 'About us', () {}),
-                  _drawerTile(Icons.lock, 'Reset Password', () {}),
-                  _drawerTile(Icons.logout, 'Logout', () async {
-                    // Clear stored static data
-                    StaticStoredData.userId = '';
-                    StaticStoredData.number = '';
-
-                    // Clear controller values
-                    _profileController.nameController.clear();
-                    _profileController.usernameController.clear();
-                    _profileController.imageFile.value = null;
-                    _profileController.profileImageUrl.value = '';
-
-                    // Delete the ProfileController instance
-                    if (Get.isRegistered<ProfileController>()) {
-                      Get.delete<ProfileController>();
-                    }
-
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    prefs.clear();
-                    StaticStoredData.userId = '';
-                    Get.put(LoginViewModel());
-                    Get.offAll(() => LoginView());
-                  }),
-                ],
-              ),
+                ),
+              ],
             ),
 
-            // Close button
+            // ================= CLOSE BUTTON =================
             Positioned(
-                top: 15,
-                right: 15,
-                child: GestureDetector(
+              top: 12.h,
+              right: 12.w,
+              child: SafeArea(
+                child: Padding(
+                  padding:
+                      EdgeInsets.all(8.w), // optional padding inside safe area
+                  child: GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: SvgPicture.asset('assets/images/cross.svg'))),
+                    child: SvgPicture.asset(
+                      'assets/drawer/cross.svg',
+                      // width: 24.w,
+                      // height: 24.h,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-// Reusable ListTile with compact spacing
+  // ================= SVG TILE =================
+  Widget _drawerSvgTile(String asset, String title, VoidCallback onTap) {
+    return ListTile(
+      dense: true,
+      leading: SvgPicture.asset(
+        asset,
+        fit: BoxFit.contain,
+        colorFilter: const ColorFilter.mode(
+          Colors.grey,
+          BlendMode.srcIn,
+        ),
+      ),
+      title: Text(title, style: TextStyle(fontSize: 14.sp)),
+      onTap: onTap,
+    );
+  }
 
+  // ================= ICON TILE =================
   Widget _drawerTile(
-    IconData icon,
+    String asset,
     String title,
     VoidCallback onTap, {
-    bool isBottomTile = false, // flag to style differently
+    bool isBottomTile = false,
   }) {
     return ListTile(
       dense: true,
-      visualDensity: const VisualDensity(vertical: -2),
-      leading: Icon(
-        icon,
-        size: isBottomTile ? 28 : 22, // bigger icon for bottom tiles
-        color: Colors.black87,
+      leading: SizedBox(
+        width: 24.w,
+        height: 24.h,
+        child: SvgPicture.asset(
+          asset,
+          fit: BoxFit.contain,
+        ),
       ),
       title: Text(
         title,
         style: TextStyle(
-          fontSize: isBottomTile ? 16 : 14, // bigger text for bottom tiles
-          fontWeight: isBottomTile ? FontWeight.w600 : FontWeight.normal,
+          fontSize: isBottomTile ? 16.sp : 14.sp,
+          color: isBottomTile ? Colors.red : Colors.black,
         ),
       ),
       onTap: onTap,
     );
   }
 }
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_svg/svg.dart';
-
-// class CustomDrawer extends StatelessWidget {
-//   const CustomDrawer({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Drawer(
-//       child: Column(
-//         children: [
-//           // ===== HEADER =====
-//           DrawerHeader(
-//             decoration: const BoxDecoration(
-//               color: Colors.blue,
-//             ),
-//             child: Align(
-//               alignment: Alignment.bottomLeft,
-//               child: Text(
-//                 'Smart Solutions',
-//                 style: TextStyle(
-//                   color: Colors.white,
-//                   fontSize: 20,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//             ),
-//           ),
-
-//           // ===== MENU ITEMS =====
-//           _drawerItem(
-//             svgPath: "assets/images/profile.svg",
-//             title: 'Profile',
-//             onTap: () {
-//               Navigator.pop(context);
-//               // Get.to(() => HomeScreen());
-//             },
-//           ),
-
-//           // _drawerItem(
-//           //   svgPath: "assets/images/drawer/company_and_pincode.svg",
-//           //   title: 'Listing',
-//           //   onTap: () {
-//           //     Navigator.pop(context);
-//           //     // Get.to(() => ListingScreen());
-//           //   },
-//           // ),
-
-//           // _drawerItem(
-//           //   svgPath: "assets/images/drawer/about_us.svg",
-//           //   title: 'AboutUs',
-//           //   onTap: () {
-//           //     Navigator.pop(context);
-//           //     // Get.to(() => ProfilePage());
-//           //   },
-//           // ),
-
-//           const Spacer(),
-
-//           const Divider(),
-
-//           // _drawerItem(
-//           //   icon: Icons.info_outline,
-//           //   title: 'About Us',
-//           //   onTap: () {
-//           //     Navigator.pop(context);
-//           //   },
-//           // ),
-
-//           // _drawerItem(
-//           //   icon: Icons.logout,
-//           //   title: 'Logout',
-//           //   onTap: () {
-//           //     Navigator.pop(context);
-//           //     // logout logic here
-//           //   },
-//           // ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _drawerItem({
-//     required String svgPath,
-//     required String title,
-//     required VoidCallback onTap,
-//   }) {
-//     return ListTile(
-//       leading: SvgPicture.asset(
-//         svgPath,
-//         width: 22,
-//         height: 22,
-//       ),
-//       title: Text(title),
-//       onTap: onTap,
-//     );
-//   }
-// }

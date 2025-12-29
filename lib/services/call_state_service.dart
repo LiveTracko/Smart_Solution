@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/internet_checker.dart';
 import 'package:smart_solutions/controllers/remark_status_controller.dart';
 

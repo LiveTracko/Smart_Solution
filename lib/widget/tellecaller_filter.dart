@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 
@@ -84,8 +84,7 @@ class _TellecallerFilterChipDialogState
                         followBackFormController.selectedTeamLeaders.value =
                             task.id;
 
-                        followBackFormController.selectedtellecaller
-                            .clear(); // ✅ Clear previous tellecallers
+                        followBackFormController.selectedtellecaller.clear();
 
                         followBackFormController.getteamLeaderData(
                             followBackFormController.selectedTeamLeaders.value);

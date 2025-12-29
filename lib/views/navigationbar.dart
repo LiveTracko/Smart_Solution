@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/active_files_controller.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/core/app_bindings.dart';
 import 'package:smart_solutions/services/api_service.dart';
 import 'package:smart_solutions/theme/app_theme.dart';

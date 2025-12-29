@@ -7,13 +7,13 @@ import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/admin/admin_disbursement.dart';
-import 'package:smart_solutions/controllers/admin/call_back_controller.dart';
 import 'package:smart_solutions/controllers/admin/call_log_controller.dart';
+import 'package:smart_solutions/controllers/all_disbursement_controller.dart';
 import 'package:smart_solutions/controllers/chartCard_controller.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/notification_controller.dart';
 import 'package:smart_solutions/controllers/profile_controller.dart';
@@ -60,8 +60,6 @@ class _DashboardScreenState extends State<DashboardScreen>
   final ProfileController profileController = Get.find<ProfileController>();
   final ChartCardsController chartCardsController =
       Get.find<ChartCardsController>();
-  final AdminCallBackController _callBackController =
-      Get.find<AdminCallBackController>();
 
   final AdminCallLogController _callLogController =
       Get.find<AdminCallLogController>();
@@ -73,6 +71,9 @@ class _DashboardScreenState extends State<DashboardScreen>
       Get.find<LoginRequestController>();
 
   final DataController _dataController = Get.find<DataController>();
+
+  final DisbursementDetailsController _disbursementDetailsController =
+      Get.find<DisbursementDetailsController>();
 
   @override
   void initState() {
@@ -243,6 +244,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             : RefreshIndicator(
                 onRefresh: () async {
                   controller.onInit();
+                  _disbursementDetailsController.fetchDisbursementDetails();
                   // await controller.fetchDashboardData(true); // Refresh monthly data
                   // await controller.fetchDashboardData(false); // Refresh today's data
                 },
@@ -645,39 +647,31 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   // Add margin to prevent bars from being cut off
                                   margin: const EdgeInsets.all(10),
                                   plotAreaBorderWidth: 0,
-
-                                  primaryXAxis: CategoryAxis(
+                                  primaryXAxis: const CategoryAxis(
                                     labelPlacement: LabelPlacement.onTicks,
                                     labelRotation: 0,
                                     labelIntersectAction:
                                         AxisLabelIntersectAction.rotate45,
                                     autoScrollingDelta: 0,
-                                    majorGridLines:
-                                        const MajorGridLines(width: 0),
-                                    // Add edge label placement
+                                    majorGridLines: MajorGridLines(width: 0),
                                     edgeLabelPlacement:
                                         EdgeLabelPlacement.shift,
-                                    // Add axis line
-                                    axisLine: const AxisLine(
-                                        width: 1, color: Colors.grey),
-                                    // Add padding to ensure first and last bars are visible
-                                    plotOffset:
-                                        15, // This creates space at edges
+                                    axisLine:
+                                        AxisLine(width: 1, color: Colors.grey),
+                                    plotOffset: 15,
                                   ),
 
-                                  primaryYAxis: NumericAxis(
+                                  primaryYAxis: const NumericAxis(
                                     labelFormat: '{value}',
-                                    majorGridLines:
-                                        const MajorGridLines(width: 0),
-                                    axisLine: const AxisLine(
-                                        width: 1, color: Colors.grey),
+                                    majorGridLines: MajorGridLines(width: 0),
+                                    axisLine:
+                                        AxisLine(width: 1, color: Colors.grey),
                                     // Add padding to Y axis as well
                                     plotOffset: 10,
                                   ),
-
                                   tooltipBehavior:
                                       TooltipBehavior(enable: true),
-                                  legend: Legend(
+                                  legend: const Legend(
                                     isVisible: true,
                                     position: LegendPosition.bottom,
                                     overflowMode: LegendItemOverflowMode.scroll,
@@ -901,14 +895,18 @@ class _DashboardScreenState extends State<DashboardScreen>
                       SizedBox(
                         height: 80,
                         child: ListView.builder(
-                          itemCount: 4,
-                          scrollDirection: Axis.horizontal,
+                          itemCount: _disbursementDetailsController
+                              .disbursementList.length,
+                          scrollDirection: Axis.horizontal, //
+                          reverse: true,
                           itemBuilder: (context, index) {
-                            //  final data = dataController.disbursementdata[index];
+                            final data = _disbursementDetailsController
+                                .disbursementList[index];
                             return Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 7.w),
-                                child:
-                                    disbursementCard('Jan 2025', '99,99,00,0'));
+                                child: disbursementCard(
+                                    '${data.month} ${data.monthName} ${data.year}',
+                                    data.amount.toString()));
                           },
                         ),
                       ),
@@ -2612,7 +2610,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   Widget disbursementCard(String month, String amount) {
     return Container(
-      width: 110.w,
+      // width: 115.w,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -2639,7 +2637,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 6),
           Text(
-            '₹$amount',
+            CurrencyUtils.formatIndianCurrency(amount),
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,

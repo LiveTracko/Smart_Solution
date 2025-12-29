@@ -17,8 +17,6 @@ class RemarkStatusController extends GetxController {
   void onInit() {
     super.onInit();
 
-    // DialerController dialerController = Get.find();
-    //  dialerController.fetchNextPhoneNumber();
     fetchRemarkStatus('2');
     getAllFollowupStatusName();
   }

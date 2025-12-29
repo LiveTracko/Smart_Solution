@@ -65,4 +65,6 @@ class APIUrls {
 
   //get updated followup list
   static const String updatedcalllog = "Auth/getupdatedfollowuplist";
+  static const String getYearlyMonthlyDisbursedAmounts =
+      "Auth/getCurrentYearMonthlyDisbursedAmounts";
 }

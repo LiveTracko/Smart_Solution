@@ -74,7 +74,17 @@ class ActiveFilesController extends GetxController {
     dataList.assignAll(dataController.dataList);
   }
 
-  void updateFilteredList() {
+  void updateFilteredList({String query = ''}) {
+    // 1️⃣ Build filter names for chips
+    final names = dataList
+        .map((e) => e.status ?? '')
+        .where((e) => e.isNotEmpty)
+        .toSet()
+        .toList();
+    filterController.setFilters(names);
+
+    // 🔥 Clear old list before filtering
+    filteredList.clear();
     try {
       // Step 1: Filter by current status (Active/Inactive)
       List<Data> tempList = dataList.where((item) {
@@ -87,7 +97,7 @@ class ActiveFilesController extends GetxController {
       }).toList();
 
       // Step 2: Apply date filter if selected
-      if (filterController.isDateSelected.value && 
+      if (filterController.isDateSelected.value &&
           filterController.selectedDate.value != null) {
         final selectedDate = filterController.selectedDate.value!;
         tempList = tempList.where((item) {
@@ -96,8 +106,8 @@ class ActiveFilesController extends GetxController {
             final itemDate = DateTime.parse(item.date.toString());
             // Compare only year, month, day (ignore time)
             return itemDate.year == selectedDate.year &&
-                   itemDate.month == selectedDate.month &&
-                   itemDate.day == selectedDate.day;
+                itemDate.month == selectedDate.month &&
+                itemDate.day == selectedDate.day;
           } catch (e) {
             print('Date parsing error: $e');
             return false;
@@ -106,13 +116,16 @@ class ActiveFilesController extends GetxController {
       }
 
       // Step 3: Apply status filter from chips
-      if (filterController.selectedFilter.value > 0 && 
-          filterController.selectedFilter.value < filterController.filters.length) {
-        final filterText = filterController.filters[filterController.selectedFilter.value];
-        
+      if (filterController.selectedFilter.value > 0 &&
+          filterController.selectedFilter.value <
+              filterController.filters.length) {
+        final filterText =
+            filterController.filters[filterController.selectedFilter.value];
+
         if (filterText != 'All') {
           tempList = tempList.where((item) {
-            return item.dataEntryStatus?.toLowerCase() == filterText.toLowerCase();
+            return item.dataEntryStatus?.toLowerCase() ==
+                filterText.toLowerCase();
           }).toList();
         }
       }

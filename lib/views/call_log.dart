@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/views/spacing_constants.dart';
 import 'package:smart_solutions/widget/common_rows_card.dart';

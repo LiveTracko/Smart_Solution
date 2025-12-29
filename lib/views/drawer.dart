@@ -150,13 +150,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       onTap: () => Get.to(() => const HrmScreen()),
                     ),
 
-                  if (StaticStoredData.roleName == 'telecaller')
-                    ListTile(
-                      leading: const Icon(Icons.supervisor_account_rounded),
-                      title: const Text('Attendence'),
-                      onTap: () => Get.to(() => const HrmScreen()),
-                    ),
-
                   // if (StaticStoredData.roleName == 'telecaller')
                   //   ListTile(
                   //       leading: const Icon(Icons.supervisor_account_rounded),

@@ -4,11 +4,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/components/widgets/DailerScreenWidget/KeypadRowWidget.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/views/followBackForm.dart';
 import 'package:smart_solutions/widget/common_rows_card.dart';
-
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/header_title.dart';
 import 'package:smart_solutions/widget/string.dart';
@@ -177,10 +176,10 @@ class _DialerScreenState extends State<DialerScreen> {
                           textAlign: TextAlign.center,
                           readOnly: true,
                           maxLength: 10,
-                          // ✅ disables keyboard
+
                           enableInteractiveSelection:
                               true, // ✅ enables copy/paste
-                          showCursor: false, // optional (clean UI)
+                          showCursor: true, // optional (clean UI)
 
                           controller: TextEditingController(
                               text:
@@ -238,7 +237,7 @@ class _DialerScreenState extends State<DialerScreen> {
                               ),
                             ),
                           )
-                        : SizedBox.shrink()
+                        : const SizedBox.shrink()
 
                     //  const Divider(color: AppColors.secondaryColor)
                   ],

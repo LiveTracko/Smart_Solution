@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/remark_status_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
@@ -63,7 +63,6 @@ class FollowBackForm extends StatelessWidget {
           _formController.remarkStatus.value = '';
           _formController.dataType.value = '';
           _formController.remark.value = '';
-          _formController.contacted.value = '';
 
           // Also clear controllers if they exist
           _formController.customerNumberController.clear();
@@ -79,41 +78,33 @@ class FollowBackForm extends StatelessWidget {
       child: CommonScaffold(
         showBack: true,
         title: 'Follow Up Add',
-
-        // appBar: AppBar(
-        //   automaticallyImplyLeading: false,
-        //   title: const Text('Follow Up Add'),
-        //   backgroundColor: AppColors.primaryColor,
-        // ),
         body: Container(
           color: AppColors.whiteColor,
           child: RefreshIndicator(
             onRefresh: () async {
-              final Map<String, dynamic> preservedValues = {
-                'customerName': _dialerController.customerName.value,
-                'mobile': _formController.mobile.value,
-                'salary': _dialerController.salary.value,
-                'customerLoan': _dialerController.customerLoan.value,
-                'bankName': _formController.bankName.value,
-                'dataType': _formController.dataType.value,
-                'contacted': _formController.contacted.value,
-                'remarkStatus': _formController.remarkStatus.value,
-                'remark': _formController.remark.value,
-                'followupDate': _formController.followupDate.value,
-              };
+              // final Map<String, dynamic> preservedValues = {
+              //   'customerName': _dialerController.customerName.value,
+              //   'mobile': _formController.mobile.value,
+              //   'salary': _dialerController.salary.value,
+              //   'customerLoan': _dialerController.customerLoan.value,
+              //   'bankName': _formController.bankName.value,
+              //   'dataType': _formController.dataType.value,
+              //   'contacted': _formController.contacted.value,
+              //   'remarkStatus': _formController.remarkStatus.value,
+              //   'remark': _formController.remark.value,
+              //   'followupDate': _formController.followupDate.value,
+              // };
               final preservedContactedStatus = _formController.contacted.value;
               final preservedRemarkStatus = _formController.remarkStatus.value;
               await Future.wait([
                 _formController.loadData(isRefresh),
-                // Reload remark status based on current contact status
                 _remarkController.fetchRemarkStatus(
                     preservedContactedStatus == 'Yes' ? '1' : '2'),
               ]);
-              
+
               if (preservedRemarkStatus.isNotEmpty) {
                 _formController.remarkStatus.value = preservedRemarkStatus;
 
-                // Also check if we need to show date picker
                 final selectedStatus = _remarkController.remarkStatusList
                     .firstWhereOrNull(
                         (status) => status.id == preservedRemarkStatus);
@@ -293,22 +284,12 @@ class FollowBackForm extends StatelessWidget {
                         SizedBox(height: 16.h),
 
                         _buildDataSourcingDropdown(),
-                        // Data Type Field
-                        // _buildTextField(
-                        //     label: 'Data Type',
-                        //     prefixIcon:
-                        //         SvgPicture.asset('assets/images/data_type.svg'),
-                        //     value: _dialerController.datatype.value.isEmpty
-                        //         ? ""
-                        //         : _dialerController.datatype.value,
-                        //     onChanged: (value) =>
-                        //         _formController.dataType.value = value,
-                        //     validator: null),
+
                         SizedBox(height: 16.h),
 
-                        // Contact Status Radio Buttons
                         _buildContactStatusRadio(_formController
-                            .customerNumberController.text.isEmpty),
+                            .customerNumberController.text.isEmpty),  
+
                         SizedBox(height: 16.h),
 
                         // Remark Status Dropdown
@@ -603,66 +584,67 @@ class FollowBackForm extends StatelessWidget {
   }
 
   Widget _buildContactStatusRadio(bool isRestricted) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Contacted Status',
-          style: TextStyle(
-            color: AppColors.primaryColor,
-            fontSize: 16.sp,
+    return Obx(
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Contacted Status',
+            style: TextStyle(
+              color: AppColors.primaryColor,
+              fontSize: 16.sp,
+            ),
           ),
-        ),
-        // Obx(() =>
-        Row(
-          children: [
-            Radio<String>(
-              value: 'Yes',
-              groupValue: _formController.contacted.value,
-              onChanged: (value) {
-                isRestricted
-                    ? {
-                        _formController.contacted.value = value!,
-                        _remarkController.fetchRemarkStatus('1')
-                      }
-                    : {};
-                // _formController.contacted.value = value!;
-                // _remarkController.fetchRemarkStatus('1');
-              },
-              activeColor: AppColors.primaryColor,
-            ),
-            const Text(
-              'Yes',
-              style: TextStyle(
-                color: AppColors.secondaryColor,
+          Row(
+            children: [
+              Radio<String>(
+                value: 'Yes',
+                groupValue: _formController.contacted.value,
+                onChanged: (value) {
+                  isRestricted
+                      ? {
+                          _formController.contacted.value = value!,
+                          _remarkController.fetchRemarkStatus('1')
+                        }
+                      : {};
+                  // _formController.contacted.value = value!;
+                  // _remarkController.fetchRemarkStatus('1');
+                },
+                activeColor: AppColors.primaryColor,
               ),
-            ),
-            SizedBox(width: 20.w),
-            Radio<String>(
-              value: 'No',
-              groupValue: _formController.contacted.value,
-              onChanged: (value) {
-                isRestricted
-                    ? {
-                        _formController.contacted.value = value!,
-                        _remarkController.fetchRemarkStatus('2')
-                      }
-                    : {};
-                // _formController.contacted.value = value!;
-                // _remarkController.fetchRemarkStatus('2');
-              },
-              activeColor: AppColors.primaryColor,
-            ),
-            const Text(
-              'No',
-              style: TextStyle(
-                color: AppColors.secondaryColor,
+              const Text(
+                'Yes',
+                style: TextStyle(
+                  color: AppColors.secondaryColor,
+                ),
               ),
-            ),
-          ],
-          // )),
-        )
-      ],
+              SizedBox(width: 20.w),
+              Radio<String>(
+                value: 'No',
+                groupValue: _formController.contacted.value,
+                onChanged: (value) {
+                  isRestricted
+                      ? {
+                          _formController.contacted.value = value!,
+                          _remarkController.fetchRemarkStatus('2')
+                        }
+                      : {};
+                  // _formController.contacted.value = value!;
+                  // _remarkController.fetchRemarkStatus('2');
+                },
+                activeColor: AppColors.primaryColor,
+              ),
+              const Text(
+                'No',
+                style: TextStyle(
+                  color: AppColors.secondaryColor,
+                ),
+              ),
+            ],
+            // )),
+          )
+        ],
+      ),
     );
   }
 
@@ -676,7 +658,7 @@ class FollowBackForm extends StatelessWidget {
             border: Border.all(color: AppColors.primaryColor),
             borderRadius: BorderRadius.circular(10.0.r),
           ),
-          child: Center(
+          child: const Center(
             child: Text(
               'Loading remark status...',
               style: TextStyle(color: AppColors.primaryColor),

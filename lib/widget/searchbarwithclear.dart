@@ -76,7 +76,7 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: AppColors.blueColor,
               onPrimary: Colors.white,
               surface: Colors.white,
@@ -158,7 +158,7 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
                         children: [
                           Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.calendar_today,
                                 size: 20,
                                 color: AppColors.blueColor,
@@ -208,7 +208,8 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
                                     // Animated clear button
                                     AnimatedOpacity(
                                       opacity: hasSearchText ? 1.0 : 0.0,
-                                      duration: Duration(milliseconds: 200),
+                                      duration:
+                                          const Duration(milliseconds: 200),
                                       child: IconButton(
                                         onPressed: _clearSearchText,
                                         icon: Icon(
@@ -217,7 +218,7 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
                                           size: 20,
                                         ),
                                         padding: EdgeInsets.zero,
-                                        constraints: BoxConstraints(
+                                        constraints: const BoxConstraints(
                                           minWidth: 36,
                                           minHeight: 36,
                                         ),
@@ -246,7 +247,7 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: AppColors.blueColor,
                             width: 1.5,
                           ),

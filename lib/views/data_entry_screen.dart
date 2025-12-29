@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/views/data_entry_form.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';

@@ -94,7 +94,7 @@ class _ListingScreenState extends State<ListingScreen> {
   Widget build(BuildContext context) {
     return CommonScaffold(
         title: 'Listing Page',
-        showBack: false,
+        showBack: true,
         key: _scaffoldKey,
         body: Column(children: [
           Container(
@@ -122,9 +122,10 @@ class _ListingScreenState extends State<ListingScreen> {
                         _chartCardsController.selectedIndex.value == 0
                             ? TextInputType.text
                             : TextInputType.number,
+                    showDatePickerIcon: false,
                     onClear: () {
-                      searchController.clear();  
-                      _debounce?.cancel();  
+                      searchController.clear();
+                      _debounce?.cancel();
 
                       if (_chartCardsController.selectedIndex.value == 0) {
                         pincodeController.companyPage.value = 1;
@@ -146,12 +147,12 @@ class _ListingScreenState extends State<ListingScreen> {
                         if (_chartCardsController.selectedIndex.value == 0) {
                           pincodeController.companyPage.value = 1;
                           pincodeController.companyhasMore.value = true;
-                          pincodeController.companyList.clear(); 
+                          pincodeController.companyList.clear();
                           pincodeController.fetchCompany(search: trimmed);
                         } else {
                           pincodeController.page.value = 1;
                           pincodeController.hasMore.value = true;
-                          pincodeController.pincodes.clear();  
+                          pincodeController.pincodes.clear();
                           pincodeController.fetchPincodes(search: trimmed);
                         }
                       });

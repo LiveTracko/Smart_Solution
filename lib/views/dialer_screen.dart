@@ -59,7 +59,7 @@ class _DialerScreenState extends State<DialerScreen> {
           },
         )
       ],
-      title: 'Dialler',
+      title: 'Dialer',
       showBack: false,
       isDrawer: true,
       body: SingleChildScrollView(
@@ -412,8 +412,8 @@ class _DialerScreenState extends State<DialerScreen> {
                     SizedBox(width: 5.w), // spacing
                     Expanded(
                       child: _buildIconButton(
-                        Icons.backspace_outlined,
-                        AppColors.greyColor,
+                        "assets/images/dialer_back.svg",
+                        AppColors.blackColor,
                         _removeNumber,
                       ),
                     ),
@@ -495,7 +495,8 @@ class _DialerScreenState extends State<DialerScreen> {
     );
   }
 
-  Widget _buildIconButton(IconData icon, Color color, VoidCallback? onPressed) {
+  Widget _buildIconButton(
+      String svgPath, Color color, VoidCallback? onPressed) {
     return CircleAvatar(
       radius: 33,
       backgroundColor: AppColors.secondaryColor,
@@ -503,12 +504,13 @@ class _DialerScreenState extends State<DialerScreen> {
         color: AppColors.greyColor,
         shape: const CircleBorder(),
         child: SizedBox(
-          height: 64, // circle size
+          height: 64.h, // circle size
           width: 64,
           child: IconButton(
-            icon: Icon(icon, color: AppColors.secondaryColor),
-            iconSize: 30.r,
             onPressed: onPressed,
+            icon: SvgPicture.asset( 
+              svgPath,
+            ),
           ),
         ),
       ),

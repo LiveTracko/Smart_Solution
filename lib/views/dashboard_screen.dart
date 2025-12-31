@@ -464,7 +464,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                                                     ),
                                                   ),
                                                 );
-                                              });
+                                              }
+                                              );
                                             },
                                           ),
                                         ),
@@ -647,7 +648,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   margin: const EdgeInsets.all(10),
                                   plotAreaBorderWidth: 0,
 
-                                  primaryXAxis: CategoryAxis(
+                                  primaryXAxis: const CategoryAxis(
                                     labelPlacement: LabelPlacement.onTicks,
                                     labelRotation: 0,
                                     labelIntersectAction:
@@ -659,18 +660,18 @@ class _DashboardScreenState extends State<DashboardScreen>
                                     edgeLabelPlacement:
                                         EdgeLabelPlacement.shift,
                                     // Add axis line
-                                    axisLine: const AxisLine(
+                                    axisLine:  AxisLine(
                                         width: 1, color: Colors.grey),
                                     // Add padding to ensure first and last bars are visible
                                     plotOffset:
                                         15, // This creates space at edges
                                   ),
 
-                                  primaryYAxis: NumericAxis(
+                                  primaryYAxis: const NumericAxis(
                                     labelFormat: '{value}',
                                     majorGridLines:
-                                        const MajorGridLines(width: 0),
-                                    axisLine: const AxisLine(
+                                        MajorGridLines(width: 0),
+                                    axisLine: AxisLine(
                                         width: 1, color: Colors.grey),
                                     // Add padding to Y axis as well
                                     plotOffset: 10,
@@ -678,7 +679,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                                   tooltipBehavior:
                                       TooltipBehavior(enable: true),
-                                  legend: Legend(
+                                  legend: const Legend(
                                     isVisible: true,
                                     position: LegendPosition.bottom,
                                     overflowMode: LegendItemOverflowMode.scroll,

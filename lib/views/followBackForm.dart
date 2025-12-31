@@ -70,6 +70,7 @@ class FollowBackForm extends StatelessWidget {
 
           // Clear callback status
           _remarkController.isCallback.value = false;
+          _formController.contacted.value = 'No';
 
           navigator.pop();
         }
@@ -288,7 +289,7 @@ class FollowBackForm extends StatelessWidget {
                         SizedBox(height: 16.h),
 
                         _buildContactStatusRadio(_formController
-                            .customerNumberController.text.isEmpty),  
+                            .customerNumberController.text.isEmpty),
 
                         SizedBox(height: 16.h),
 
@@ -600,16 +601,14 @@ class FollowBackForm extends StatelessWidget {
               Radio<String>(
                 value: 'Yes',
                 groupValue: _formController.contacted.value,
-                onChanged: (value) {
-                  isRestricted
-                      ? {
-                          _formController.contacted.value = value!,
-                          _remarkController.fetchRemarkStatus('1')
-                        }
-                      : {};
-                  // _formController.contacted.value = value!;
-                  // _remarkController.fetchRemarkStatus('1');
-                },
+                onChanged: isRestricted
+                    ? (value) {
+                        _formController.onContactedChanged(
+                          value: value!,
+                          remarkController: _remarkController,
+                        );
+                      }
+                    : null,
                 activeColor: AppColors.primaryColor,
               ),
               const Text(
@@ -622,16 +621,15 @@ class FollowBackForm extends StatelessWidget {
               Radio<String>(
                 value: 'No',
                 groupValue: _formController.contacted.value,
-                onChanged: (value) {
-                  isRestricted
-                      ? {
-                          _formController.contacted.value = value!,
-                          _remarkController.fetchRemarkStatus('2')
-                        }
-                      : {};
-                  // _formController.contacted.value = value!;
-                  // _remarkController.fetchRemarkStatus('2');
-                },
+                onChanged: isRestricted
+                    ? (value) {
+                        _formController.onContactedChanged(
+                          value: value!,
+                          remarkController: _remarkController,
+                        );
+                      }
+                    : null, // 🔒 disabled
+
                 activeColor: AppColors.primaryColor,
               ),
               const Text(

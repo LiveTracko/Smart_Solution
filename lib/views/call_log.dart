@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/views/spacing_constants.dart';
 import 'package:smart_solutions/widget/common_rows_card.dart';
@@ -37,6 +38,7 @@ class _CallLogPageState extends State<CallLogPage> {
   }
 
   final _followBackController = Get.find<FollowBackFormController>();
+  final _themeController = Get.find<ThemeController>();
   final _diallerController = Get.find<DialerController>();
   final CommonRows _commonRows = CommonRows();
 
@@ -160,7 +162,12 @@ class _CallLogPageState extends State<CallLogPage> {
                         _followBackController.filteredFollowBackList[index];
 
                     return CommonTitleCard(
-                      leading: SvgPicture.asset('assets/images/phone_call.svg'),
+                      leading: Obx(
+                        () => SvgPicture.asset(
+                          'assets/images/phone_call.svg',
+                          color: _themeController.primaryColor.value,
+                        ),
+                      ),
                       onLeadingTap: () {
                         _diallerController.makePhoneCall(
                             data.contactNumber ?? '',

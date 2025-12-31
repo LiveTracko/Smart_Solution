@@ -66,6 +66,8 @@ dependencies:
   lucide_icons: ^0.257.0
   persistent_bottom_nav_bar_v2: ^6.2.0
   mobile_scanner: ^7.1.4
+  pinput: ^6.0.1
+  flutter_colorpicker: ^1.1.0
 
   
 
@@ -108,6 +110,7 @@ flutter:
     - assets/animations/
     - assets/fonts/
     - assets/hrms/
+    - assets/drawer/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

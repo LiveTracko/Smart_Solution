@@ -26,11 +26,13 @@ class HrmScreen extends StatelessWidget {
       HrmItem(
           icon: "assets/hrms/mark_attendance.svg",
           title: "Mark Attendance",
-          page: MarkAttendancePage()),
+          page: MarkAttendancePage()
+      ),
       HrmItem(
           icon: "assets/hrms/view_attendance.svg",
           title: "View Attendance",
-          page: ViewAttendancePage()),
+          page: ViewAttendancePage()
+      ),
       HrmItem(
         icon: "assets/hrms/request_leave.svg",
         title: "Request Leave",

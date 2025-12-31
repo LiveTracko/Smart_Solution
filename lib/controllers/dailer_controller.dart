@@ -214,7 +214,7 @@ class DialerController extends GetxController {
     Get.to(() => FollowBackForm());
 
     //  final callInfo =
-    await CallStateService.getLastCallInfo();
+    CallStateService.getLastCallInfo();
 
     // final int duration = callInfo['duration'] ?? 0;
     // final String type = callInfo['type'] ?? 'unknown';

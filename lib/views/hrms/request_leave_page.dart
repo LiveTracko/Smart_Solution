@@ -16,8 +16,7 @@ class _RequestLeaveScreenState extends State<RequestLeavePage> {
   DateTime? _fromDate;
   DateTime? _toDate;
 
-  final TextEditingController _reasonController =
-      TextEditingController(text: 'Do Not Disturb..!!');
+  final TextEditingController _reasonController = TextEditingController();
 
   Future<void> _pickFromDate() async {
     final picked = await showDatePicker(

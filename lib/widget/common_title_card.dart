@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_solutions/theme/app_theme.dart';
+
 import 'package:smart_solutions/views/spacing_constants.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 

@@ -8,6 +8,7 @@ import 'package:smart_solutions/controllers/chartCard_controller.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/controllers/follow_form_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/utils/scroll_utils.dart';
@@ -44,6 +45,7 @@ class _ActiveFilesState extends State<ActiveFiles> {
   final ActiveFilesController _activeFilesController =
       Get.find<ActiveFilesController>();
   final DialerController _dialerController = Get.find<DialerController>();
+  final ThemeController _themeController = Get.find<ThemeController>();
   final FollowBackFormController _formController =
       Get.find<FollowBackFormController>();
 
@@ -165,7 +167,12 @@ class _ActiveFilesState extends State<ActiveFiles> {
                     var data = _activeFilesController.filteredList[index];
 
                     return CommonTitleCard(
-                      leading: SvgPicture.asset('assets/images/phone_call.svg'),
+                      leading: Obx(
+                        () => SvgPicture.asset(
+                          'assets/images/phone_call.svg',
+                          color: _themeController.primaryColor.value,
+                        ),
+                      ),
                       onLeadingTap: () {
                         _dialerController.makePhoneCall(data.mobileNo ?? '',
                             followUpId: data.id ?? '');

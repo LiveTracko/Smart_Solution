@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/common_filter_controller.dart';
+import 'package:smart_solutions/controllers/remark_status_controller.dart';
 import 'package:smart_solutions/models/FollowUpSubmittedList.dart';
 import 'package:smart_solutions/models/all_bank_names_model.dart';
 import 'package:smart_solutions/models/callBack_model.dart';
@@ -109,7 +110,6 @@ class FollowBackFormController extends GetxController
     });
 
     // loadData();
- 
 
     super.onInit();
   }
@@ -813,5 +813,22 @@ class FollowBackFormController extends GetxController
   void setFilters(List<String> names) {
     filters.value = ["All", ...names.toSet()];
     update();
+  }
+
+  void onContactedChanged({
+    required String value,
+    required RemarkStatusController remarkController,
+  }) {
+    contacted.value = value;
+
+    // 🔥 RESET dropdown selection
+    remarkStatus.value = '';
+
+    // 🔥 Load correct remark list
+    if (value == 'Yes') {
+      remarkController.fetchRemarkStatus('1');
+    } else {
+      remarkController.fetchRemarkStatus('2');
+    }
   }
 }

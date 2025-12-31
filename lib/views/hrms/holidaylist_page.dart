@@ -88,56 +88,69 @@ class _HolidayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 70.h,
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+      padding: EdgeInsets.all(2), // this will act as border thickness
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: const Color(0xFFD0E3FF)),
         gradient: const LinearGradient(
-          colors: [Color(0xFFE8F2FF), Color(0xFFFFFFFF)],
+          colors: [Color(0xFFDEEDFF), Color(0xFFD2E7FF)], // gradient border
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
       ),
-      child: Row(
-        children: [
-          // LEFT SIDE
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 15.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  weekday,
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(6.r), 
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFFEFF6FF),
+              Color(0xFFD2E7FF)
+            ], // inner content background
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
           ),
+        ),
+        child: Row(
+          children: [
+            // LEFT SIDE
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    weekday,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
-          // RIGHT DATE
-          Text(
-            dateText,
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
+            // RIGHT DATE
+            Text(
+              dateText,
+              style: TextStyle(
+                fontSize: 13.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

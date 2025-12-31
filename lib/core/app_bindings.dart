@@ -32,6 +32,7 @@ class AppBinding extends Bindings {
     Get.lazyPut(() => AdminCallLogController(), fenix: true);
     Get.lazyPut(() => DisbursementController(), fenix: true);
     Get.lazyPut(() => LoginRequestController(), fenix: true);
-    Get.lazyPut(() => DisbursementDetailsController());
+    Get.lazyPut(() => DisbursementDetailsController(), fenix: true);
+    Get.lazyPut(() => DisbursementDetailsController(), fenix: true);
   }
 }

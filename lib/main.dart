@@ -6,21 +6,25 @@ import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUti
 import 'package:get/get.dart';
 import 'package:smart_solutions/components/commons.dart';
 import 'package:smart_solutions/controllers/internet_checker.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart'; // <-- import ThemeController
 import 'package:smart_solutions/services/firbase_notifications.dart';
 import 'package:smart_solutions/services/local_notification_service.dart';
-import 'package:smart_solutions/theme/app_theme.dart';
-import 'core/app_bindings.dart';
+ import 'core/app_bindings.dart';
 import 'routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Create and keep controller alive for whole app
-  Get.put(ConnectivityController()); // Global instance
+  // 🌐 Global controllers (alive for whole app)
+  Get.put(ConnectivityController(), permanent: true);
+  Get.put(ThemeController(), permanent: true); // 🎨 Theme controller
 
+  // 🔔 Firebase & notifications
   await FireBaseNotificatinService.initializeApp();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await LocalNotificationService.initLocalNotification();
+
+  // 🔒 Force portrait mode
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -32,30 +36,7 @@ void main() async {
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage v) async {
   await Firebase.initializeApp();
-
   customLog("this is background body ${v.notification?.body}");
-  // String img = '';
-  // if ((v.notification?.android?.imageUrl != null &&
-  //         (v.notification?.android?.imageUrl ?? '').isNotEmpty) ||
-  //     v.notification?.apple?.imageUrl != null &&
-  //         (v.notification?.android?.imageUrl ?? '').isNotEmpty ||
-  //     (v.data['imageUrl'] != null && v.data['imageUrl'].isNotEmpty)) {
-  //   img = await FireBaseNotificatinService.downloadAndSaveFile(
-  //           (v.notification?.android?.imageUrl) ??
-  //               v.notification?.apple?.imageUrl ??
-  //               v.data['imageUrl'] ??
-  //               '') ??
-  //       '';
-  // }
-  // BigPictureStyleInformation? bigPictureStyle;
-  // bigPictureStyle = await FireBaseNotificatinService.getPicture(v: v);
-  // LocalNotificationService.showNotification(
-  //     info: bigPictureStyle,
-  //     filePath: img,
-
-  //     ///to show image on foreground
-  //     title: v.data['title'] ?? v.notification?.title ?? '',
-  //     body: v.data['body'] ?? v.notification?.body ?? '');
 }
 
 class MyApp extends StatelessWidget {
@@ -63,35 +44,53 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🔥 Get theme controller
+    final ThemeController themeController = Get.find<ThemeController>();
+
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       minTextAdapt: true,
       builder: (context, child) {
-        return GetMaterialApp(
-          initialBinding: AppBinding(),
-          initialRoute: AppRoutes.splashScreen,
-          getPages: AppRoutes.pages,
-          debugShowCheckedModeBanner: false,
-          title: 'Smart Solutions',
-          // theme: AppTheme.lightTheme,
-          theme: ThemeData(
-            fontFamily: 'Poppins',
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+        // 🔁 Obx listens to theme changes
+        return Obx(() => GetMaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'Smart Solutions',
+
+              // 🚦 Routing
+              initialBinding: AppBinding(),
+              initialRoute: AppRoutes.splashScreen,
+              getPages: AppRoutes.pages,
+
+              // 🎨 Dynamic theme
+              theme: ThemeData(
+                fontFamily: 'Poppins',
+                primaryColor: themeController.primaryColor.value,
+                scaffoldBackgroundColor: Colors.white,
+                cardColor: Colors.white,
+                appBarTheme: AppBarTheme(
+                  backgroundColor: themeController.primaryColor.value,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                ),
+                elevatedButtonTheme: ElevatedButtonThemeData(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: themeController.primaryColor.value,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5, horizontal: 20),
+                  ),
+                ),
+                textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                      textStyle: const TextStyle(color: Colors.white)),
+                ),
+                colorScheme: ColorScheme.fromSeed(
+                    seedColor: themeController.primaryColor.value,
+                    brightness: Brightness.light),
               ),
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                  textStyle: const TextStyle(color: Colors.white)),
-            ),
-          ),
-        );
+            ));
       },
     );
   }

@@ -75,16 +75,6 @@ class ActiveFilesController extends GetxController {
   }
 
   void updateFilteredList({String query = ''}) {
-    // 1️⃣ Build filter names for chips
-    final names = dataList
-        .map((e) => e.status ?? '')
-        .where((e) => e.isNotEmpty)
-        .toSet()
-        .toList();
-    filterController.setFilters(names);
-
-    // 🔥 Clear old list before filtering
-    filteredList.clear();
     try {
       // Step 1: Filter by current status (Active/Inactive)
       List<Data> tempList = dataList.where((item) {
@@ -96,7 +86,17 @@ class ActiveFilesController extends GetxController {
         return item.dataStatus?.toLowerCase() == 'active';
       }).toList();
 
-      // Step 2: Apply date filter if selected
+      // 1️⃣ Build filter names for chips
+      final names = tempList
+          .map((e) => e.status ?? '')
+          .where((e) => e.isNotEmpty)
+          .toSet()
+          .toList();
+      filterController.setFilters(names);
+
+      // 🔥 Clear old list before filtering
+      filteredList.clear();
+
       if (filterController.isDateSelected.value &&
           filterController.selectedDate.value != null) {
         final selectedDate = filterController.selectedDate.value!;

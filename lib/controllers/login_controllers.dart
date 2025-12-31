@@ -11,7 +11,7 @@ import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/utils/error_utils.dart';
 import 'package:smart_solutions/views/navigationbar.dart';
 import 'package:smart_solutions/utils/snackbar_utils.dart';
-import '../constants/services.dart'; // Direct navigation to MainScreen
+import '../constants/services.dart';
 
 class LoginViewModel extends GetxController {
   var usernameController = TextEditingController();
@@ -40,6 +40,7 @@ class LoginViewModel extends GetxController {
       final response = await _apiService
           .postRequest(APIUrls.loginUrl, loginData, type: 'login');
       var responseData = jsonDecode(response.body);
+
       if (response.statusCode == 200) {
         StaticStoredData.userId = "";
 
@@ -57,15 +58,21 @@ class LoginViewModel extends GetxController {
           String number =
               responseData['profile']['data']['profile']['username'];
 
+          String colorCode =
+              responseData['profile']['data']['profile']['theme_color'] ?? '';
+
           StaticStoredData.userId = userId;
           StaticStoredData.roleName = roleName;
           StaticStoredData.number = number;
+          StaticStoredData.themeColor = colorCode;
+
           // Store the user ID locally using Shared Preferences
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('userId', userId);
           await prefs.setString(
               'userName', userName); // Store username 2nd chnge
           await prefs.setString('roleName', roleName);
+          await prefs.setString('themeColor', colorCode);
           // Secure Type
           if (secureType.value != null) {
             await prefs.setInt('secureType', secureType.value!);

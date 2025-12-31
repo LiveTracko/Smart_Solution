@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
-import 'package:smart_solutions/services/firbase_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smart_solutions/theme/app_theme.dart';
-import '../components/button_component.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:smart_solutions/views/otp_view.dart';
+import 'package:smart_solutions/widget/common_form_field.dart';
+import 'package:smart_solutions/widget/text_style.dart';
 
 class ForgetView extends StatefulWidget {
   const ForgetView({super.key});
@@ -14,483 +14,99 @@ class ForgetView extends StatefulWidget {
 }
 
 class ForgetViewState extends State<ForgetView> {
-  final _formKey = GlobalKey<FormState>(); // Form key for validation
-  bool _isObscured = true; // State for password visibility
-
-  String? _selectedLoanType; // 'secure' or 'unsecure'
-  String? token;
-
-  @override
-  void initState() {
-    getDeviceToken();
-    super.initState();
-  }
-
-  getDeviceToken() async {
-    await FireBaseNotificatinService().getDeviceToken();
-    token = FireBaseNotificatinService.token;
-  }
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController emailController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    const Color selectedColor = Color(0xFF356EFF);
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: true,
 
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints:
-              BoxConstraints(minHeight: size.height, maxWidth: size.width),
-          child: IntrinsicHeight(
-            child: Stack(
+        /// 🔽 BUTTON FIXED AT BOTTOM
+        bottomNavigationBar: Padding(
+          padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
+          child: SizedBox(
+            height: 45.h,
+            child: ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  Get.to(
+                    () => const OtpView(),
+                    transition: Transition.rightToLeft,
+                    duration: const Duration(milliseconds: 300),
+                  );
+                }
+              },
+              child: const Text("Verify"),
+            ),
+          ),
+        ),
+
+        body: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            bottom: 100.h,
+            top: 32.h,
+            left: 5.w,
+            right: 5.w,
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Positioned.fill(
-                  child: Image.asset(
-                    'assets/images/login_background.png',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
+                SizedBox(height: 20.h),
+                Align(
+                  alignment: Alignment.topCenter,
                   child: SvgPicture.asset(
-                    'assets/images/login_grey.svg',
-                    width: size.width,
-                    fit: BoxFit.cover,
+                    "assets/images/forgot_password.svg",
+                    height: 220.h,
+                    width: 220.w,
                   ),
                 ),
-
-                // Second SVG at top overlapping (blue)
-                Positioned(
-                  top: size.height * 0.0,
-                  left: 0,
-                  right: 0,
-                  child: SvgPicture.asset(
-                    'assets/images/login_blue.svg',
-                    width: size.width,
-                    fit: BoxFit.cover,
+                SizedBox(height: 24.h),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15, right: 15),
+                  child: Text(
+                    "Forgot Password",
+                    style: AppTextStyle.headerTitle1.copyWith(fontSize: 24.sp),
                   ),
                 ),
-
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 15),
-                        child: Form(
-                            key: _formKey,
-                            child: Column(children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 15.w),
-                                child: Text(
-                                  "Change Password",
-                                  style: TextStyle(
-                                    fontSize: 21.sp,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              SizedBox(height: 5.h),
-                              Image.asset('assets/images/forgot_password.png'),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    const CircleAvatar(
-                                      radius: 25,
-                                      // ignore: sort_child_properties_last
-                                      child: Text(
-                                        'A',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      backgroundColor: AppColors.primaryColor,
-                                    ),
-                                    SizedBox(
-                                      width: 25.w,
-                                    ),
-                                    Text(
-                                      "Ashwini Mishra",
-                                      style: TextStyle(
-                                          fontSize: 20.sp,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 25.h),
-
-                              // Password TextField
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8.w),
-                                child: TextFormField(
-                                  keyboardType: TextInputType.number,
-                                  style: const TextStyle(color: Colors.black),
-                                  // controller: controller.passwordController,
-                                  maxLength: 6,
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter New Password',
-                                    labelStyle:
-                                        const TextStyle(color: Colors.black),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.r)),
-                                    ),
-                                    prefixIcon: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: SvgPicture.asset(
-                                        'assets/images/password.svg',
-                                        height: 20,
-                                        width: 20,
-                                      ),
-                                    ),
-                                    prefixIconConstraints: const BoxConstraints(
-                                      minWidth: 32,
-                                      minHeight: 32,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _isObscured
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                        color: Colors.black,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _isObscured = !_isObscured;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  obscureText: _isObscured,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter your password';
-                                    } else if (value.length < 6) {
-                                      return 'Password must be at least 6 characters long';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ),
-                              SizedBox(height: 20.h),
-                              // controller.isLoading.value
-                              //     ? const CircularProgressIndicator()
-                              //     :
-                              ButtonComponent(
-                                text: 'Submit',
-                                color: const Color(0xFF356EFF),
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {
-                                    if (_selectedLoanType == null) {
-                                      Get.snackbar(
-                                        "Error",
-                                        "Please select loan type",
-                                        snackPosition: SnackPosition.BOTTOM,
-                                      );
-                                      return;
-                                    }
-                                    // controller.login(token!);
-                                    // controller.usernameController.clear();
-                                    // controller.passwordController.clear();
-                                  }
-                                },
-                              )
-                            ]))),
-                  ],
-                )
-                //           Positioned(
-                //             top: size.height * 0.45, // Start the scrollable area below the logo
-                //             left: 0,
-                //             right: 0,
-                //             bottom: 0,
-                //             child: SingleChildScrollView(
-                //               child: Padding(
-                //                 padding: EdgeInsets.only(
-                //                     bottom: MediaQuery.of(context).viewInsets.bottom),
-                //                 child: Form(
-                //                   key: _formKey,
-                //                   child: Column(
-                //                     children: [
-                //                       Padding(
-                //                         padding: EdgeInsets.symmetric(horizontal: 15.w),
-                //                         child: Text(
-                //                           "Welcome Back",
-                //                           style: TextStyle(
-                //                             fontSize: 21.sp,
-                //                             fontWeight: FontWeight.bold,
-                //                             color: Colors.black,
-                //                           ),
-                //                           textAlign: TextAlign.center,
-                //                         ),
-                //                       ),
-                //                       Text(
-                //                         "Login to your account",
-                //                         style: TextStyle(
-                //                           fontSize: 12.sp,
-                //                           color: Colors.black,
-                //                         ),
-                //                         textAlign: TextAlign.center,
-                //                       ),
-                //                       SizedBox(height: 15.h),
-
-                //                       // Loan type selection containers in a Row BELOW welcome text
-                //                       Padding(
-                //                         padding: EdgeInsets.symmetric(horizontal: 15.w),
-                //                         child: Row(
-                //                           children: [
-                //                             // Unsecure loan
-                //                             Expanded(
-                //                               child: GestureDetector(
-                //                                 onTap: () {
-                //                                   setState(() {
-                //                                     _selectedLoanType = 'unsecure';
-                //                                     controller.secureType.value = 0;
-                //                                   });
-                //                                 },
-                //                                 child: Container(
-                //                                   height: 50.h,
-                //                                   decoration: BoxDecoration(
-                //                                     color: _selectedLoanType == 'unsecure'
-                //                                         ? selectedColor // solid blue background
-                //                                         : Colors.transparent,
-                //                                     borderRadius: BorderRadius.circular(12.r),
-                //                                     border: Border.all(
-                //                                       color: _selectedLoanType == 'unsecure'
-                //                                           ? selectedColor
-                //                                           : Colors.blue,
-                //                                       width: 1, // reduced border width
-                //                                     ),
-                //                                   ),
-                //                                   child: Row(
-                //                                     mainAxisAlignment: MainAxisAlignment.start,
-                //                                     children: [
-                //                                       SizedBox(width: 8.w),
-                //                                       Image.asset(
-                //                                         'assets/images/login_homeloan_secure.png',
-                //                                         height: 20.h,
-                //                                         width: 20.w,
-                //                                       ),
-                //                                       SizedBox(width: 8.w),
-                //                                       Text(
-                //                                         "Personal Loan\nUnsecure",
-                //                                         style: TextStyle(
-                //                                           color: _selectedLoanType == 'unsecure'
-                //                                               ? Colors.white
-                //                                               : Colors.black54,
-                //                                           fontSize: 14.sp,
-                //                                         ),
-                //                                       ),
-                //                                     ],
-                //                                   ),
-                //                                 ),
-                //                               ),
-                //                             ),
-                //                             SizedBox(width: 15.w),
-                //                             // Secure loan
-                //                             Expanded(
-                //                               child: GestureDetector(
-                //                                 onTap: () {
-                //                                   setState(() {
-                //                                     _selectedLoanType = 'secure';
-                //                                     controller.secureType.value = 1;
-                //                                   });
-                //                                 },
-                //                                 child: Container(
-                //                                   height: 50.h,
-                //                                   decoration: BoxDecoration(
-                //                                     color: _selectedLoanType == 'secure'
-                //                                         ? selectedColor
-                //                                         : Colors.transparent,
-                //                                     borderRadius: BorderRadius.circular(12.r),
-                //                                     border: Border.all(
-                //                                       color: _selectedLoanType == 'secure'
-                //                                           ? selectedColor
-                //                                           : Colors.blue,
-                //                                       width: 1,
-                //                                     ),
-                //                                   ),
-                //                                   child: Padding(
-                //                                     padding:
-                //                                         EdgeInsets.symmetric(horizontal: 8.w),
-                //                                     child: Row(
-                //                                       mainAxisAlignment:
-                //                                           MainAxisAlignment.start,
-                //                                       children: [
-                //                                         Image.asset(
-                //                                           'assets/images/login_personalloan_unsecure.png',
-                //                                           height: 20.h,
-                //                                           width: 20.w,
-                //                                           color: _selectedLoanType == 'secure'
-                //                                               ? Colors.white
-                //                                               : Colors.black54,
-                //                                         ),
-                //                                         SizedBox(width: 8.w),
-                //                                         Text(
-                //                                           "Home Loan\nSecure",
-                //                                           style: TextStyle(
-                //                                             fontSize: 14.sp,
-                //                                             color: _selectedLoanType == 'secure'
-                //                                                 ? Colors.white
-                //                                                 : Colors.black54,
-                //                                           ),
-                //                                         ),
-                //                                       ],
-                //                                     ),
-                //                                   ),
-                //                                 ),
-                //                               ),
-                //                             ),
-                //                           ],
-                //                         ),
-                //                       ),
-
-                //                       SizedBox(height: 20.h),
-
-                //                       // Username TextField
-                //                       Padding(
-                //                         padding: EdgeInsets.symmetric(horizontal: 15.w),
-                //                         child: TextFormField(
-                //                           style: const TextStyle(color: AppColors.primaryColor),
-                //                           controller: controller.usernameController,
-                //                           decoration: InputDecoration(
-                //                             labelText: 'Username',
-                //                             labelStyle: const TextStyle(color: Colors.black),
-                //                             border: OutlineInputBorder(
-                //                               borderRadius:
-                //                                   BorderRadius.all(Radius.circular(16.r)),
-                //                             ),
-                //                             prefixIcon: const Icon(
-                //                               Icons.person,
-                //                               color: Colors.black,
-                //                             ),
-                //                           ),
-                //                           validator: (value) {
-                //                             if (value == null || value.isEmpty) {
-                //                               return 'Please enter your username';
-                //                             }
-                //                             return null;
-                //                           },
-                //                         ),
-                //                       ),
-                //                       SizedBox(height: 20.h),
-
-                //                       // Password TextField
-                //                       Padding(
-                //                         padding: EdgeInsets.symmetric(horizontal: 15.w),
-                //                         child: TextFormField(
-                //                           keyboardType: TextInputType.number,
-                //                           style: const TextStyle(color: Colors.black),
-                //                           controller: controller.passwordController,
-                //                           decoration: InputDecoration(
-                //                             labelText: 'Password',
-                //                             labelStyle: const TextStyle(color: Colors.black),
-                //                             border: OutlineInputBorder(
-                //                               borderRadius:
-                //                                   BorderRadius.all(Radius.circular(16.r)),
-                //                             ),
-                //                             prefixIcon: const Icon(
-                //                               Icons.lock,
-                //                               color: Colors.black,
-                //                             ),
-                //                             suffixIcon: IconButton(
-                //                               icon: Icon(
-                //                                 _isObscured
-                //                                     ? Icons.visibility
-                //                                     : Icons.visibility_off,
-                //                                 color: Colors.black,
-                //                               ),
-                //                               onPressed: () {
-                //                                 setState(() {
-                //                                   _isObscured = !_isObscured;
-                //                                 });
-                //                               },
-                //                             ),
-                //                           ),
-                //                           obscureText: _isObscured,
-                //                           validator: (value) {
-                //                             if (value == null || value.isEmpty) {
-                //                               return 'Please enter your password';
-                //                             } else if (value.length < 6) {
-                //                               return 'Password must be at least 6 characters long';
-                //                             }
-                //                             return null;
-                //                           },
-                //                         ),
-                //                       ),
-
-                // // Forgot Password text (no extra top padding)
-                //                       Padding(
-                //                         padding: EdgeInsets.only(
-                //                           right: 15.w,
-                //                         ),
-                //                         child: Align(
-                //                           alignment: Alignment.centerRight,
-                //                           child: TextButton(
-                //                             onPressed: () {
-                //                               Get.snackbar(
-                //                                 'Forgot Password',
-                //                                 'Reset link sent to your email',
-                //                                 snackPosition: SnackPosition.BOTTOM,
-                //                               );
-                //                             },
-                //                             child: Text(
-                //                               'Forgot Password',
-                //                               style: TextStyle(
-                //                                 color: Theme.of(context).primaryColor,
-                //                                 fontWeight: FontWeight.w500,
-                //                                 fontSize: 14.sp,
-                //                                 decoration: TextDecoration.underline,
-                //                                 decorationColor: Theme.of(context).primaryColor,
-                //                                 decorationThickness: 1.5,
-                //                               ),
-                //                             ),
-                //                           ),
-                //                         ),
-                //                       ),
-
-                //                       SizedBox(height: 15.h),
-
-                //                       // Login button or loading indicator
-                //                       Obx(() {
-                //                         return controller.isLoading.value
-                //                             ? const CircularProgressIndicator()
-                //                             : ButtonComponent(
-                //                                 text: 'Log in',
-                //                                 color: const Color(0xFF356EFF),
-                //                                 onPressed: () async {
-                //                                   if (_formKey.currentState!.validate()) {
-                //                                     if (_selectedLoanType == null) {
-                //                                       Get.snackbar(
-                //                                         "Error",
-                //                                         "Please select loan type",
-                //                                         snackPosition: SnackPosition.BOTTOM,
-                //                                       );
-                //                                       return;
-                //                                     }
-                //                                     controller.login();
-                //                                     controller.usernameController.clear();
-                //                                     controller.passwordController.clear();
-                //                                   }
-                //                                 },
-                //                               );
-                //                       }),
-
-                //                       SizedBox(height: 16.h),
-                //                     ],
-                //                   ),
-                //                 ),
-                //               ),
-                //             ),
-                //           ),
+                SizedBox(height: 8.h),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15, right: 15),
+                  child: Text(
+                    "Enter your registered email address or mobile number to receive an OTP and reset your password",
+                    style: AppTextStyle.normalHeadingTxt
+                        .copyWith(fontSize: 12.5.sp),
+                  ),
+                ),
+                SizedBox(height: 24.h),
+                CommonTextField(
+                  label: "Enter Email Or Mobile No.",
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) {
+                    if (v == null || v.isEmpty) {
+                      return "This field is required";
+                    }
+                    final value = v.trim();
+                    if (RegExp(r'^\d+$').hasMatch(value)) {
+                      if (value.length != 10) {
+                        return "Mobile Number must be 10 digits";
+                      }
+                      return null;
+                    }
+                    final emailRegex =
+                        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                    if (!emailRegex.hasMatch(value)) {
+                      return "Enter a valid email or 10 digit mobile number";
+                    }
+                    return null;
+                  },  
+                ),
               ],
             ),
           ),

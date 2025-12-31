@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
+import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/models/all_disbursement_details.dart';
 import 'package:smart_solutions/services/api_service.dart';
 
@@ -19,8 +20,12 @@ class DisbursementDetailsController extends GetxController {
       isLoading.value = true;
 
       // 🔹 Replace with your API URL
-      final response = await ApiService()
-          .getRequest(APIUrls.getYearlyMonthlyDisbursedAmounts);
+      final response = await ApiService().postRequest(
+        APIUrls.getYearlyMonthlyDisbursedAmounts,
+        {
+          "telecaller_id": StaticStoredData.userId,
+        },
+      );
 
       if (response.statusCode == 200) {
         final result = allDisbursementDetailsFromJson(response.body);

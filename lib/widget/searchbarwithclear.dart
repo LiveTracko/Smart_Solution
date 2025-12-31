@@ -76,8 +76,8 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.blueColor,
+            colorScheme: ColorScheme.light(
+              primary: Theme.of(context).primaryColor,
               onPrimary: Colors.white,
               surface: Colors.white,
               onSurface: Colors.black,
@@ -158,10 +158,10 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
                         children: [
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.calendar_today,
                                 size: 20,
-                                color: AppColors.blueColor,
+                                color: Theme.of(context).primaryColor,
                               ),
                               SizedBox(width: 8.w),
                               Text(
@@ -263,8 +263,8 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
                     ),
             ),
           ),
-          SizedBox(width: 10.w),
           if (widget.showDatePickerIcon) ...[
+            SizedBox(width: 10.w),
             GestureDetector(
               onTap: _showDatePicker,
               child: Container(
@@ -273,17 +273,18 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: _isDateSelected
-                        ? AppColors.blueColor
+                        ? Theme.of(context).primaryColor
                         : Colors.grey.shade400,
                     width: 1,
                   ),
                   color: _isDateSelected
-                      ? AppColors.blueColor.withOpacity(0.1)
+                      ? Theme.of(context).primaryColor.withOpacity(0.1)
                       : Colors.transparent,
                   boxShadow: _isDateSelected
                       ? [
                           BoxShadow(
-                            color: AppColors.blueColor.withOpacity(0.1),
+                            color:
+                                Theme.of(context).primaryColor.withOpacity(0.1),
                             blurRadius: 4,
                             offset: Offset(0, 2),
                           )
@@ -294,8 +295,8 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
                   Icons.calendar_month,
                   size: 22.sp,
                   color: _isDateSelected
-                      ? AppColors.blueColor
-                      : Colors.blue.shade600,
+                      ? Theme.of(context).primaryColor
+                      : Theme.of(context).primaryColor.withOpacity(0.7),
                 ),
               ),
             ),

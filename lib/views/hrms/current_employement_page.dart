@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:smart_solutions/widget/common_form_field.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 
 class CurrentEmploymentPage extends StatefulWidget {
@@ -17,20 +17,20 @@ class CurrentEmploymentPage extends StatefulWidget {
 class _CurrentEmploymentPageState extends State<CurrentEmploymentPage> {
   // Controllers
   final TextEditingController branchController = TextEditingController(
-    text: 'Smart Solution Main Branch',
-  );
+      // text: 'Smart Solution Main Branch',
+      );
   final TextEditingController employeeIdController = TextEditingController(
-    text: 'SS-001',
-  );
+      // text: 'SS-001',
+      );
   final TextEditingController emailController = TextEditingController(
-    text: 'chiragwadhwani29@gmail.com',
-  );
+      // text: 'chiragwadhwani29@gmail.com',
+      );
   final TextEditingController pfController = TextEditingController(
-    text: '63620hc762g',
-  );
+      // text: '63620hc762g',
+      );
   final TextEditingController esiController = TextEditingController(
-    text: '63620hc762g',
-  );
+      // text: '63620hc762g',
+      );
 
   String department = 'All Departments Assigned';
   String employeeType = 'Full Time';
@@ -90,42 +90,44 @@ class _CurrentEmploymentPageState extends State<CurrentEmploymentPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _inputField('Branch', branchController),
-            _dropdownField(
-              label: 'Departments',
+            CommonTextField(label: "Branch", controller: branchController),
+            CommonDropdownField(
+              label: "Departments",
               value: department,
               items: const ['All Departments Assigned', 'HR', 'Finance', 'IT'],
               onChanged: (v) => setState(() => department = v!),
             ),
-            _dropdownField(
-              label: 'Employee Type',
+            CommonDropdownField(
+              label: "Employee Type",
               value: employeeType,
               items: const ['Full Time', 'Part Time', 'Contract'],
               onChanged: (v) => setState(() => employeeType = v!),
             ),
-            _dropdownField(
-              label: 'Job Title',
+            CommonDropdownField(
+              label: "Job Title",
               value: jobTitle,
               items: const ['Back Office', 'Manager', 'Supervisor'],
               onChanged: (v) => setState(() => jobTitle = v!),
             ),
-            _dateField(
-              'Date of Joining',
-              joiningDate == null ? 'Select Date' : _formatDate(joiningDate),
-              () => _pickDate(true),
+            CommonDateField(
+              label: 'Date of Joining',
+              value: joiningDate == null ? '' : _formatDate(joiningDate),
+              onTap: () => _pickDate(true),
             ),
-            _dateField(
-              'Date of Leaving',
-              leavingDate == null ? 'Select Date' : _formatDate(leavingDate),
-              () => _pickDate(false),
+            CommonDateField(
+              label: 'Date of Leaving',
+              value: leavingDate == null ? '' : _formatDate(leavingDate),
+              onTap: () => _pickDate(false),
             ),
-            _inputField('Employee ID', employeeIdController),
-            _inputField('Official Email ID', emailController),
-            _inputField('PF A/C No.', pfController),
-            _inputField('ESI A/C No.', esiController),
+            CommonTextField(
+                label: "Emoloyee ID", controller: employeeIdController),
+            CommonTextField(
+                label: "Official Email ID", controller: emailController),
+            CommonTextField(label: "PF A/C.", controller: pfController),
+            CommonTextField(label: "ESI A/C No.", controller: esiController),
             const SizedBox(height: 20),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 1),
               child: SizedBox(
                 width: double.infinity,
                 height: 48,
@@ -151,142 +153,6 @@ class _CurrentEmploymentPageState extends State<CurrentEmploymentPage> {
             const SizedBox(height: 24),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _label(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontSize: 15,
-        fontWeight: FontWeight.w500,
-        color: CurrentEmploymentPage.labelColor,
-      ),
-    );
-  }
-
-  Widget _inputField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _label(label),
-          const SizedBox(height: 8),
-          Container(
-            height: 40,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: CurrentEmploymentPage.borderGrey,
-              ),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: TextField(
-              controller: controller,
-              textAlign: TextAlign.start,
-              decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.all(0),
-                  border: InputBorder.none,
-                  isDense: true),
-              style: const TextStyle(fontSize: 14),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _dropdownField({
-    required String label,
-    required String value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _label(label),
-          const SizedBox(height: 8),
-          Container(
-            height: 40,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              border: Border.all(color: CurrentEmploymentPage.borderGrey),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: value,
-                isExpanded: true,
-                icon: const Icon(
-                  Icons.keyboard_arrow_down,
-                  color: CurrentEmploymentPage.textGrey,
-                ),
-                items: items
-                    .map(
-                      (e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e, style: const TextStyle(fontSize: 14)),
-                      ),
-                    )
-                    .toList(),
-                onChanged: onChanged,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _dateField(String label, String value, VoidCallback onTap) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _label(label),
-          const SizedBox(height: 8),
-          InkWell(
-            onTap: onTap,
-            child: Container(
-              height: 40,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                border: Border.all(color: CurrentEmploymentPage.borderGrey),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Text(
-                      value.isEmpty ? 'Select Date' : value,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: value.isEmpty
-                            ? CurrentEmploymentPage.textGrey
-                            : CurrentEmploymentPage.labelColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  SvgPicture.asset(
-                    "assets/hrms/calander_date.svg",
-                    width: 18,
-                    height: 18,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

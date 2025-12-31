@@ -62,4 +62,7 @@ class RemarkStatusController extends GetxController {
       // Ensure loading is set to false on error as well
     }
   }
+
+
+  
 }

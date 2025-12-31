@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:smart_solutions/widget/common_form_field.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 
 class DocumentsPage extends StatelessWidget {
@@ -10,18 +11,15 @@ class DocumentsPage extends StatelessWidget {
     return CommonScaffold(
       title: "Documents",
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
         child: Column(
           children: [
             // Search Box
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Search Text Here',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+            CommonTextFieldWithPrefixIcon(
+              label: "Search Text Here ",
+              controller: SearchController(),
+              prefixIcon: const Icon(Icons.search_rounded),
+              hintText: "Search Text Here",
             ),
 
             const SizedBox(height: 20),

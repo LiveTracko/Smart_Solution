@@ -15,7 +15,6 @@ class CommonScaffold extends StatelessWidget {
   final double height;
   final double bodyPadding;
 
-  
   final Widget? bottomNavigationBar;
 
   CommonScaffold({
@@ -27,8 +26,6 @@ class CommonScaffold extends StatelessWidget {
     this.showBack = true,
     this.height = 15,
     this.bodyPadding = 80,
-
-    
     this.bottomNavigationBar,
   });
 
@@ -41,10 +38,8 @@ class CommonScaffold extends StatelessWidget {
       key: _scaffoldKey,
       backgroundColor: AppColors.backgroundColor,
       resizeToAvoidBottomInset: true,
-
       drawerEnableOpenDragGesture: false,
       drawer: isDrawer ? const CustomDrawer() : null,
-
       appBar: CurvedAppBar(
         title: title,
         actions: actions,
@@ -60,13 +55,10 @@ class CommonScaffold extends StatelessWidget {
                 },
                 icon: SvgPicture.asset('assets/images/menu.svg'),
               )
-            : null,  
+            : null,
       ),
-
       body: SafeArea(child: body),
-
-      
       bottomNavigationBar: bottomNavigationBar,
     );
   }
-}  
+}

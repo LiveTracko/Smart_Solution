@@ -7,7 +7,7 @@ import 'package:smart_solutions/components/commons.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/admin/call_log_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/models/call_time_model.dart';
 import 'package:smart_solutions/models/getGroupStatus.dart';
 import 'package:smart_solutions/models/top_disburse_model.dart';

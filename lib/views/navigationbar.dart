@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -7,7 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/active_files_controller.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/core/app_bindings.dart';
 import 'package:smart_solutions/services/api_service.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
@@ -36,13 +36,13 @@ class _MainScreenState extends State<MainScreen> {
   late final List<PersistentTabConfig> tabs;
   late int _previousIndex;
   bool _isCheckingAuth = false;
+  final ThemeController themeController = Get.find<ThemeController>();
 
   @override
   void initState() {
     super.initState();
     _previousIndex = widget.pageIndex;
     _controller = PersistentTabController(initialIndex: widget.pageIndex);
-    tabs = _buildTabs();
   }
 
   @override
@@ -61,7 +61,7 @@ class _MainScreenState extends State<MainScreen> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.clear();
         if (mounted) {
-          Get.off(() => LoginView(), binding: AppBinding());
+          Get.off(() => const LoginView(), binding: AppBinding());
         }
         return false;
       }
@@ -81,8 +81,8 @@ class _MainScreenState extends State<MainScreen> {
           item: ItemConfig(
             icon: SvgPicture.asset(
               'assets/images/dashboard.svg',
-              colorFilter: const ColorFilter.mode(
-                CupertinoColors.activeBlue,
+              colorFilter: ColorFilter.mode(
+                themeController.primaryColor.value,
                 BlendMode.srcIn,
               ),
             ),
@@ -94,7 +94,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             title: "Dashboard",
-            activeForegroundColor: AppColors.primaryColor,
+            activeForegroundColor: themeController.primaryColor.value,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
               fontSize: 12,
@@ -113,8 +113,8 @@ class _MainScreenState extends State<MainScreen> {
           item: ItemConfig(
             icon: SvgPicture.asset(
               'assets/images/leads.svg',
-              colorFilter: const ColorFilter.mode(
-                CupertinoColors.activeBlue,
+              colorFilter: ColorFilter.mode(
+                themeController.primaryColor.value,
                 BlendMode.srcIn,
               ),
             ),
@@ -126,7 +126,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             title: "Leads",
-            activeForegroundColor: AppColors.primaryColor,
+            activeForegroundColor: themeController.primaryColor.value,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
               fontSize: 12,
@@ -137,10 +137,18 @@ class _MainScreenState extends State<MainScreen> {
         PersistentTabConfig(
           screen: const DialerScreen(key: ValueKey('dialer_screen')),
           item: ItemConfig(
-            icon: SvgPicture.asset(
-              'assets/images/fab.svg',
-              fit: BoxFit.contain,
+            icon: CircleAvatar(
+              backgroundColor: themeController.primaryColor.value,
+              child: SvgPicture.asset(
+                'assets/images/phone_call.svg',
+                color: AppColors.appBarTextColor,
+                fit: BoxFit.contain,
+              ),
             ),
+            // SvgPicture.asset(
+            //   'assets/images/fab.svg',
+            //   fit: BoxFit.contain,
+            // ),
             iconSize: 50,
             title: "DIALER",
             textStyle:
@@ -158,8 +166,8 @@ class _MainScreenState extends State<MainScreen> {
           item: ItemConfig(
             icon: SvgPicture.asset(
               'assets/images/clock_fast_forward.svg',
-              colorFilter: const ColorFilter.mode(
-                CupertinoColors.activeBlue,
+              colorFilter: ColorFilter.mode(
+                themeController.primaryColor.value,
                 BlendMode.srcIn,
               ),
             ),
@@ -171,7 +179,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             title: "Call Log",
-            activeForegroundColor: AppColors.primaryColor,
+            activeForegroundColor: themeController.primaryColor.value,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
               fontSize: 12,
@@ -183,7 +191,6 @@ class _MainScreenState extends State<MainScreen> {
           screen: LoginRequestScreen(
             key: const ValueKey('hrm_screen'),
             title: 'Login Request',
-
             isShowBack: false,
             isDrawer: true,
             //key: const ValueKey('hrm_screen')
@@ -191,8 +198,8 @@ class _MainScreenState extends State<MainScreen> {
           item: ItemConfig(
             icon: SvgPicture.asset(
               'assets/images/user_plus_grey.svg',
-              colorFilter: const ColorFilter.mode(
-                CupertinoColors.activeBlue,
+              colorFilter: ColorFilter.mode(
+                themeController.primaryColor.value,
                 BlendMode.srcIn,
               ),
             ),
@@ -206,7 +213,7 @@ class _MainScreenState extends State<MainScreen> {
             // icon: const Icon(Icons.co_present_outlined, size: 24),
             // inactiveIcon: const Icon(Icons.co_present_outlined, size: 24),
             title: "Request",
-            activeForegroundColor: AppColors.primaryColor,
+            activeForegroundColor: themeController.primaryColor.value,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
               fontSize: 12,
@@ -222,8 +229,8 @@ class _MainScreenState extends State<MainScreen> {
           item: ItemConfig(
             icon: SvgPicture.asset(
               'assets/images/dashboard.svg',
-              colorFilter: const ColorFilter.mode(
-                CupertinoColors.activeBlue,
+              colorFilter: ColorFilter.mode(
+                themeController.primaryColor.value,
                 BlendMode.srcIn,
               ),
             ),
@@ -235,7 +242,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             title: "Dashboard",
-            activeForegroundColor: AppColors.primaryColor,
+            activeForegroundColor: themeController.primaryColor.value,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
               fontSize: 12,
@@ -254,8 +261,8 @@ class _MainScreenState extends State<MainScreen> {
           item: ItemConfig(
             icon: SvgPicture.asset(
               'assets/images/leads.svg',
-              colorFilter: const ColorFilter.mode(
-                CupertinoColors.activeBlue,
+              colorFilter: ColorFilter.mode(
+                themeController.primaryColor.value,
                 BlendMode.srcIn,
               ),
             ),
@@ -267,7 +274,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             title: "Leads",
-            activeForegroundColor: AppColors.primaryColor,
+            activeForegroundColor: themeController.primaryColor.value,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
               fontSize: 12,
@@ -287,8 +294,8 @@ class _MainScreenState extends State<MainScreen> {
           item: ItemConfig(
             icon: SvgPicture.asset(
               'assets/images/drawer.svg',
-              colorFilter: const ColorFilter.mode(
-                CupertinoColors.activeBlue,
+              colorFilter: ColorFilter.mode(
+                themeController.primaryColor.value,
                 BlendMode.srcIn,
               ),
             ),
@@ -302,7 +309,7 @@ class _MainScreenState extends State<MainScreen> {
             // icon: const Icon(Icons.co_present_outlined, size: 24),
             // inactiveIcon: const Icon(Icons.co_present_outlined, size: 24),
             title: "Listing ",
-            activeForegroundColor: AppColors.primaryColor,
+            activeForegroundColor: themeController.primaryColor.value,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
               fontSize: 12,
@@ -322,8 +329,8 @@ class _MainScreenState extends State<MainScreen> {
           item: ItemConfig(
             icon: SvgPicture.asset(
               'assets/images/user_plus_grey.svg',
-              colorFilter: const ColorFilter.mode(
-                CupertinoColors.activeBlue,
+              colorFilter: ColorFilter.mode(
+                themeController.primaryColor.value,
                 BlendMode.srcIn,
               ),
             ),
@@ -337,7 +344,7 @@ class _MainScreenState extends State<MainScreen> {
             // icon: const Icon(Icons.co_present_outlined, size: 24),
             // inactiveIcon: const Icon(Icons.co_present_outlined, size: 24),
             title: "Request ",
-            activeForegroundColor: AppColors.primaryColor,
+            activeForegroundColor: themeController.primaryColor.value,
             inactiveForegroundColor: Colors.grey.shade600,
             textStyle: const TextStyle(
               fontSize: 12,
@@ -355,47 +362,50 @@ class _MainScreenState extends State<MainScreen> {
       top: false,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        body: PersistentTabView(
-          tabs: tabs,
-          controller: _controller,
-
-          navBarBuilder: (navBarConfig) => StaticStoredData.roleName == 'admin'
-              ? Style4BottomNavBar(
-                  navBarConfig: navBarConfig,
-                  height: 70,
-                  navBarDecoration: const NavBarDecoration(
-                    padding: EdgeInsets.zero,
-                    color: Colors.white12,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15),
-                    ),
-                  ),
-                )
-              : Style15BottomNavBar(
-                  navBarConfig: navBarConfig,
-                  height: 70,
-                  navBarDecoration: const NavBarDecoration(
-                    padding: EdgeInsets.zero,
-                    color: Colors.white12,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15),
-                    ),
-                  ),
-                ),
-          backgroundColor: Colors.white,
-          onTabChanged: _onTabChanged,
-          keepNavigatorHistory: false,
-          stateManagement: true, // ⚠️ Changed to true for better state handling
-          navBarOverlap: const NavBarOverlap.custom(),
-          handleAndroidBackButtonPress: true,
-          avoidBottomPadding: false,
-          //     confineInSafeArea: true, // ⚠️ ADD THIS for safety
-          screenTransitionAnimation: const ScreenTransitionAnimation(
-            //     animateTabTransition: true,
-            curve: Curves.ease,
-            duration: Duration(milliseconds: 200),
+        body: Obx(
+          () => PersistentTabView(
+            tabs: _buildTabs(),
+            controller: _controller,
+            navBarBuilder: (navBarConfig) =>
+                StaticStoredData.roleName == 'admin'
+                    ? Style4BottomNavBar(
+                        navBarConfig: navBarConfig,
+                        height: 70,
+                        navBarDecoration: const NavBarDecoration(
+                          padding: EdgeInsets.zero,
+                          color: Colors.white12,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15),
+                          ),
+                        ),
+                      )
+                    : Style15BottomNavBar(
+                        navBarConfig: navBarConfig,
+                        height: 70,
+                        navBarDecoration: const NavBarDecoration(
+                          padding: EdgeInsets.zero,
+                          color: Colors.white12,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15),
+                          ),
+                        ),
+                      ),
+            backgroundColor: Colors.white,
+            onTabChanged: _onTabChanged,
+            keepNavigatorHistory: false,
+            stateManagement:
+                true, // ⚠️ Changed to true for better state handling
+            navBarOverlap: const NavBarOverlap.custom(),
+            handleAndroidBackButtonPress: true,
+            avoidBottomPadding: false,
+            //     confineInSafeArea: true, // ⚠️ ADD THIS for safety
+            screenTransitionAnimation: const ScreenTransitionAnimation(
+              //     animateTabTransition: true,
+              curve: Curves.ease,
+              duration: Duration(milliseconds: 200),
+            ),
           ),
         ),
       ),

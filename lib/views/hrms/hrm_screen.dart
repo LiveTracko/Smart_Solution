@@ -8,7 +8,6 @@ import 'package:smart_solutions/views/hrms/mark_attendence_page.dart';
 import 'package:smart_solutions/views/hrms/profile_screen.dart';
 import 'package:smart_solutions/views/hrms/request_leave_page.dart';
 import 'package:smart_solutions/views/hrms/view_attendence_page.dart';
-import 'package:smart_solutions/views/view_attendance.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/hrm_card.dart';
 

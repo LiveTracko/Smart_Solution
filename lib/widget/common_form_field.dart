@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/services/text_formatter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 
 class CommonFormStyles {
   static const Color borderGrey = Color(0xFFE0E0E0);
   static const Color labelColor = Color(0xFF000000);
+    
 }
 
 /// ================= LABEL =================
 class CommonLabel extends StatelessWidget {
+  
   final String text;
+  
+ 
   const CommonLabel(this.text, {super.key});
 
   @override
@@ -31,6 +37,9 @@ class CommonTextField extends StatelessWidget {
   final TextEditingController controller;
   final String? Function(String?)? validator;
   final TextInputType keyboardType;
+  final Color? borderColor;
+  final Color? focusedBorderColor;
+  
 
   const CommonTextField({
     super.key,
@@ -38,6 +47,8 @@ class CommonTextField extends StatelessWidget {
     required this.controller,
     this.validator,
     this.keyboardType = TextInputType.text,
+    this.borderColor,
+    this.focusedBorderColor,
   });
 
   @override
@@ -50,36 +61,39 @@ class CommonTextField extends StatelessWidget {
           CommonLabel(label),
           const SizedBox(height: 8),
           TextFormField(
-            controller: controller,
-            validator: validator,
-            keyboardType: keyboardType,
-            decoration: InputDecoration(
-              // hintText: label,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: Colors.grey),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: Colors.grey),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: Colors.blue),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: Colors.red),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: Colors.red),
-              ),
-              isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            ),
-          ),
+  controller: controller,
+  validator: validator,
+  keyboardType: keyboardType,
+  decoration: InputDecoration(
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(6),
+      borderSide: BorderSide(color: borderColor ?? Colors.grey),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(6),
+      borderSide: BorderSide(color: borderColor ?? Colors.grey),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(6),
+      borderSide: BorderSide(
+        color: focusedBorderColor ?? Colors.blue,
+        width: 1.5,
+      ),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(6),
+      borderSide: const BorderSide(color: Colors.red),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(6),
+      borderSide: const BorderSide(color: Colors.red),
+    ),
+    isDense: true,
+    contentPadding:
+        const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+  ),
+),
+
         ],
       ),
     );
@@ -92,6 +106,7 @@ class CommonDropdownField extends StatelessWidget {
   final String value;
   final List<String> items;
   final ValueChanged<String?> onChanged;
+   final Color? borderColor;
 
   const CommonDropdownField({
     super.key,
@@ -99,6 +114,7 @@ class CommonDropdownField extends StatelessWidget {
     required this.value,
     required this.items,
     required this.onChanged,
+    this.borderColor,
   });
 
   @override
@@ -114,7 +130,9 @@ class CommonDropdownField extends StatelessWidget {
             height: 40,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              border: Border.all(color: CommonFormStyles.borderGrey),
+              border: Border.all(
+      color: borderColor ?? CommonFormStyles.borderGrey,
+    ),
               borderRadius: BorderRadius.circular(6),
             ),
             child: DropdownButtonHideUnderline(

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/button_controller.dart';
 import 'package:smart_solutions/controllers/chartCard_controller.dart';
 import 'package:smart_solutions/controllers/pin_code_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/views/chart_card_toggle.dart';
 import 'package:smart_solutions/views/spacing_constants.dart';
@@ -38,6 +39,7 @@ class _ListingScreenState extends State<ListingScreen> {
   final TextEditingController searchController = TextEditingController();
   final ChartCardsController _chartCardsController =
       Get.find<ChartCardsController>();
+  final ThemeController themeController = Get.find<ThemeController>();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Timer? _debounce;
@@ -118,11 +120,12 @@ class _ListingScreenState extends State<ListingScreen> {
                     key: ValueKey(_chartCardsController.selectedIndex.value),
                     controller: searchController,
                     focusNode: FocusNode(),
+                    showDatePickerIcon: false,
                     textInputType:
                         _chartCardsController.selectedIndex.value == 0
                             ? TextInputType.text
                             : TextInputType.number,
-                    showDatePickerIcon: false,
+                    //  showDatePickerIcon: false,
                     onClear: () {
                       searchController.clear();
                       _debounce?.cancel();
@@ -381,7 +384,10 @@ class _ListingScreenState extends State<ListingScreen> {
 
             final data = list[index];
             return CommonTitleCard(
-                leading: SvgPicture.asset('assets/images/bank.svg'),
+                leading: SvgPicture.asset(
+                  'assets/images/bank.svg',
+                  color: themeController.primaryColor.value,
+                ),
                 title: data.bankName.toString(),
                 subtitle: data.companyName.toString(),
                 amount: data.category.toString(),
@@ -418,7 +424,10 @@ class _ListingScreenState extends State<ListingScreen> {
             final data = list[i];
 
             return CommonTitleCard(
-                leading: SvgPicture.asset('assets/images/bank.svg'),
+                leading: SvgPicture.asset(
+                  'assets/images/bank.svg',
+                  color: themeController.primaryColor.value,
+                ),
                 title: data.bankName.toString(),
                 subtitle: data.city.toString(),
                 amount: data.pincode.toString(),

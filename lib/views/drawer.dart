@@ -5,8 +5,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/internet_checker.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
 import 'package:smart_solutions/controllers/profile_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/views/followBackForm.dart';
 import 'package:smart_solutions/views/forget_password.dart';
 import 'package:smart_solutions/views/hrms/hrm_screen.dart';
@@ -196,8 +198,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
                             final prefs = await SharedPreferences.getInstance();
                             prefs.clear();
 
-                            Get.put(LoginViewModel());
-                            Get.offAll(() => LoginView());
+                            await Get.deleteAll(force: true);
+
+                            // 4️⃣ Re-register GLOBAL controllers
+                            Get.put(ConnectivityController(), permanent: true);
+                            Get.put(ThemeController(), permanent: true);
+
+                            Get.put(
+                              LoginViewModel(),
+                            );
+                            Get.offAll(() => const LoginView());
                           },
                           isBottomTile: true,
                         ),

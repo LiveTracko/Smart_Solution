@@ -6,8 +6,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
 import 'package:smart_solutions/widget/suggestin_textfiels.dart';
@@ -32,6 +33,7 @@ class LoginRequestForm extends StatelessWidget {
   LoginRequestForm({super.key});
 
   final TextEditingController customerNameController = TextEditingController();
+  final ThemeController themeController = Get.find<ThemeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -267,11 +269,13 @@ class LoginRequestForm extends StatelessWidget {
             padding: const EdgeInsets.only(left: 10.0, right: 8.0),
             child: prefixIcon,
           ),
-          const SizedBox(
+          SizedBox(
             height: 50,
             width: 5,
             child: VerticalDivider(
-                width: 1, thickness: 1, color: AppColors.primaryColor),
+                width: 1,
+                thickness: 1,
+                color: themeController.primaryColor.value),
           ),
           const SizedBox(
             width: 5,
@@ -300,17 +304,18 @@ class LoginRequestForm extends StatelessWidget {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: AppColors.primaryColor),
+                borderSide:
+                    BorderSide(color: themeController.primaryColor.value),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide:
-                    const BorderSide(color: AppColors.primaryColor, width: 2),
+                borderSide: BorderSide(
+                    color: themeController.primaryColor.value, width: 2),
               ),
               filled: true,
               fillColor: AppColors.backgroundColor,
             ),
-            style: const TextStyle(color: AppColors.primaryColor),
+            style: TextStyle(color: themeController.primaryColor.value),
             onChanged: onChanged,
             validator: validator,
           ),
@@ -416,9 +421,9 @@ class LoginRequestForm extends StatelessWidget {
                             width: 24,
                           ),
                           SizedBox(width: 5.w),
-                          const VerticalDivider(
+                          VerticalDivider(
                             thickness: 1,
-                            color: AppColors.primaryColor,
+                            color: themeController.primaryColor.value,
                           ),
                         ],
                       ),
@@ -430,12 +435,13 @@ class LoginRequestForm extends StatelessWidget {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0.r),
-                    borderSide: const BorderSide(color: AppColors.primaryColor),
+                    borderSide:
+                        BorderSide(color: themeController.primaryColor.value),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0.r),
-                    borderSide: const BorderSide(
-                      color: AppColors.primaryColor,
+                    borderSide: BorderSide(
+                      color: themeController.primaryColor.value,
                       width: 2,
                     ),
                   ),
@@ -515,9 +521,9 @@ class LoginRequestForm extends StatelessWidget {
                             width: 24,
                           ),
                           SizedBox(width: 5.w),
-                          const VerticalDivider(
+                          VerticalDivider(
                             thickness: 1,
-                            color: AppColors.primaryColor,
+                            color: themeController.primaryColor.value,
                           ),
                         ],
                       ),
@@ -532,12 +538,13 @@ class LoginRequestForm extends StatelessWidget {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0.r),
-                    borderSide: const BorderSide(color: AppColors.primaryColor),
+                    borderSide:
+                        BorderSide(color: themeController.primaryColor.value),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0.r),
-                    borderSide: const BorderSide(
-                      color: AppColors.primaryColor,
+                    borderSide: BorderSide(
+                      color: themeController.primaryColor.value,
                       width: 2,
                     ),
                   ),

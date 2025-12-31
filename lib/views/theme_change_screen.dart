@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import '../controllers/theme_controller.dart';
 
 class ThemeChangeScreen extends StatelessWidget {
   ThemeChangeScreen({super.key});
-
-  // Fetch the ThemeController
   final ThemeController themeController = Get.find<ThemeController>();
 
   @override
@@ -45,10 +44,12 @@ class ThemeChangeScreen extends StatelessWidget {
                     letterSpacing: 1.2,
                   ),
             ),
-            SizedBox(height: 20.h,),
+            SizedBox(
+              height: 20.h,
+            ),
             ElevatedButton.icon(
-              icon: Icon(Icons.color_lens),
-              label: Text("Choose Custom Color"),
+              icon: const Icon(Icons.color_lens),
+              label: const Text("Choose Custom Color"),
               onPressed: () => _openColorPicker(context),
             ),
           ],
@@ -62,12 +63,13 @@ class ThemeChangeScreen extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         themeController.changeThemeColor(color);
+        themeController.saveThemeColor(StaticStoredData.userId, color);
       },
       child: Obx(() {
         bool isSelected = themeController.primaryColor.value == color;
         return Container(
-          width: 80,
-          height: 80,
+          width: 70.w,
+          height: 70.h,
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(12),

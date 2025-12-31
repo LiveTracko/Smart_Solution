@@ -7,13 +7,13 @@ import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/admin/admin_disbursement.dart';
-import 'package:smart_solutions/controllers/admin/call_back_controller.dart';
 import 'package:smart_solutions/controllers/admin/call_log_controller.dart';
+import 'package:smart_solutions/controllers/all_disbursement_controller.dart';
 import 'package:smart_solutions/controllers/chartCard_controller.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/notification_controller.dart';
 import 'package:smart_solutions/controllers/profile_controller.dart';
@@ -35,7 +35,7 @@ import 'package:smart_solutions/widget/image_helper.dart';
 import 'package:smart_solutions/widget/incentive_card.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
 import 'package:smart_solutions/widget/string.dart';
-import 'package:smart_solutions/widget/tellecaller_filter.dart';
+
 import 'package:smart_solutions/widget/text_style.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../models/getGroupStatus.dart';
@@ -61,8 +61,6 @@ class _DashboardScreenState extends State<DashboardScreen>
   final ProfileController profileController = Get.find<ProfileController>();
   final ChartCardsController chartCardsController =
       Get.find<ChartCardsController>();
-  final AdminCallBackController _callBackController =
-      Get.find<AdminCallBackController>();
 
   final AdminCallLogController _callLogController =
       Get.find<AdminCallLogController>();
@@ -75,12 +73,20 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   final DataController _dataController = Get.find<DataController>();
 
+  final DisbursementDetailsController _disbursementDetailsController =
+      Get.find<DisbursementDetailsController>();
+
+  final ThemeController themeController = Get.find<ThemeController>();
+
   @override
   void initState() {
     controller.onInit();
     // int tabBarlength = StaticStoredData.roleName == 'telecaller' ? 2 : 3;
     // controller.tabController = TabController(length: 2, vsync: this);
 
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      themeController.loadSavedTheme();
+    });
     controller.loadTodayAndMonthlyData();
 
     // followBackFormController.callController =
@@ -127,63 +133,63 @@ class _DashboardScreenState extends State<DashboardScreen>
     final NotificationController notificationController =
         Get.put(NotificationController());
 
-    String role = StaticStoredData.roleName; // example role
+    //  String role = StaticStoredData.roleName; // example role
 
-    final List<String> labels = role == "telecaller" ? [] : ["Select Date"];
-    // : ["Select Date", "Filter"];
+    // final List<String> labels = role == "telecaller" ? [] : ["Select Date"];
+    // // : ["Select Date", "Filter"];
 
-    final String tellecallerLabels = role == "telecaller"
-        ? "Call Back & Incentive"
-        : "Tellecaller Performance";
+    // final String tellecallerLabels = role == "telecaller"
+    //     ? "Call Back & Incentive"
+    //     : "Tellecaller Performance";
 
-    //   final List<String> labels = ["Select Date", "Filter"];
+    // //   final List<String> labels = ["Select Date", "Filter"];
 
-    final callBackTabFortellecaller = [
-      const Tab(text: "Today"),
+    // final callBackTabFortellecaller = [
+    //   const Tab(text: "Today"),
 
-      const Tab(text: "Monthly"),
-      //     const Tab(text: "Incentive"),
-    ];
+    //   const Tab(text: "Monthly"),
+    //   //     const Tab(text: "Incentive"),
+    // ];
 
-    final callBackTabForAdmin = [
-      const Tab(text: "Call Back"),
-      const Tab(text: "Call Log"),
-      const Tab(text: "Disbursement"),
-      //  const Tab(text: "Incentive"),
-    ];
+    // final callBackTabForAdmin = [
+    //   const Tab(text: "Call Back"),
+    //   const Tab(text: "Call Log"),
+    //   const Tab(text: "Disbursement"),
+    //   //  const Tab(text: "Incentive"),
+    // ];
 
-    final callBackTabBarFortellecaller = [
-      dailyCallBack(),
-      monthlyCallBack()
-      //     callDisbursement(Icons.person)
-    ];
+    // final callBackTabBarFortellecaller = [
+    //   dailyCallBack(),
+    //   monthlyCallBack()
+    //   //     callDisbursement(Icons.person)
+    // ];
 
-    final callBackTabBarForAdmin = [
-      callback(Icons.person),
-      callLog(Icons.person),
-      callDisbursement(Icons.person),
-    ];
+    // final callBackTabBarForAdmin = [
+    //   callback(Icons.person),
+    //   callLog(Icons.person),
+    //   callDisbursement(Icons.person),
+    // ];
 
-    final List<VoidCallback> callbacks = [
-      () => showDatePicker(),
-      () => showDialog(
-          context: context,
-          builder: (context) {
-            return Obx(
-              () => TellecallerFilterChipDialog(
-                title1: 'Teamleader',
-                title2: 'Tellecaller',
-                teamleader: followBackFormController.teamleaderList.toList(),
-                tellecaller: followBackFormController.tellecallerList.toList(),
-                onApply: (teamleader, tellecaller) {},
-              ),
-            );
-          })
-    ];
+    // final List<VoidCallback> callbacks = [
+    //   () => showDatePicker(),
+    //   () => showDialog(
+    //       context: context,
+    //       builder: (context) {
+    //         return Obx(
+    //           () => TellecallerFilterChipDialog(
+    //             title1: 'Teamleader',
+    //             title2: 'Tellecaller',
+    //             teamleader: followBackFormController.teamleaderList.toList(),
+    //             tellecaller: followBackFormController.tellecallerList.toList(),
+    //             onApply: (teamleader, tellecaller) {},
+    //           ),
+    //         );
+    //       })
+    // ];
 
-    String today = "${DateTime.now().day.toString().padLeft(2, '0')} "
-        "${DateFormat('MMM').format(DateTime.now()).toUpperCase()} "
-        "${DateTime.now().year}";
+    // String today = "${DateTime.now().day.toString().padLeft(2, '0')} "
+    //     "${DateFormat('MMM').format(DateTime.now()).toUpperCase()} "
+    //     "${DateTime.now().year}";
 
     return CommonScaffold(
       title: "Dashboard",
@@ -244,6 +250,7 @@ class _DashboardScreenState extends State<DashboardScreen>
             : RefreshIndicator(
                 onRefresh: () async {
                   controller.onInit();
+                  _disbursementDetailsController.fetchDisbursementDetails();
                   // await controller.fetchDashboardData(true); // Refresh monthly data
                   // await controller.fetchDashboardData(false); // Refresh today's data
                 },
@@ -292,187 +299,187 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 )
                               ],
                             ),
-                            StaticStoredData.roleName != 'telecaller'
-                                ? SizedBox(
-                                    height: 32,
-                                    child: Row(
-                                      children: [
-                                        if (controller
-                                            .dateRangeList.isNotEmpty) ...[
-                                          const SizedBox(width: 10),
+                            // StaticStoredData.roleName != 'telecaller'
+                            //     ? SizedBox(
+                            //         height: 32,
+                            //         child: Row(
+                            //           children: [
+                            //             if (controller
+                            //                 .dateRangeList.isNotEmpty) ...[
+                            //               const SizedBox(width: 10),
 
-                                          // Simple Selected Date Text
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 12, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.greyColor
-                                                  .withOpacity(0.1),
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              border: Border.all(
-                                                color: AppColors
-                                                    .diallerContainerColor,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                const Icon(Icons.calendar_month,
-                                                    size: 16,
-                                                    color: Colors.grey),
-                                                const SizedBox(width: 6),
-                                                Text(
-                                                  controller
-                                                      .formattedDate.value,
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 6),
+                            //               // Simple Selected Date Text
+                            //               Container(
+                            //                 padding: const EdgeInsets.symmetric(
+                            //                     horizontal: 12, vertical: 4),
+                            //                 decoration: BoxDecoration(
+                            //                   color: AppColors.greyColor
+                            //                       .withOpacity(0.1),
+                            //                   borderRadius:
+                            //                       BorderRadius.circular(8),
+                            //                   border: Border.all(
+                            //                     color: AppColors
+                            //                         .diallerContainerColor,
+                            //                     width: 1,
+                            //                   ),
+                            //                 ),
+                            //                 child: Row(
+                            //                   children: [
+                            //                     const Icon(Icons.calendar_month,
+                            //                         size: 16,
+                            //                         color: Colors.grey),
+                            //                     const SizedBox(width: 6),
+                            //                     Text(
+                            //                       controller
+                            //                           .formattedDate.value,
+                            //                       style: const TextStyle(
+                            //                         fontSize: 14,
+                            //                         color: Colors.black,
+                            //                         fontWeight: FontWeight.w500,
+                            //                       ),
+                            //                     ),
+                            //                     const SizedBox(width: 6),
 
-                                                // Simple Close Icon
-                                                InkWell(
-                                                  onTap: () {
-                                                    controller.dateRangeList
-                                                        .clear();
-                                                    controller.totalContact
-                                                        .clear();
-                                                    controller.totalNoContact
-                                                        .clear();
-                                                    controller.totalAttempt
-                                                        .clear();
-                                                    controller.activeCallMap
-                                                        .clear();
-                                                    controller.activeNoCallMap
-                                                        .clear();
-                                                    controller.activeAttemptMap
-                                                        .clear();
-                                                    controller
-                                                        .finalActiveNoCallList
-                                                        .clear();
-                                                    controller
-                                                        .finalActiveCallList
-                                                        .clear();
-                                                    controller
-                                                        .finalTotalAttemptCallList
-                                                        .clear();
+                            //                     // Simple Close Icon
+                            //                     InkWell(
+                            //                       onTap: () {
+                            //                         controller.dateRangeList
+                            //                             .clear();
+                            //                         controller.totalContact
+                            //                             .clear();
+                            //                         controller.totalNoContact
+                            //                             .clear();
+                            //                         controller.totalAttempt
+                            //                             .clear();
+                            //                         controller.activeCallMap
+                            //                             .clear();
+                            //                         controller.activeNoCallMap
+                            //                             .clear();
+                            //                         controller.activeAttemptMap
+                            //                             .clear();
+                            //                         controller
+                            //                             .finalActiveNoCallList
+                            //                             .clear();
+                            //                         controller
+                            //                             .finalActiveCallList
+                            //                             .clear();
+                            //                         controller
+                            //                             .finalTotalAttemptCallList
+                            //                             .clear();
 
-                                                    DateTime now =
-                                                        DateTime.now();
-                                                    controller.dateRange.value =
-                                                        "${now.day}-${now.month}-${now.year},${now.day}-${now.month}-${now.year}";
-                                                    controller.getTimeGraph();
-                                                  },
-                                                  child: const Icon(
-                                                    Icons.close,
-                                                    size: 16,
-                                                    color: Colors.black54,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ] else ...[
-                                          // --- NO DATE SELECTED PLACEHOLDER ---
-                                          const SizedBox(width: 10),
+                            //                         DateTime now =
+                            //                             DateTime.now();
+                            //                         controller.dateRange.value =
+                            //                             "${now.day}-${now.month}-${now.year},${now.day}-${now.month}-${now.year}";
+                            //                         controller.getTimeGraph();
+                            //                       },
+                            //                       child: const Icon(
+                            //                         Icons.close,
+                            //                         size: 16,
+                            //                         color: Colors.black54,
+                            //                       ),
+                            //                     ),
+                            //                   ],
+                            //                 ),
+                            //               ),
+                            //             ] else ...[
+                            //               // --- NO DATE SELECTED PLACEHOLDER ---
+                            //               const SizedBox(width: 10),
 
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 12, vertical: 4),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              border: Border.all(
-                                                color: Colors.grey.shade400,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                const Icon(Icons.calendar_month,
-                                                    size: 16,
-                                                    color: Colors.grey),
-                                                const SizedBox(width: 6),
-                                                Text(
-                                                  today,
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
+                            //               Container(
+                            //                 padding: const EdgeInsets.symmetric(
+                            //                     horizontal: 12, vertical: 4),
+                            //                 decoration: BoxDecoration(
+                            //                   borderRadius:
+                            //                       BorderRadius.circular(8),
+                            //                   border: Border.all(
+                            //                     color: Colors.grey.shade400,
+                            //                     width: 1,
+                            //                   ),
+                            //                 ),
+                            //                 child: Row(
+                            //                   children: [
+                            //                     const Icon(Icons.calendar_month,
+                            //                         size: 16,
+                            //                         color: Colors.grey),
+                            //                     const SizedBox(width: 6),
+                            //                     Text(
+                            //                       today,
+                            //                       style: const TextStyle(
+                            //                         fontSize: 14,
+                            //                         fontWeight: FontWeight.w500,
+                            //                       ),
+                            //                     ),
+                            //                   ],
+                            //                 ),
+                            //               ),
+                            //             ],
 
-                                        const SizedBox(width: 10),
+                            //             const SizedBox(width: 10),
 
-                                        // Tabs (Simple Boxes with Icon)
-                                        Expanded(
-                                          child: ListView.builder(
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: labels.length,
-                                            reverse: true,
-                                            itemBuilder: (context, index) {
-                                              return Obx(() {
-                                                final isSelected = controller
-                                                        .selectedTab.value ==
-                                                    index;
+                            //             // Tabs (Simple Boxes with Icon)
+                            //             Expanded(
+                            //               child: ListView.builder(
+                            //                 scrollDirection: Axis.horizontal,
+                            //                 itemCount: labels.length,
+                            //                 reverse: true,
+                            //                 itemBuilder: (context, index) {
+                            //                   return Obx(() {
+                            //                     final isSelected = controller
+                            //                             .selectedTab.value ==
+                            //                         index;
 
-                                                return GestureDetector(
-                                                  onTap: () {
-                                                    controller.selectedTab
-                                                        .value = index;
-                                                    callbacks[index]();
-                                                  },
-                                                  child: Container(
-                                                    margin: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 20),
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 10,
-                                                        vertical: 5),
-                                                    decoration: BoxDecoration(
-                                                      color: isSelected
-                                                          ? AppColors.greyColor
-                                                              .withOpacity(0.15)
-                                                          : Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                      border: Border.all(
-                                                        color: isSelected
-                                                            ? AppColors
-                                                                .greyColor
-                                                            : Colors
-                                                                .grey.shade400,
-                                                        width: 1,
-                                                      ),
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.calendar_month,
-                                                      size: 18,
-                                                      color: isSelected
-                                                          ? AppColors
-                                                              .primaryColor
-                                                          : Colors
-                                                              .grey.shade600,
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : const SizedBox.shrink(),
+                            //                     return GestureDetector(
+                            //                       onTap: () {
+                            //                         controller.selectedTab
+                            //                             .value = index;
+                            //                         callbacks[index]();
+                            //                       },
+                            //                       child: Container(
+                            //                         margin: const EdgeInsets
+                            //                             .symmetric(
+                            //                             horizontal: 20),
+                            //                         padding: const EdgeInsets
+                            //                             .symmetric(
+                            //                             horizontal: 10,
+                            //                             vertical: 5),
+                            //                         decoration: BoxDecoration(
+                            //                           color: isSelected
+                            //                               ? AppColors.greyColor
+                            //                                   .withOpacity(0.15)
+                            //                               : Colors.white,
+                            //                           borderRadius:
+                            //                               BorderRadius.circular(
+                            //                                   8),
+                            //                           border: Border.all(
+                            //                             color: isSelected
+                            //                                 ? AppColors
+                            //                                     .greyColor
+                            //                                 : Colors
+                            //                                     .grey.shade400,
+                            //                             width: 1,
+                            //                           ),
+                            //                         ),
+                            //                         child: Icon(
+                            //                           Icons.calendar_month,
+                            //                           size: 18,
+                            //                           color: isSelected
+                            //                               ? AppColors
+                            //                                   .primaryColor
+                            //                               : Colors
+                            //                                   .grey.shade600,
+                            //                         ),
+                            //                       ),
+                            //                     );
+                            //                   });
+                            //                 },
+                            //               ),
+                            //             ),
+                            //           ],
+                            //         ),
+                            //       )
+                            //     : const SizedBox.shrink(),
+
                             Visibility(
                               visible: (chartCardsController.selectedIndex == 0)
                                   ? true
@@ -648,19 +655,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   margin: const EdgeInsets.all(10),
                                   plotAreaBorderWidth: 0,
 
-                                  primaryXAxis: const CategoryAxis(
+                                  primaryXAxis: CategoryAxis(
                                     labelPlacement: LabelPlacement.onTicks,
                                     labelRotation: 0,
                                     labelIntersectAction:
                                         AxisLabelIntersectAction.rotate45,
                                     autoScrollingDelta: 0,
-                                    majorGridLines:
-                                        const MajorGridLines(width: 0),
-                                    // Add edge label placement
+                                    majorGridLines: MajorGridLines(width: 0),
                                     edgeLabelPlacement:
                                         EdgeLabelPlacement.shift,
                                     // Add axis line
-                                    axisLine:  AxisLine(
+                                    axisLine: const AxisLine(
                                         width: 1, color: Colors.grey),
                                     // Add padding to ensure first and last bars are visible
                                     plotOffset:
@@ -670,13 +675,12 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   primaryYAxis: const NumericAxis(
                                     labelFormat: '{value}',
                                     majorGridLines:
-                                        MajorGridLines(width: 0),
-                                    axisLine: AxisLine(
+                                        const MajorGridLines(width: 0),
+                                    axisLine: const AxisLine(
                                         width: 1, color: Colors.grey),
                                     // Add padding to Y axis as well
                                     plotOffset: 10,
                                   ),
-
                                   tooltipBehavior:
                                       TooltipBehavior(enable: true),
                                   legend: const Legend(
@@ -902,16 +906,20 @@ class _DashboardScreenState extends State<DashboardScreen>
                       headerTitleWithContainer('Disbursement'),
                       verticalSpace(15.h),
                       SizedBox(
-                        height: 80,
+                        height: 80.h,
                         child: ListView.builder(
-                          itemCount: 4,
-                          scrollDirection: Axis.horizontal,
+                          itemCount: _disbursementDetailsController
+                              .disbursementList.length,
+                          scrollDirection: Axis.horizontal, //
+                          reverse: true,
                           itemBuilder: (context, index) {
-                            //  final data = dataController.disbursementdata[index];
+                            final data = _disbursementDetailsController
+                                .disbursementList[index];
                             return Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 7.w),
-                                child:
-                                    disbursementCard('Jan 2025', '99,99,00,0'));
+                                padding: EdgeInsets.symmetric(horizontal: 5.w),
+                                child: disbursementCard(
+                                    '${data.monthName} ${data.year}',
+                                    data.amount.toString()));
                           },
                         ),
                       ),
@@ -2631,7 +2639,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   Widget disbursementCard(String month, String amount) {
     return Container(
-      width: 110.w,
+      width: 115.w,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -2658,7 +2666,7 @@ class _DashboardScreenState extends State<DashboardScreen>
           ),
           const SizedBox(height: 6),
           Text(
-            '₹$amount',
+            CurrencyUtils.formatIndianCurrency(amount),
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,

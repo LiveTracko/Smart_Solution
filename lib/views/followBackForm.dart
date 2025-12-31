@@ -4,9 +4,10 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
-import 'package:smart_solutions/controllers/follow_form.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/remark_status_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
@@ -26,6 +27,7 @@ class FollowBackForm extends StatelessWidget {
       Get.find<LoginRequestController>();
   final _formKey = GlobalKey<FormState>();
   var selectedDate = DateTime.now().obs;
+  final ThemeController themeController = Get.find<ThemeController>();
 
   // final DialerController _dialerController = Get.put(DialerController());
   final DialerController _dialerController = Get.find<DialerController>();
@@ -63,7 +65,6 @@ class FollowBackForm extends StatelessWidget {
           _formController.remarkStatus.value = '';
           _formController.dataType.value = '';
           _formController.remark.value = '';
-          _formController.contacted.value = '';
 
           // Also clear controllers if they exist
           _formController.customerNumberController.clear();
@@ -71,6 +72,7 @@ class FollowBackForm extends StatelessWidget {
 
           // Clear callback status
           _remarkController.isCallback.value = false;
+          _formController.contacted.value = 'No';
 
           navigator.pop();
         }
@@ -79,41 +81,33 @@ class FollowBackForm extends StatelessWidget {
       child: CommonScaffold(
         showBack: true,
         title: 'Follow Up Add',
-
-        // appBar: AppBar(
-        //   automaticallyImplyLeading: false,
-        //   title: const Text('Follow Up Add'),
-        //   backgroundColor: AppColors.primaryColor,
-        // ),
         body: Container(
           color: AppColors.whiteColor,
           child: RefreshIndicator(
             onRefresh: () async {
-              final Map<String, dynamic> preservedValues = {
-                'customerName': _dialerController.customerName.value,
-                'mobile': _formController.mobile.value,
-                'salary': _dialerController.salary.value,
-                'customerLoan': _dialerController.customerLoan.value,
-                'bankName': _formController.bankName.value,
-                'dataType': _formController.dataType.value,
-                'contacted': _formController.contacted.value,
-                'remarkStatus': _formController.remarkStatus.value,
-                'remark': _formController.remark.value,
-                'followupDate': _formController.followupDate.value,
-              };
+              // final Map<String, dynamic> preservedValues = {
+              //   'customerName': _dialerController.customerName.value,
+              //   'mobile': _formController.mobile.value,
+              //   'salary': _dialerController.salary.value,
+              //   'customerLoan': _dialerController.customerLoan.value,
+              //   'bankName': _formController.bankName.value,
+              //   'dataType': _formController.dataType.value,
+              //   'contacted': _formController.contacted.value,
+              //   'remarkStatus': _formController.remarkStatus.value,
+              //   'remark': _formController.remark.value,
+              //   'followupDate': _formController.followupDate.value,
+              // };
               final preservedContactedStatus = _formController.contacted.value;
               final preservedRemarkStatus = _formController.remarkStatus.value;
               await Future.wait([
                 _formController.loadData(isRefresh),
-                // Reload remark status based on current contact status
                 _remarkController.fetchRemarkStatus(
                     preservedContactedStatus == 'Yes' ? '1' : '2'),
               ]);
-              
+
               if (preservedRemarkStatus.isNotEmpty) {
                 _formController.remarkStatus.value = preservedRemarkStatus;
 
-                // Also check if we need to show date picker
                 final selectedStatus = _remarkController.remarkStatusList
                     .firstWhereOrNull(
                         (status) => status.id == preservedRemarkStatus);
@@ -146,6 +140,7 @@ class FollowBackForm extends StatelessWidget {
                             'assets/images/user.svg',
                             height: 24,
                             width: 24,
+                            color: themeController.primaryColor.value,
                           ),
                           controller: _dialerController.customerNameController,
                           onChanged: (value) =>
@@ -175,6 +170,7 @@ class FollowBackForm extends StatelessWidget {
                             'assets/images/phone.svg',
                             height: 24,
                             width: 24,
+                            color: themeController.primaryColor.value,
                           ),
                           onChanged: (value) {
                             _formController.mobile.value =
@@ -244,6 +240,7 @@ class FollowBackForm extends StatelessWidget {
                                   'assets/images/rupees.svg',
                                   height: 24,
                                   width: 24,
+                                  color: themeController.primaryColor.value,
                                 ),
                                 value: (_dialerController
                                             .salary.value.isEmpty ||
@@ -267,11 +264,10 @@ class FollowBackForm extends StatelessWidget {
                                 label: 'Loan Amount',
                                 inputType: TextInputType.number,
                                 prefixIcon: SvgPicture.asset(
-                                  'assets/images/loan_amount.svg',
-                                  height: 28,
-                                  width: 28,
-                                  color: AppColors.primaryColor,
-                                ),
+                                    'assets/images/loan_amount.svg',
+                                    height: 28,
+                                    width: 28,
+                                    color: themeController.primaryColor.value),
                                 value: (_dialerController
                                             .customerLoan.value.isEmpty ||
                                         _dialerController.customerLoan.value ==
@@ -293,22 +289,12 @@ class FollowBackForm extends StatelessWidget {
                         SizedBox(height: 16.h),
 
                         _buildDataSourcingDropdown(),
-                        // Data Type Field
-                        // _buildTextField(
-                        //     label: 'Data Type',
-                        //     prefixIcon:
-                        //         SvgPicture.asset('assets/images/data_type.svg'),
-                        //     value: _dialerController.datatype.value.isEmpty
-                        //         ? ""
-                        //         : _dialerController.datatype.value,
-                        //     onChanged: (value) =>
-                        //         _formController.dataType.value = value,
-                        //     validator: null),
+
                         SizedBox(height: 16.h),
 
-                        // Contact Status Radio Buttons
                         _buildContactStatusRadio(_formController
                             .customerNumberController.text.isEmpty),
+
                         SizedBox(height: 16.h),
 
                         // Remark Status Dropdown
@@ -372,50 +358,67 @@ class FollowBackForm extends StatelessWidget {
             padding: const EdgeInsets.only(left: 10.0, right: 8.0),
             child: prefixIcon,
           ),
-          const SizedBox(
+          const SizedBox(width: 5),
+          SizedBox(
             height: 50,
-            width: 5,
-            child: VerticalDivider(
-                width: 1, thickness: 1, color: AppColors.primaryColor),
+            child: Obx(() => VerticalDivider(
+                  width: 1,
+                  thickness: 1,
+                  color: themeController.primaryColor.value,
+                )),
           ),
-          const SizedBox(width: 5)
+          const SizedBox(width: 5),
         ],
       );
     }
 
-    return TextFormField(
-      keyboardType: inputType,
-      maxLines: maxLines,
-      readOnly: false,
-      controller: controller,
-      initialValue:
-          controller == null && (value!.isNotEmpty ?? false) ? value : null,
-      decoration: InputDecoration(
-        //    labelText: label,
-        hintText: label,
-        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+    return Obx(() => TextFormField(
+          keyboardType: inputType,
+          maxLines: maxLines,
+          readOnly: isRead ?? false,
+          controller: controller,
+          initialValue:
+              controller == null && (value?.isNotEmpty ?? false) ? value : null,
+          decoration: InputDecoration(
+            hintText: label,
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+            hintStyle: AppTextStyle.hintText,
+            prefixIcon: decoratedPrefixIcon,
+            labelStyle: AppTextStyle.textStyle,
 
-        hintStyle: AppTextStyle.hintText,
-        prefixIcon: decoratedPrefixIcon,
-        labelStyle: AppTextStyle.textStyle,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0.r),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0.r),
-          borderSide: const BorderSide(color: AppColors.primaryColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0.r),
-          borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
-        ),
-        filled: true,
-        fillColor: AppColors.whiteColor,
-      ),
-      style: const TextStyle(color: AppColors.primaryColor),
-      onChanged: onChanged,
-      validator: validator,
-    );
+            // 🔹 Default border
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+            ),
+
+            // 🔹 Enabled border (theme color)
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+              borderSide: BorderSide(
+                color: themeController.primaryColor.value,
+                width: 1,
+              ),
+            ),
+
+            // 🔹 Focused border (thicker)
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+              borderSide: BorderSide(
+                color: themeController.primaryColor.value,
+                width: 2,
+              ),
+            ),
+
+            filled: true,
+            fillColor: AppColors.whiteColor,
+          ),
+          style: TextStyle(
+            color: themeController.primaryColor.value,
+          ),
+          onChanged: onChanged,
+          validator: validator,
+        ));
   }
 
   Widget _buildMobileField({
@@ -435,58 +438,66 @@ class FollowBackForm extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 10.0, right: 8.0),
+            padding: const EdgeInsets.only(left: 10.0, right: 5.0),
             child: prefixIcon,
           ),
-          const SizedBox(
+          // const SizedBox(width: 5),
+          SizedBox(
             height: 50,
-            width: 5,
-            child: VerticalDivider(
-              thickness: 1,
-              color: AppColors.primaryColor,
-            ),
+            child: Obx(() => VerticalDivider(
+                  thickness: 1,
+                  color: themeController.primaryColor.value,
+                )),
           ),
-          const SizedBox(width: 5)
+          const SizedBox(width: 5),
         ],
       );
     }
-    return TextFormField(
-      initialValue:
-          controller == null && (value!.isNotEmpty ?? false) ? value : null,
-      keyboardType: inputType,
-      controller: controller,
-      maxLines: maxLines,
-      maxLength: 10,
-      readOnly: false,
-      decoration: InputDecoration(
-        counterText: '',
-        hintText: label,
-        hintStyle: AppTextStyle.hintText,
-        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-        prefixIcon: decoratedPrefixIcon,
-        prefixIconConstraints: const BoxConstraints(
-          minWidth: 0,
-          minHeight: 0,
-        ), //,
-        labelStyle: const TextStyle(color: AppColors.secondaryColor),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0.r),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0.r),
-          borderSide: const BorderSide(color: AppColors.primaryColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0.r),
-          borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
-        ),
-        filled: true,
-        fillColor: AppColors.whiteColor,
-      ),
-      style: const TextStyle(color: AppColors.primaryColor),
-      onChanged: onChanged,
-      validator: validator,
-    );
+
+    return Obx(() => TextFormField(
+          initialValue:
+              controller == null && (value?.isNotEmpty ?? false) ? value : null,
+          keyboardType: inputType,
+          controller: controller,
+          maxLines: maxLines,
+          maxLength: 10,
+          readOnly: false,
+          decoration: InputDecoration(
+            counterText: '',
+            hintText: label,
+            hintStyle: AppTextStyle.hintText,
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+            prefixIcon: decoratedPrefixIcon,
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 0,
+              minHeight: 0,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+              borderSide: BorderSide(
+                color: themeController.primaryColor.value,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+              borderSide: BorderSide(
+                color: themeController.primaryColor.value,
+                width: 2,
+              ),
+            ),
+            filled: true,
+            fillColor: AppColors.whiteColor,
+          ),
+          style: TextStyle(
+            color: themeController.primaryColor.value,
+          ),
+          onChanged: onChanged,
+          validator: validator,
+        ));
   }
 
   // Widget _buildDatePicker(BuildContext context, bool chooseDate) {
@@ -603,94 +614,93 @@ class FollowBackForm extends StatelessWidget {
   }
 
   Widget _buildContactStatusRadio(bool isRestricted) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Contacted Status',
-          style: TextStyle(
-            color: AppColors.primaryColor,
-            fontSize: 16.sp,
+    return Obx(
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Contacted Status',
+            style: TextStyle(
+              color: themeController.primaryColor.value,
+              fontSize: 16.sp,
+            ),
           ),
-        ),
-        // Obx(() =>
-        Row(
-          children: [
-            Radio<String>(
-              value: 'Yes',
-              groupValue: _formController.contacted.value,
-              onChanged: (value) {
-                isRestricted
-                    ? {
-                        _formController.contacted.value = value!,
-                        _remarkController.fetchRemarkStatus('1')
+          Row(
+            children: [
+              Radio<String>(
+                value: 'Yes',
+                groupValue: _formController.contacted.value,
+                onChanged: isRestricted
+                    ? (value) {
+                        _formController.onContactedChanged(
+                          value: value!,
+                          remarkController: _remarkController,
+                        );
                       }
-                    : {};
-                // _formController.contacted.value = value!;
-                // _remarkController.fetchRemarkStatus('1');
-              },
-              activeColor: AppColors.primaryColor,
-            ),
-            const Text(
-              'Yes',
-              style: TextStyle(
-                color: AppColors.secondaryColor,
+                    : null,
+                activeColor: AppColors.primaryColor,
               ),
-            ),
-            SizedBox(width: 20.w),
-            Radio<String>(
-              value: 'No',
-              groupValue: _formController.contacted.value,
-              onChanged: (value) {
-                isRestricted
-                    ? {
-                        _formController.contacted.value = value!,
-                        _remarkController.fetchRemarkStatus('2')
+              const Text(
+                'Yes',
+                style: TextStyle(
+                  color: AppColors.secondaryColor,
+                ),
+              ),
+              SizedBox(width: 20.w),
+              Radio<String>(
+                value: 'No',
+                groupValue: _formController.contacted.value,
+                onChanged: isRestricted
+                    ? (value) {
+                        _formController.onContactedChanged(
+                          value: value!,
+                          remarkController: _remarkController,
+                        );
                       }
-                    : {};
-                // _formController.contacted.value = value!;
-                // _remarkController.fetchRemarkStatus('2');
-              },
-              activeColor: AppColors.primaryColor,
-            ),
-            const Text(
-              'No',
-              style: TextStyle(
-                color: AppColors.secondaryColor,
+                    : null, // 🔒 disabled
+
+                activeColor: themeController.primaryColor.value,
               ),
-            ),
-          ],
-          // )),
-        )
-      ],
+              const Text(
+                'No',
+                style: TextStyle(
+                  color: AppColors.secondaryColor,
+                ),
+              ),
+            ],
+            // )),
+          )
+        ],
+      ),
     );
   }
 
   Widget _buildRemarkStatusDropdown() {
     return Obx(() {
-      // Check if remark status list is loaded
+      // 🔹 Loading state (theme-aware)
       if (_remarkController.remarkStatusList.isEmpty) {
         return Container(
           padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.primaryColor),
+            border: Border.all(
+              color: themeController.primaryColor.value,
+            ),
             borderRadius: BorderRadius.circular(10.0.r),
           ),
           child: Center(
             child: Text(
               'Loading remark status...',
-              style: TextStyle(color: AppColors.primaryColor),
+              style: TextStyle(
+                color: themeController.primaryColor.value,
+              ),
             ),
           ),
         );
       }
 
-      // Get the current selected value
+      // 🔹 Selected value logic (UNCHANGED)
       String? currentValue;
-
-      // Check if form controller has a selected remark status
       if (_formController.remarkStatus.value.isNotEmpty) {
-        // Verify if this value exists in the current list
         final existsInList = _remarkController.remarkStatusList
             .any((status) => status.id == _formController.remarkStatus.value);
 
@@ -700,32 +710,39 @@ class FollowBackForm extends StatelessWidget {
       }
 
       return DropdownButtonFormField<String>(
-        style: AppTextStyle.hintText,
+        style: TextStyle(
+          color: themeController.primaryColor.value,
+        ),
+
         decoration: InputDecoration(
           hintText: 'Remark Status',
           contentPadding:
               const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
           hintStyle: AppTextStyle.hintText,
-          labelStyle: const TextStyle(color: AppColors.primaryColor),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0.r),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0.r),
-            borderSide: const BorderSide(color: AppColors.primaryColor),
+            borderSide: BorderSide(
+              color: themeController.primaryColor.value,
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0.r),
-            borderSide:
-                const BorderSide(color: AppColors.primaryColor, width: 2),
+            borderSide: BorderSide(
+              color: themeController.primaryColor.value,
+              width: 2,
+            ),
           ),
           filled: true,
           fillColor: AppColors.whiteColor,
         ),
-        // FIX: Set the value from the controller
+
         value: currentValue,
+
         items: [
-          // Add a placeholder item
+          // 🔹 Placeholder (UNCHANGED)
           DropdownMenuItem<String>(
             value: '',
             enabled: false,
@@ -737,38 +754,38 @@ class FollowBackForm extends StatelessWidget {
               ),
             ),
           ),
+
+          // 🔹 API list items
           ..._remarkController.remarkStatusList.map((status) {
             return DropdownMenuItem<String>(
               value: status.id,
               child: Text(
                 status.title ?? 'Select remark status',
-                style: const TextStyle(color: AppColors.primaryColor),
+                style: TextStyle(
+                  color: themeController.primaryColor.value,
+                ),
               ),
             );
           }).toList(),
         ],
+
+        // 🔹 onChanged logic (UNCHANGED)
         onChanged: (newValue) {
           if (newValue == null || newValue.isEmpty) return;
 
           _formController.remarkStatus.value = newValue;
 
-          logOutput("Selected ID: ${_formController.remarkStatus.value}");
-
-          // Find the selected status using the ID
           var selectedStatus = _remarkController.remarkStatusList
               .firstWhereOrNull((status) => status.id == newValue);
-          logOutput('selected status ${selectedStatus?.title}');
 
-          // Check if the selected status title is 'CallBack'
           if (selectedStatus?.title?.toLowerCase().contains('callback') ==
               true) {
-            logOutput("Setting isCallback to true");
             _remarkController.isCallback.value = true;
           } else {
-            logOutput("Setting isCallback to false");
             _remarkController.isCallback.value = false;
           }
         },
+
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Please select a remark status';
@@ -780,138 +797,141 @@ class FollowBackForm extends StatelessWidget {
   }
 
   Widget _buildAllBankNamesDropdown() {
-    return Obx(
-      () =>
-          // _formController.isLoading.value
-          //     ? const Center(child: LoadingPage())
-          //     :
-          SizedBox(
-        width: double.infinity,
-        child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          isDense: true,
-          style: AppTextStyle.hintText,
-          decoration: InputDecoration(
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-
-            prefixIcon: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 12.0, right: 0.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/images/bank.svg',
-                      height: 24,
-                      width: 24,
-                    ),
-                    const VerticalDivider(
-                      thickness: 1,
-                      color: AppColors.primaryColor,
-                    ),
-                  ],
+    return Obx(() => SizedBox(
+          width: double.infinity,
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
+            isDense: true,
+            style: TextStyle(
+              color: themeController.primaryColor.value,
+            ),
+            decoration: InputDecoration(
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+              prefixIcon: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 12.0, right: 0.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/images/bank.svg',
+                        height: 24,
+                        width: 24,
+                        color: themeController.primaryColor.value,
+                      ),
+                      const SizedBox(width: 8),
+                      VerticalDivider(
+                        thickness: 1,
+                        color: themeController.primaryColor.value,
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              hintText: "Select Bank",
+              hintStyle: AppTextStyle.hintText,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0.r),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0.r),
+                borderSide: BorderSide(
+                  color: themeController.primaryColor.value,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0.r),
+                borderSide: BorderSide(
+                  color: themeController.primaryColor.value,
+                  width: 2,
+                ),
+              ),
+              filled: true,
+              fillColor: AppColors.whiteColor,
             ),
-            hintText: "Select Bank",
-            hintStyle: AppTextStyle.hintText,
-
-            // labelStyle: AppTextStyle.hintText,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0.r),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0.r),
-              borderSide: const BorderSide(color: AppColors.primaryColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0.r),
-              borderSide:
-                  const BorderSide(color: AppColors.primaryColor, width: 2),
-            ),
-            filled: true,
-            fillColor: AppColors.whiteColor,
+            value: _getInitialBankValue(),
+            items: _formController.allBankNamesList.map((bank) {
+              return DropdownMenuItem<String>(
+                value: bank.bankName,
+                child: Text(
+                  bank.bankName ?? 'Select bank',
+                  style: TextStyle(
+                    color: themeController.primaryColor.value,
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              _formController.bankName.value = newValue ?? 'Select bank';
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please select a bank';
+              }
+              return null;
+            },
           ),
-
-          value:
-              _getInitialBankValue(), // Use the method to get the initial value
-          items: _formController.allBankNamesList.map((bank) {
-            return DropdownMenuItem<String>(
-              value: bank.bankName,
-              child: Text(bank.bankName ?? 'Select bank',
-                  style: const TextStyle(color: AppColors.primaryColor)),
-            );
-          }).toList(),
-          onChanged: (newValue) {
-            logOutput("bank is $newValue");
-            _formController.bankName.value = newValue ?? 'Select bank';
-          },
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please select a bank';
-            }
-            return null;
-          },
-        ),
-      ),
-    );
+        ));
   }
 
   Widget _buildDataSourcingDropdown() {
     return Obx(() {
-      // Get the current selected value
       final selectedValue = _formController.dataType.value.isNotEmpty
           ? _formController.dataType.value
           : null;
 
-      // Check if selected value exists in list
       final selectedItemExists = selectedValue != null &&
           _loginRequestController.sourcingList
               .any((item) => item.id == selectedValue);
 
-      // Create dropdown items
       final List<DropdownMenuItem<String>> dropdownItems = [];
 
-      // Add the current selected item first (even if not in list)
       if (selectedValue != null && !selectedItemExists) {
         dropdownItems.add(
           DropdownMenuItem<String>(
             value: selectedValue,
             child: Text(
               'Selected: $selectedValue',
-              style: const TextStyle(
-                  color: AppColors.primaryColor, fontStyle: FontStyle.italic),
+              style: TextStyle(
+                color: themeController.primaryColor.value,
+                fontStyle: FontStyle.italic,
+              ),
             ),
           ),
         );
       }
 
-      // Add all items from sourcing list
-      dropdownItems.addAll(_loginRequestController.sourcingList.map((source) {
-        return DropdownMenuItem<String>(
-          value: source.id,
-          child: Text(
-            source.sourcingTitle ?? '',
-            overflow: TextOverflow.ellipsis,
-            style: AppTextStyle.textStyle,
-          ),
-        );
-      }).toList());
+      dropdownItems.addAll(
+        _loginRequestController.sourcingList.map((source) {
+          return DropdownMenuItem<String>(
+            value: source.id,
+            child: Text(
+              source.sourcingTitle ?? '',
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: themeController.primaryColor.value,
+              ),
+            ),
+          );
+        }).toList(),
+      );
 
       return SizedBox(
         width: double.infinity,
         child: DropdownButtonFormField<String>(
           isExpanded: true,
           isDense: true,
-          style: AppTextStyle.hintText,
+          style: TextStyle(
+            color: themeController.primaryColor.value,
+          ),
           padding: EdgeInsets.zero,
           decoration: InputDecoration(
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
             prefixIcon: IntrinsicHeight(
               child: Padding(
-                padding: const EdgeInsets.only(left: 12.0, right: 0.0),
+                padding: const EdgeInsets.only(left: 12.0),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -919,10 +939,12 @@ class FollowBackForm extends StatelessWidget {
                       'assets/images/data_type.svg',
                       height: 24,
                       width: 24,
+                      color: themeController.primaryColor.value,
                     ),
-                    const VerticalDivider(
+                    const SizedBox(width: 8),
+                    VerticalDivider(
                       thickness: 1,
-                      color: AppColors.primaryColor,
+                      color: themeController.primaryColor.value,
                     ),
                   ],
                 ),
@@ -935,12 +957,16 @@ class FollowBackForm extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0.r),
-              borderSide: const BorderSide(color: AppColors.primaryColor),
+              borderSide: BorderSide(
+                color: themeController.primaryColor.value,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0.r),
-              borderSide:
-                  const BorderSide(color: AppColors.primaryColor, width: 2),
+              borderSide: BorderSide(
+                color: themeController.primaryColor.value,
+                width: 2,
+              ),
             ),
             filled: true,
             fillColor: AppColors.whiteColor,
@@ -948,7 +974,7 @@ class FollowBackForm extends StatelessWidget {
           value: selectedValue,
           items: dropdownItems,
           onChanged: (newValue) {
-            _formController.dataType.value = newValue.toString();
+            _formController.dataType.value = newValue ?? '';
           },
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -1016,7 +1042,8 @@ class FollowBackForm extends StatelessWidget {
                         'Success',
                         'Follow up saved successfully',
                         snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.green.shade400,
+                        backgroundColor:
+                            themeController.primaryColor.value.withOpacity(0.5),
                         colorText: Colors.white,
                         margin: const EdgeInsets.all(12),
                         borderRadius: 8,
@@ -1026,7 +1053,7 @@ class FollowBackForm extends StatelessWidget {
                   }
                 },
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryColor,
+            backgroundColor: themeController.primaryColor.value,
             padding: EdgeInsets.symmetric(vertical: 15.h),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0.r),

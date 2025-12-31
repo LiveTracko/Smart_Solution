@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/views/login_request_form.dart';
 import 'package:smart_solutions/views/spacing_constants.dart';
@@ -30,6 +31,8 @@ class LoginRequestScreen extends StatelessWidget {
   final DataController dataEntryController = Get.find<DataController>();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  final ThemeController _themeController = Get.find<ThemeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -104,8 +107,12 @@ class LoginRequestScreen extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final data = controller.loginRequestList[index];
                           return CommonTitleCard(
-                            leading: SvgPicture.asset(
-                                'assets/images/phone_call.svg'),
+                            leading: Obx(
+                              () => SvgPicture.asset(
+                                'assets/images/phone_call.svg',
+                                color: _themeController.primaryColor.value,
+                              ),
+                            ),
                             onLeadingTap: () {},
                             title: data.customerName,
                             subtitle: data.bankName ?? '',

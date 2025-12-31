@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/common_filter_controller.dart';
+import 'package:smart_solutions/controllers/remark_status_controller.dart';
 import 'package:smart_solutions/models/FollowUpSubmittedList.dart';
 import 'package:smart_solutions/models/all_bank_names_model.dart';
 import 'package:smart_solutions/models/callBack_model.dart';
@@ -88,12 +89,10 @@ class FollowBackFormController extends GetxController
     ever(selectedFilter, (_) => updateFilteredList());
 
     await fetchFollowBackList();
-    // 1️⃣ When text changes, update observable
     customerNumberController.addListener(() {
       mobile.value = customerNumberController.text;
     });
 
-    // 2️⃣ When observable changes, update text
     ever<String>(mobile, (number) {
       if (customerNumberController.text != number) {
         customerNumberController.text = number;
@@ -115,55 +114,56 @@ class FollowBackFormController extends GetxController
     super.onInit();
   }
 
- Future<void> loadData(bool isRefresh) async {
-  isBankAndStatusLoading(true);
-  try {
-    if (isRefresh) {
-      // Save current form values BEFORE refresh
-      final savedCustomerName = _dialerController.customerName.value;
-      final savedMobile = mobile.value;
-      final savedSalary = _dialerController.salary.value;
-      final savedLoanAmount = _dialerController.customerLoan.value;
-      final savedBankName = bankName.value;
-      final savedDataType = dataType.value; // ✅ Save dataType
-      final savedContacted = contacted.value;
-      final savedRemark = remark.value;
-      final savedRemarkStatus = remarkStatus.value;
-      
-      // Reload essential data
-      await getAllBanks();
-      await getDisbursementData();
-      await CallStateService.getLastCallInfo();
-      
-      // RESTORE form values AFTER refresh
-      _dialerController.customerName.value = savedCustomerName;
-      mobile.value = savedMobile;
-      _dialerController.salary.value = savedSalary;
-      _dialerController.customerLoan.value = savedLoanAmount;
-      bankName.value = savedBankName;
-      dataType.value = savedDataType; // ✅ Restore dataType
-      contacted.value = savedContacted;
-      remark.value = savedRemark;
-      remarkStatus.value = savedRemarkStatus;
-      
-      // Also update controllers if needed
-      if (savedCustomerName.isNotEmpty) {
-        _dialerController.customerNameController.text = savedCustomerName;
+  Future<void> loadData(bool isRefresh) async {
+    isBankAndStatusLoading(true);
+    try {
+      if (isRefresh) {
+        // Save current form values BEFORE refresh
+        final savedCustomerName = _dialerController.customerName.value;
+        final savedMobile = mobile.value;
+        final savedSalary = _dialerController.salary.value;
+        final savedLoanAmount = _dialerController.customerLoan.value;
+        final savedBankName = bankName.value;
+        final savedDataType = dataType.value; // ✅ Save dataType
+        final savedContacted = contacted.value;
+        final savedRemark = remark.value;
+        final savedRemarkStatus = remarkStatus.value;
+
+        // Reload essential data
+        await getAllBanks();
+        await getDisbursementData();
+        await CallStateService.getLastCallInfo();
+
+        // RESTORE form values AFTER refresh
+        _dialerController.customerName.value = savedCustomerName;
+        mobile.value = savedMobile;
+        _dialerController.salary.value = savedSalary;
+        _dialerController.customerLoan.value = savedLoanAmount;
+        bankName.value = savedBankName;
+        dataType.value = savedDataType; // ✅ Restore dataType
+        contacted.value = savedContacted;
+        remark.value = savedRemark;
+        remarkStatus.value = savedRemarkStatus;
+
+        // Also update controllers if needed
+        if (savedCustomerName.isNotEmpty) {
+          _dialerController.customerNameController.text = savedCustomerName;
+        }
+        if (savedMobile.isNotEmpty) {
+          customerNumberController.text = savedMobile;
+        }
+      } else {
+        // For initial load (not refresh)
+        await getAllBanks();
+        await getDisbursementData();
       }
-      if (savedMobile.isNotEmpty) {
-        customerNumberController.text = savedMobile;
-      }
-    } else {
-      // For initial load (not refresh)
-      await getAllBanks();
-      await getDisbursementData();
+    } catch (e) {
+      print("Error while loading data: $e");
+    } finally {
+      isBankAndStatusLoading(false);
     }
-  } catch (e) {
-    print("Error while loading data: $e");
-  } finally {
-    isBankAndStatusLoading(false);
   }
-}
+
   void toggleSearch() {
     showSearchField.value = !showSearchField.value;
   }
@@ -660,24 +660,24 @@ class FollowBackFormController extends GetxController
     } finally {}
   }
 
- void clearForm() {
-  // This should only be called on successful form submit
-  customerName.value = '';
-  mobile.value = '';
-  bankName.value = '';
-  dataType.value = '';
-  contacted.value = 'No';
-  remarkStatus.value = '';
-  remark.value = '';
-  followupDate.value = null;
-  
-  customerNumberController.clear();
-  
-  // Clear dialer data
-  _dialerController.datatype.value = '';
-  _dialerController.elapsedTimeInSeconds.value = 0;
-  _dialerController.followup_id.value = '';
-}
+  void clearForm() {
+    // This should only be called on successful form submit
+    customerName.value = '';
+    mobile.value = '';
+    bankName.value = '';
+    dataType.value = '';
+    contacted.value = 'No';
+    remarkStatus.value = '';
+    remark.value = '';
+    followupDate.value = null;
+
+    customerNumberController.clear();
+
+    // Clear dialer data
+    _dialerController.datatype.value = '';
+    _dialerController.elapsedTimeInSeconds.value = 0;
+    _dialerController.followup_id.value = '';
+  }
 
   void setFromDate(DateTime date) {
     fromDate.value = date;
@@ -813,5 +813,22 @@ class FollowBackFormController extends GetxController
   void setFilters(List<String> names) {
     filters.value = ["All", ...names.toSet()];
     update();
+  }
+
+  void onContactedChanged({
+    required String value,
+    required RemarkStatusController remarkController,
+  }) {
+    contacted.value = value;
+
+    // 🔥 RESET dropdown selection
+    remarkStatus.value = '';
+
+    // 🔥 Load correct remark list
+    if (value == 'Yes') {
+      remarkController.fetchRemarkStatus('1');
+    } else {
+      remarkController.fetchRemarkStatus('2');
+    }
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/widget/common_form_field.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/text_style.dart';
@@ -13,6 +15,7 @@ class PersonalDetailScreen extends StatefulWidget {
 }
 
 class _PersonalDetailScreenState extends State<PersonalDetailScreen> {
+  final ThemeController themeController = Get.find<ThemeController>();
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController staffNameController = TextEditingController();
@@ -76,6 +79,9 @@ class _PersonalDetailScreenState extends State<PersonalDetailScreen> {
                   label: "Staff Name",
                   controller: staffNameController,
                   validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                  borderColor:
+                      themeController.primaryColor.value.withOpacity(0.4),
+                  focusedBorderColor: themeController.primaryColor.value,
                 ),
 
                 CommonCountryPhoneField(
@@ -96,6 +102,8 @@ class _PersonalDetailScreenState extends State<PersonalDetailScreen> {
                   value: gender,
                   items: const ["Male", "Female", "Other"],
                   onChanged: (v) => setState(() => gender = v!),
+                  borderColor:
+                      themeController.primaryColor.value.withOpacity(0.4),
                 ),
 
                 CommonDropdownField(
@@ -103,6 +111,8 @@ class _PersonalDetailScreenState extends State<PersonalDetailScreen> {
                   value: maritalStatus,
                   items: const ["Single", "Married", "Divorced", "Widowed"],
                   onChanged: (v) => setState(() => maritalStatus = v!),
+                  borderColor:
+                      themeController.primaryColor.value.withOpacity(0.4),
                 ),
 
                 CommonDropdownField(
@@ -110,11 +120,16 @@ class _PersonalDetailScreenState extends State<PersonalDetailScreen> {
                   value: bloodGroup,
                   items: const ['O+', 'O-', 'A+', 'B+', 'AB+'],
                   onChanged: (v) => setState(() => bloodGroup = v!),
+                  borderColor:
+                      themeController.primaryColor.value.withOpacity(0.4),
                 ),
 
                 CommonTextField(
                   label: "Guardian Name",
                   controller: guardianNameController,
+                  borderColor:
+                      themeController.primaryColor.value.withOpacity(0.4),
+                  focusedBorderColor: themeController.primaryColor.value,
                 ),
 
                 const Divider(thickness: 10, color: Color(0xFFE0E0E0)),
@@ -134,6 +149,9 @@ class _PersonalDetailScreenState extends State<PersonalDetailScreen> {
                 CommonTextField(
                   label: "Emergency Contact Name",
                   controller: emergencyNameController,
+                  borderColor:
+                      themeController.primaryColor.value.withOpacity(0.4),
+                  focusedBorderColor: themeController.primaryColor.value,
                 ),
 
                 CommonDropdownField(
@@ -147,6 +165,8 @@ class _PersonalDetailScreenState extends State<PersonalDetailScreen> {
                     'Spouse'
                   ],
                   onChanged: (v) => setState(() => emergencyRelation = v!),
+                  borderColor:
+                      themeController.primaryColor.value.withOpacity(0.4),
                 ),
 
                 CommonCountryPhoneField(

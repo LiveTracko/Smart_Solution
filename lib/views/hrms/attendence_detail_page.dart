@@ -130,7 +130,7 @@ class _AttendanceModesScreenState extends State<AttendanceModesScreen> {
             ),
 
             const SizedBox(height: 8),
-
+            
             // ===================== GREY AREA START =====================
             Container(
               width: double.infinity,

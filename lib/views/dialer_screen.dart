@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:smart_solutions/components/widgets/DailerScreenWidget/KeypadRowWidget.dart';
 import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/controllers/follow_form_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/views/followBackForm.dart';
 import 'package:smart_solutions/widget/common_rows_card.dart';
@@ -27,6 +28,7 @@ class _DialerScreenState extends State<DialerScreen> {
   final DialerController dialerController = Get.find<DialerController>();
   final FollowBackFormController _formController =
       Get.find<FollowBackFormController>();
+  final ThemeController themeController = Get.find<ThemeController>();
 
   int callsToBeHeld = 5;
 
@@ -58,7 +60,7 @@ class _DialerScreenState extends State<DialerScreen> {
           },
         )
       ],
-      title: 'Dialler',
+      title: 'Dialer',
       showBack: false,
       isDrawer: true,
       body: SingleChildScrollView(
@@ -98,7 +100,7 @@ class _DialerScreenState extends State<DialerScreen> {
                           Transform.scale(
                             scale: 0.8, // Ensuring the switch remains compact
                             child: Switch(
-                              activeColor: AppColors.greenColor,
+                              activeColor: themeController.primaryColor.value,
                               inactiveTrackColor: Colors.grey.shade100,
                               value: isActive,
                               onChanged: dialerController.isCallOngoing.value
@@ -343,6 +345,7 @@ class _DialerScreenState extends State<DialerScreen> {
                             : _buildIconNextCallButton(
                                 SvgPicture.asset(
                                   'assets/images/tellecaller.svg',
+                                  color: themeController.primaryColor.value,
                                 ),
                                 dialerController.isManual.value
                                     ? null
@@ -411,8 +414,8 @@ class _DialerScreenState extends State<DialerScreen> {
                     SizedBox(width: 5.w), // spacing
                     Expanded(
                       child: _buildIconButton(
-                        Icons.backspace_outlined,
-                        AppColors.greyColor,
+                        "assets/images/dialer_back.svg",
+                        AppColors.blackColor,
                         _removeNumber,
                       ),
                     ),
@@ -494,7 +497,8 @@ class _DialerScreenState extends State<DialerScreen> {
     );
   }
 
-  Widget _buildIconButton(IconData icon, Color color, VoidCallback? onPressed) {
+  Widget _buildIconButton(
+      String svgPath, Color color, VoidCallback? onPressed) {
     return CircleAvatar(
       radius: 33,
       backgroundColor: AppColors.secondaryColor,
@@ -502,12 +506,13 @@ class _DialerScreenState extends State<DialerScreen> {
         color: AppColors.greyColor,
         shape: const CircleBorder(),
         child: SizedBox(
-          height: 64, // circle size
+          height: 64.h, // circle size
           width: 64,
           child: IconButton(
-            icon: Icon(icon, color: AppColors.secondaryColor),
-            iconSize: 30.r,
             onPressed: onPressed,
+            icon: SvgPicture.asset(
+              svgPath,
+            ),
           ),
         ),
       ),

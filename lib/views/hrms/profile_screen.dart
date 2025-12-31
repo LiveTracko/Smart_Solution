@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smart_solutions/controllers/profile_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/views/hrms/attendence_detail_page.dart';
 import 'package:smart_solutions/views/hrms/bank_detail_page.dart';
@@ -19,6 +21,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final controller = Get.find<ProfileController>();
+  final ThemeController themeController = Get.find<ThemeController>();
 
   ImageProvider profileImage() {
     if (controller.imageFile.value != null) {
@@ -43,7 +46,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         child: Row(
           children: [
-            SvgPicture.asset(iconPath, height: 24, width: 24),
+            SvgPicture.asset(
+              iconPath,
+              height: 24,
+              width: 24,
+              color: themeController.primaryColor.value,
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
@@ -91,11 +99,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onTap: _openProfileImageBottomSheet,
                           child: CircleAvatar(
                             radius: 16,
-                            backgroundColor: Colors.transparent,
+                            backgroundColor: themeController.primaryColor.value,
                             child: SvgPicture.asset(
-                              "assets/hrms/pencil_with_blue_container.svg",
-                              width: 30,
-                              height: 30,
+                              "assets/hrms/pencil.svg",
+                              width: 17.w,
+                              height: 17.h,
+                              color: Colors.white,
                             ),
                           ),
                         ),

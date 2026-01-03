@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:get/get.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
@@ -11,7 +13,7 @@ class SuggestionTextField extends StatelessWidget {
   final List<String> suggestions;
   final ValueChanged<String>? onChanged;
 
-  const SuggestionTextField({
+  SuggestionTextField({
     super.key,
     required this.label,
     this.svgIconPath,
@@ -19,6 +21,8 @@ class SuggestionTextField extends StatelessWidget {
     required this.suggestions,
     this.onChanged,
   });
+
+  final ThemeController themeController = Get.find<ThemeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -56,14 +60,20 @@ class SuggestionTextField extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 0.0, right: 3.0),
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: SvgPicture.asset(svgIconPath!),
+                  child: SvgPicture.asset(
+                    svgIconPath!,
+                    color: themeController.primaryColor.value,
+                  ),
                 ),
               ),
-              const SizedBox(
+              SizedBox(
                 height: 50,
                 width: 5,
                 child: VerticalDivider(
-                    width: 1, thickness: 1, color: AppColors.primaryColor),
+                  width: 1,
+                  thickness: 1,
+                  color: themeController.primaryColor.value,
+                ),
               ),
             ],
           );
@@ -86,17 +96,18 @@ class SuggestionTextField extends StatelessWidget {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: AppColors.primaryColor),
+                borderSide:
+                    BorderSide(color: themeController.primaryColor.value),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide:
-                    const BorderSide(color: AppColors.primaryColor, width: 2),
+                borderSide: BorderSide(
+                    color: themeController.primaryColor.value, width: 2),
               ),
               filled: true,
               fillColor: AppColors.appBarTextColor,
             ),
-            style: const TextStyle(color: AppColors.primaryColor),
+            style: TextStyle(color: themeController.primaryColor.value),
           ),
         );
       },

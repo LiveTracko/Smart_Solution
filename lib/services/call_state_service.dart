@@ -55,62 +55,105 @@ class CallStateService {
   //   return Map<dynamic, dynamic>.from(result);
   // }
 
-  static Future<Map<dynamic, dynamic>> 
-  getLastCallInfo() async {
+  // static Future<Map<dynamic, dynamic>>
+  // getLastCallInfo() async {
+  //   await Future.delayed(const Duration(milliseconds: 100));
+  //   try {
+  //     final result = await _channel.invokeMethod('getLastCallInfo');
+  //     final callMap = Map<dynamic, dynamic>.from(result);
+
+  //     // Get your controllers
+  //     final dialerController = Get.find<DialerController>();
+  //     final followBackFormController = Get.find<FollowBackFormController>();
+  //     final remarkStatusController = Get.find<RemarkStatusController>();
+
+  //     // Extract info from callMap
+  //     //  final callType = callMap['type']?.toString() ?? 'unknown';
+  //     final callDuration = (callMap['duration'] ?? 0) as int;
+  //     final name = callMap['name']?.toString() ?? '';
+  //     final number =
+  //         callMap['number'].toString().replaceAll(RegExp(r'^\+91\s*'), '');
+  //     //callMap['number']?.toString() ?? '';
+
+  //     // Only clear for missed calls (duration == 0)
+  //     if (callDuration == 0) {
+  //       dialerController.customerName.value = name;
+  //       followBackFormController.mobile.value = number;
+  //       followBackFormController.contacted.value = 'No';
+  //       dialerController.elapsedTimeInSeconds.value = callDuration;
+  //       await remarkStatusController.fetchRemarkStatus('2');
+  //     } else {
+  //       // Incoming or outgoing call → keep info
+  //       dialerController.customerName.value = name;
+  //       followBackFormController.mobile.value = number;
+  //       followBackFormController.contacted.value = 'Yes';
+  //       dialerController.elapsedTimeInSeconds.value = callDuration;
+  //       await remarkStatusController.fetchRemarkStatus('1');
+  //     }
+
+  //     // Give GetX time to update reactive fields
+  //     await Future.delayed(const Duration(milliseconds: 50));
+
+  //     // Call API if online
+  //     if (connectivity.isOnline.value) {
+  //       String statusForAPI = followBackFormController.contactStatus;
+  //       await remarkStatusController.fetchRemarkStatus(statusForAPI);
+  //     } else {
+  //       Get.snackbar('No Internet', 'Will retry when connected');
+  //       ever(connectivity.isOnline, (bool connected) async {
+  //         if (connected) {
+  //           String statusForAPI = followBackFormController.contactStatus;
+  //           await remarkStatusController.fetchRemarkStatus(statusForAPI);
+  //         }
+  //       });
+  //     }
+
+  //     return callMap;
+  //   } catch (e) {
+  //     print("Error in getLastCallInfo: $e");
+  //     return {};
+  //   }
+  // }
+
+  static Future<Map<dynamic, dynamic>> getLastCallInfo() async {
     await Future.delayed(const Duration(milliseconds: 100));
+
     try {
       final result = await _channel.invokeMethod('getLastCallInfo');
       final callMap = Map<dynamic, dynamic>.from(result);
 
-      // Get your controllers
       final dialerController = Get.find<DialerController>();
-      final followBackFormController = Get.find<FollowBackFormController>();
-      final remarkStatusController = Get.find<RemarkStatusController>();
+      final followController = Get.find<FollowBackFormController>();
+      final remarkController = Get.find<RemarkStatusController>();
 
-      // Extract info from callMap
-      //  final callType = callMap['type']?.toString() ?? 'unknown';
-      final callDuration = (callMap['duration'] ?? 0) as int;
-      final name = callMap['name']?.toString() ?? '';
-      final number =
-          callMap['number'].toString().replaceAll(RegExp(r'^\+91\s*'), '');
-      //callMap['number']?.toString() ?? '';
+      final int callDuration = (callMap['duration'] ?? 0) as int;
+      final String name = callMap['name']?.toString() ?? '';
+      final String number =
+          callMap['number']?.toString().replaceAll(RegExp(r'^\+91\s*'), '') ??
+              '';
 
-      // Only clear for missed calls (duration == 0)
-      if (callDuration == 0) {
-        dialerController.customerName.value = name;
-        followBackFormController.mobile.value = number;
-        followBackFormController.contacted.value = 'No';
-        dialerController.elapsedTimeInSeconds.value = callDuration;
-        await remarkStatusController.fetchRemarkStatus('2');
-      } else {
-        // Incoming or outgoing call → keep info
-        dialerController.customerName.value = name;
-        followBackFormController.mobile.value = number;
-        followBackFormController.contacted.value = 'Yes';
-        dialerController.elapsedTimeInSeconds.value = callDuration;
-        await remarkStatusController.fetchRemarkStatus('1');
-      }
+      // Update common fields
+      dialerController.customerName.value = name;
+      followController.mobile.value = number;
+      dialerController.elapsedTimeInSeconds.value = callDuration;
 
-      // Give GetX time to update reactive fields
-      await Future.delayed(const Duration(milliseconds: 50));
+      // Determine contacted status
+      final bool isContacted = callDuration > 0;
+      followController.contacted.value = isContacted ? 'Yes' : 'No';
 
-      // Call API if online
+      // API status value
+      final String apiStatus = isContacted ? '1' : '2';
+
+      // Fetch remark status ONLY ONCE
       if (connectivity.isOnline.value) {
-        String statusForAPI = followBackFormController.contactStatus;
-        await remarkStatusController.fetchRemarkStatus(statusForAPI);
+        await remarkController.fetchRemarkStatus(apiStatus);
       } else {
         Get.snackbar('No Internet', 'Will retry when connected');
-        ever(connectivity.isOnline, (bool connected) async {
-          if (connected) {
-            String statusForAPI = followBackFormController.contactStatus;
-            await remarkStatusController.fetchRemarkStatus(statusForAPI);
-          }
-        });
       }
 
       return callMap;
     } catch (e) {
-      print("Error in getLastCallInfo: $e");
+      // debugPrint("Error in getLastCallInfo: $e");
       return {};
     }
   }

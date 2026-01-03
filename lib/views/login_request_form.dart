@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
 import 'package:smart_solutions/widget/suggestin_textfiels.dart';
@@ -32,6 +33,7 @@ class LoginRequestForm extends StatelessWidget {
   LoginRequestForm({super.key});
 
   final TextEditingController customerNameController = TextEditingController();
+  final ThemeController themeController = Get.find<ThemeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -92,8 +94,10 @@ class LoginRequestForm extends StatelessWidget {
                             SizedBox(height: 10.h),
                             _buildTextField(
                               label: 'Contact Number',
-                              prefixIcon:
-                                  SvgPicture.asset('assets/images/phone.svg'),
+                              prefixIcon: SvgPicture.asset(
+                                'assets/images/phone.svg',
+                                color: themeController.primaryColor.value,
+                              ),
                               content: controller.contactNumber.value,
                               onChanged: (value) {
                                 controller.contactNumber.value = value;
@@ -163,6 +167,7 @@ class LoginRequestForm extends StatelessWidget {
                               label: 'Loan Amount',
                               prefixIcon: SvgPicture.asset(
                                 'assets/images/rupees.svg',
+                                color: themeController.primaryColor.value,
                                 height: 24,
                                 width: 24,
                               ),
@@ -267,11 +272,13 @@ class LoginRequestForm extends StatelessWidget {
             padding: const EdgeInsets.only(left: 10.0, right: 8.0),
             child: prefixIcon,
           ),
-          const SizedBox(
+          SizedBox(
             height: 50,
             width: 5,
             child: VerticalDivider(
-                width: 1, thickness: 1, color: AppColors.primaryColor),
+                width: 1,
+                thickness: 1,
+                color: themeController.primaryColor.value),
           ),
           const SizedBox(
             width: 5,
@@ -300,17 +307,18 @@ class LoginRequestForm extends StatelessWidget {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: AppColors.primaryColor),
+                borderSide:
+                    BorderSide(color: themeController.primaryColor.value),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide:
-                    const BorderSide(color: AppColors.primaryColor, width: 2),
+                borderSide: BorderSide(
+                    color: themeController.primaryColor.value, width: 2),
               ),
               filled: true,
               fillColor: AppColors.backgroundColor,
             ),
-            style: const TextStyle(color: AppColors.primaryColor),
+            style: TextStyle(color: themeController.primaryColor.value),
             onChanged: onChanged,
             validator: validator,
           ),
@@ -346,7 +354,8 @@ class LoginRequestForm extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.add, color: AppColors.primaryColor),
+                icon:
+                    Icon(Icons.add, color: themeController.primaryColor.value),
                 onPressed: () {
                   // Add a new empty remark to the list
                   controller.remarksList.add('');
@@ -414,11 +423,12 @@ class LoginRequestForm extends StatelessWidget {
                             'assets/images/bank.svg',
                             height: 24,
                             width: 24,
+                            color: themeController.primaryColor.value,
                           ),
                           SizedBox(width: 5.w),
-                          const VerticalDivider(
+                          VerticalDivider(
                             thickness: 1,
-                            color: AppColors.primaryColor,
+                            color: themeController.primaryColor.value,
                           ),
                         ],
                       ),
@@ -430,12 +440,13 @@ class LoginRequestForm extends StatelessWidget {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0.r),
-                    borderSide: const BorderSide(color: AppColors.primaryColor),
+                    borderSide:
+                        BorderSide(color: themeController.primaryColor.value),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0.r),
-                    borderSide: const BorderSide(
-                      color: AppColors.primaryColor,
+                    borderSide: BorderSide(
+                      color: themeController.primaryColor.value,
                       width: 2,
                     ),
                   ),
@@ -513,11 +524,12 @@ class LoginRequestForm extends StatelessWidget {
                             'assets/images/data_type.svg',
                             height: 24,
                             width: 24,
+                            color: themeController.primaryColor.value,
                           ),
                           SizedBox(width: 5.w),
-                          const VerticalDivider(
+                          VerticalDivider(
                             thickness: 1,
-                            color: AppColors.primaryColor,
+                            color: themeController.primaryColor.value,
                           ),
                         ],
                       ),
@@ -532,12 +544,13 @@ class LoginRequestForm extends StatelessWidget {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0.r),
-                    borderSide: const BorderSide(color: AppColors.primaryColor),
+                    borderSide:
+                        BorderSide(color: themeController.primaryColor.value),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0.r),
-                    borderSide: const BorderSide(
-                      color: AppColors.primaryColor,
+                    borderSide: BorderSide(
+                      color: themeController.primaryColor.value,
                       width: 2,
                     ),
                   ),

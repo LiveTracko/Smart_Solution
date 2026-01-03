@@ -1089,10 +1089,10 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   IncentiveCard(
                                       title: 'Incentives',
                                       items: [
-                                        IncentiveItem("Target", "₹10,00,000"),
-                                        IncentiveItem(
-                                            "Achievement", "7,50,000"),
-                                        IncentiveItem("Incentive", "₹7,50,000"),
+                                        IncentiveItem("Target", "₹0"),
+                                        IncentiveItem("Achievement",
+                                            "₹${_disbursementController.disbursementList.first.amount}"),
+                                        IncentiveItem("Incentive", "₹0"),
                                       ],
                                       statusColor: AppColors.greenCOlor)
                                 ],

@@ -206,9 +206,9 @@ class _ActiveFilesState extends State<ActiveFiles> {
                         ));
                       },
                       children: [
-                        if (StaticStoredData.roleName == 'teamleader')
-                          _buildSingleRow(
-                              Icons.person_2_outlined, data.tcName ?? 'NA'),
+                        // if (StaticStoredData.roleName == 'teamleader')
+                        //   _buildSingleRow(
+                        //       Icons.person_2_outlined, data.tcName ?? 'NA'),
                         if (StaticStoredData.roleName != 'telecaller')
                           _buildDoubleRow(
                             iconLeft: Icons.headphones_outlined,

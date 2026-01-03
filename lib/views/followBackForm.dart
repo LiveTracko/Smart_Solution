@@ -815,16 +815,13 @@ class FollowBackForm extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SvgPicture.asset(
-                      'assets/images/bank.svg',
-                      height: 24,
-                      width: 24,
-                      color: themeController.primaryColor.value,
-                    ),
+                    SvgPicture.asset('assets/images/bank.svg',
+                        height: 24,
+                        width: 24,
+                        color: themeController.primaryColor.value),
                     VerticalDivider(
-                      thickness: 1,
-                      color: themeController.primaryColor.value,
-                    ),
+                        thickness: 1,
+                        color: themeController.primaryColor.value),
                   ],
                 ),
               ),

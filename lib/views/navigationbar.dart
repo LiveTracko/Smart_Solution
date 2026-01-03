@@ -286,7 +286,6 @@ class _MainScreenState extends State<MainScreen> {
           screen: ListingScreen(
             key: const ValueKey('listing_screen '),
             title: 'Listing',
-
             isShowBack: false,
             isDrawer: true,
             //key: const ValueKey('hrm_screen')
@@ -367,7 +366,7 @@ class _MainScreenState extends State<MainScreen> {
             tabs: _buildTabs(),
             controller: _controller,
             navBarBuilder: (navBarConfig) =>
-                StaticStoredData.roleName == 'admin'
+                StaticStoredData.roleName != 'telecaller'
                     ? Style4BottomNavBar(
                         navBarConfig: navBarConfig,
                         height: 70,

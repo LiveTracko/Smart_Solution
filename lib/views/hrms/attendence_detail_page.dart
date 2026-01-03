@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
+
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
@@ -80,13 +83,14 @@ class _AttendanceModesScreenState extends State<AttendanceModesScreen> {
   bool qrAttendance = true;
   bool gpsAttendance = true;
   String markFrom = 'office';
+  final ThemeController themeController = Get.find<ThemeController>();
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
       child: CommonScaffold(
-        title: 'Attendance Modes',
+        title: 'Attendance Modess',
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: SizedBox(
@@ -94,7 +98,7 @@ class _AttendanceModesScreenState extends State<AttendanceModesScreen> {
             width: double.infinity,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2F6DF6),
+                backgroundColor: themeController.primaryColor.value,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -130,7 +134,7 @@ class _AttendanceModesScreenState extends State<AttendanceModesScreen> {
             ),
 
             const SizedBox(height: 8),
-            
+
             // ===================== GREY AREA START =====================
             Container(
               width: double.infinity,
@@ -220,25 +224,27 @@ class _AttendanceModesScreenState extends State<AttendanceModesScreen> {
                           Row(
                             children: [
                               Radio(
-                                value: 'office',
-                                //ignore:deprecated_member_use
-                                groupValue: markFrom,
-                                //ignore:deprecated_member_use
-                                onChanged: (v) => setState(() => markFrom = v!),
-                                activeColor: Color(0xFF2F6DF6),
-                              ),
+                                  value: 'office',
+                                  //ignore:deprecated_member_use
+                                  groupValue: markFrom,
+                                  //ignore:deprecated_member_use
+                                  onChanged: (v) =>
+                                      setState(() => markFrom = v!),
+                                  activeColor:
+                                      themeController.primaryColor.value),
                               const Text(
                                 "Office",
                               ),
                               const SizedBox(width: 16),
                               Radio(
-                                value: 'anywhere',
-                                //ignore:deprecated_member_use
-                                groupValue: markFrom,
-                                //ignore:deprecated_member_use
-                                onChanged: (v) => setState(() => markFrom = v!),
-                                activeColor: Color(0xFF2F6DF6),
-                              ),
+                                  value: 'anywhere',
+                                  //ignore:deprecated_member_use
+                                  groupValue: markFrom,
+                                  //ignore:deprecated_member_use
+                                  onChanged: (v) =>
+                                      setState(() => markFrom = v!),
+                                  activeColor:
+                                      themeController.primaryColor.value),
                               const Text("Anywhere"),
                             ],
                           ),
@@ -295,7 +301,7 @@ class _AttendanceModesScreenState extends State<AttendanceModesScreen> {
           onChanged: onChanged,
           //ignore:deprecated_member_use
           activeColor: Colors.white,
-          activeTrackColor: Color(0xff12AF69),
+          activeTrackColor: themeController.primaryColor.value,
           inactiveThumbColor: Colors.white,
           inactiveTrackColor: const Color(0xFFF3F4F6),
         ),
@@ -324,10 +330,9 @@ class _AttendanceModesScreenState extends State<AttendanceModesScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-
             //ignore:deprecated_member_use
             activeColor: Colors.white,
-            activeTrackColor: Color(0xff12AF69),
+            activeTrackColor: themeController.primaryColor.value,
             inactiveThumbColor: Colors.white,
             inactiveTrackColor: const Color(0xFFF3F4F6),
           ),

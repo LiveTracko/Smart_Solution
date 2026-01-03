@@ -367,7 +367,7 @@ class _MainScreenState extends State<MainScreen> {
             tabs: _buildTabs(),
             controller: _controller,
             navBarBuilder: (navBarConfig) =>
-                StaticStoredData.roleName == 'admin'
+                StaticStoredData.roleName == 'admin' 
                     ? Style4BottomNavBar(
                         navBarConfig: navBarConfig,
                         height: 70,

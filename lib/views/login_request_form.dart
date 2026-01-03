@@ -318,7 +318,7 @@ class LoginRequestForm extends StatelessWidget {
               filled: true,
               fillColor: AppColors.backgroundColor,
             ),
-            style: TextStyle(color: themeController.primaryColor.value),
+            style: TextStyle(color: Colors.black),
             onChanged: onChanged,
             validator: validator,
           ),

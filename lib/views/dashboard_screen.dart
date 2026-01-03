@@ -654,7 +654,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   // Add margin to prevent bars from being cut off
                                   margin: const EdgeInsets.all(10),
                                   plotAreaBorderWidth: 0,
-                                  primaryXAxis: const CategoryAxis(
+
+                                  primaryXAxis: CategoryAxis(
                                     labelPlacement: LabelPlacement.onTicks,
                                     labelRotation: 0,
                                     labelIntersectAction:
@@ -663,16 +664,20 @@ class _DashboardScreenState extends State<DashboardScreen>
                                     majorGridLines: MajorGridLines(width: 0),
                                     edgeLabelPlacement:
                                         EdgeLabelPlacement.shift,
-                                    axisLine:
-                                        AxisLine(width: 1, color: Colors.grey),
-                                    plotOffset: 15,
+                                    // Add axis line
+                                    axisLine: const AxisLine(
+                                        width: 1, color: Colors.grey),
+                                    // Add padding to ensure first and last bars are visible
+                                    plotOffset:
+                                        15, // This creates space at edges
                                   ),
 
                                   primaryYAxis: const NumericAxis(
                                     labelFormat: '{value}',
-                                    majorGridLines: MajorGridLines(width: 0),
-                                    axisLine:
-                                        AxisLine(width: 1, color: Colors.grey),
+                                    majorGridLines:
+                                        const MajorGridLines(width: 0),
+                                    axisLine: const AxisLine(
+                                        width: 1, color: Colors.grey),
                                     // Add padding to Y axis as well
                                     plotOffset: 10,
                                   ),

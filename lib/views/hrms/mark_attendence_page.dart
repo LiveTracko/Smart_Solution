@@ -49,12 +49,12 @@ class _MarkAttendancePageState extends State<MarkAttendancePage>
             "Mark Attendance",
             style: TextStyle(color: Colors.white),
           ),
-          centerTitle: true,
+          centerTitle: false,
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 24),
+             SizedBox(height: 24.h),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -76,7 +76,7 @@ class _MarkAttendancePageState extends State<MarkAttendancePage>
                 ),
               ),
             ),
-            const SizedBox(height: 30),
+           SizedBox(height: 30.h),
 
             // -------- Scanner Box ----------
             Center(
@@ -117,7 +117,7 @@ class _MarkAttendancePageState extends State<MarkAttendancePage>
                           left: 0,
                           right: 0,
                           child: Container(
-                            height: 2,
+                            height: 2.h,
                             color: const Color(0xFF2F6DF6),
                           ),
                         );

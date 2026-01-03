@@ -72,8 +72,11 @@ class ThemeController extends GetxController {
       // Handle the response
       if (response.statusCode == 200) {
         Get.snackbar(
-            "Theme Updated", "Your app theme has been updated successfully.",
-            snackPosition: SnackPosition.BOTTOM, backgroundColor: colorCode);
+          "Theme Updated",
+          "Your app theme has been updated successfully.",
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: colorCode.withOpacity(0.3),
+        );
       } else {
         Get.snackbar('Error', 'Failed to update profile.');
       }

@@ -8,6 +8,7 @@ import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/remark_status_controller.dart';
 import 'package:smart_solutions/controllers/theme_controller.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
@@ -793,80 +794,83 @@ class FollowBackForm extends StatelessWidget {
   }
 
   Widget _buildAllBankNamesDropdown() {
-    return Obx(() => SizedBox(
-          width: double.infinity,
-          child: DropdownButtonFormField<String>(
-            isExpanded: true,
-            isDense: true,
-            style: const TextStyle(color: AppColors.blackColor),
-            decoration: InputDecoration(
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-              prefixIcon: IntrinsicHeight(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 12.0, right: 0.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SvgPicture.asset(
-                        'assets/images/bank.svg',
-                        height: 24,
-                        width: 24,
-                        color: themeController.primaryColor.value,
-                      ),
-                      const SizedBox(width: 8),
-                      VerticalDivider(
-                        thickness: 1,
-                        color: themeController.primaryColor.value,
-                      ),
-                    ],
-                  ),
+    return Obx(
+      () =>
+          // _formController.isLoading.value
+          //     ? const Center(child: LoadingPage())
+          //     :
+          SizedBox(
+        width: double.infinity,
+        child: DropdownButtonFormField<String>(
+          isExpanded: true,
+          isDense: true,
+          style: AppTextStyle.hintText,
+          decoration: InputDecoration(
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+
+            prefixIcon: IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 12.0, right: 0.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/bank.svg',
+                      height: 24,
+                      width: 24,
+                      color: themeController.primaryColor.value,
+                    ),
+                    VerticalDivider(
+                      thickness: 1,
+                      color: themeController.primaryColor.value,
+                    ),
+                  ],
                 ),
               ),
-              hintText: "Select Bank",
-              hintStyle: AppTextStyle.hintText,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0.r),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0.r),
-                borderSide: BorderSide(
-                  color: themeController.primaryColor.value,
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0.r),
-                borderSide: BorderSide(
-                  color: themeController.primaryColor.value,
-                  width: 2,
-                ),
-              ),
-              filled: true,
-              fillColor: AppColors.whiteColor,
             ),
-            value: _getInitialBankValue(),
-            items: _formController.allBankNamesList.map((bank) {
-              return DropdownMenuItem<String>(
-                value: bank.bankName,
-                child: Text(
-                  bank.bankName ?? 'Select bank',
-                  // style: TextStyle(
-                  //   color: themeController.primaryColor.value,
-                  // ),
-                ),
-              );
-            }).toList(),
-            onChanged: (newValue) {
-              _formController.bankName.value = newValue ?? 'Select bank';
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please select a bank';
-              }
-              return null;
-            },
+            hintText: "Select Bank",
+            hintStyle: AppTextStyle.hintText,
+
+            // labelStyle: AppTextStyle.hintText,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+              borderSide: BorderSide(color: themeController.primaryColor.value),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0.r),
+              borderSide: BorderSide(
+                  color: themeController.primaryColor.value, width: 2),
+            ),
+            filled: true,
+            fillColor: AppColors.whiteColor,
           ),
-        ));
+
+          value:
+              _getInitialBankValue(), // Use the method to get the initial value
+          items: _formController.allBankNamesList.map((bank) {
+            return DropdownMenuItem<String>(
+              value: bank.bankName,
+              child: Text(bank.bankName ?? 'Select bank',
+                  style: const TextStyle(color: AppColors.primaryColor)),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            logOutput("bank is $newValue");
+            _formController.bankName.value = newValue ?? 'Select bank';
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please select a bank';
+            }
+            return null;
+          },
+        ),
+      ),
+    );
   }
 
   Widget _buildDataSourcingDropdown() {
@@ -896,20 +900,17 @@ class FollowBackForm extends StatelessWidget {
         );
       }
 
-      dropdownItems.addAll(
-        _loginRequestController.sourcingList.map((source) {
-          return DropdownMenuItem<String>(
-            value: source.id,
-            child: Text(
-              source.sourcingTitle ?? '',
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: AppColors.blackColor,
-              ),
-            ),
-          );
-        }).toList(),
-      );
+      // Add all items from sourcing list
+      dropdownItems.addAll(_loginRequestController.sourcingList.map((source) {
+        return DropdownMenuItem<String>(
+          value: source.id,
+          child: Text(
+            source.sourcingTitle ?? '',
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyle.textStyle,
+          ),
+        );
+      }).toList());
 
       return SizedBox(
         width: double.infinity,

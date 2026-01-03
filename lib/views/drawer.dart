@@ -9,6 +9,7 @@ import 'package:smart_solutions/controllers/internet_checker.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
 import 'package:smart_solutions/controllers/profile_controller.dart';
 import 'package:smart_solutions/controllers/theme_controller.dart';
+import 'package:smart_solutions/views/followBackForm.dart';
 import 'package:smart_solutions/views/forget_password.dart';
 import 'package:smart_solutions/views/hrms/hrm_screen.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
@@ -77,7 +78,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       InkWell(
-                        onTap: () => Get.to(() => ProfilePage()),
+                        //onTap: () => Get.to(() => ProfilePage()),
                         child: CircleAvatar(
                           radius: screenHeight * 0.05, // responsive avatar
                           backgroundColor: Colors.white,
@@ -101,6 +102,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
+                      ),
+                      SizedBox(
+                        height: 5.h,
+                      ),
+                      Text(
+                        StaticStoredData.roleName.isEmpty
+                            ? StaticStoredData.roleName.toUpperCase()
+                            : "",
+                        style: TextStyle(
+                            fontSize: 12.sp, color: AppColors.whiteColor),
                       ),
                     ],
                   ),
@@ -143,14 +154,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         //     () {},
                         //   ),
                         // if (StaticStoredData.roleName == 'telecaller')
-                        _drawerSvgTile(
-                          'assets/drawer/lock.svg',
-                          'Reset Password',
-                          () => Get.to(() => const ForgetView()),
-                        ),
+                        // _drawerSvgTile(
+                        //   'assets/drawer/lock.svg',
+                        //   'Reset Password',
+                        //   () => Get.to(() => const ForgetView()),
+                        // ),
                         if (StaticStoredData.roleName == 'telecaller')
                           _drawerSvgTile(
-                            'assets/drawer/login_request.svg',
+                            'assets/drawer/hrm.svg',
                             'HRM',
                             () => Get.to(() => HrmScreen()),
                           ),
@@ -162,6 +173,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         ),
                         const Spacer(),
                         const Divider(),
+
+                        _drawerSvgTile(
+                          'assets/drawer/lock.svg',
+                          'Reset Password',
+                          () => Get.to(() => const ForgetView()),
+                        ),
                         _drawerTile(
                           'assets/drawer/log_out.svg',
                           'Log Out',

@@ -415,7 +415,7 @@ class FollowBackForm extends StatelessWidget {
             fillColor: AppColors.whiteColor,
           ),
           style: TextStyle(
-            color: themeController.primaryColor.value,
+            color: Colors.black,
           ),
           onChanged: onChanged,
           validator: validator,
@@ -494,7 +494,7 @@ class FollowBackForm extends StatelessWidget {
             fillColor: AppColors.whiteColor,
           ),
           style: TextStyle(
-            color: themeController.primaryColor.value,
+            color: Colors.black,
           ),
           onChanged: onChanged,
           validator: validator,
@@ -758,9 +758,7 @@ class FollowBackForm extends StatelessWidget {
               value: status.id,
               child: Text(
                 status.title ?? 'Select remark status',
-                style: TextStyle(
-                  color: themeController.primaryColor.value,
-                ),
+                style: TextStyle(color: AppColors.blackColor),
               ),
             );
           }).toList(),
@@ -855,7 +853,7 @@ class FollowBackForm extends StatelessWidget {
             return DropdownMenuItem<String>(
               value: bank.bankName,
               child: Text(bank.bankName ?? 'Select bank',
-                  style: const TextStyle(color: AppColors.primaryColor)),
+                  style: const TextStyle(color: AppColors.blackColor)),
             );
           }).toList(),
           onChanged: (newValue) {
@@ -904,11 +902,9 @@ class FollowBackForm extends StatelessWidget {
       dropdownItems.addAll(_loginRequestController.sourcingList.map((source) {
         return DropdownMenuItem<String>(
           value: source.id,
-          child: Text(
-            source.sourcingTitle ?? '',
-            overflow: TextOverflow.ellipsis,
-            style: AppTextStyle.textStyle,
-          ),
+          child: Text(source.sourcingTitle ?? '',
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: AppColors.blackColor)),
         );
       }).toList());
 
@@ -918,7 +914,7 @@ class FollowBackForm extends StatelessWidget {
           isExpanded: true,
           isDense: true,
           style: TextStyle(
-            color: themeController.primaryColor.value,
+            color: AppColors.blackColor,
           ),
           padding: EdgeInsets.zero,
           decoration: InputDecoration(

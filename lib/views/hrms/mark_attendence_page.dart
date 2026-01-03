@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
+import 'package:get/get.dart';
 
 class MarkAttendancePage extends StatefulWidget {
   const MarkAttendancePage({super.key});
@@ -13,6 +15,7 @@ class MarkAttendancePage extends StatefulWidget {
 class _MarkAttendancePageState extends State<MarkAttendancePage>
     with SingleTickerProviderStateMixin {
   final MobileScannerController _controller = MobileScannerController();
+  final ThemeController themeController = Get.find<ThemeController>();
   String? _lastCode;
   bool _torchOn = false;
 
@@ -43,7 +46,7 @@ class _MarkAttendancePageState extends State<MarkAttendancePage>
       child: Scaffold(
         backgroundColor: const Color(0xFF808080),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF2F6DF6),
+          backgroundColor: themeController.primaryColor.value,
           leading: const BackButton(color: Color(0xffFFFFFF)),
           title: const Text(
             "Mark Attendance",
@@ -54,7 +57,7 @@ class _MarkAttendancePageState extends State<MarkAttendancePage>
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             SizedBox(height: 24.h),
+            SizedBox(height: 24.h),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -76,7 +79,7 @@ class _MarkAttendancePageState extends State<MarkAttendancePage>
                 ),
               ),
             ),
-           SizedBox(height: 30.h),
+            SizedBox(height: 30.h),
 
             // -------- Scanner Box ----------
             Center(
@@ -167,6 +170,7 @@ class _MarkAttendancePageState extends State<MarkAttendancePage>
                                 "assets/hrms/scan_camera.svg",
                                 height: 22.h,
                                 width: 22.w,
+                                color: themeController.primaryColor.value,
                               ),
                             ),
                           ),

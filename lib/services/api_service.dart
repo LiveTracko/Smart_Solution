@@ -38,6 +38,8 @@ class ApiService {
             : "${APIUrls.newBaseUrl}$companyName/api/index.php/$endpoint",
       ),
       headers: {
+        "Accept": "application/json",
+        'User-Agent': 'SmartDialApp/1.0',
         "x-api-key": type == "login" ? APIUrls.loginApiKey : APIUrls.apiKey,
       },
       body: data,

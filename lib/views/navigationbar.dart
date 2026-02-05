@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
-import 'package:smart_solutions/controllers/active_files_controller.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
+import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/core/app_bindings.dart';
@@ -364,6 +364,7 @@ class _MainScreenState extends State<MainScreen> {
         body: Obx(
           () => PersistentTabView(
             tabs: _buildTabs(),
+            gestureNavigationEnabled: true,
             controller: _controller,
             navBarBuilder: (navBarConfig) =>
                 StaticStoredData.roleName != 'telecaller'
@@ -416,7 +417,6 @@ class _MainScreenState extends State<MainScreen> {
 
     final ok = await _ensureLoggedIn();
     if (!ok) {
-      // Jump back to the previous tab if not authenticated
       Future.microtask(() {
         if (mounted && _controller.index != _previousIndex) {
           _controller.jumpToTab(_previousIndex);
@@ -424,15 +424,46 @@ class _MainScreenState extends State<MainScreen> {
       });
       return;
     }
-    if (newIndex == 0) {
-      Get.find<DashboardController>().onInit();
+
+    switch (newIndex) {
+      case 0:
+        Get.find<DashboardController>().refreshDashboard();
+        break;
+
+      case 1:
+        Get.find<DataController>().refreshData();
+        break;
+
+      case 3:
+        Get.find<FollowBackFormController>().fetchFollowBackList();
+        break;
     }
-    if (newIndex == 1) {
-      Get.find<ActiveFilesController>().loadData();
-    }
-    if (newIndex == 3) {
-      Get.find<FollowBackFormController>().fetchFollowBackList();
-    }
+
     _previousIndex = newIndex;
   }
+
+  // void _onTabChanged(int newIndex) async {
+  //   if (newIndex == _previousIndex) return;
+
+  //   final ok = await _ensureLoggedIn();
+  //   if (!ok) {
+  //     // Jump back to the previous tab if not authenticated
+  //     Future.microtask(() {
+  //       if (mounted && _controller.index != _previousIndex) {
+  //         _controller.jumpToTab(_previousIndex);
+  //       }
+  //     });
+  //     return;
+  //   }
+  //   if (newIndex == 0) {
+  //     Get.find<DashboardController>().onInit();
+  //   }
+  //   if (newIndex == 1) {
+  //     Get.find<ActiveFilesController>().loadData();
+  //   }
+  //   if (newIndex == 3) {
+  //     Get.find<FollowBackFormController>().fetchFollowBackList();
+  //   }
+  //   _previousIndex = newIndex;
+  // }
 }

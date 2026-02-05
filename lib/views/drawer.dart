@@ -1,22 +1,23 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/internet_checker.dart';
-import 'package:smart_solutions/controllers/login_controllers.dart';
 import 'package:smart_solutions/controllers/profile_controller.dart';
 import 'package:smart_solutions/controllers/theme_controller.dart';
+import 'package:smart_solutions/core/app_bindings.dart';
 import 'package:smart_solutions/views/followBackForm.dart';
 import 'package:smart_solutions/views/forget_password.dart';
-import 'package:smart_solutions/views/hrms/hrm_screen.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_request_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
 import 'package:smart_solutions/views/theme_change_screen.dart';
-import 'package:smart_solutions/views/profile_view.dart';
+
+import '../routes/app_routes.dart';
+import '../services/logout_helper.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -27,6 +28,8 @@ class CustomDrawer extends StatefulWidget {
 
 class _CustomDrawerState extends State<CustomDrawer> {
   final ProfileController _profileController = Get.find<ProfileController>();
+  final FollowBackFormController _followBackFormController =
+      Get.find<FollowBackFormController>();
   String _userName = "";
 
   @override
@@ -159,12 +162,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         //   'Reset Password',
                         //   () => Get.to(() => const ForgetView()),
                         // ),
-                        if (StaticStoredData.roleName == 'telecaller')
-                          _drawerSvgTile(
-                            'assets/drawer/hrm.svg',
-                            'HRM',
-                            () => Get.to(() => HrmScreen()),
-                          ),
+                        // if (StaticStoredData.roleName == 'telecaller')
+                        //   _drawerSvgTile(
+                        //     'assets/drawer/hrm.svg',
+                        //     'HRM',
+                        //     () => Get.to(() => HrmScreen()),
+                        //   ),
                         // if (StaticStoredData.roleName == 'telecaller')
                         _drawerSvgTile(
                           'assets/drawer/theme.svg',
@@ -183,31 +186,59 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           'assets/drawer/log_out.svg',
                           'Log Out',
                           () async {
-                            StaticStoredData.userId = '';
-                            StaticStoredData.number = '';
+                            // Show a quick confirmation dialog
+                            Get.defaultDialog(
+                                title: "Logout",
+                                middleText: "Are you sure you want to logout?",
+                                textConfirm: "Yes",
+                                textCancel: "No",
+                                confirmTextColor: Colors.white,
+                                onConfirm: () async {
+                                  // Close the dialog
+                                  Get.back();
 
-                            _profileController.nameController.clear();
-                            _profileController.usernameController.clear();
-                            _profileController.imageFile.value = null;
-                            _profileController.profileImageUrl.value = '';
+                                  // Pass the CURRENT context to the helper
+                                  await LogoutHelper.logout(context);
+                                });
 
-                            if (Get.isRegistered<ProfileController>()) {
-                              Get.delete<ProfileController>();
-                            }
+                            // final prefs = await SharedPreferences.getInstance();
+                            // await prefs.clear();
 
-                            final prefs = await SharedPreferences.getInstance();
-                            prefs.clear();
+                            // StaticStoredData.userId = '';
+                            // StaticStoredData.number = '';
 
-                            await Get.deleteAll(force: true);
+                            // await Get.deleteAll(force: true);
+                            // Get.put(ConnectivityController(), permanent: true);
+                            // Get.put(ThemeController(), permanent: true);
 
-                            // 4️⃣ Re-register GLOBAL controllers
-                            Get.put(ConnectivityController(), permanent: true);
-                            Get.put(ThemeController(), permanent: true);
+                            // Get.offAll(() => const LoginView(),
+                            //     binding: AppBinding());
+                            // _followBackFormController.clearForm();
 
-                            Get.put(
-                              LoginViewModel(),
-                            );
-                            Get.offAll(() => const LoginView());
+                            // final prefs = await SharedPreferences.getInstance();
+                            // prefs.clear();
+
+                            // StaticStoredData.userId = '';
+                            // StaticStoredData.number = '';
+
+                            // //       _profileController.nameController.clear();
+                            // //       _profileController.usernameController.clear();
+                            // _profileController.imageFile.value = null;
+                            // _profileController.profileImageUrl.value = '';
+
+                            // // if (Get.isRegistered<ProfileController>()) {
+                            // //   Get.delete<ProfileController>();
+                            // // }
+
+                            // await Get.deleteAll(force: true);
+
+                            // // 4️⃣ Re-register GLOBAL controllers
+                            // Get.put(ConnectivityController(), permanent: true);
+                            // Get.put(ThemeController(), permanent: true);
+
+                            // Get.put(LoginViewModel());
+                            // Get.offAll(() => const LoginView(),
+                            //     binding: AppBinding());
                           },
                           isBottomTile: true,
                         ),

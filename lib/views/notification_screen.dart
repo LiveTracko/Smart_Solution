@@ -17,6 +17,7 @@ class NotificationSCreen extends StatefulWidget {
 class _NotificationSCreenState extends State<NotificationSCreen> {
   final NotificationController notificationController =
       Get.put(NotificationController());
+
   @override
   void initState() {
     notificationController.getNotificationList();
@@ -42,7 +43,7 @@ class _NotificationSCreenState extends State<NotificationSCreen> {
           () => notificationController.isLoading.value
               ? const Center(child: LoadingPage())
               : notificationController.notificationData.isEmpty
-                  ? NoDataAvailable()
+                  ? const NoDataAvailable()
                   : ListView.builder(
                       itemCount: notificationController.notificationData.length,
                       itemBuilder: (context, index) {

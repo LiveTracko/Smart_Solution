@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:smart_solutions/components/commons.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
-import 'package:smart_solutions/controllers/admin/call_log_controller.dart';
 import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/models/call_time_model.dart';
 import 'package:smart_solutions/models/getGroupStatus.dart';
@@ -20,8 +19,6 @@ class DashboardController extends GetxController
   var dateRangeList = <DateTime?>[].obs;
   final ApiService _apiService = ApiService();
   GetCallTimeModel callTimeModel = GetCallTimeModel();
-  final AdminCallLogController _callLogController =
-      Get.find<AdminCallLogController>();
   var isLoading = true.obs;
   RxString totalValActive = "0".obs;
   RxString totalNoValActive = "0".obs;
@@ -34,11 +31,16 @@ class DashboardController extends GetxController
 
   RxString dateRange = ''.obs;
   RxString formattedDate = ''.obs;
-  late TabController tabController;
-  RxInt selectedTab = (-1).obs;
+  // late TabController tabController;
+  //RxInt selectedTab = (-1).obs;
   var isApiCalled = false.obs;
 
   var topDisburserUser = <TopDisburseUser>[].obs;
+
+  final ScrollController scrollController = ScrollController();
+
+  RxBool isActiveLoaded = false.obs;
+  RxBool isCallLogLoaded = false.obs;
 
   Future<void> loadTodayAndMonthlyData() async {
     final FollowBackFormController followBackFormController =
@@ -159,52 +161,108 @@ class DashboardController extends GetxController
   void onInit() async {
     isDrawerOpen.value = false;
 
-    Future.microtask(() async {
-      isLoading.value = true;
+    _loadInitialData();
+    // _attachScrollListener();
 
-      try {
-        await getTimeGraph();
-        await getActiveData(status: 1);
-        await getActiveData(status: 2);
-        await loadTodayAndMonthlyData();
-        await loadtellecallerTabData(0);
-        await getTopDisburseUser();
-        await _callLogController.getCallLogData();
-      } catch (e) {
-        logOutput('Error fetching dashboard data: $e');
-      } finally {
-        isLoading.value = false;
-      }
-    });
+    // Future.microtask(() async {
+    //   isLoading.value = true;
+
+    //   try {
+    //     await getTimeGraph();
+    //     await _callLogController.getCallLogData();
+    //     getTopDisburseUser();
+    //     getActiveData(status: 1);
+    //     getActiveData(status: 2);
+    //     loadTodayAndMonthlyData();
+    //     //   await loadtellecallerTabData(0);
+
+    //     // _callLogController.getCallLogData();
+    //   } catch (e) {
+    //     logOutput('Error fetching dashboard data: $e');
+    //   } finally {
+    //     isLoading.value = false;
+    //   }
+    // });
 
     super.onInit();
   }
 
-  Future<void> loadTabData(int index) async {
-    switch (index) {
-      case 0: // Active
-        await getActiveData(status: 1);
-        break;
-      case 1: // Inactive
-        await getActiveData(status: 2);
-        break;
+  /// 🔁 SAFE manual refresh (for tab switch)
+  Future<void> refreshDashboard() async {
+    if (isLoading.value) return;
+    _loadInitialData();
+  }
+
+  // @override
+  // void onClose() {
+  //   scrollController.dispose();
+  //   super.onClose();
+  // }
+
+  void _loadInitialData() async {
+    isLoading.value = true;
+
+    try {
+      await Future.wait<void>([
+        getTimeGraph(),
+        getTopDisburseUser(),
+        _loadActiveData(),
+      ]);
+    } finally {
+      isLoading.value = false;
     }
   }
 
-  Future<void> loadtellecallerTabData(int index) async {
-    FollowBackFormController followBackFormController = Get.find();
-    switch (index) {
-      case 0:
-        await followBackFormController.getCallBackData();
-        break;
-      case 1:
-        await followBackFormController.getCallLogData();
-        break;
-      case 2:
-        await followBackFormController.getDisbursementData();
-        break;
-    }
+  // void _attachScrollListener() {
+  //   scrollController.addListener(() {
+  //     final position = scrollController.position;
+
+  //     // When user is near bottom
+  //     if (position.extentAfter < 200 && !isActiveLoaded.value) {
+  //       isActiveLoaded.value = true;
+  //       _loadActiveData();
+  //     }
+
+  //     if (position.extentAfter < 100 && !isCallLogLoaded.value) {
+  //        isCallLogLoaded.value = true;
+  //       // _callLogController.getCallLogData();
+  //     }
+  //   });
+  // }
+
+  Future<void> _loadActiveData() async {
+    await Future.wait<void>([
+      getActiveData(status: 1),
+      getActiveData(status: 2),
+      loadTodayAndMonthlyData(),
+    ]);
   }
+
+  // Future<void> loadTabData(int index) async {
+  //   switch (index) {
+  //     case 0: // Active
+  //       await getActiveData(status: 1);
+  //       break;
+  //     case 1: // Inactive
+  //       await getActiveData(status: 2);
+  //       break;
+  //   }
+  // }
+
+  // Future<void> loadtellecallerTabData(int index) async {
+  //   FollowBackFormController followBackFormController = Get.find();
+  //   switch (index) {
+  //     case 0:
+  //       await followBackFormController.getCallBackData();
+  //       break;
+  //     case 1:
+  //       await followBackFormController.getCallLogData();
+  //       break;
+  //     case 2:
+  //       await followBackFormController.getDisbursementData();
+  //       break;
+  //   }
+  // }
 
   // Future<void> fetchDashboardData(bool isMonthly) async {
   //   //FollowBackFormController followBackFormController = Get.find();

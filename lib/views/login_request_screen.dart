@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
-import 'package:smart_solutions/controllers/data_entry_controller.dart';
+
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
@@ -27,19 +27,20 @@ class LoginRequestScreen extends StatelessWidget {
       required this.title,
       required this.isShowBack,
       required this.isDrawer});
-  final LoginRequestController controller = Get.find<LoginRequestController>();
-  final DataController dataEntryController = Get.find<DataController>();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final ThemeController _themeController = Get.find<ThemeController>();
-
   @override
   Widget build(BuildContext context) {
+    final LoginRequestController controller =
+        Get.find<LoginRequestController>();
+
+    final ThemeController themeController = Get.find<ThemeController>();
+
     return CommonScaffold(
         title: title,
-        showBack: false,
-        isDrawer: true,
+        showBack: isShowBack,
+        isDrawer: isDrawer,
         actions: [
           IconButton(
             icon: SvgPicture.asset('assets/images/user_plus.svg'),
@@ -110,7 +111,7 @@ class LoginRequestScreen extends StatelessWidget {
                             leading: Obx(
                               () => SvgPicture.asset(
                                 'assets/images/phone_call.svg',
-                                color: _themeController.primaryColor.value,
+                                color: themeController.primaryColor.value,
                               ),
                             ),
                             onLeadingTap: () {},

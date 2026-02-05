@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 import 'package:smart_solutions/views/spacing_constants.dart';
 import 'package:smart_solutions/widget/text_style.dart';
@@ -94,13 +95,13 @@ class CommonTitleCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   if (followupdate != null) // your follow up date string
-
-                    Text(
-                      "Follow Up: $followupdate",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyle.blueHeaderTitletStyle
-                          .copyWith(fontSize: 12),
+                    Obx(
+                      () => Text(
+                        "Follow Up: $followupdate",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextColor.primaryText(12),
+                      ),
                     )
                 ],
               ),

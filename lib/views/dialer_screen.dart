@@ -53,9 +53,7 @@ class _DialerScreenState extends State<DialerScreen> {
             'assets/images/user_plus.svg',
           ),
           onPressed: () {
-            Get.to(() => FollowBackForm(
-                  isRefresh: true,
-                ));
+            Get.to(() => const FollowBackForm(isgetData: false));
             // handle click
           },
         )

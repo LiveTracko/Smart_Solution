@@ -23,7 +23,7 @@ class ThemeController extends GetxController {
 
   void changeThemeColor(Color color) async {
     primaryColor.value = color;
-    // Optional: update GetMaterialApp theme dynamically
+
     Get.changeTheme(
       ThemeData(
         fontFamily: 'Poppins',

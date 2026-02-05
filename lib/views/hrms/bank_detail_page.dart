@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/widget/common_form_field.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 
@@ -14,6 +16,7 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
   final accountNumberController = TextEditingController();
   final bankNameController = TextEditingController();
   final ifscController = TextEditingController();
+  final ThemeController themeController = Get.find<ThemeController>();
 
   @override
   void dispose() {
@@ -39,7 +42,7 @@ class _BankDetailsPageState extends State<BankDetailsPage> {
             width: double.infinity,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2F6DF6),
+                backgroundColor: themeController.primaryColor.value,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

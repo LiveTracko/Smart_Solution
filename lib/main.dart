@@ -2,14 +2,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUtil
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/components/commons.dart';
 import 'package:smart_solutions/controllers/internet_checker.dart';
-import 'package:smart_solutions/controllers/theme_controller.dart'; // <-- import ThemeController
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/services/firbase_notifications.dart';
 import 'package:smart_solutions/services/local_notification_service.dart';
- import 'core/app_bindings.dart';
+import 'core/app_bindings.dart';
 import 'routes/app_routes.dart';
 
 void main() async {
@@ -51,12 +51,9 @@ class MyApp extends StatelessWidget {
       designSize: const Size(375, 812),
       minTextAdapt: true,
       builder: (context, child) {
-        // 🔁 Obx listens to theme changes
         return Obx(() => GetMaterialApp(
               debugShowCheckedModeBanner: false,
               title: 'Smart Solutions',
-
-              // 🚦 Routing
               initialBinding: AppBinding(),
               initialRoute: AppRoutes.splashScreen,
               getPages: AppRoutes.pages,
@@ -78,8 +75,8 @@ class MyApp extends StatelessWidget {
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 5, horizontal: 20),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                   ),
                 ),
                 textButtonTheme: TextButtonThemeData(

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/widget/common_form_field.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 
 class CurrentEmploymentPage extends StatefulWidget {
   const CurrentEmploymentPage({super.key});
 
-  static const Color primaryBlue = Color(0xFF2F6DF6);
-  static const Color borderGrey = Color(0xFFE0E0E0);
-  static const Color textGrey = Color.fromARGB(255, 27, 26, 26);
-  static const Color labelColor = Color.fromARGB(255, 62, 59, 59);
+  // static const Color primaryBlue = Color(0xFF2F6DF6);
+  // static const Color borderGrey = Color(0xFFE0E0E0);
+  // static const Color textGrey = Color.fromARGB(255, 27, 26, 26);
+  // static const Color labelColor = Color.fromARGB(255, 62, 59, 59);
 
   @override
   State<CurrentEmploymentPage> createState() => _CurrentEmploymentPageState();
@@ -31,6 +33,8 @@ class _CurrentEmploymentPageState extends State<CurrentEmploymentPage> {
   final TextEditingController esiController = TextEditingController(
       // text: '63620hc762g',
       );
+       final ThemeController themeController = Get.find<ThemeController>();
+
 
   String department = 'All Departments Assigned';
   String employeeType = 'Full Time';
@@ -133,7 +137,7 @@ class _CurrentEmploymentPageState extends State<CurrentEmploymentPage> {
                 height: 48,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: CurrentEmploymentPage.primaryBlue,
+                    backgroundColor: themeController.primaryColor.value,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6),
                     ),

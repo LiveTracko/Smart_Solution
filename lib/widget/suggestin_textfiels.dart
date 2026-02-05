@@ -107,7 +107,7 @@ class SuggestionTextField extends StatelessWidget {
               filled: true,
               fillColor: AppColors.appBarTextColor,
             ),
-            style: TextStyle(color: themeController.primaryColor.value),
+            style: TextStyle(color: Colors.black),
           ),
         );
       },

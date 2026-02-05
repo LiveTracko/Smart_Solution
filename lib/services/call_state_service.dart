@@ -134,11 +134,13 @@ class CallStateService {
 
       // Update common fields
       dialerController.customerName.value = name;
+
       followController.mobile.value = number;
       dialerController.elapsedTimeInSeconds.value = callDuration;
 
       // Determine contacted status
       final bool isContacted = callDuration > 0;
+      followController.isDurationAvailable.value = callDuration < 0;
       followController.contacted.value = isContacted ? 'Yes' : 'No';
 
       // API status value

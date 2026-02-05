@@ -22,12 +22,9 @@ class FollowBackListScreen extends StatefulWidget {
 class _FollowBackListScreenState extends State<FollowBackListScreen> {
   // final FollowBackFormController controller =
   //     Get.put(FollowBackFormController());
-  final controller = Get.find<FollowBackFormController>();
+  final controller = Get.put(FollowBackFormController());
 
   final DialerController _dialerController = Get.put(DialerController());
-
-  final FollowBackFormController _formController =
-      Get.find<FollowBackFormController>();
 
   final RemarkStatusController _remarkStatusController =
       Get.put(RemarkStatusController());
@@ -89,7 +86,7 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
 
   @override
   void initState() {
-    _formController.fetchFollowBackList();
+    controller.fetchFollowBackList();
     super.initState();
   }
 
@@ -161,7 +158,7 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
               child: Obx(
                 () => Row(
                   children: [
-                    _formController.showSearchField.value
+                    controller.showSearchField.value
                         ? SizedBox(
                             width: 300.w,
                             child: TextField(
@@ -179,9 +176,8 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
                                 ),
                               ),
                               onChanged: (value) {
-                                _formController.searchText.value = value;
-                                _formController
-                                    .fetchFollowBackList(); // filter live
+                                controller.searchText.value = value;
+                                controller.fetchFollowBackList(); // filter live
                               },
                             ),
                           )
@@ -288,13 +284,13 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
                             : const SizedBox.shrink(),
                         Obx(() => IconButton(
                               icon: Icon(
-                                _formController.showSearchField.value
+                                controller.showSearchField.value
                                     ? Icons.close
                                     : Icons.search,
                                 color: AppColors.primaryColor,
                                 size: 25,
                               ),
-                              onPressed: _formController.toggleSearch,
+                              onPressed: controller.toggleSearch,
                             )),
                       ],
                     )
@@ -427,11 +423,10 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
                                 );
                               }
 
-                              _formController.mobile.value =
+                              controller.mobile.value =
                                   item.contactNumber ?? "";
-                              _formController.bankName.value =
-                                  item.bankName ?? "";
-                              _formController.customerName.value =
+                              controller.bankName.value = item.bankName ?? "";
+                              controller.customerName.value =
                                   item.customerName ?? "";
                               _dialerController.customerName.value =
                                   item.customerName ?? '';
@@ -440,7 +435,7 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
                               // _dialerController.customerName.value =
                               //     item.customerName ?? "";
                               _dialerController.datatype.value = '';
-                              _formController.remark.value = item.remark ?? '';
+                              controller.remark.value = item.remark ?? '';
                               _dialerController.followup_id.value =
                                   item.id ?? '';
                               _dialerController.excel_id.value =
@@ -660,11 +655,11 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
                 //                         );
                 //                       }
 
-                //                       _formController.mobile.value =
+                //                       controller.mobile.value =
                 //                           item.contactNumber ?? "";
-                //                       _formController.bankName.value =
+                //                       controller.bankName.value =
                 //                           item.bankName ?? "";
-                //                       _formController.customerName.value =
+                //                       controller.customerName.value =
                 //                           item.customerName ?? "";
                 //                       _dialerController.customerName.value =
                 //                           item.customerName ?? '';
@@ -673,7 +668,7 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
                 //                       // _dialerController.customerName.value =
                 //                       //     item.customerName ?? "";
                 //                       _dialerController.datatype.value = '';
-                //                       _formController.remark.value =
+                //                       controller.remark.value =
                 //                           item.remark ?? '';
                 //                       _dialerController.followup_id.value =
                 //                           item.id ?? '';

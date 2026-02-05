@@ -3,14 +3,15 @@ import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_solutions/binding/dashboard_binding.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/services/api_service.dart';
-import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/utils/error_utils.dart';
 import 'package:smart_solutions/views/navigationbar.dart';
 import 'package:smart_solutions/utils/snackbar_utils.dart';
+import 'package:smart_solutions/widget/text_style.dart';
 import '../constants/services.dart';
 
 class LoginViewModel extends GetxController {
@@ -84,7 +85,7 @@ class LoginViewModel extends GetxController {
           // Navigate to the MainScreen on successful login
           // dashboardController.fetchDashboardData(false);
           // dashboardController.fetchDashboardData(true);
-          Get.off(() => const MainScreen());
+          Get.off(() => const MainScreen(), binding: DashboardBinding());
           showDialog(
               context: (Get.context!),
               builder: (context) => AlertDialog(
@@ -117,7 +118,7 @@ class LoginViewModel extends GetxController {
                           child: ElevatedButton(
                             style: ButtonStyle(
                                 backgroundColor: WidgetStateProperty.all(
-                                    AppColors.primaryColor)),
+                                    themeController.primaryColor.value)),
                             onPressed: () {
                               Get.back();
                             },

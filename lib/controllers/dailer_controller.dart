@@ -9,10 +9,10 @@ import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/core/widgets/custom_snackbars.dart';
 import 'package:smart_solutions/models/mobile_number_fetching.dart';
 import 'package:smart_solutions/services/api_service.dart';
-import 'package:smart_solutions/services/call_state_service.dart';
 import 'package:smart_solutions/views/followBackForm.dart';
 import '../constants/services.dart';
 import '../services/CallHelper.dart';
+import '../services/call_state_service.dart';
 
 class DialerController extends GetxController {
   var dialNumber = ''.obs;
@@ -32,8 +32,10 @@ class DialerController extends GetxController {
   StreamSubscription<PhoneStateStatus>? _phoneStateSubscription;
   var followup_id = ''.obs;
 
-  var isManual = false.obs;
+  var isManual = true.obs;
   final customerNameController = TextEditingController();
+
+  RxBool isCallInfoLoading = false.obs;
 
   @override
   void onInit() {
@@ -49,6 +51,19 @@ class DialerController extends GetxController {
     _phoneStateSubscription?.cancel();
     customerNameController.dispose();
     super.onClose();
+  }
+
+  Future<void> fetchLastCallInfoIfNeeded(bool shouldFetch) async {
+    if (!shouldFetch) return;
+
+    try {
+      isCallInfoLoading.value = true;
+      await CallStateService.getLastCallInfo();
+    } catch (e) {
+      debugPrint('Call info error: $e');
+    } finally {
+      isCallInfoLoading.value = false;
+    }
   }
 
   // void startTimer() {
@@ -211,10 +226,16 @@ class DialerController extends GetxController {
     //  _timer?.cancel();
     logOutput("${customerName.value}:${phoneNumber.value}");
 
-    Get.to(() => FollowBackForm());
+    Get.to(() => const FollowBackForm(
+          isgetData: true,
+        ));
+
+    // final callInfo = await CallStateService.getLastCallInfo();
+
+    // debugPrint("Last Call Info: $callInfo");
 
     //  final callInfo =
-    CallStateService.getLastCallInfo();
+//    await CallStateService.getLastCallInfo();
 
     // final int duration = callInfo['duration'] ?? 0;
     // final String type = callInfo['type'] ?? 'unknown';

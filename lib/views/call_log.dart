@@ -67,6 +67,7 @@ class _CallLogPageState extends State<CallLogPage> {
   @override
   void dispose() {
     _followBackController.clearFilters();
+    _followBackController.searchController.value;
     super.dispose();
   }
 

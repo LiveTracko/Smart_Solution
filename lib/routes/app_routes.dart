@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:smart_solutions/binding/dashboard_binding.dart';
+import 'package:smart_solutions/binding/login_binding.dart';
 import 'package:smart_solutions/views/dashboard_screen.dart';
 import 'package:smart_solutions/views/internet_checker.dart';
 import 'package:smart_solutions/views/navigationbar.dart';
@@ -14,19 +16,23 @@ class AppRoutes {
   static List<GetPage> pages = [
     GetPage(name: splashScreen, page: () => const SplashScreen()),
     GetPage(
-      name: navigationscreen,
-      page: () {
-        final args = Get.arguments as Map<String, dynamic>? ?? {};
-        final int pageIndex = args['pageIndex'] ?? 0;
+        name: navigationscreen,
+        page: () {
+          final args = Get.arguments as Map<String, dynamic>? ?? {};
+          final int pageIndex = args['pageIndex'] ?? 0;
 
-        return InternetChecker(
-          child: MainScreen(
-            pageIndex: pageIndex,
-          ),
-        );
-      },
-    ),
-    GetPage(name: login, page: () =>  InternetChecker(child: LoginView())),
-    GetPage(name: home, page: () => const InternetChecker(child: DashboardScreen())),
+          return InternetChecker(
+            child: MainScreen(pageIndex: pageIndex),
+          );
+        },
+        binding: DashboardBinding()),
+    GetPage(
+        name: login,
+        page: () => const InternetChecker(child: LoginView()),
+        binding: LoginBinding()),
+    GetPage(
+        name: home,
+        page: () => const InternetChecker(child: DashboardScreen()),
+        binding: DashboardBinding()),
   ];
 }

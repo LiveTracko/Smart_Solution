@@ -27,6 +27,7 @@ class CallBackData extends StatelessWidget {
   });
 
   final DialerController _dialerController = Get.find<DialerController>();
+
   final CommonRows _commonRows = CommonRows();
 
   @override
@@ -75,7 +76,12 @@ class CallBackData extends StatelessWidget {
             itemBuilder: (context, index) {
               var data = dataList[index];
               return CommonTitleCard(
-                leading: SvgPicture.asset('assets/images/phone_call.svg'),
+                leading: Obx(
+                  () => SvgPicture.asset(
+                    'assets/images/phone_call.svg',
+                    color: themeController.primaryColor.value,
+                  ),
+                ),
                 followupdate: data.followupDate.toString(),
                 onLeadingTap: () {
                   if (!_dialerController.isCallOngoing.value) {
@@ -89,10 +95,7 @@ class CallBackData extends StatelessWidget {
                   controller.customerName.value = data.customerName ?? "";
                   _dialerController.customerName.value =
                       data.customerName ?? '';
-                  // _dialerController.customerLoan.value =
-                  //     '';0
-                  // _dialerController.customerName.value =
-                  //     item.customerName ?? "";
+
                   _dialerController.datatype.value = '';
                   controller.remark.value = data.remark ?? '';
                   _dialerController.followup_id.value = data.id ?? '';

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
 import 'package:smart_solutions/services/firbase_notifications.dart';

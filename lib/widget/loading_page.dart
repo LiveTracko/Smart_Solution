@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:smart_solutions/theme/app_theme.dart';
+import 'package:get/get.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({super.key});
@@ -8,16 +9,26 @@ class LoadingPage extends StatefulWidget {
   State<LoadingPage> createState() => _LoadingPageState();
 }
 
+ThemeController _themeController = Get.find<ThemeController>();
+
 class _LoadingPageState extends State<LoadingPage> {
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
         child: SizedBox(
-      height: 40, // set height
-      width: 40, // set width
-      child: CircularProgressIndicator(
-        strokeWidth: 5, // thickness of the circle
-        color: AppColors.primaryColor,
+      height: 40,
+      width: 40,
+      child: Obx(
+        () => Theme(
+          data: ThemeData(
+            progressIndicatorTheme: ProgressIndicatorThemeData(
+              color: _themeController.primaryColor.value,
+            ),
+          ),
+          child: const CircularProgressIndicator(
+            strokeWidth: 5, // thickness of the circle
+          ),
+        ),
       ),
     ));
   }

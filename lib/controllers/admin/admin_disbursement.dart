@@ -118,11 +118,21 @@ class DisbursementController extends GetxController {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        final disbursement = DisbursementModel.fromJson(responseData);
-        final total = disbursementTotals.fromJson(responseData['totals']);
+        if (responseData != null &&
+            responseData['data'] != null &&
+            (responseData['data'] as List).isNotEmpty) {
+          final disbursement = DisbursementModel.fromJson(responseData);
+          final total = disbursementTotals.fromJson(responseData['totals']);
 
-        disbursementList.assignAll(disbursement.data);
-        disbursementTotal.assign(total);
+          disbursementList.assignAll(disbursement.data);
+          disbursementTotal.assign(total);
+        }
+        // final responseData = jsonDecode(response.body);
+        // final disbursement = DisbursementModel.fromJson(responseData);
+        // final total = disbursementTotals.fromJson(responseData['totals']);
+
+        // disbursementList.assignAll(disbursement.data);
+        // disbursementTotal.assign(total);
       } else {
         logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
       }

@@ -7,12 +7,14 @@ import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/routes/app_routes.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_solutions/widget/text_style.dart';
+
+import '../controllers/theme_controller.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _SplashScreenState createState() => _SplashScreenState();
 }
 
@@ -24,6 +26,16 @@ class _SplashScreenState extends State<SplashScreen> {
     //  _checkLoginStatus(); // Check login status when the splash screen initializes
   }
 
+  Color hexToColor(String hex) {
+    hex = hex.replaceAll('#', '');
+
+    if (hex.length == 6) {
+      hex = 'FF$hex'; // add alpha if missing
+    }
+
+    return Color(int.parse(hex, radix: 16));
+  }
+
   // Check if user is already logged in
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -33,6 +45,11 @@ class _SplashScreenState extends State<SplashScreen> {
     String? roleName = prefs.getString('roleName');
     String? number = prefs.getString('userName');
     String? colorCode = prefs.getString('themeColor');
+
+    // Apply theme immediately
+    if (colorCode != null && colorCode.isNotEmpty) {
+      themeController.loadSavedTheme();
+    }
     // Navigate to the appropriate screen after a delay
     Future.delayed(const Duration(seconds: 3), () {
       if (userId != null) {

@@ -8,7 +8,7 @@ import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/remark_status_controller.dart';
 import 'package:smart_solutions/controllers/theme_controller.dart';
-import 'package:smart_solutions/controllers/theme_controller.dart';
+
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
@@ -16,339 +16,396 @@ import 'package:smart_solutions/widget/text_style.dart';
 import '../constants/services.dart';
 
 // ignore: must_be_immutable
-class FollowBackForm extends StatelessWidget {
+class FollowBackForm extends StatefulWidget {
   final bool isRefresh;
-  FollowBackForm({Key? key, this.isRefresh = true}) : super(key: key);
+  final bool isgetData;
+  const FollowBackForm(
+      {Key? key, this.isRefresh = true, this.isgetData = false})
+      : super(key: key);
 
+  @override
+  State<FollowBackForm> createState() => _FollowBackFormState();
+}
+
+class _FollowBackFormState extends State<FollowBackForm> {
   final FollowBackFormController _formController =
       Get.find<FollowBackFormController>();
+
   final RemarkStatusController _remarkController =
       Get.put(RemarkStatusController());
+
   final LoginRequestController _loginRequestController =
       Get.find<LoginRequestController>();
-  final _formKey = GlobalKey<FormState>();
-  var selectedDate = DateTime.now().obs;
-  final ThemeController themeController = Get.find<ThemeController>();
 
-  // final DialerController _dialerController = Get.put(DialerController());
+  final _formKey = GlobalKey<FormState>();
+
+  var selectedDate = DateTime.now().obs;
+
+  final ThemeController themeController = Get.find<ThemeController>();
   final DialerController _dialerController = Get.find<DialerController>();
+
   int backPressCounter = 0;
+
   bool canPop = false;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _dialerController.fetchLastCallInfoIfNeeded(widget.isgetData);
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _formController.searchController.value;
+    super.dispose();
+  }
+
+  bool get isPageLoading =>
+      _formController.isBankAndStatusLoading.value ||
+      _dialerController.isCallInfoLoading.value;
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: canPop,
-      onPopInvoked: (didPop) {
-        if (didPop) return;
-        final NavigatorState navigator = Navigator.of(context);
-        backPressCounter++;
-        if (backPressCounter == 1) {
-          Get.snackbar('Restricted', "Press back button once again to close",
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.blue.shade100);
-          canPop = true;
-          Future.delayed(const Duration(seconds: 2), () {
-            backPressCounter = 0; // Reset counter after 2 seconds
-            canPop = false;
-          });
-        } else {
-          // ALWAYS clear data when going back
-          _dialerController.salary.value = '';
-          _formController.bankName.value = '';
-          _formController.mobile.value = '';
-          _dialerController.elapsedTimeInSeconds.value = 0;
-          _dialerController.customerName.value = '';
-          _dialerController.customerLoan.value = '';
-          _dialerController.followup_id.value = '';
+        canPop: canPop,
+        onPopInvoked: (didPop) {
+          if (didPop) return;
+          final NavigatorState navigator = Navigator.of(context);
+          backPressCounter++;
+          if (backPressCounter == 1) {
+            Get.snackbar('Restricted', "Press back button once again to close",
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.blue.shade100);
+            canPop = true;
+            Future.delayed(const Duration(seconds: 2), () {
+              backPressCounter = 0; // Reset counter after 2 seconds
+              canPop = false;
+            });
+          } else {
+            // ALWAYS clear data when going back
+            _dialerController.salary.value = '';
+            _formController.bankName.value = '';
+            _formController.mobile.value = '';
+            _dialerController.elapsedTimeInSeconds.value = 0;
+            _dialerController.customerName.value = '';
+            _dialerController.customerLoan.value = '';
+            _dialerController.followup_id.value = '';
 
-          // ADD THESE: Clear remark status and data type
-          _formController.remarkStatus.value = '';
-          _formController.dataType.value = '';
-          _formController.remark.value = '';
+            // ADD THESE: Clear remark status and data type
+            _formController.remarkStatus.value = '';
+            _formController.dataType.value = '';
+            _formController.remark.value = '';
 
-          // Also clear controllers if they exist
-          _formController.customerNumberController.clear();
-          _dialerController.customerNameController.clear();
+            // Also clear controllers if they exist
+            _formController.customerNumberController.clear();
+            _dialerController.customerNameController.clear();
 
-          // Clear callback status
-          _remarkController.isCallback.value = false;
-          _formController.contacted.value = 'No';
+            // Clear callback status
+            _remarkController.isCallback.value = false;
+            _formController.contacted.value = 'No';
 
-          navigator.pop();
-        }
-        logOutput("$canPop and $backPressCounter");
-      },
-      child: CommonScaffold(
-        showBack: true,
-        title: 'Follow Up Add',
-        body: Container(
-          color: AppColors.whiteColor,
-          child: RefreshIndicator(
-            onRefresh: () async {
-              // final Map<String, dynamic> preservedValues = {
-              //   'customerName': _dialerController.customerName.value,
-              //   'mobile': _formController.mobile.value,
-              //   'salary': _dialerController.salary.value,
-              //   'customerLoan': _dialerController.customerLoan.value,
-              //   'bankName': _formController.bankName.value,
-              //   'dataType': _formController.dataType.value,
-              //   'contacted': _formController.contacted.value,
-              //   'remarkStatus': _formController.remarkStatus.value,
-              //   'remark': _formController.remark.value,
-              //   'followupDate': _formController.followupDate.value,
-              // };
-              final preservedContactedStatus = _formController.contacted.value;
-              final preservedRemarkStatus = _formController.remarkStatus.value;
-              await Future.wait([
-                _formController.loadData(isRefresh),
-                _remarkController.fetchRemarkStatus(
-                    preservedContactedStatus == 'Yes' ? '1' : '2'),
-              ]);
+            navigator.pop();
+          }
+          logOutput("$canPop and $backPressCounter");
+        },
+        child: CommonScaffold(
+          showBack: true,
+          title: 'Follow Up Add',
+          body: Stack(children: [
+            Container(
+              color: AppColors.whiteColor,
+              child: RefreshIndicator(
+                  onRefresh: () async {
+                    // final Map<String, dynamic> preservedValues = {
+                    //   'customerName': _dialerController.customerName.value,
+                    //   'mobile': _formController.mobile.value,
+                    //   'salary': _dialerController.salary.value,
+                    //   'customerLoan': _dialerController.customerLoan.value,
+                    //   'bankName': _formController.bankName.value,
+                    //   'dataType': _formController.dataType.value,
+                    //   'contacted': _formController.contacted.value,
+                    //   'remarkStatus': _formController.remarkStatus.value,
+                    //   'remark': _formController.remark.value,
+                    //   'followupDate': _formController.followupDate.value,
+                    // };
+                    final preservedContactedStatus =
+                        _formController.contacted.value;
+                    final preservedRemarkStatus =
+                        _formController.remarkStatus.value;
+                    await Future.wait([
+                      _formController.loadData(widget.isRefresh),
+                      _remarkController.fetchRemarkStatus(
+                          preservedContactedStatus == 'Yes' ? '1' : '2'),
+                    ]);
 
-              if (preservedRemarkStatus.isNotEmpty) {
-                _formController.remarkStatus.value = preservedRemarkStatus;
+                    _dialerController.handleCallEnd();
 
-                final selectedStatus = _remarkController.remarkStatusList
-                    .firstWhereOrNull(
-                        (status) => status.id == preservedRemarkStatus);
+                    if (preservedRemarkStatus.isNotEmpty) {
+                      _formController.remarkStatus.value =
+                          preservedRemarkStatus;
 
-                if (selectedStatus?.title?.toLowerCase().contains('callback') ==
-                    true) {
-                  _remarkController.isCallback.value = true;
-                } else {
-                  _remarkController.isCallback.value = false;
-                }
-              }
-            },
-            child: Obx(() {
-              if (_formController.isBankAndStatusLoading.value) {
-                return const Center(child: LoadingPage());
-              } else {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Form(
-                    key: _formKey,
-                    child: ListView(
-                      children: [
-                        // _buildDatePicker(context, false),
-                        // SizedBox(height: 16.h),
-                        // loan amount field
-                        SizedBox(height: 10.h),
-                        _buildTextField(
-                          label: 'Customer Name',
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/user.svg',
-                            height: 24,
-                            width: 24,
-                            color: themeController.primaryColor.value,
-                          ),
-                          controller: _dialerController.customerNameController,
-                          onChanged: (value) =>
-                              _dialerController.customerName.value = value,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter customer name';
-                            }
-                            // else if (_dialerController
-                            //     .customerName.value.isNotEmpty) {
-                            //   _dialerController.customerName.value =
-                            //       _formController.customerName.value;
-                            //   // _formController.customerName.value =
-                            //   //     _dialerController.customerName.value;
-                            // }
-                            return null;
-                          },
-                        ),
+                      final selectedStatus = _remarkController.remarkStatusList
+                          .firstWhereOrNull(
+                              (status) => status.id == preservedRemarkStatus);
 
-                        SizedBox(height: 16.h),
+                      if (selectedStatus?.title
+                              ?.toLowerCase()
+                              .contains('callback') ==
+                          true) {
+                        _remarkController.isCallback.value = true;
+                      } else {
+                        _remarkController.isCallback.value = false;
+                      }
+                    }
+                  },
+                  child:
+                      //Obx(() {
+                      // if (_formController.isBankAndStatusLoading.value) {
+                      //   return const Center(child: LoadingPage());
+                      // } else {
+                      //   return
 
-                        _buildMobileField(
-                          label: 'Enter Mobile Number',
-                          controller: _formController.customerNumberController,
-                          inputType: TextInputType.number,
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/phone.svg',
-                            height: 24,
-                            width: 24,
-                            color: themeController.primaryColor.value,
-                          ),
-                          onChanged: (value) {
-                            _formController.mobile.value =
-                                value; // ✅ Proper update
-                          },
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter mobile number';
-                            } else if (value.length < 10) {
-                              return 'Please enter a valid phone number';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        SizedBox(height: 16.h),
-
-                        // _buildTextField(
-                        //     isRead: _dialerController.salary.value.isEmpty
-                        //         ? false
-                        //         : true,
-                        //     inputType: TextInputType.number,
-                        //     label: 'Salary',
-                        //     prefixIcon: SvgPicture.asset(
-                        //       'assets/images/rupees.svg',
-                        //       height: 24,
-                        //       width: 24,
-                        //     ),
-                        //     value: (_dialerController.salary.value.isEmpty ||
-                        //             _dialerController.salary.value == "0")
-                        //         ? ""
-                        //         : CurrencyUtils.formatAmount(
-                        //             _dialerController.salary.value),
-                        //     onChanged: (value) =>
-                        //         _dialerController.salary.value = value,
-                        //     validator: null),
-
-                        // SizedBox(height: 16.h),
-
-                        // _buildTextField(
-                        //     isRead: _dialerController.customerLoan.value.isEmpty
-                        //         ? false
-                        //         : true,
-                        //     label: 'Loan Amount',
-                        //     inputType: TextInputType.number,
-                        //     prefixIcon: SvgPicture.asset(
-                        //       'assets/images/rupees.svg',
-                        //       height: 24,
-                        //       width: 24,
-                        //     ),
-                        //     value: CurrencyUtils.formatIndianCurrency(
-                        //         _dialerController.customerLoan.value),
-                        //     onChanged: (value) =>
-                        //         _dialerController.customerLoan.value = value,
-                        //     validator: null),
-
-                        Row(
-                          children: [
-                            // ------- Salary Field -------
-                            Expanded(
-                              child: _buildTextField(
-                                isRead:
-                                    _dialerController.salary.value.isNotEmpty,
-                                inputType: TextInputType.number,
-                                label: 'Salary',
-                                prefixIcon: SvgPicture.asset(
-                                  'assets/images/rupees.svg',
-                                  height: 24,
-                                  width: 24,
-                                  color: themeController.primaryColor.value,
-                                ),
-                                value: (_dialerController
-                                            .salary.value.isEmpty ||
-                                        _dialerController.salary.value == "0")
-                                    ? ""
-                                    : CurrencyUtils.formatAmount(
-                                        _dialerController.salary.value),
-                                onChanged: (value) =>
-                                    _dialerController.salary.value = value,
-                                validator: null,
-                              ),
+                      Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Form(
+                      key: _formKey,
+                      child: ListView(
+                        key: const ValueKey(
+                            'follow_up_form_list'), // Use ValueKey instead
+                        children: [
+                          // _buildDatePicker(context, false),
+                          // SizedBox(height: 16.h),
+                          // loan amount field
+                          SizedBox(height: 10.h),
+                          _buildTextField(
+                            label: 'Customer Name',
+                            prefixIcon: SvgPicture.asset(
+                              'assets/images/user.svg',
+                              height: 24,
+                              width: 24,
+                              color: themeController.primaryColor.value,
                             ),
-
-                            const SizedBox(width: 12), // space between fields
-
-                            // ------- Loan Amount Field -------
-                            Expanded(
-                              child: _buildTextField(
-                                isRead: _dialerController
-                                    .customerLoan.value.isNotEmpty,
-                                label: 'Loan Amount',
-                                inputType: TextInputType.number,
-                                prefixIcon: SvgPicture.asset(
-                                    'assets/images/loan_amount.svg',
-                                    height: 28,
-                                    width: 28,
-                                    color: themeController.primaryColor.value),
-                                value: (_dialerController
-                                            .customerLoan.value.isEmpty ||
-                                        _dialerController.customerLoan.value ==
-                                            "0")
-                                    ? ""
-                                    : CurrencyUtils.formatIndianCurrency(
-                                        _dialerController.customerLoan.value),
-                                onChanged: (value) => _dialerController
-                                    .customerLoan.value = value,
-                                validator: null,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16.h),
-
-                        // Bank Name Field
-                        _buildAllBankNamesDropdown(),
-                        SizedBox(height: 16.h),
-
-                        _buildDataSourcingDropdown(),
-
-                        SizedBox(height: 16.h),
-
-                        _buildContactStatusRadio(_formController
-                            .customerNumberController.text.isEmpty),
-
-                        SizedBox(height: 16.h),
-
-                        // Remark Status Dropdown
-                        _buildRemarkStatusDropdown(),
-                        SizedBox(height: 16.h),
-
-                        Obx(() => _remarkController.isCallback.value
-                            ? Column(
-                                children: [
-                                  _buildDatePicker(context, true),
-                                  SizedBox(height: 16.h),
-                                ],
-                              )
-                            : const SizedBox.shrink()),
-
-                        // Remark Field
-                        _buildTextField(
-                            label: 'Remark',
-                            value: _formController.remark.value,
-                            maxLines: 3,
+                            controller:
+                                _dialerController.customerNameController,
                             onChanged: (value) =>
-                                _formController.remark.value = value,
-                            validator: null),
-                        SizedBox(height: 16.h),
+                                _dialerController.customerName.value = value,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter customer name';
+                              }
+                              // else if (_dialerController
+                              //     .customerName.value.isNotEmpty) {
+                              //   _dialerController.customerName.value =
+                              //       _formController.customerName.value;
+                              //   // _formController.customerName.value =
+                              //   //     _dialerController.customerName.value;
+                              // }
+                              return null;
+                            },
+                          ),
 
-                        // Submit Button
-                        Padding(
-                          padding: EdgeInsetsGeometry.only(bottom: 20.h),
-                          child: _buildSubmitButton(),
-                        ),
-                      ],
+                          SizedBox(height: 16.h),
+
+                          _buildMobileField(
+                            label: 'Enter Mobile Number',
+                            controller:
+                                _formController.customerNumberController,
+                            inputType: TextInputType.number,
+                            prefixIcon: SvgPicture.asset(
+                              'assets/images/phone.svg',
+                              height: 24,
+                              width: 24,
+                              color: themeController.primaryColor.value,
+                            ),
+                            onChanged: (value) {
+                              _formController.mobile.value =
+                                  value; // ✅ Proper update
+                            },
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter mobile number';
+                              } else if (value.length < 10) {
+                                return 'Please enter a valid phone number';
+                              }
+                              return null;
+                            },
+                          ),
+
+                          SizedBox(height: 16.h),
+
+                          // _buildTextField(
+                          //     isRead: _dialerController.salary.value.isEmpty
+                          //         ? false
+                          //         : true,
+                          //     inputType: TextInputType.number,
+                          //     label: 'Salary',
+                          //     prefixIcon: SvgPicture.asset(
+                          //       'assets/images/rupees.svg',
+                          //       height: 24,
+                          //       width: 24,
+                          //     ),
+                          //     value: (_dialerController.salary.value.isEmpty ||
+                          //             _dialerController.salary.value == "0")
+                          //         ? ""
+                          //         : CurrencyUtils.formatAmount(
+                          //             _dialerController.salary.value),
+                          //     onChanged: (value) =>
+                          //         _dialerController.salary.value = value,
+                          //     validator: null),
+
+                          // SizedBox(height: 16.h),
+
+                          // _buildTextField(
+                          //     isRead: _dialerController.customerLoan.value.isEmpty
+                          //         ? false
+                          //         : true,
+                          //     label: 'Loan Amount',
+                          //     inputType: TextInputType.number,
+                          //     prefixIcon: SvgPicture.asset(
+                          //       'assets/images/rupees.svg',
+                          //       height: 24,
+                          //       width: 24,
+                          //     ),
+                          //     value: CurrencyUtils.formatIndianCurrency(
+                          //         _dialerController.customerLoan.value),
+                          //     onChanged: (value) =>
+                          //         _dialerController.customerLoan.value = value,
+                          //     validator: null),
+
+                          Row(
+                            children: [
+                              // ------- Salary Field -------
+                              Expanded(
+                                child: _buildTextField(
+                                  isRead:
+                                      _dialerController.salary.value.isNotEmpty,
+                                  inputType: TextInputType.number,
+                                  label: 'Salary',
+                                  prefixIcon: SvgPicture.asset(
+                                    'assets/images/rupees.svg',
+                                    height: 24,
+                                    width: 24,
+                                    color: themeController.primaryColor.value,
+                                  ),
+                                  value: (_dialerController
+                                              .salary.value.isEmpty ||
+                                          _dialerController.salary.value == "0")
+                                      ? ""
+                                      : CurrencyUtils.formatAmount(
+                                          _dialerController.salary.value),
+                                  onChanged: (value) =>
+                                      _dialerController.salary.value = value,
+                                  validator: null,
+                                ),
+                              ),
+
+                              const SizedBox(width: 12), // space between fields
+
+                              // ------- Loan Amount Field -------
+                              Expanded(
+                                child: _buildTextField(
+                                  isRead: _dialerController
+                                      .customerLoan.value.isNotEmpty,
+                                  label: 'Loan Amount',
+                                  inputType: TextInputType.number,
+                                  prefixIcon: SvgPicture.asset(
+                                      'assets/images/loan_amount.svg',
+                                      height: 28,
+                                      width: 28,
+                                      color:
+                                          themeController.primaryColor.value),
+                                  value: (_dialerController
+                                              .customerLoan.value.isEmpty ||
+                                          _dialerController
+                                                  .customerLoan.value ==
+                                              "0")
+                                      ? ""
+                                      : CurrencyUtils.formatIndianCurrency(
+                                          _dialerController.customerLoan.value),
+                                  onChanged: (value) => _dialerController
+                                      .customerLoan.value = value,
+                                  validator: null,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16.h),
+
+                          // Bank Name Field
+                          _buildAllBankNamesDropdown(),
+                          SizedBox(height: 16.h),
+
+                          _buildDataSourcingDropdown(),
+
+                          SizedBox(height: 16.h),
+
+                          _buildContactStatusRadio(),
+
+                          SizedBox(height: 16.h),
+
+                          // Remark Status Dropdown
+                          _buildRemarkStatusDropdown(),
+                          SizedBox(height: 16.h),
+
+                          Obx(() => _remarkController.isCallback.value
+                              ? Column(
+                                  children: [
+                                    _buildDatePicker(context, true),
+                                    SizedBox(height: 16.h),
+                                  ],
+                                )
+                              : const SizedBox.shrink()),
+
+                          // Remark Field
+                          _buildTextField(
+                              label: 'Remark',
+                              value: _formController.remark.value,
+                              maxLines: 3,
+                              onChanged: (value) =>
+                                  _formController.remark.value = value,
+                              validator: null),
+                          SizedBox(height: 16.h),
+
+                          // Submit Button
+                          Padding(
+                            padding: EdgeInsetsGeometry.only(bottom: 20.h),
+                            child: _buildSubmitButton(),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }
-            }),
-          ),
-        ),
-      ),
-    );
+                  )),
+            ),
+
+            /// 🔒 Block interaction + show loader
+            Obx(() => isPageLoading
+                ? Positioned.fill(
+                    child: AbsorbPointer(
+                      absorbing: true,
+                      child: Container(
+                        color: Colors.white.withOpacity(0.6),
+                        child: const Center(child: LoadingPage()),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink()),
+          ]),
+        ));
   }
 
-  Widget _buildTextField({
-    required String label,
-    String? value,
-    TextEditingController? controller,
-    bool? isRead,
-    required ValueChanged<String> onChanged,
-    required String? Function(String?)? validator,
-    Widget? prefixIcon,
-    TextInputType inputType = TextInputType.text,
-    int maxLines = 1,
-  }) {
+  Widget _buildTextField(
+      {required String label,
+      String? value,
+      TextEditingController? controller,
+      bool? isRead,
+      required ValueChanged<String> onChanged,
+      required String? Function(String?)? validator,
+      Widget? prefixIcon,
+      TextInputType inputType = TextInputType.text,
+      int maxLines = 1,
+      s}) {
     Widget? decoratedPrefixIcon;
 
     if (prefixIcon != null) {
@@ -362,64 +419,63 @@ class FollowBackForm extends StatelessWidget {
           const SizedBox(width: 5),
           SizedBox(
             height: 50,
-            child: Obx(() => VerticalDivider(
-                  width: 1,
-                  thickness: 1,
-                  color: themeController.primaryColor.value,
-                )),
+            child: VerticalDivider(
+              width: 1,
+              thickness: 1,
+              color: themeController.primaryColor.value,
+            ),
           ),
           const SizedBox(width: 5),
         ],
       );
     }
 
-    return Obx(() => TextFormField(
-          keyboardType: inputType,
-          maxLines: maxLines,
-          readOnly: isRead ?? false,
-          controller: controller,
-          initialValue:
-              controller == null && (value?.isNotEmpty ?? false) ? value : null,
-          decoration: InputDecoration(
-            hintText: label,
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
-            hintStyle: AppTextStyle.hintText,
-            prefixIcon: decoratedPrefixIcon,
-            labelStyle: AppTextStyle.textStyle,
+    return TextFormField(
+      keyboardType: inputType,
+      maxLines: maxLines,
+      readOnly: isRead ?? false,
+      controller: controller,
+      // initialValue:
+      //     controller == null && (value?.isNotEmpty ?? false) ? value : null,
+      decoration: InputDecoration(
+        hintText: label,
+        contentPadding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+        hintStyle: AppTextStyle.hintText,
+        prefixIcon: decoratedPrefixIcon,
+        labelStyle: AppTextStyle.textStyle,
 
-            // 🔹 Default border
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0.r),
-            ),
+        // 🔹 Default border
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0.r),
+        ),
 
-            // 🔹 Enabled border (theme color)
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0.r),
-              borderSide: BorderSide(
-                color: themeController.primaryColor.value,
-                width: 1,
-              ),
-            ),
-
-            // 🔹 Focused border (thicker)
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0.r),
-              borderSide: BorderSide(
-                color: themeController.primaryColor.value,
-                width: 2,
-              ),
-            ),
-
-            filled: true,
-            fillColor: AppColors.whiteColor,
-          ),
-          style: TextStyle(
+        // 🔹 Enabled border (theme color)
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0.r),
+          borderSide: BorderSide(
             color: themeController.primaryColor.value,
+            width: 1,
           ),
-          onChanged: onChanged,
-          validator: validator,
-        ));
+        ),
+
+        // 🔹 Focused border (thicker)
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0.r),
+          borderSide: BorderSide(
+            color: themeController.primaryColor.value,
+            width: 2,
+          ),
+        ),
+
+        filled: true,
+        fillColor: AppColors.whiteColor,
+      ),
+      style: const TextStyle(
+        color: Colors.black,
+      ),
+      onChanged: onChanged,
+      validator: validator,
+    );
   }
 
   Widget _buildMobileField({
@@ -450,7 +506,6 @@ class FollowBackForm extends StatelessWidget {
                   color: themeController.primaryColor.value,
                 )),
           ),
-          const SizedBox(width: 5),
         ],
       );
     }
@@ -493,8 +548,8 @@ class FollowBackForm extends StatelessWidget {
             filled: true,
             fillColor: AppColors.whiteColor,
           ),
-          style: TextStyle(
-            color: themeController.primaryColor.value,
+          style: const TextStyle(
+            color: Colors.black,
           ),
           onChanged: onChanged,
           validator: validator,
@@ -502,54 +557,6 @@ class FollowBackForm extends StatelessWidget {
   }
 
   // Widget _buildDatePicker(BuildContext context, bool chooseDate) {
-  //   // This controller will store the selected date
-  //   // final selectedDate = DateTime.now().obs;
-  //   final selectedDate = DateTime.now().obs;
-
-  //   selectedDate.value = _formController.followupDate.value;
-
-  //   return InkWell(
-  //     onTap: () async {
-  //       if (chooseDate) {
-  //         final DateTime? picked = await showDatePicker(
-  //           context: context,
-  //           initialDate: DateTime.now(),
-  //           firstDate: DateTime.now(), // Prevent selecting past dates
-  //           lastDate: DateTime(2100), // Set a far future date limit
-  //         );
-
-  //         if (picked != null) {
-  //           selectedDate.value = picked; // Update selected date
-  //           _formController.followupDate.value = picked;
-  //         }
-  //       }
-  //     },
-  //     child: Container(
-  //       padding: EdgeInsets.all(16.w),
-  //       decoration: BoxDecoration(
-  //         border: Border.all(color: AppColors.primaryColor),
-  //         borderRadius: BorderRadius.circular(20.0.r),
-  //         color: AppColors.backgroundColor,,
-  //       ),
-  //       child: Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         children: [
-  //           chooseDate
-  //               ? Text(
-  //                   '${'Follow Up Date'}: ${DateFormat('dd-MM-yyyy').format(selectedDate.value)}',
-  //                   style: const TextStyle(color: AppColors.primaryColor),
-  //                 )
-  //               : Text(
-  //                   '${'Date'}: ${DateFormat('dd-MM-yyyy').format(DateTime.now())}',
-  //                   style: const TextStyle(color: AppColors.primaryColor),
-  //                 ),
-  //           const Icon(Icons.calendar_today, color: AppColors.primaryColor),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget _buildDatePicker(BuildContext context, bool chooseDate) {
     // Initialize selectedDate as null
     final Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
@@ -614,9 +621,10 @@ class FollowBackForm extends StatelessWidget {
     );
   }
 
-  Widget _buildContactStatusRadio(bool isRestricted) {
-    return Obx(
-      () => Column(
+  Widget _buildContactStatusRadio() {
+    return Obx(() {
+      final bool isRestricted = _formController.isDurationAvailable.value;
+      return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -668,8 +676,8 @@ class FollowBackForm extends StatelessWidget {
             // )),
           )
         ],
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildRemarkStatusDropdown() {
@@ -758,9 +766,7 @@ class FollowBackForm extends StatelessWidget {
               value: status.id,
               child: Text(
                 status.title ?? 'Select remark status',
-                style: TextStyle(
-                  color: themeController.primaryColor.value,
-                ),
+                style: const TextStyle(color: AppColors.blackColor),
               ),
             );
           }).toList(),
@@ -852,7 +858,7 @@ class FollowBackForm extends StatelessWidget {
             return DropdownMenuItem<String>(
               value: bank.bankName,
               child: Text(bank.bankName ?? 'Select bank',
-                  style: const TextStyle(color: AppColors.primaryColor)),
+                  style: const TextStyle(color: AppColors.blackColor)),
             );
           }).toList(),
           onChanged: (newValue) {
@@ -901,11 +907,9 @@ class FollowBackForm extends StatelessWidget {
       dropdownItems.addAll(_loginRequestController.sourcingList.map((source) {
         return DropdownMenuItem<String>(
           value: source.id,
-          child: Text(
-            source.sourcingTitle ?? '',
-            overflow: TextOverflow.ellipsis,
-            style: AppTextStyle.textStyle,
-          ),
+          child: Text(source.sourcingTitle ?? '',
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: AppColors.blackColor)),
         );
       }).toList());
 
@@ -914,8 +918,8 @@ class FollowBackForm extends StatelessWidget {
         child: DropdownButtonFormField<String>(
           isExpanded: true,
           isDense: true,
-          style: TextStyle(
-            color: themeController.primaryColor.value,
+          style: const TextStyle(
+            color: AppColors.blackColor,
           ),
           padding: EdgeInsets.zero,
           decoration: InputDecoration(
@@ -933,7 +937,6 @@ class FollowBackForm extends StatelessWidget {
                       width: 24,
                       color: themeController.primaryColor.value,
                     ),
-                    const SizedBox(width: 8),
                     VerticalDivider(
                       thickness: 1,
                       color: themeController.primaryColor.value,

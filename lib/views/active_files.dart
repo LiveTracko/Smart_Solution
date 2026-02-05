@@ -43,7 +43,7 @@ class ActiveFiles extends StatefulWidget {
 class _ActiveFilesState extends State<ActiveFiles> {
   final DataController dataController = Get.find<DataController>();
   final ActiveFilesController _activeFilesController =
-      Get.find<ActiveFilesController>();
+      Get.put(ActiveFilesController());
   final DialerController _dialerController = Get.find<DialerController>();
   final ThemeController _themeController = Get.find<ThemeController>();
   final FollowBackFormController _formController =

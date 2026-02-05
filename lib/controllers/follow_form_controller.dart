@@ -14,7 +14,6 @@ import 'package:smart_solutions/models/callBack_model.dart';
 import 'package:smart_solutions/models/call_log_model.dart';
 import 'package:smart_solutions/models/disbursement_model.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
-import 'package:smart_solutions/services/call_state_service.dart';
 import 'package:smart_solutions/utils/scroll_utils.dart';
 import '../constants/services.dart';
 import '../services/api_service.dart';
@@ -114,6 +113,21 @@ class FollowBackFormController extends GetxController
     super.onInit();
   }
 
+  @override
+  void onClose() {
+    // 1. Dispose all controllers properly
+    searchController.dispose();
+    customerNumberController.dispose(); // Use dispose, not clear
+    fromDateController.dispose();
+    toDateController.dispose();
+    filterScrollController.dispose();
+
+    // 2. TabController must be disposed
+    callController.dispose();
+
+    super.onClose();
+  }
+
   Future<void> loadData(bool isRefresh) async {
     isBankAndStatusLoading(true);
     try {
@@ -132,7 +146,6 @@ class FollowBackFormController extends GetxController
         // Reload essential data
         await getAllBanks();
         await getDisbursementData();
-        await CallStateService.getLastCallInfo();
 
         // RESTORE form values AFTER refresh
         _dialerController.customerName.value = savedCustomerName;
@@ -200,6 +213,8 @@ class FollowBackFormController extends GetxController
   var bankName = ''.obs;
   var dataType = ''.obs;
   var contacted = 'No'.obs;
+  final RxBool isDurationAvailable = true.obs;
+
   var remarkStatus = ''.obs;
   var remark = ''.obs;
   var telecallerId = StaticStoredData.userId.obs;

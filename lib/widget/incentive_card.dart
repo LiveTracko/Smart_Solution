@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:smart_solutions/models/incentive_model.dart';
 import 'package:smart_solutions/views/spacing_constants.dart';
 import 'package:smart_solutions/widget/text_style.dart';
@@ -71,9 +72,9 @@ class IncentiveCard extends StatelessWidget {
                 Row(
                   children: [
                     if (duration != null)
-                      Text(
-                        duration!,
-                        style: AppTextStyle.blueHeaderTitletStyle,
+                      Obx(
+                        () => Text(duration!,
+                            style: AppTextColor.primaryText(15)),
                       ),
                     kHorizontalSpace(15.w),
                     if (isNextPage)

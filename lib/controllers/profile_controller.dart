@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/services.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/routes/app_routes.dart';
 import 'package:smart_solutions/services/api_service.dart';
 import 'package:smart_solutions/views/dashboard_screen.dart';
 
@@ -62,7 +63,6 @@ class ProfileController extends GetxController {
       ),
     );
   }
-  
 
   // Save login request
   Future<void> saveProfile(
@@ -106,7 +106,8 @@ class ProfileController extends GetxController {
           backgroundColor: Colors.green.withOpacity(0.2),
         );
 
-        Get.offAll(() => const DashboardScreen());
+        Get.offAll(AppRoutes.home);
+        // Get.offAll(() => const DashboardScreen());
       } else {
         Get.snackbar('Error', 'Failed to update profile.');
       }

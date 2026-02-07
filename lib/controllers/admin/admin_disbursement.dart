@@ -25,64 +25,125 @@ class DisbursementController extends GetxController {
   var disbursementTotal = <disbursementTotals>[].obs;
 
   var iscallDisbursedLoading = false.obs;
-  void selectFilter(int index) {
-    selectedFilter.value = index;
-  }
 
   @override
   void onInit() {
-    getDisbursementData();
+    getteamLeaderData(); // Load team leaders first
+    getDisbursementData(); // Then load disbursement data
     super.onInit();
+  }
+
+  void selectFilter(int index) {
+    selectedFilter.value = index;
+    // When filter changes, fetch filtered disbursement data
+    getDisbursementData();
   }
 
   void clearFilters() {
     selectedFilter.value = 0;
     searchController.clear();
+    getDisbursementData(); // Reload all data when cleared
   }
 
   void setFilters(List<String> names) {
+    debugPrint('Setting filters with ${names.length} names');
     filters.value = ["All", ...names.toSet()];
-    update();
   }
 
+  // Get selected team leader ID for filtering
+  String? getSelectedTeamLeaderId() {
+    if (selectedFilter.value == 0) return null; // "All" selected
+
+    if (selectedFilter.value < filters.length) {
+      final selectedName = filters[selectedFilter.value];
+      final tl = teamleaderList.firstWhereOrNull((e) => e.name == selectedName);
+      return tl?.id;
+    }
+    return null;
+  }
+
+  // UPDATED: Use Login Request Team Leaders API
   Future<void> getteamLeaderData([String? teamleaderId]) async {
     isLoading.value = true;
+    debugPrint('=== Fetching Login Request Team Leaders for Disbursement ===');
 
     try {
-      final response = await _apiService.postRequest(
-        APIUrls.teamleaderlist,
-        {
-          "teamleader_id": teamleaderId ?? '',
-        },
+      // Use GET request for login request team leaders
+      final response = await _apiService.getRequest(
+        APIUrls.loginRequestTeamLeader,
       );
 
-      debugPrint(
-          "FollowUp callback Response => ${response.statusCode}: ${response.body}");
+      debugPrint('Team Leader Response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        final teamleader = TealLeaderModel.fromJson(responseData);
+        final responseData = jsonDecode(response.body) as Map<String, dynamic>;
 
-        if (teamleaderId != null && teamleaderId.isNotEmpty) {
-          tellecallerList.assignAll(teamleader.data);
-        } else {
-          teamleaderList.assignAll(teamleader.data);
-          setFilters(
-            teamleaderList.map((e) => e.name).toList(),
-          );
+        if (responseData.containsKey('data')) {
+          final List<dynamic> data = responseData['data'] as List<dynamic>;
+          debugPrint('Found ${data.length} team leaders');
+
+          // Parse using your existing model
+          final model = TealLeaderModel.fromJson({"data": data});
+
+          if (teamleaderId != null && teamleaderId.isNotEmpty) {
+            tellecallerList.assignAll(model.data);
+          } else {
+            teamleaderList.assignAll(model.data);
+
+            // Extract names for filters
+            final names = model.data.map((tl) => tl.name).toList();
+            debugPrint('Team leader names: $names');
+
+            // Set filters
+            setFilters(names);
+          }
         }
       } else {
-        logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
+        debugPrint('Team Leader API Error: ${response.statusCode}');
+        // Fallback to regular team leader API if login request API fails
+        await _fetchRegularTeamLeaders(teamleaderId);
       }
     } catch (e) {
-      logOutput("Exception while fetching follow-back list: $e");
+      debugPrint('Exception in getteamLeaderData: $e');
+      // Fallback to regular team leader API
+      await _fetchRegularTeamLeaders(teamleaderId);
     } finally {
       isLoading.value = false;
+      debugPrint('=== Finished Loading Team Leaders ===');
     }
   }
 
+  // Fallback method for regular team leaders
+  Future<void> _fetchRegularTeamLeaders([String? teamleaderId]) async {
+    try {
+      debugPrint('Trying regular team leader API as fallback...');
+      final response = await _apiService.postRequest(
+        APIUrls.teamleaderlist,
+        {"teamleader_id": teamleaderId ?? ''},
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+        final model = TealLeaderModel.fromJson(responseData);
+
+        if (teamleaderId != null && teamleaderId.isNotEmpty) {
+          tellecallerList.assignAll(model.data);
+        } else {
+          teamleaderList.assignAll(model.data);
+          final names = model.data.map((tl) => tl.name).toList();
+          setFilters(names);
+        }
+      }
+    } catch (e) {
+      debugPrint('Exception in _fetchRegularTeamLeaders: $e');
+    }
+  }
+
+  // UPDATED: Add team leader filtering to disbursement data
   Future<void> getDisbursementData() async {
     iscallDisbursedLoading.value = true;
+    debugPrint('=== Fetching Disbursement Data ===');
+
     final String dateRage = dateRangeList.isNotEmpty &&
             dateRangeList.first != null &&
             dateRangeList.last != null
@@ -94,11 +155,17 @@ class DisbursementController extends GetxController {
       "daterange": dateRage,
     };
 
-    //Add telecaller IDs dynamically if the list is not empty
+    // Add team leader filter if selected (except "All")
+    final teamLeaderId = getSelectedTeamLeaderId();
+    if (teamLeaderId != null) {
+      formdata['teamleader_id'] = teamLeaderId;
+      debugPrint('Filtering disbursement by team leader ID: $teamLeaderId');
+    }
+
+    // Add telecaller IDs dynamically if the list is not empty
     if (selectedtellecaller.isNotEmpty) {
       for (var i = 0; i < selectedtellecaller.length; i++) {
         final telecallerId = selectedtellecaller[i];
-
         formdata["telecaller_ids[$i]"] = telecallerId;
         hasValidTelecaller = true;
       }
@@ -110,36 +177,49 @@ class DisbursementController extends GetxController {
     }
 
     try {
-      final response =
-          await _apiService.postRequest(APIUrls.disbursmentlist, formdata);
+      final response = await _apiService.postRequest(
+        APIUrls.disbursmentlist,
+        formdata,
+      );
 
-      debugPrint(
-          "FollowUp callback Response => ${response.statusCode}: ${response.body}");
+      debugPrint('Disbursement Response Status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        if (responseData != null &&
-            responseData['data'] != null &&
-            (responseData['data'] as List).isNotEmpty) {
-          final disbursement = DisbursementModel.fromJson(responseData);
-          final total = disbursementTotals.fromJson(responseData['totals']);
+        final responseData = jsonDecode(response.body) as Map<String, dynamic>;
 
-          disbursementList.assignAll(disbursement.data);
-          disbursementTotal.assign(total);
+        // Check if we have data
+        if (responseData != null && responseData['data'] != null) {
+          final List<dynamic> dataList = responseData['data'] as List<dynamic>;
+
+          if (dataList.isNotEmpty) {
+            final disbursement = DisbursementModel.fromJson(responseData);
+
+            // Check if we have totals
+            if (responseData.containsKey('totals')) {
+              final total = disbursementTotals.fromJson(responseData['totals']);
+              disbursementTotal.assign(total);
+            }
+
+            disbursementList.assignAll(disbursement.data);
+            debugPrint(
+                'Disbursement data loaded: ${disbursement.data.length} items');
+          } else {
+            debugPrint('Disbursement data list is empty');
+            disbursementList.clear();
+          }
+        } else {
+          debugPrint('No data in disbursement response');
+          disbursementList.clear();
         }
-        // final responseData = jsonDecode(response.body);
-        // final disbursement = DisbursementModel.fromJson(responseData);
-        // final total = disbursementTotals.fromJson(responseData['totals']);
-
-        // disbursementList.assignAll(disbursement.data);
-        // disbursementTotal.assign(total);
       } else {
-        logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
+        debugPrint('Disbursement API Error: ${response.statusCode}');
       }
     } catch (e) {
-      logOutput("Exception while fetching follow-back list: $e");
+      debugPrint('Exception while fetching disbursement data: $e');
+      debugPrint('Error details: ${e.toString()}');
     } finally {
       iscallDisbursedLoading.value = false;
+      debugPrint('=== Finished Loading Disbursement Data ===');
     }
   }
 }

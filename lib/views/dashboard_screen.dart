@@ -1100,7 +1100,7 @@ class _DashboardScreenState extends State<DashboardScreen>
 
                         headerTitleWithContainer(
                           isNotTelecaller
-                              ? 'Performance Insights'
+                              ? 'Performance Insight'
                               : 'Call Back & Incentives',
                         ),
                         verticalSpace(15.h),

@@ -120,15 +120,13 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
 
   Widget _buildTotalSummary() {
     return Obx(() {
-      final data = _adminDisbursementController.disbursementTotal;
+      final totalData = _adminDisbursementController.disbursementTotal.value;
 
-      if (data.isEmpty) {
-        return Container();
+      // If API not loaded yet
+      if (totalData == null) {
+        return const SizedBox.shrink();
       }
 
-      final totalData = data.first;
-
-      // Calculate simple total sum
       final totalSum =
           totalData.loginCountTotal + totalData.disbursedCountTotal;
 
@@ -144,7 +142,7 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
             ),
             child: Column(
               children: [
-                // Simple total count
+                // Total count
                 Text(
                   totalSum.toString(),
                   style: TextStyle(
@@ -166,31 +164,26 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
                 ),
                 SizedBox(height: 5.h),
 
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          const TextSpan(
-                            text: 'Disbursed Files - ',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14,
-                            ),
-                          ),
-                          TextSpan(
-                            text: totalData.disbursedCountTotal.toString(),
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Disbursed Files - ',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                  ],
+                      TextSpan(
+                        text: totalData.disbursedCountTotal.toString(),
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

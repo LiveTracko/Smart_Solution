@@ -1205,13 +1205,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                                     children: [
                                       FileStatusCard(
                                         title: "Disbursement",
-                                        fileCount: _disbursementController
-                                            .disbursementTotal
-                                            .first
-                                            .disbursedCountTotal
+                                        fileCount: (_disbursementController
+                                                    .disbursementTotal
+                                                    .value
+                                                    ?.disbursedCountTotal ??
+                                                0)
                                             .toString(),
-                                        amount: _disbursementController
-                                            .disbursementTotal.first.amountTotal
+                                        amount: (_disbursementController
+                                                    .disbursementTotal
+                                                    .value
+                                                    ?.amountTotal ??
+                                                "0")
                                             .toString(),
                                         statusColor: Colors.blue,
                                         onPress: () {

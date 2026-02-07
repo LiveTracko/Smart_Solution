@@ -15,6 +15,7 @@ import 'package:smart_solutions/models/leads_status_group.dart';
 import 'package:smart_solutions/models/product_type.dart';
 import 'package:smart_solutions/models/source_model.dart';
 import 'package:smart_solutions/models/status_list_model.dart';
+import 'package:smart_solutions/models/team_leader_model.dart';
 import 'package:smart_solutions/models/tellecaller_name_model.dart';
 import 'package:smart_solutions/services/api_service.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
@@ -29,6 +30,10 @@ class DataController extends GetxController {
   var dataList = <Data>[].obs;
   var disbursementdata = <Data>[].obs;
   var errorMessage = ''.obs;
+  // TEAM LEADER FILTER
+  var teamLeaderList = <TeamleaderData>[].obs;
+  var selectedTeamLeaderIds = <String>[].obs;
+
   bool granted = false;
 
   var allBankNamesList = <DataEntryBankList>[].obs;
@@ -275,6 +280,23 @@ class DataController extends GetxController {
       );
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<void> getLoginRequestTeamLeader() async {
+    try {
+      final response =
+          await _apiService.getRequest(APIUrls.loginRequestTeamLeader);
+
+      if (response.statusCode == 200) {
+        final model = TealLeaderModel.fromJson(json.decode(response.body));
+
+        if (model.data.isNotEmpty) {
+          teamLeaderList.assignAll(model.data);
+        }
+      }
+    } catch (e) {
+      logOutput("Team leader api error: $e");
     }
   }
 

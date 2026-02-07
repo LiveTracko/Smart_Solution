@@ -70,6 +70,8 @@ class APIUrls {
   static const String getYearlyMonthlyDisbursedAmounts =
       "Auth/getCurrentYearMonthlyDisbursedAmounts";
 
+  static const getDisbursementForAdmin = "Auth/getdisbursementforadmin";
+
   static const String themeColor = "Auth/updatethemecolor";
   static const String adminLoginRequest = 'Auth/getloginrequestforadmin';
   static const String loginRequestTeamLeader = 'Auth/getloginrequestteamleader';

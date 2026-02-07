@@ -7,52 +7,87 @@ class SummaryCard extends StatelessWidget {
   final List<Widget> rows;
   final double height;
   final EdgeInsets padding;
+  final IconData icon;
 
   const SummaryCard({
     super.key,
     required this.title,
     required this.duration,
     required this.rows,
-    this.height = 80,
+    this.height = 90,
     this.padding = const EdgeInsets.all(14),
+    this.icon = Icons.person_outline,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: padding,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: ListTile(
-        dense: true,
-        leading: const CircleAvatar(
-          child: Icon(Icons.person),
-        ),
-        title: Text(title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTextStyle.smallbodyTxt),
-        subtitle: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: duration.isNotEmpty
-              ? MainAxisAlignment.spaceBetween
-              : MainAxisAlignment.end,
-          children: [
-            if (duration.isNotEmpty)
-              Text(duration,
-                  style: AppTextStyle.blueHeaderTitletStyle
-                      .copyWith(fontSize: 12)),
-            Row(
-              children: rows,
-            )
-          ],
-        ),
-        // trailing: Row(
-        //   mainAxisSize: MainAxisSize.min,
-        //   children: rows,
-        // ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// Avatar
+          Container(
+            height: 42,
+            width: 42,
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(.08),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: Colors.blue),
+          ),
+
+          const SizedBox(width: 12),
+
+          /// Content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// Title
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyle.smallbodyTxt.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                if (duration.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    duration,
+                    style: AppTextStyle.blueHeaderTitletStyle.copyWith(
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: 10),
+
+                /// Stats Row
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  children: rows,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

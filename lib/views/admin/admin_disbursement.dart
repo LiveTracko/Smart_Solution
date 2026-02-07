@@ -10,9 +10,11 @@ import 'package:smart_solutions/widget/flutter_chiplist.dart';
 import 'package:smart_solutions/widget/header_title.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
 import 'package:smart_solutions/widget/searchbarwithclear.dart';
-import 'package:smart_solutions/widget/summary_card.dart' show SummaryCard;
+
 import 'package:smart_solutions/widget/summary_header_card.dart';
 import 'package:smart_solutions/widget/text_style.dart';
+
+import '../../widget/summary_card.dart';
 
 class AdminDisbursement extends StatefulWidget {
   final String title;
@@ -57,7 +59,6 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
                     title: widget.title,
                     style: AppTextStyle.headerTitle,
                   ),
-
                   SearchBarWithClear(
                     controller: _adminDisbursementController.searchController,
                     onClear: _adminDisbursementController.clearFilters,
@@ -65,22 +66,14 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
                       // Handle search if needed
                     },
                   ),
-
                   kVerticalSpace(5),
-
-                  // FILTER CHIPS
                   _buildFilterChips(),
-
                   kVerticalSpace(10),
-
-                  // TOTAL SUMMARY
                   _buildTotalSummary(),
                 ],
               ),
             ),
-            Expanded(
-              child: _buildDisbursementList(),
-            ),
+            Expanded(child: _buildDisbursementList()),
           ],
         );
       }),
@@ -106,7 +99,7 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
         );
       }
 
-      return Container(
+      return SizedBox(
         height: 50.h,
         child: FilterChipList(
           filters: filterList,
@@ -118,11 +111,121 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
     });
   }
 
+  // Widget _buildTotalSummary() {
+  //   return Obx(() {
+  //     final totalData = _adminDisbursementController.disbursementTotal.value;
+
+  //     if (totalData == null) {
+  //       return const SizedBox.shrink();
+  //     }
+
+  //     final totalSum =
+  //         totalData.loginCountTotal + totalData.disbursedCountTotal;
+
+  //     return SummaryHeaderCard(
+  //       title: 'Total',
+  //       duration: 'Login Files - ${totalData.loginCountTotal}',
+  //       rows: [
+  //         Row(mainAxisSize: MainAxisSize.min, children: [
+  //           Icon(Icons.account_balance_wallet_outlined,
+  //               color: Colors.blue, size: 20),
+  //           const SizedBox(width: 6),
+  //           Text(
+  //             totalSum.toString(),
+  //             style: TextStyle(
+  //               fontSize: 16.sp,
+  //               fontWeight: FontWeight.bold,
+  //             ),
+  //           ),
+  //           const SizedBox(width: 12),
+  //           Text(
+  //             '₹${CurrencyUtils.formatAmount(totalData.amountTotal.toString())}',
+  //             style: TextStyle(
+  //               color: Colors.green,
+  //               fontSize: 14.sp,
+  //               fontWeight: FontWeight.w600,
+  //             ),
+  //           ),
+  //           const SizedBox(width: 12),
+  //           _statChip(
+  //             icon: Icons.login,
+  //             label: "Login",
+  //             value: totalData.loginCountTotal.toString(),
+  //             color: Colors.blue,
+  //           ),
+  //           const SizedBox(width: 6),
+  //           _statChip(
+  //             icon: Icons.check_circle_outline,
+  //             label: "Disbursed",
+  //             value: totalData.disbursedCountTotal.toString(),
+  //             color: Colors.green,
+  //           ),
+  //         ])
+
+  //         // Container(
+  //         //   padding: const EdgeInsets.all(14),
+  //         //   decoration: BoxDecoration(
+  //         //     color: Colors.white,
+  //         //     borderRadius: BorderRadius.circular(16),
+  //         //     boxShadow: [
+  //         //       BoxShadow(
+  //         //         color: Colors.black.withOpacity(.05),
+  //         //         blurRadius: 10,
+  //         //         offset: const Offset(0, 4),
+  //         //       ),
+  //         //     ],
+  //         //   ),
+  //         //   child: Column(
+  //         //     children: [
+  //         //       Icon(Icons.account_balance_wallet_outlined,
+  //         //           color: Colors.blue, size: 26),
+  //         //       const SizedBox(height: 6),
+  //         //       Text(
+  //         //         totalSum.toString(),
+  //         //         style: TextStyle(
+  //         //           fontSize: 22.sp,
+  //         //           fontWeight: FontWeight.bold,
+  //         //         ),
+  //         //       ),
+  //         //       SizedBox(height: 6.h),
+  //         //       Text(
+  //         //         '₹${CurrencyUtils.formatAmount(totalData.amountTotal.toString())}',
+  //         //         style: TextStyle(
+  //         //           color: Colors.green,
+  //         //           fontSize: 16.sp,
+  //         //           fontWeight: FontWeight.w600,
+  //         //         ),
+  //         //       ),
+  //         //       const Divider(height: 18),
+  //         //       Row(
+  //         //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         //         children: [
+  //         //           _statChip(
+  //         //             icon: Icons.login,
+  //         //             label: "Login",
+  //         //             value: totalData.loginCountTotal.toString(),
+  //         //             color: Colors.blue,
+  //         //           ),
+  //         //           _statChip(
+  //         //             icon: Icons.check_circle_outline,
+  //         //             label: "Disbursed",
+  //         //             value: totalData.disbursedCountTotal.toString(),
+  //         //             color: Colors.green,
+  //         //           ),
+  //         //         ],
+  //         //       )
+  //         //     ],
+  //         //   ),
+  //         // ),
+  //       ],
+  //     );
+  //   });
+  // }
+
   Widget _buildTotalSummary() {
     return Obx(() {
       final totalData = _adminDisbursementController.disbursementTotal.value;
 
-      // If API not loaded yet
       if (totalData == null) {
         return const SizedBox.shrink();
       }
@@ -131,67 +234,154 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
           totalData.loginCountTotal + totalData.disbursedCountTotal;
 
       return SummaryHeaderCard(
-        title: 'Total',
-        duration: 'Login Files - ${totalData.loginCountTotal}',
+        title: 'Files: $totalSum',
+        //  duration: 'Files: $totalSum',
         rows: [
-          Container(
-            padding: const EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              color: AppColors.appBarTextColor,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Column(
-              children: [
-                // Total count
-                Text(
-                  totalSum.toString(),
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // const Icon(Icons.summarize_outlined,
+              //     size: 18, color: Colors.blue),
+              // const SizedBox(width: 4),
+              // Text(
+              //   totalSum.toString(),
+              //   style: TextStyle(
+              //     fontWeight: FontWeight.bold,
+              //     fontSize: 14.sp,
+              //   ),
+              // ),
+              // const SizedBox(width: 10),
+              Text(
+                '₹${CurrencyUtils.formatAmount(totalData.amountTotal.toString())}',
+                style: TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13.sp,
                 ),
-                SizedBox(height: 8.h),
-
-                // Amount
-                Text(
-                  '₹${CurrencyUtils.formatAmount(totalData.amountTotal.toString())}',
-                  style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 5.h),
-
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      const TextSpan(
-                        text: 'Disbursed Files - ',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                      ),
-                      TextSpan(
-                        text: totalData.disbursedCountTotal.toString(),
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 10),
+              _statChip(
+                icon: Icons.login,
+                label: "L",
+                value: totalData.loginCountTotal.toString(),
+                color: Colors.blue,
+              ),
+              const SizedBox(width: 4),
+              _statChip(
+                icon: Icons.check_circle_outline,
+                label: "D",
+                value: totalData.disbursedCountTotal.toString(),
+                color: Colors.green,
+              ),
+            ],
           ),
         ],
       );
     });
   }
+
+  Widget _statChip({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(.08),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 6),
+          Text(
+            "$label: $value",
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget _buildTotalSummary() {
+  //   return Obx(() {
+  //     final totalData = _adminDisbursementController.disbursementTotal.value;
+
+  //     // If API not loaded yet
+  //     if (totalData == null) {
+  //       return const SizedBox.shrink();
+  //     }
+
+  //     final totalSum =
+  //         totalData.loginCountTotal + totalData.disbursedCountTotal;
+
+  //     return SummaryHeaderCard(
+  //       title: 'Total',
+  //       duration: 'Login Files - ${totalData.loginCountTotal}',
+  //       rows: [
+  //         Container(
+  //           padding: const EdgeInsets.all(5),
+  //           decoration: BoxDecoration(
+  //             color: AppColors.appBarTextColor,
+  //             borderRadius: BorderRadius.circular(15),
+  //           ),
+  //           child: Column(
+  //             children: [
+  //               // Total count
+  //               Text(
+  //                 totalSum.toString(),
+  //                 style: TextStyle(
+  //                   color: Colors.black,
+  //                   fontSize: 20.sp,
+  //                   fontWeight: FontWeight.bold,
+  //                 ),
+  //               ),
+  //               SizedBox(height: 8.h),
+
+  //               // Amount
+  //               Text(
+  //                 '₹${CurrencyUtils.formatAmount(totalData.amountTotal.toString())}',
+  //                 style: TextStyle(
+  //                   color: Colors.green,
+  //                   fontSize: 16.sp,
+  //                   fontWeight: FontWeight.w600,
+  //                 ),
+  //               ),
+  //               SizedBox(height: 5.h),
+
+  //               RichText(
+  //                 text: TextSpan(
+  //                   children: [
+  //                     const TextSpan(
+  //                       text: 'Disbursed Files - ',
+  //                       style: TextStyle(
+  //                         color: Colors.grey,
+  //                         fontSize: 14,
+  //                       ),
+  //                     ),
+  //                     TextSpan(
+  //                       text: totalData.disbursedCountTotal.toString(),
+  //                       style: const TextStyle(
+  //                         color: Colors.black,
+  //                         fontSize: 14,
+  //                         fontWeight: FontWeight.w600,
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     );
+  //   });
+  // }
 
   Widget _buildDisbursementList() {
     return Obx(() {
@@ -220,101 +410,330 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
         );
       }
 
-      return Padding(
-        padding: EdgeInsets.only(top: 4.h, bottom: 10.h),
-        child: ListView.builder(
-          itemCount: data.length,
-          itemBuilder: (context, index) {
-            final item = data[index];
+      return ListView.builder(
+        padding: const EdgeInsets.only(top: 6, bottom: 10),
+        itemCount: data.length,
+        itemBuilder: (context, index) {
+          final item = data[index];
 
-            // Calculate total for this item
-            final itemTotal = (int.tryParse(item.loginCount) ?? 0) +
-                (int.tryParse(item.disbursedCount) ?? 0);
+          final itemTotal = (int.tryParse(item.loginCount) ?? 0) +
+              (int.tryParse(item.disbursedCount) ?? 0);
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-              child: SummaryCard(
-                title: item.name.toString(),
-                duration: 'Total: $itemTotal',
-                rows: [
-                  Container(
-                    padding: EdgeInsets.all(8.h),
-                    decoration: BoxDecoration(
-                      color: AppColors.appBarTextColor,
-                      borderRadius: BorderRadius.circular(15),
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+            child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        // Amount
-                        Text(
-                          '₹${CurrencyUtils.formatAmount(item.amount)}',
-                          style: AppTextStyle.blueHeaderTitletStyle.copyWith(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.bold,
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                      leading: const CircleAvatar(
+                        radius: 18,
+                        backgroundColor: Color(0xffEEF2FF),
+                        child: Icon(Icons.person, color: Colors.indigo),
+                      ),
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            item.name.toString(),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 8.h),
-
-                        // Login Files
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            RichText(
-                              text: TextSpan(
-                                children: [
-                                  const TextSpan(
-                                    text: 'Login Files - ',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: item.loginCount,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          Text(
+                            "₹${CurrencyUtils.formatAmount(item.amount)}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
                             ),
-                            SizedBox(width: 15.w),
-                            // Disbursed Files
-                            RichText(
-                              text: TextSpan(
-                                children: [
-                                  const TextSpan(
-                                    text: 'Disbursed Files - ',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: item.disbursedCount,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          ),
+                        ],
+                      ),
+                      subtitle: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Total: $itemTotal",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                          Row(
+                            children: [
+                              _modernStat(
+                                  "Login", item.loginCount, Colors.blue),
+                              const SizedBox(width: 6),
+                              _modernStat("Disbursed", item.disbursedCount,
+                                  Colors.orange),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
+                  ],
+                )),
+          );
+        },
       );
     });
+
+    //  Padding(
+
+    //   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+    //   child: Container(
+    //     padding: const EdgeInsets.all(14),
+    //     decoration: BoxDecoration(
+    //       color: Colors.white,
+    //       borderRadius: BorderRadius.circular(14),
+    //       boxShadow: [
+    //         BoxShadow(
+    //           color: Colors.black.withOpacity(.05),
+    //           blurRadius: 8,
+    //           offset: const Offset(0, 3),
+    //         ),
+    //       ],
+    //     ),
+    //     child: Column(
+    //       crossAxisAlignment: CrossAxisAlignment.start,
+    //       children: [
+    //          HEADER
+    //         Row(
+    //           children: [
+    //             const CircleAvatar(
+    //               radius: 18,
+    //               backgroundColor: Color(0xffEEF2FF),
+    //               child: Icon(Icons.person, color: Colors.indigo),
+    //             ),
+    //             const SizedBox(width: 10),
+    //             Expanded(
+    //               child: Text(
+    //                 data.name.toString(),
+    //                 style: const TextStyle(
+    //                   fontWeight: FontWeight.w600,
+    //                   fontSize: 14,
+    //                 ),
+    //               ),
+    //             ),
+    //             Text(
+    //               "Total: $itemTotal",
+    //               style: const TextStyle(
+    //                 fontSize: 12,
+    //                 color: Colors.grey,
+    //               ),
+    //             ),
+    //           ],
+    //         ),
+
+    //         const SizedBox(height: 12),
+
+    //          AMOUNT
+    //         Text(
+    //           "₹${CurrencyUtils.formatAmount(item.amount)}",
+    //           style: const TextStyle(
+    //             fontSize: 18,
+    //             fontWeight: FontWeight.bold,
+    //             color: Colors.green,
+    //           ),
+    //         ),
+
+    //         const SizedBox(height: 10),
+
+    //          STATS
+    //         Row(
+    //           children: [
+    //             _modernStat("Login", item.loginCount, Colors.blue),
+    //             const SizedBox(width: 10),
+    //             _modernStat("Disbursed", item.disbursedCount, Colors.orange),
+    //           ],
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
+
+    //  Padding(
+    //   padding: EdgeInsets.only(top: 4.h, bottom: 10.h),
+    //   child: ListView.builder(
+    //     itemCount: data.length,
+    //     itemBuilder: (context, index) {
+    //       final item = data[index];
+
+    //       // Calculate total for this item
+    //       final itemTotal = (int.tryParse(item.loginCount) ?? 0) +
+    //           (int.tryParse(item.disbursedCount) ?? 0);
+
+    //       return Padding(
+    //         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+    //         child: SummaryCard(
+    //           title: item.name.toString(),
+    //           duration: 'Total: $itemTotal',
+    //           icon: Icons.person,
+    //           rows: [
+    //             Wrap(
+    //               spacing: 8,
+    //               runSpacing: 6,
+    //               alignment: WrapAlignment.end,
+    //               children: [
+    //                 _statChip(
+    //                   icon: Icons.currency_rupee,
+    //                   label: "Amount",
+    //                   value: CurrencyUtils.formatAmount(item.amount),
+    //                   color: Colors.green,
+    //                 ),
+    //                 _statChip(
+    //                   icon: Icons.file_copy_outlined,
+    //                   label: "Login",
+    //                   value: item.loginCount,
+    //                   color: Colors.blue,
+    //                 ),
+    //                 _statChip(
+    //                   icon: Icons.check_circle_outline,
+    //                   label: "Disbursed",
+    //                   value: item.disbursedCount,
+    //                   color: Colors.orange,
+    //                 ),
+    //               ],
+    //             )
+
+    //             // Container(
+    //             //   padding: EdgeInsets.all(8.h),
+    //             //   decoration: BoxDecoration(
+    //             //     color: AppColors.appBarTextColor,
+    //             //     borderRadius: BorderRadius.circular(15),
+    //             //   ),
+    //             //   child: Column(
+    //             //     crossAxisAlignment: CrossAxisAlignment.end,
+    //             //     children: [
+    //             //       // Amount
+    //             //       Text(
+    //             //         '₹${CurrencyUtils.formatAmount(item.amount)}',
+    //             //         style: AppTextStyle.blueHeaderTitletStyle.copyWith(
+    //             //           fontSize: 14.sp,
+    //             //           fontWeight: FontWeight.bold,
+    //             //         ),
+    //             //       ),
+    //             //       SizedBox(height: 8.h),
+
+    //             //       // Login Files
+    //             //       Row(
+    //             //         mainAxisSize: MainAxisSize.min,
+    //             //         children: [
+    //             //           RichText(
+    //             //             text: TextSpan(
+    //             //               children: [
+    //             //                 const TextSpan(
+    //             //                   text: 'Login Files - ',
+    //             //                   style: TextStyle(
+    //             //                     color: Colors.grey,
+    //             //                     fontSize: 12,
+    //             //                   ),
+    //             //                 ),
+    //             //                 TextSpan(
+    //             //                   text: item.loginCount,
+    //             //                   style: const TextStyle(
+    //             //                     color: Colors.black,
+    //             //                     fontSize: 12,
+    //             //                     fontWeight: FontWeight.w600,
+    //             //                   ),
+    //             //                 ),
+    //             //               ],
+    //             //             ),
+    //             //           ),
+    //             //           SizedBox(width: 15.w),
+    //             //           // Disbursed Files
+    //             //           RichText(
+    //             //             text: TextSpan(
+    //             //               children: [
+    //             //                 const TextSpan(
+    //             //                   text: 'Disbursed Files - ',
+    //             //                   style: TextStyle(
+    //             //                     color: Colors.grey,
+    //             //                     fontSize: 12,
+    //             //                   ),
+    //             //                 ),
+    //             //                 TextSpan(
+    //             //                   text: item.disbursedCount,
+    //             //                   style: const TextStyle(
+    //             //                     color: Colors.black,
+    //             //                     fontSize: 12,
+    //             //                     fontWeight: FontWeight.w600,
+    //             //                   ),
+    //             //                 ),
+    //             //               ],
+    //             //             ),
+    //             //           ),
+    //             //         ],
+    //             //       ),
+    //             //     ],
+    //             //   ),
+    //             // ),
+    //           ],
+    //         ),
+    //       );
+    //     },
+    //   ),
+    // );
   }
 }
+
+Widget _modernStat(String label, String value, Color color) {
+  return Chip(
+    padding: EdgeInsets.zero,
+    labelPadding: const EdgeInsets.symmetric(horizontal: 6),
+    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    visualDensity: const VisualDensity(horizontal: -3, vertical: -3),
+    backgroundColor: color.withOpacity(.08),
+    label: Text(
+      "$label: $value",
+      style: TextStyle(
+        fontSize: 10.5,
+        fontWeight: FontWeight.w600,
+        color: color,
+      ),
+    ),
+  );
+}
+
+// Widget _modernStat(String label, String value, Color color) {
+//   return Container(
+//     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+//     decoration: BoxDecoration(
+//       color: color.withOpacity(.08),
+//       borderRadius: BorderRadius.circular(10),
+//     ),
+//     child: Row(
+//       mainAxisSize: MainAxisSize.min,
+//       children: [
+//         Text(
+//           "$label: ",
+//           style: const TextStyle(fontSize: 11, color: Colors.grey),
+//         ),
+//         Text(
+//           value,
+//           style: TextStyle(
+//             fontSize: 12,
+//             fontWeight: FontWeight.bold,
+//             color: color,
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }

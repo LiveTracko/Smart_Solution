@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../controllers/theme_controller.dart';
 
 class SummaryHeaderCard extends StatelessWidget {
   final String title;
@@ -7,7 +10,7 @@ class SummaryHeaderCard extends StatelessWidget {
   final double height;
   final EdgeInsets padding;
 
-  const SummaryHeaderCard({
+  SummaryHeaderCard({
     super.key,
     required this.title,
     required this.duration,
@@ -15,6 +18,8 @@ class SummaryHeaderCard extends StatelessWidget {
     this.height = 80,
     this.padding = const EdgeInsets.all(14),
   });
+
+  final ThemeController themeController = Get.find<ThemeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +29,7 @@ class SummaryHeaderCard extends StatelessWidget {
         width: double.infinity,
         padding: padding,
         decoration: BoxDecoration(
-          color: Colors.blue.shade100.withOpacity(.6),
+          color: themeController.primaryColor.value.withOpacity(0.2),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(

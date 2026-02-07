@@ -1836,11 +1836,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                   image: AssetImage(imageurl),
                   fit: BoxFit.fitWidth), // makes it fill nicely),
               borderRadius: BorderRadius.circular(6),
-              // gradient: LinearGradient(
-              //   colors: [startColor, endColor],
-              //   begin: Alignment.topLeft,
-              //   end: Alignment.bottomRight,
-              // ),
+
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.05),

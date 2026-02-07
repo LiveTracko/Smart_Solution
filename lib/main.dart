@@ -17,7 +17,7 @@ void main() async {
 
   // 🌐 Global controllers (alive for whole app)
   Get.put(ConnectivityController(), permanent: true);
-  Get.put(ThemeController(), permanent: true); // 🎨 Theme controller
+  Get.put(ThemeController(), permanent: true);
 
   // 🔔 Firebase & notifications
   await FireBaseNotificatinService.initializeApp();

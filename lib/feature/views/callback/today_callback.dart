@@ -75,6 +75,9 @@ class CallBackData extends StatelessWidget {
             itemCount: dataList.length,
             itemBuilder: (context, index) {
               var data = dataList[index];
+              debugPrint(
+                  'FOLLOW UP FINAL => ${formatDateTime(data.followupDate)}');
+
               return CommonTitleCard(
                 leading: Obx(
                   () => SvgPicture.asset(
@@ -82,7 +85,7 @@ class CallBackData extends StatelessWidget {
                     color: themeController.primaryColor.value,
                   ),
                 ),
-                followupdate: data.followupDate.toString(),
+                followupdate: formatDateTime(data.followupDate),
                 onLeadingTap: () {
                   if (!_dialerController.isCallOngoing.value) {
                     _dialerController.makePhoneCall(
@@ -102,7 +105,7 @@ class CallBackData extends StatelessWidget {
                   _dialerController.excel_id.value = '';
                 },
                 title: data.customerName.toString(),
-                subtitle: formatDateTime(data.entryDate.toString()),
+                subtitle: formatDateTime(data.entryDate),
                 amount: maskFirst6Digits(data.contactNumber.toString()),
                 children: [
                   _commonRows.buildSingleRow(
@@ -122,12 +125,30 @@ class CallBackData extends StatelessWidget {
     return 'xxxxxx${number.substring(6)}';
   }
 
-  String formatDateTime(String dateString) {
+  String formatDateTime(dynamic date) {
+    if (date == null) return '--';
+
     try {
-      DateTime dateTime = DateTime.parse(dateString);
-      return DateFormat('dd/MM/yy - HH:mm:ss').format(dateTime);
+      if (date is DateTime) {
+        return DateFormat('dd/MM/yyyy').format(date);
+      }
+
+      String dateString = date.toString().trim();
+
+      // 🔑 Normalize yyyy-M-d → yyyy-MM-dd
+      final parts = dateString.split('-');
+      if (parts.length == 3) {
+        final year = parts[0];
+        final month = parts[1].padLeft(2, '0');
+        final day = parts[2].padLeft(2, '0');
+        dateString = '$year-$month-$day';
+      }
+
+      final dt = DateTime.parse(dateString);
+      return DateFormat('dd/MM/yyyy').format(dt);
     } catch (e) {
-      return dateString; // Return original if parsing fails
+      debugPrint('DATE FORMAT ERROR => $date');
+      return '--';
     }
   }
 }

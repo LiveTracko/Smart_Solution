@@ -37,6 +37,7 @@ class _ListingScreenState extends State<ListingScreen> {
 
   final ScrollController companyScrollController = ScrollController();
   final TextEditingController searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
   final ChartCardsController _chartCardsController =
       Get.find<ChartCardsController>();
   final ThemeController themeController = Get.find<ThemeController>();
@@ -87,6 +88,7 @@ class _ListingScreenState extends State<ListingScreen> {
     Future.microtask(() {
       _debounce?.cancel();
       searchController.dispose();
+      _searchFocusNode.dispose();
       _chartCardsController.selectedIndex.value = 0;
     });
     super.dispose();
@@ -113,13 +115,13 @@ class _ListingScreenState extends State<ListingScreen> {
                 kVerticalSpace(10),
                 Obx(() {
                   // 🔥 Clear search when toggling
-                  searchController.clear();
-                  _debounce?.cancel();
+                  // searchController.clear();
+                  // _debounce?.cancel();
 
                   return SearchBarWithClear(
                     key: ValueKey(_chartCardsController.selectedIndex.value),
                     controller: searchController,
-                    focusNode: FocusNode(),
+                    focusNode: _searchFocusNode,
                     showDatePickerIcon: false,
                     textInputType:
                         _chartCardsController.selectedIndex.value == 0
@@ -129,19 +131,23 @@ class _ListingScreenState extends State<ListingScreen> {
                     onClear: () {
                       searchController.clear();
                       _debounce?.cancel();
+                      _searchFocusNode.unfocus(); // optional but recommended
 
                       if (_chartCardsController.selectedIndex.value == 0) {
+                        // Company tab
                         pincodeController.companyPage.value = 1;
                         pincodeController.companyhasMore.value = true;
                         pincodeController.companyList.clear();
                         pincodeController.fetchCompany(search: "");
                       } else {
+                        // Pincode tab
                         pincodeController.page.value = 1;
                         pincodeController.hasMore.value = true;
                         pincodeController.pincodes.clear();
                         pincodeController.fetchPincodes(search: "");
                       }
                     },
+
                     onChanged: (value) {
                       if (_debounce?.isActive ?? false) _debounce!.cancel();
                       _debounce = Timer(const Duration(milliseconds: 400), () {

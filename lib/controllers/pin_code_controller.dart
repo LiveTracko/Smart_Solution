@@ -22,7 +22,6 @@ class PincodeController extends GetxController {
   final searchQuery = ''.obs;
   final searchController = TextEditingController();
 
-
   @override
   void onInit() {
     super.onInit();
@@ -30,12 +29,13 @@ class PincodeController extends GetxController {
     fetchCompany();
   }
 
-
-
   Future<void> fetchPincodes({String? search}) async {
-    if (isLoading.value || !hasMore.value) return;
+    if (isLoading.value) return;
 
     isLoading.value = true;
+
+    // Debug print
+    print('Fetching pincodes - Page: ${page.value}, Search: $search');
 
     final Map<String, String> body = {
       'telecaller_id': StaticStoredData.userId,
@@ -45,23 +45,32 @@ class PincodeController extends GetxController {
 
     if (search != null && search.isNotEmpty) {
       body['search'] = search;
-      if (page.value == 1) {
-        pincodes.clear();
-        isLoading.value = true;
-      }
     }
+
+    // Debug print
+    print('Request body: $body');
 
     final response = await _apiService.postRequest(APIUrls.pinCodelist, body);
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
+      print('Response data: ${jsonData['data'].length} items');
+
       final List<dynamic> data = jsonData['data'];
 
       final List<Datum> result = data.map((e) => Datum.fromJson(e)).toList();
+
+      // Debug print
+      print('Parsed ${result.length} items');
+      if (result.isNotEmpty) {
+        print('First item pincode: ${result.first.pincode}');
+      }
+
       pincodes.addAll(result);
-      page++;
-        } else {
-      //   Get.snackbar('Error', 'Failed to fetch data');
+      page.value++;
+      hasMore.value = result.length == limit;
+    } else {
+      print('Error: ${response.statusCode}');
     }
 
     isLoading.value = false;
@@ -96,7 +105,7 @@ class PincodeController extends GetxController {
           data.map((e) => companyData.fromJson(e)).toList();
       companyList.addAll(result);
       companyPage++;
-        } else {
+    } else {
       //  Get.snackbar('Error', 'Failed to fetch data');
     }
 

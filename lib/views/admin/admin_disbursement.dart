@@ -210,11 +210,6 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
                 ),
               ),
               SizedBox(height: 10.h),
-              ElevatedButton(
-                onPressed: () =>
-                    _adminDisbursementController.getDisbursementData(),
-                child: Text('Refresh Data'),
-              ),
             ],
           ),
         );

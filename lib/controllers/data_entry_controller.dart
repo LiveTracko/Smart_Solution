@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
@@ -10,7 +9,6 @@ import 'package:smart_solutions/models/data_entery_model.dart';
 import 'package:smart_solutions/models/data_entry_bank_list.dart';
 import 'package:smart_solutions/models/dsa_bank_list.dart';
 import 'package:smart_solutions/models/dsa_name_model.dart';
-
 import 'package:smart_solutions/models/leads_status_group.dart';
 import 'package:smart_solutions/models/product_type.dart';
 import 'package:smart_solutions/models/source_model.dart';

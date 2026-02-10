@@ -905,25 +905,48 @@ class _DashboardScreenState extends State<DashboardScreen>
                         verticalSpace(15.h),
                         headerTitleWithContainer('Disbursement'),
                         verticalSpace(15.h),
-                        SizedBox(
-                          height: 80.h,
-                          child: ListView.builder(
-                            itemCount: _disbursementDetailsController
-                                .disbursementList.length,
-                            scrollDirection: Axis.horizontal, //
-                            reverse: true,
-                            itemBuilder: (context, index) {
-                              final data = _disbursementDetailsController
-                                  .disbursementList[index];
-                              return Padding(
+                        Obx(() {
+                          if (_disbursementDetailsController.isLoading.value) {
+                            return SizedBox(
+                              height: 80.h,
+                              child: const Center(
+                                  child: CircularProgressIndicator()),
+                            );
+                          }
+
+                          if (_disbursementDetailsController
+                              .disbursementList.isEmpty) {
+                            return SizedBox(
+                              height: 80.h,
+                              child: const Center(
+                                  child: Text('No disbursement data')),
+                            );
+                          }
+
+                          return SizedBox(
+                            height: 80.h,
+                            child: ListView.builder(
+                              itemCount: _disbursementDetailsController
+                                  .disbursementList.length,
+                              scrollDirection: Axis.horizontal,
+                              reverse: true,
+                              itemBuilder: (context, index) {
+                                final data = _disbursementDetailsController
+                                    .disbursementList[index];
+
+                                return Padding(
                                   padding:
                                       EdgeInsets.symmetric(horizontal: 5.w),
                                   child: disbursementCard(
-                                      '${data.monthName} ${data.year}',
-                                      data.amount.toString()));
-                            },
-                          ),
-                        ),
+                                    '${data.monthName ?? ''} ${data.year ?? ''}',
+                                    data.amount,
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        }),
+
                         verticalSpace(15.h),
                         customContainer(20.h),
                         verticalSpace(15.h),

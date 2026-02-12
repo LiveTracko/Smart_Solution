@@ -2,13 +2,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
-import 'package:smart_solutions/constants/services.dart';
-import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/models/callBack_model.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
 import 'package:smart_solutions/services/api_service.dart';
+import '../../models/admin/admin_loginRequest_model.dart';
 
 class AdminCallBackController extends GetxController {
+  late final String? pageType;
+
+  AdminCallBackController({this.pageType});
   final ApiService _apiService = ApiService();
 
   // ============================
@@ -26,41 +28,118 @@ class AdminCallBackController extends GetxController {
   var isCallBackLoading = false.obs;
   var isLoginRequestTeamLeaderLoading = false.obs;
   var isLoginRequestDataLoading = false.obs;
+  var isLoginFileRequestDataLoading = false.obs;
 
   // ============================
   // 🔹 DATA LISTS
   // ============================
   var teamleaderList = <TeamleaderData>[].obs;
   var tellecallerList = <TeamleaderData>[].obs;
-  var callBackData = <CallBackData>[].obs;
+  // var callBackData = <CallBackData>[].obs;
   var dateRangeList = <DateTime?>[].obs;
   late RxList selectedtellecaller = [].obs;
   var callBackTotalData = <Totals>[].obs;
 
   // NEW: For login request data
-  var loginRequestData = <Map<String, dynamic>>[].obs;
-  var filteredLoginRequestData = <Map<String, dynamic>>[].obs;
+  var loginRequestData = <Datum>[].obs;
+  var loginFilesData = <Datum>[].obs;
+  RxList<Datum> filteredLoginRequestData = <Datum>[].obs;
+  RxList<Datum> filteredLoginFilesData = <Datum>[].obs;
+  RxString teamleaderId = ''.obs;
 
-  // ============================
-  // 🔹 METHODS
-  // ============================
+  RxInt todayTotal = 0.obs;
+  RxInt monthlyTotal = 0.obs;
+
+  RxBool loginRequestLoaded = false.obs;
+  RxBool loginFilesLoaded = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    getteamLeaderData();
+
+    if (pageType == 'Login Request') {
+      fetchLoginRequestOnce();
+    } else {
+      fetchLoginFilesOnce();
+    }
+
+    ever(filteredLoginRequestData, (_) {
+      calculateRequestTotal(filteredLoginRequestData);
+    });
+
+    ever(filteredLoginFilesData, (_) {
+      calculateRequestTotal(filteredLoginFilesData);
+    });
+  }
+
+  Future<void> fetchLoginRequestOnce() async {
+    if (loginRequestLoaded.value) return;
+    loginRequestLoaded = false.obs;
+    await _fetchLoginRequestData();
+    loginRequestLoaded = true.obs;
+  }
+
+  Future<void> fetchLoginFilesOnce() async {
+    if (loginFilesLoaded.value) return;
+
+    loginFilesLoaded.value = false; // show loader
+    await _fetchLoginFileData();
+    loginFilesLoaded.value = true; // hide loader
+  }
+
+  void filterByTeamLeader({
+    required List<Datum> source,
+    required RxList<Datum> target,
+    String? teamleaderId,
+    VoidCallback? onDone,
+    Function(List<Datum>)? calculateTotals,
+  }) {
+    if (pageType == 'Login Request') {
+      // LOGIN REQUEST
+      filteredLoginRequestData.assignAll(
+        teamleaderId == null || teamleaderId.isEmpty
+            ? loginRequestData
+            : loginRequestData.where((e) => e.teamleaderId == teamleaderId),
+      );
+
+      calculateRequestTotal(filteredLoginRequestData);
+    } else {
+      // LOGIN FILES
+      filteredLoginFilesData.assignAll(
+        teamleaderId == null || teamleaderId.isEmpty
+            ? loginFilesData
+            : loginFilesData.where((e) => e.teamleaderId == teamleaderId),
+      );
+      calculateRequestTotal(filteredLoginFilesData);
+    }
+  }
+
   void selectFilter(int index) {
     selectedFilter.value = index;
     debugPrint('Selected filter: $index - ${filters[index]}');
 
-    // When filter changes, fetch filtered login request data
-    if (filters.isNotEmpty && index > 0) {
-      _fetchLoginRequestDataForSelectedFilter();
-    } else {
-      // "All" selected, fetch all data
-      _fetchLoginRequestData();
-    }
+    final teamLeaderId = getSelectedTeamLeaderId();
+    filterByTeamLeader(
+      source: loginRequestData,
+      target: filteredLoginRequestData,
+      teamleaderId: teamLeaderId,
+      calculateTotals: calculateRequestTotal,
+    );
+
+    filterByTeamLeader(
+      source: loginFilesData,
+      target: filteredLoginFilesData,
+      teamleaderId: teamLeaderId,
+      calculateTotals: calculateRequestTotal,
+    );
   }
 
   void clearFilters() {
     selectedFilter.value = 0;
     searchController.clear();
     _fetchLoginRequestData(); // Fetch all data when cleared
+    _fetchLoginFileData();
   }
 
   void setFilters(List<String> names) {
@@ -68,7 +147,6 @@ class AdminCallBackController extends GetxController {
     filters.value = ["All", ...names.toSet()];
   }
 
-  // Get selected team leader ID
   String? getSelectedTeamLeaderId() {
     if (selectedFilter.value == 0) return null; // "All" selected
 
@@ -80,9 +158,6 @@ class AdminCallBackController extends GetxController {
     return null;
   }
 
-  // ============================
-  // 🔹 TEAM LEADER API (First API)
-  // ============================
   Future<void> getLoginRequestTeamLeaderData() async {
     isLoginRequestTeamLeaderLoading.value = true;
     debugPrint('=== Fetching Login Request Team Leaders ===');
@@ -121,25 +196,35 @@ class AdminCallBackController extends GetxController {
     }
   }
 
-  // ============================
-  // 🔹 LOGIN REQUEST DATA API (Second API)
-  // ============================
-  Future<void> _fetchLoginRequestData() async {
+  Future<void> _fetchLoginRequestData({String? teamleaderId}) async {
+    if (loginRequestData.isNotEmpty) return; // prevents re-fetch
     isLoginRequestDataLoading.value = true;
     debugPrint('=== Fetching ALL Login Request Data ===');
 
     try {
       final response = await _apiService.postRequest(
         APIUrls.adminLoginRequest,
-        {}, // Empty form data for all data
+        {},
       );
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+        final decoded = jsonDecode(response.body);
 
-        if (responseData.containsKey('data')) {
-          final List<dynamic> data = responseData['data'] as List<dynamic>;
-          _processLoginRequestData(data);
+        final List list = decoded['data'];
+
+        final allData = list.map((e) => Datum.fromJson(e)).toList();
+
+        loginRequestData.assignAll(allData);
+
+        // FILTER HERE
+        if (teamleaderId != null && teamleaderId.isNotEmpty) {
+          filteredLoginRequestData.assignAll(
+              allData.where((item) => item.teamleaderId == teamleaderId));
+
+          //   calculateRequestTotal(filteredLoginRequestData);
+        } else {
+          filteredLoginRequestData.assignAll(allData);
+          calculateRequestTotal(filteredLoginRequestData);
         }
       }
     } catch (e) {
@@ -149,92 +234,184 @@ class AdminCallBackController extends GetxController {
     }
   }
 
-  Future<void> _fetchLoginRequestDataForSelectedFilter() async {
-    isLoginRequestDataLoading.value = true;
-    final teamLeaderId = getSelectedTeamLeaderId();
+  void searchLoginRequests(String query, {String? teamleaderId}) {
+    if (query.isEmpty) {
+      // reset list
+      filteredLoginRequestData.assignAll(
+        teamleaderId == null || teamleaderId.isEmpty
+            ? loginRequestData
+            : loginRequestData
+                .where((e) => e.teamleaderId == teamleaderId)
+                .toList(),
+      );
 
-    if (teamLeaderId == null) {
-      await _fetchLoginRequestData();
+      calculateRequestTotal(filteredLoginRequestData);
       return;
     }
 
-    debugPrint(
-        '=== Fetching Login Request Data for Team Leader ID: $teamLeaderId ===');
+    final result = loginRequestData.where((item) {
+      final name = item.name.toLowerCase();
+      //  final mobile = item.mobile?.toLowerCase() ?? "";
+
+      return name.contains(query.toLowerCase());
+      //      mobile.contains(query.toLowerCase());
+    }).toList();
+
+    filteredLoginRequestData.assignAll(result);
+    calculateRequestTotal(filteredLoginRequestData);
+  }
+
+  Future<void> _fetchLoginFileData({String? teamleaderId}) async {
+    if (loginFilesData.isNotEmpty) return; // prevents re-fetch
+    isLoginFileRequestDataLoading.value = true;
+    debugPrint('=== Fetching ALL Login Request Data ===');
 
     try {
       final response = await _apiService.postRequest(
-        APIUrls.adminLoginRequest,
-        {'teamleader_id': teamLeaderId},
+        APIUrls.adminLoginFiles,
+        {},
       );
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+        final decoded = jsonDecode(response.body);
 
-        if (responseData.containsKey('data')) {
-          final List<dynamic> data = responseData['data'] as List<dynamic>;
-          _processLoginRequestData(data);
+        final List list = decoded['data'];
+
+        final allData = list.map((e) => Datum.fromJson(e)).toList();
+
+        loginFilesData.assignAll(allData);
+
+        // FILTER HERE
+        if (teamleaderId != null && teamleaderId.isNotEmpty) {
+          filteredLoginFilesData.assignAll(
+              allData.where((item) => item.teamleaderId == teamleaderId));
+
+          //    calculateRequestTotal(filteredLoginFilesData);
+        } else {
+          filteredLoginFilesData.assignAll(allData);
+          calculateRequestTotal(filteredLoginFilesData);
         }
       }
     } catch (e) {
-      debugPrint('Exception in _fetchLoginRequestDataForSelectedFilter: $e');
+      debugPrint('Exception in _fetchLoginRequestData: $e');
     } finally {
-      isLoginRequestDataLoading.value = false;
+      isLoginFileRequestDataLoading.value = false;
     }
   }
 
-  void _processLoginRequestData(List<dynamic> data) {
-    // Clear existing data
-    loginRequestData.clear();
+  void searchLoginFileData(String query, {String? teamleaderId}) {
+    if (query.isEmpty) {
+      // reset list
+      filteredLoginFilesData.assignAll(
+        teamleaderId == null || teamleaderId.isEmpty
+            ? loginFilesData
+            : loginFilesData
+                .where((e) => e.teamleaderId == teamleaderId)
+                .toList(),
+      );
 
-    // Process each record
-    for (var item in data) {
-      final itemMap = item as Map<String, dynamic>;
-
-      // Skip the "TOTAL" row
-      if (itemMap['name'] == 'TOTAL') continue;
-
-      // Find team leader name
-      String teamLeaderName = 'Not Assigned';
-      if (itemMap['teamleader_id'] != null) {
-        final tl = teamleaderList.firstWhereOrNull(
-          (teamLeader) => teamLeader.id == itemMap['teamleader_id'].toString(),
-        );
-        teamLeaderName = tl?.name ?? 'Unknown';
-      }
-
-      loginRequestData.add({
-        'name': itemMap['name']?.toString() ?? 'Unknown',
-        'teamleader_id': itemMap['teamleader_id']?.toString(),
-        'teamleader_name': teamLeaderName,
-        'monthlycount': itemMap['monthlycount']?.toString() ?? '0',
-        'todaycount': itemMap['todaycount']?.toString() ?? '0',
-      });
+      calculateRequestTotal(filteredLoginFilesData);
+      return;
     }
 
-    debugPrint('Processed ${loginRequestData.length} login request records');
+    final result = loginFilesData.where((item) {
+      final name = item.name.toLowerCase();
+      //  final mobile = item.mobile?.toLowerCase() ?? "";
 
-    // Update filtered data
-    filteredLoginRequestData.assignAll(loginRequestData);
+      return name.contains(query.toLowerCase());
+      //      mobile.contains(query.toLowerCase());
+    }).toList();
+
+    filteredLoginFilesData.assignAll(result);
+    calculateRequestTotal(filteredLoginFilesData);
   }
 
-  // ============================
-  // 🔹 TOTALS CALCULATION
-  // ============================
-  Map<String, int> getLoginRequestTotals() {
-    int todayTotal = 0;
-    int monthlyTotal = 0;
+  // Future<void> _fetchLoginRequestDataForSelectedFilter() async {
+  //   isLoginRequestDataLoading.value = true;
+  //   final teamLeaderId = getSelectedTeamLeaderId();
 
-    for (var item in filteredLoginRequestData) {
-      todayTotal += int.tryParse(item['todaycount']?.toString() ?? '0') ?? 0;
-      monthlyTotal +=
-          int.tryParse(item['monthlycount']?.toString() ?? '0') ?? 0;
-    }
+  //   if (teamLeaderId == null) {
+  //     await _fetchLoginRequestData();
+  //     return;
+  //   }
 
-    return {
-      'today': todayTotal,
-      'monthly': monthlyTotal,
-    };
-  }
+  //   debugPrint(
+  //       '=== Fetching Login Request Data for Team Leader ID: $teamLeaderId ===');
+
+  //   try {
+  //     final response = await _apiService.postRequest(
+  //       APIUrls.adminLoginRequest,
+  //       {'teamleader_id': teamLeaderId},
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+
+  //       if (responseData.containsKey('data')) {
+  //         final List<dynamic> data = responseData['data'] as List<dynamic>;
+  //         _processLoginRequestData(data);
+  //       }
+  //     }
+  //   } catch (e) {
+  //     debugPrint('Exception in _fetchLoginRequestDataForSelectedFilter: $e');
+  //   } finally {
+  //     isLoginRequestDataLoading.value = false;
+  //   }
+  // }
+
+  // void _processLoginRequestData(List<dynamic> data) {
+  //   // Clear existing data
+  //   loginRequestData.clear();
+
+  //   // Process each record
+  //   for (var item in data) {
+  //     final itemMap = item as Map<String, dynamic>;
+
+  //     // Skip the "TOTAL" row
+  //     if (itemMap['name'] == 'TOTAL') continue;
+
+  //     // Find team leader name
+  //     String teamLeaderName = 'Not Assigned';
+  //     if (itemMap['teamleader_id'] != null) {
+  //       final tl = teamleaderList.firstWhereOrNull(
+  //         (teamLeader) => teamLeader.id == itemMap['teamleader_id'].toString(),
+  //       );
+  //       teamLeaderName = tl?.name ?? 'Unknown';
+  //     }
+
+  //     loginRequestData.add({
+  //       'name': itemMap['name']?.toString() ?? 'Unknown',
+  //       'teamleader_id': itemMap['teamleader_id']?.toString(),
+  //       'teamleader_name': teamLeaderName,
+  //       'monthlycount': itemMap['monthlycount']?.toString() ?? '0',
+  //       'todaycount': itemMap['todaycount']?.toString() ?? '0',
+  //     });
+  //   }
+
+  //   debugPrint('Processed ${loginRequestData.length} login request records');
+
+  //   // Update filtered data
+  //   filteredLoginRequestData.assignAll(loginRequestData);
+  // }
+
+  // // ============================
+  // // 🔹 TOTALS CALCULATION
+  // // ============================
+  // Map<String, int> getLoginRequestTotals() {
+  //   int todayTotal = 0;
+  //   int monthlyTotal = 0;
+
+  //   for (var item in filteredLoginRequestData) {
+  //     todayTotal += int.tryParse(item['todaycount']?.toString() ?? '0') ?? 0;
+  //     monthlyTotal +=
+  //         int.tryParse(item['monthlycount']?.toString() ?? '0') ?? 0;
+  //   }
+
+  //   return {
+  //     'today': todayTotal,
+  //     'monthly': monthlyTotal,
+  //   };
+  // }
 
   // ============================
   // 🔹 REGULAR METHODS (for other screens)
@@ -270,50 +447,79 @@ class AdminCallBackController extends GetxController {
   Future<void> getCallBackData() async {
     isCallBackLoading.value = true;
 
-    final String dateRage = dateRangeList.isNotEmpty &&
-            dateRangeList.first != null &&
-            dateRangeList.last != null
-        ? "${dateRangeList.first},${dateRangeList.last}"
-        : "";
+    // final String dateRage = dateRangeList.isNotEmpty &&
+    //         dateRangeList.first != null &&
+    //         dateRangeList.last != null
+    //     ? "${dateRangeList.first},${dateRangeList.last}"
+    //     : "";
 
-    bool hasValidTelecaller = false;
-    final formdata = {
-      "daterange": dateRage,
-    };
+    // bool hasValidTelecaller = false;
+    // final formdata = {
+    //   "daterange": dateRage,
+    // };
 
-    if (selectedtellecaller.isNotEmpty) {
-      for (var i = 0; i < selectedtellecaller.length; i++) {
-        final telecallerId = selectedtellecaller[i];
-        formdata["telecaller_ids[$i]"] = telecallerId;
-        hasValidTelecaller = true;
-      }
-    }
+    // if (selectedtellecaller.isNotEmpty) {
+    //   for (var i = 0; i < selectedtellecaller.length; i++) {
+    //     final telecallerId = selectedtellecaller[i];
+    //     formdata["telecaller_ids[$i]"] = telecallerId;
+    //     hasValidTelecaller = true;
+    //   }
+    // }
 
-    if (!hasValidTelecaller) {
-      formdata['telecaller_id'] = StaticStoredData.userId;
-    }
+    // if (!hasValidTelecaller) {
+    //   formdata['telecaller_id'] = StaticStoredData.userId;
+    // }
 
     try {
       final response = await _apiService.postRequest(
-        APIUrls.callBacklist,
-        formdata,
+        APIUrls.adminLoginFiles,
+        {},
       );
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body) as Map<String, dynamic>;
-        final data = CallBackModel.fromJson(responseData);
+        final decoded = jsonDecode(response.body);
 
-        if (responseData.containsKey('totals')) {
-          final totaldata = Totals.fromJson(responseData['totals']);
-          callBackTotalData.assign(totaldata);
+        final List list = decoded['data'];
+
+        final allData = list.map((e) => Datum.fromJson(e)).toList();
+
+        // if (responseData.containsKey('totals')) {
+        //   final totaldata = Totals.fromJson(responseData['totals']);
+        //   callBackTotalData.assign(totaldata);
+        // }
+
+        filteredLoginFilesData.assignAll(allData);
+
+        // FILTER HERE
+        if (teamleaderId.isNotEmpty) {
+          filteredLoginRequestData.assignAll(
+              allData.where((item) => item.teamleaderId == teamleaderId));
+
+          calculateRequestTotal(filteredLoginRequestData);
+        } else {
+          filteredLoginRequestData.assignAll(allData);
+          calculateRequestTotal(filteredLoginRequestData);
         }
-
-        callBackData.assignAll(data.data);
       }
     } catch (e) {
       debugPrint('Exception in getCallBackData: $e');
     } finally {
       isCallBackLoading.value = false;
     }
+  }
+
+  void calculateRequestTotal(List<Datum> data) {
+    todayTotal.value = data.fold<int>(
+      0,
+      (sum, item) => sum + (int.tryParse(item.todaycount ?? '0') ?? 0),
+    );
+
+    monthlyTotal.value = data.fold<int>(
+      0,
+      (sum, item) => sum + (int.tryParse(item.monthlycount ?? '0') ?? 0),
+    );
+
+    print(todayTotal);
+    print(monthlyTotal);
   }
 }

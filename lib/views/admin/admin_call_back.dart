@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/admin/call_back_controller.dart';
-import 'package:smart_solutions/controllers/dailer_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/views/spacing_constants.dart';
-import 'package:smart_solutions/widget/common_rows_card.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/flutter_chiplist.dart';
 import 'package:smart_solutions/widget/header_title.dart';
@@ -29,15 +26,12 @@ class _AdminCallBackState extends State<AdminCallBack> {
 
   final TextEditingController searchController = TextEditingController();
 
-  final _AdminCallBackController = Get.put(AdminCallBackController());
-  final _diallerController = Get.find<DialerController>();
-  final CommonRows _commonRows = CommonRows();
-  final ScrollController _scrollController = ScrollController();
+  final _adminCallBackController = Get.put(AdminCallBackController());
 
   @override
   void initState() {
     super.initState();
-    _AdminCallBackController.getteamLeaderData();
+    _adminCallBackController.getteamLeaderData();
   }
 
   @override
@@ -48,7 +42,7 @@ class _AdminCallBackState extends State<AdminCallBack> {
         title: widget.title,
         key: _scaffoldKey,
         body: Obx(
-          () => _AdminCallBackController.isCallBackLoading.value
+          () => _adminCallBackController.isCallBackLoading.value
               ? const LoadingPage()
               : Column(
                   children: [
@@ -62,35 +56,37 @@ class _AdminCallBackState extends State<AdminCallBack> {
                                   style: AppTextStyle.headerTitle),
                               SearchBarWithClear(
                                   controller:
-                                      _AdminCallBackController.searchController,
+                                      _adminCallBackController.searchController,
                                   onClear: () {
-                                    _AdminCallBackController.clearFilters();
-                                    //      _AdminCallBackController.updateFilteredList();
+                                    _adminCallBackController.clearFilters();
+                                    //      _adminCallBackController.updateFilteredList();
                                   },
                                   onChanged: (value) {
-                                    //     _AdminCallBackController.updateFilteredList();
+                                    //     _adminCallBackController.updateFilteredList();
                                   }),
                               kVerticalSpace(5),
                               Obx(() {
                                 final filterList =
-                                    _AdminCallBackController.filters;
+                                    _adminCallBackController.filters;
 
                                 return FilterChipList(
                                   filters: filterList,
-                                  controller: _AdminCallBackController
+                                  controller: _adminCallBackController
                                       .filterScrollController,
-                                  selectedIndex: _AdminCallBackController
+                                  selectedIndex: _adminCallBackController
                                       .selectedFilter.value,
                                   onSelected:
-                                      _AdminCallBackController.selectFilter,
+                                      _adminCallBackController.selectFilter,
                                 );
                               }),
                               kVerticalSpace(10),
                               Obx(() {
                                 final data =
-                                    _AdminCallBackController.callBackTotalData;
+                                    _adminCallBackController.callBackTotalData;
+
+                                    
                                 return SummaryHeaderCard(
-                                  title: 'Total',
+                                  title: 0,
                                   duration: '',
                                   rows: [
                                     Container(
@@ -172,16 +168,17 @@ class _AdminCallBackState extends State<AdminCallBack> {
                         () => Padding(
                           padding: EdgeInsets.only(top: 4.h),
                           child: ListView.builder(
-                              itemCount:
-                                  _AdminCallBackController.callBackData.length,
+                              itemCount: _adminCallBackController
+                                  .filteredLoginFilesData.length,
                               itemBuilder: (context, index) {
-                                final data = _AdminCallBackController
-                                    .callBackData[index];
+                                final data = _adminCallBackController
+                                    .filteredLoginFilesData[index];
 
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 4),
                                   child: SummaryCard(
+                                    imageUrl: data.profileImage.toString(),
                                     title: data.name.toString(),
                                     duration: '',
                                     rows: [
@@ -205,8 +202,7 @@ class _AdminCallBackState extends State<AdminCallBack> {
                                                       ),
                                                     ),
                                                     TextSpan(
-                                                      text: data
-                                                          .todayCallbackCount,
+                                                      text: data.todaycount,
                                                       style: const TextStyle(
                                                         color: Colors.black,
                                                         fontSize: 12,
@@ -238,8 +234,7 @@ class _AdminCallBackState extends State<AdminCallBack> {
                                                       ),
                                                     ),
                                                     TextSpan(
-                                                      text: data
-                                                          .monthlyCallbackCount,
+                                                      text: data.monthlycount,
                                                       style: const TextStyle(
                                                         color: Colors.black,
                                                         fontSize: 12,

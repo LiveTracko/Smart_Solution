@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
 class SummaryCard extends StatelessWidget {
+  final String imageUrl;
   final String title;
   final String duration;
   final List<Widget> rows;
@@ -11,6 +13,7 @@ class SummaryCard extends StatelessWidget {
 
   const SummaryCard({
     super.key,
+    required this.imageUrl,
     required this.title,
     required this.duration,
     required this.rows,
@@ -38,20 +41,18 @@ class SummaryCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// Avatar
           Container(
             height: 42,
             width: 42,
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(.08),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: Colors.blue),
+                color: Colors.blue.withOpacity(.08),
+                borderRadius: BorderRadius.circular(12)),
+            child: Image.network('${APIUrls.imagebaseUrl}$imageUrl',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    const Icon(Icons.image_not_supported)),
           ),
-
           const SizedBox(width: 12),
-
-          /// Content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,24 +67,45 @@ class SummaryCard extends StatelessWidget {
                   ),
                 ),
 
-                if (duration.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    duration,
-                    style: AppTextStyle.blueHeaderTitletStyle.copyWith(
-                      fontSize: 12,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (duration.isNotEmpty) ...[
+                      Text(
+                        duration,
+                        style: AppTextStyle.blueHeaderTitletStyle.copyWith(
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                    Expanded(
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        children: rows,
+                      ),
                     ),
-                  ),
-                ],
-
-                const SizedBox(height: 10),
-
-                /// Stats Row
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 6,
-                  children: rows,
+                  ],
                 ),
+
+                // if (duration.isNotEmpty) ...[
+                //   const SizedBox(height: 4),
+                //   Text(
+                //     duration,
+                //     style: AppTextStyle.blueHeaderTitletStyle.copyWith(
+                //       fontSize: 12,
+                //     ),
+                //   ),
+                // ],
+
+                // const SizedBox(height: 5),
+
+                // /// Stats Row
+                // Wrap(
+                //   spacing: 8,
+                //   runSpacing: 6,
+                //   children: rows,
+                // ),
               ],
             ),
           ),

@@ -70,7 +70,7 @@ import '../controllers/theme_controller.dart';
 // }
 
 class SummaryHeaderCard extends StatelessWidget {
-  final String title;
+  final int title;
   final String? duration;
   final List<Widget> rows;
   final EdgeInsets padding;
@@ -111,29 +111,31 @@ class SummaryHeaderCard extends StatelessWidget {
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  // Text(
-                  //   duration,
-                  //   style: const TextStyle(
-                  //     fontSize: 14,
-                  //     fontWeight: FontWeight.w600,
-                  //   ),
-                  // ),
-                ],
-              ),
-            ),
+            _totalBadge(title),
+            // Expanded(
+            //   child: Column(
+            //     mainAxisSize: MainAxisSize.min,
+            //     crossAxisAlignment: CrossAxisAlignment.start,
+            //     children: [
+            //       Text(
+            //         title,
+            //         style: const TextStyle(
+            //           fontSize: 14,
+            //           fontWeight: FontWeight.w600,
+            //         ),
+            //       ),
+            //       // Text(
+            //       //   duration,
+            //       //   style: const TextStyle(
+            //       //     fontSize: 14,
+            //       //     fontWeight: FontWeight.w600,
+            //       //   ),
+            //       // ),
+            //     ],
+            //   ),
+            // ),
             Wrap(
               spacing: 6,
               runSpacing: 4,
@@ -145,4 +147,37 @@ class SummaryHeaderCard extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _totalBadge(int total) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(
+        colors: [Color(0xFF1976D2), Color(0xFF42A5F5)],
+      ),
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.blue.withOpacity(.3),
+          blurRadius: 6,
+          offset: const Offset(0, 3),
+        ),
+      ],
+    ),
+    child: Row(
+      children: [
+        const Icon(Icons.summarize, color: Colors.white, size: 16),
+        const SizedBox(width: 6),
+        Text(
+          total.toString(),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    ),
+  );
 }

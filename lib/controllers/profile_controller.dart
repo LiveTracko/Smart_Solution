@@ -8,7 +8,7 @@ import 'package:smart_solutions/constants/services.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/routes/app_routes.dart';
 import 'package:smart_solutions/services/api_service.dart';
-import 'package:smart_solutions/views/dashboard_screen.dart';
+
 
 class ProfileController extends GetxController {
   // Observables

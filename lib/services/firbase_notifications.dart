@@ -7,12 +7,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:smart_solutions/components/commons.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
-import 'package:smart_solutions/services/api_service.dart';
 import 'package:smart_solutions/services/local_notification_service.dart';
 import 'package:http/http.dart' as http;
 
 class FireBaseNotificatinService {
-  final ApiService _apiService = ApiService(); // ApiService instance
   static final FireBaseNotificatinService notificationService =
       FireBaseNotificatinService._init();
   factory FireBaseNotificatinService() => notificationService;
@@ -65,15 +63,15 @@ class FireBaseNotificatinService {
   }
 
   Future<String> getDeviceToken() async {
-  try {
-    token = await firebaseMessaging.getToken() ?? '';
-    customLog('DeviceToken $token ', name: "getDeviceToken");
-    return token;
-  } catch (e) {
-    customLog('error while getting token $e');
-    return '';
+    try {
+      token = await firebaseMessaging.getToken() ?? '';
+      customLog('DeviceToken $token ', name: "getDeviceToken");
+      return token;
+    } catch (e) {
+      customLog('error while getting token $e');
+      return '';
+    }
   }
-}
 
   // getDeviceToken() async {
   //   try {

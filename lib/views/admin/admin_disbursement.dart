@@ -10,11 +10,7 @@ import 'package:smart_solutions/widget/flutter_chiplist.dart';
 import 'package:smart_solutions/widget/header_title.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
 import 'package:smart_solutions/widget/searchbarwithclear.dart';
-
-import 'package:smart_solutions/widget/summary_header_card.dart';
 import 'package:smart_solutions/widget/text_style.dart';
-
-import '../../widget/summary_card.dart';
 
 class AdminDisbursement extends StatefulWidget {
   final String title;
@@ -63,6 +59,8 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
                     controller: _adminDisbursementController.searchController,
                     onClear: _adminDisbursementController.clearFilters,
                     onChanged: (value) {
+                      _adminDisbursementController.getDisbursementData(
+                          query: value);
                       // Handle search if needed
                     },
                   ),
@@ -222,97 +220,10 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
   //   });
   // }
 
-  Widget _buildTotalSummary() {
-    return Obx(() {
-      final totalData = _adminDisbursementController.disbursementTotal.value;
-
-      if (totalData == null) {
-        return const SizedBox.shrink();
-      }
-
-      final totalSum =
-          totalData.loginCountTotal + totalData.disbursedCountTotal;
-
-      return SummaryHeaderCard(
-        title: 'Files: $totalSum',
-        //  duration: 'Files: $totalSum',
-        rows: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // const Icon(Icons.summarize_outlined,
-              //     size: 18, color: Colors.blue),
-              // const SizedBox(width: 4),
-              // Text(
-              //   totalSum.toString(),
-              //   style: TextStyle(
-              //     fontWeight: FontWeight.bold,
-              //     fontSize: 14.sp,
-              //   ),
-              // ),
-              // const SizedBox(width: 10),
-              Text(
-                '₹${CurrencyUtils.formatAmount(totalData.amountTotal.toString())}',
-                style: TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13.sp,
-                ),
-              ),
-              const SizedBox(width: 10),
-              _statChip(
-                icon: Icons.login,
-                label: "L",
-                value: totalData.loginCountTotal.toString(),
-                color: Colors.blue,
-              ),
-              const SizedBox(width: 4),
-              _statChip(
-                icon: Icons.check_circle_outline,
-                label: "D",
-                value: totalData.disbursedCountTotal.toString(),
-                color: Colors.green,
-              ),
-            ],
-          ),
-        ],
-      );
-    });
-  }
-
-  Widget _statChip({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(.08),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 6),
-          Text(
-            "$label: $value",
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   // Widget _buildTotalSummary() {
   //   return Obx(() {
   //     final totalData = _adminDisbursementController.disbursementTotal.value;
 
-  //     // If API not loaded yet
   //     if (totalData == null) {
   //       return const SizedBox.shrink();
   //     }
@@ -321,67 +232,163 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
   //         totalData.loginCountTotal + totalData.disbursedCountTotal;
 
   //     return SummaryHeaderCard(
-  //       title: 'Total',
-  //       duration: 'Login Files - ${totalData.loginCountTotal}',
+  //       title: 'Files: $totalSum',
+  //       //  duration: 'Files: $totalSum',
   //       rows: [
-  //         Container(
-  //           padding: const EdgeInsets.all(5),
-  //           decoration: BoxDecoration(
-  //             color: AppColors.appBarTextColor,
-  //             borderRadius: BorderRadius.circular(15),
-  //           ),
-  //           child: Column(
-  //             children: [
-  //               // Total count
-  //               Text(
-  //                 totalSum.toString(),
-  //                 style: TextStyle(
-  //                   color: Colors.black,
-  //                   fontSize: 20.sp,
-  //                   fontWeight: FontWeight.bold,
-  //                 ),
+  //         Row(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             // const Icon(Icons.summarize_outlined,
+  //             //     size: 18, color: Colors.blue),
+  //             // const SizedBox(width: 4),
+  //             // Text(
+  //             //   totalSum.toString(),
+  //             //   style: TextStyle(
+  //             //     fontWeight: FontWeight.bold,
+  //             //     fontSize: 14.sp,
+  //             //   ),
+  //             // ),
+  //             // const SizedBox(width: 10),
+  //             Text(
+  //               '₹${CurrencyUtils.formatAmount(totalData.amountTotal.toString())}',
+  //               style: TextStyle(
+  //                 color: Colors.green,
+  //                 fontWeight: FontWeight.w600,
+  //                 fontSize: 13.sp,
   //               ),
-  //               SizedBox(height: 8.h),
-
-  //               // Amount
-  //               Text(
-  //                 '₹${CurrencyUtils.formatAmount(totalData.amountTotal.toString())}',
-  //                 style: TextStyle(
-  //                   color: Colors.green,
-  //                   fontSize: 16.sp,
-  //                   fontWeight: FontWeight.w600,
-  //                 ),
-  //               ),
-  //               SizedBox(height: 5.h),
-
-  //               RichText(
-  //                 text: TextSpan(
-  //                   children: [
-  //                     const TextSpan(
-  //                       text: 'Disbursed Files - ',
-  //                       style: TextStyle(
-  //                         color: Colors.grey,
-  //                         fontSize: 14,
-  //                       ),
-  //                     ),
-  //                     TextSpan(
-  //                       text: totalData.disbursedCountTotal.toString(),
-  //                       style: const TextStyle(
-  //                         color: Colors.black,
-  //                         fontSize: 14,
-  //                         fontWeight: FontWeight.w600,
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
+  //             ),
+  //             const SizedBox(width: 10),
+  //             _statChip(
+  //               icon: Icons.login,
+  //               label: "L",
+  //               value: totalData.loginCountTotal.toString(),
+  //               color: Colors.blue,
+  //             ),
+  //             const SizedBox(width: 4),
+  //             _statChip(
+  //               icon: Icons.check_circle_outline,
+  //               label: "D",
+  //               value: totalData.disbursedCountTotal.toString(),
+  //               color: Colors.green,
+  //             ),
+  //           ],
   //         ),
   //       ],
   //     );
   //   });
   // }
+
+  Widget _buildTotalSummary() {
+    return Obx(() {
+      final list = _adminDisbursementController.disbursementList;
+
+      if (list.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      int loginTotal = 0;
+      int disbursedTotal = 0;
+      double amountTotal = 0;
+
+      for (var e in list) {
+        loginTotal += int.parse(e.loginCount);
+        disbursedTotal += int.parse(e.disbursedCount);
+        amountTotal += int.parse(e.amount);
+      }
+
+      final totalSum = loginTotal + disbursedTotal;
+
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.white,
+              Colors.blue.shade50,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.06),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            /// TOTAL COUNT BOX
+            Container(
+              height: 46,
+              width: 46,
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  totalSum.toString(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 12),
+
+            /// LOGIN + DISBURSED
+            Expanded(
+              child: Row(
+                children: [
+                  Icon(Icons.login, size: 16, color: Colors.blue.shade700),
+                  const SizedBox(width: 4),
+                  Text(
+                    "Login: $loginTotal",
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Icon(Icons.check_circle_outline,
+                      size: 16, color: Colors.orange),
+                  const SizedBox(width: 4),
+                  Text(
+                    "Disbursed: $disbursedTotal",
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            /// AMOUNT
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                "₹${CurrencyUtils.formatAmount(amountTotal.toString())}",
+                style: const TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
 
   Widget _buildDisbursementList() {
     return Obx(() {
@@ -400,11 +407,6 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
                 ),
               ),
               SizedBox(height: 10.h),
-              ElevatedButton(
-                onPressed: () =>
-                    _adminDisbursementController.getDisbursementData(),
-                child: Text('Refresh Data'),
-              ),
             ],
           ),
         );
@@ -458,7 +460,7 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
                           Text(
                             "₹${CurrencyUtils.formatAmount(item.amount)}",
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: Colors.green,
                             ),

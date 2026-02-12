@@ -39,14 +39,9 @@ class _AdminCallLogState extends State<AdminCallLog> {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      showBack: true,
-      title: 'Call Log',
-      body: Obx(() {
-        if (_controller.isCallLogLoading.value) {
-          return const LoadingPage();
-        }
-
-        return Column(
+        showBack: true,
+        title: 'Call Log',
+        body: Column(
           children: [
             Container(
               color: AppColors.appBarTextColor,
@@ -80,10 +75,18 @@ class _AdminCallLogState extends State<AdminCallLog> {
                       return const SizedBox();
                     }
 
+                    // if (_controller.isCallLogLoading.value) {
+                    //   return const LoadingPage();
+                    // }
+
                     final data = _controller.callLogData.first;
 
+                    int total = (int.tryParse(data.callAttempt) ?? 0) +
+                        (int.tryParse(data.callContacted) ?? 0) +
+                        (int.tryParse(data.callNotcontact) ?? 0);
+
                     return SummaryHeaderCard(
-                      title: data.name,
+                      title: total,
                       duration: data.totalCallTime,
                       rows: [
                         Row(
@@ -113,7 +116,17 @@ class _AdminCallLogState extends State<AdminCallLog> {
 
             // -------- LIST --------
             Expanded(
-              child: Obx(() => ListView.builder(
+              child: Obx(() {
+                if (_controller.isCallLogLoading.value) {
+                  return const Center(child: LoadingPage());
+                }
+
+                if (_controller.callLogData.isEmpty) {
+                  return const Center(
+                    child: Text("No call logs available"),
+                  );
+                }
+                return ListView.builder(
                     padding: EdgeInsets.only(top: 4.h),
                     itemCount: _controller.callLogData.length > 1
                         ? _controller.callLogData.length - 1
@@ -121,14 +134,19 @@ class _AdminCallLogState extends State<AdminCallLog> {
                     itemBuilder: (context, index) {
                       final data = _controller.callLogData[index + 1];
 
+                      if (_controller.isCallLogLoading.value) {
+                        return const LoadingPage();
+                      }
                       return Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 15, vertical: 4),
                         child: SummaryCard(
+                          imageUrl: data.profileImage.toString(),
                           title: data.name,
                           duration: data.totalCallTime,
                           rows: [
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 const Icon(Icons.call,
                                     size: 16, color: Colors.blue),
@@ -149,12 +167,10 @@ class _AdminCallLogState extends State<AdminCallLog> {
                           ],
                         ),
                       );
-                    },
-                  )),
-            ),
+                    });
+              }),
+            )
           ],
-        );
-      }),
-    );
+        ));
   }
 }

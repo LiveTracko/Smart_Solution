@@ -21,7 +21,8 @@ class DisbursementController extends GetxController {
 
   /// Data
   final teamleaderList = <TeamleaderData>[].obs;
-  final disbursementList = <DisbursementData>[].obs;
+  RxList<DisbursementData> disbursementList = <DisbursementData>[].obs;
+  RxList<DisbursementData> allDisbursementList = <DisbursementData>[].obs;
 
   /// Totals (single object)
   final disbursementTotal = Rxn<disbursementTotals>();
@@ -55,36 +56,59 @@ class DisbursementController extends GetxController {
   }
 
   // ---------------- DISBURSEMENT ----------------
-  Future<void> getDisbursementData() async {
+  // Future<void> getDisbursementData() async {
+  //   iscallDisbursedLoading.value = true;
+
+  //   try {
+  //     final response =
+  //         await _apiService.postRequest(APIUrls.getDisbursementForAdmin, {});
+
+  //     debugPrint('📥 Disbursement API Response: ${response.body}');
+
+  //     if (response.statusCode == 200) {
+  //       final json = jsonDecode(response.body);
+
+  //       final model = DisbursementModel.fromJson(json);
+  //       allDisbursementList.assignAll(model.data);
+  //       disbursementList.assignAll(model.data);
+  //     }
+  //   } catch (e) {
+  //     debugPrint('❌ Disbursement error: $e');
+  //   } finally {
+  //     iscallDisbursedLoading.value = false;
+  //   }
+  // }
+
+  Future<void> getDisbursementData({String? query}) async {
     iscallDisbursedLoading.value = true;
 
     try {
-      /// 🔑 IMPORTANT: send teamleader_id
-      Map<String, dynamic> body = {};
+      // Fetch only once
+      if (allDisbursementList.isEmpty) {
+        final response =
+            await _apiService.postRequest(APIUrls.getDisbursementForAdmin, {});
 
-      if (selectedFilter.value != 0) {
-        final leader = teamleaderList[selectedFilter.value - 1];
-        body['teamleader_id'] = leader.id;
+        if (response.statusCode == 200) {
+          final json = jsonDecode(response.body);
+          final model = DisbursementModel.fromJson(json);
+          allDisbursementList.assignAll(model.data);
+        }
       }
 
-      debugPrint('📤 Disbursement API Body: $body');
+      // SEARCH FILTER
+      if (query != null && query.isNotEmpty) {
+        final filtered = allDisbursementList.where((item) {
+          final name = item.name.toLowerCase();
+          // final mobile = item.mobile?.toLowerCase() ?? "";
 
-      final response = await _apiService.postRequest(
-        APIUrls.getDisbursementForAdmin,
-        body,
-      );
+          return name.contains(query.toLowerCase());
+          //||
+          //  mobile.contains(query.toLowerCase());
+        }).toList();
 
-      debugPrint('📥 Disbursement API Response: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-
-        final model = DisbursementModel.fromJson(json);
-        disbursementList.assignAll(model.data);
-
-        if (json['totals'] != null) {
-          disbursementTotal.value = disbursementTotals.fromJson(json['totals']);
-        }
+        disbursementList.assignAll(filtered);
+      } else {
+        disbursementList.assignAll(allDisbursementList);
       }
     } catch (e) {
       debugPrint('❌ Disbursement error: $e');
@@ -96,7 +120,16 @@ class DisbursementController extends GetxController {
   // ---------------- FILTER ----------------
   void selectFilter(int index) {
     selectedFilter.value = index;
-    getDisbursementData(); // 🔥 re-call API with teamleader_id
+    if (index == 0) {
+      disbursementList.assignAll(allDisbursementList);
+      return;
+    }
+
+    final leader = teamleaderList[index - 1];
+
+    disbursementList.assignAll(
+      allDisbursementList.where((e) => e.id == leader.id).toList(),
+    );
   }
 
   void clearFilters() {

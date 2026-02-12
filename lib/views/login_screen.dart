@@ -91,7 +91,7 @@ class _LoginViewState extends State<LoginView> {
                   boxShadow: [
                     BoxShadow(
                       blurRadius: 12,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                       spreadRadius: 0,
                       color: Colors.black.withOpacity(.08),
                     ),
@@ -111,8 +111,7 @@ class _LoginViewState extends State<LoginView> {
                         keyboardType: TextInputType.phone,
                         maxLength: 10,
                         decoration: InputDecoration(
-                            suffixIcon: const SizedBox(
-                                width: 0), 
+                            suffixIcon: const SizedBox(width: 0),
                             isDense: true,
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 10.w, vertical: 10.h),
@@ -1150,7 +1149,7 @@ class LoanTypeSelector extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             blurRadius: 12,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
             spreadRadius: 0,
             color: Colors.black.withOpacity(.08),
           ),

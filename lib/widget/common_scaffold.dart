@@ -14,7 +14,6 @@ class CommonScaffold extends StatelessWidget {
   final bool isDrawer;
   final double height;
   final double bodyPadding;
-
   final Widget? bottomNavigationBar;
 
   CommonScaffold({

@@ -8,23 +8,19 @@ String disbursementModelToJson(DisbursementModel data) =>
 
 class DisbursementModel {
   List<DisbursementData> data;
-  disbursementTotals totals;
 
   DisbursementModel({
     required this.data,
-    required this.totals,
   });
 
   factory DisbursementModel.fromJson(Map<String, dynamic> json) =>
       DisbursementModel(
         data: List<DisbursementData>.from(
             json["data"].map((x) => DisbursementData.fromJson(x))),
-        totals: disbursementTotals.fromJson(json["totals"]),
       );
 
   Map<String, dynamic> toJson() => {
         "data": List<dynamic>.from(data.map((x) => x.toJson())),
-        "totals": totals.toJson(),
       };
 }
 

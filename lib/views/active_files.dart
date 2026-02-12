@@ -74,22 +74,20 @@ class _ActiveFilesState extends State<ActiveFiles> {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      title: widget.title,
-      isDrawer: widget.isDrawer,
-      showBack: widget.isShowBack,
-      // actions: [
-      //   Padding(
-      //     padding: const EdgeInsets.all(5.0),
-      //     child: IconButton(
-      //       onPressed: () => Get.to(() => const NotificationSCreen()),
-      //       icon: SvgPicture.asset('assets/images/notification.svg'),
-      //     ),
-      //   ),
-      // ],
-      key: _scaffoldKey,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        title: widget.title,
+        isDrawer: widget.isDrawer,
+        showBack: widget.isShowBack,
+        // actions: [
+        //   Padding(
+        //     padding: const EdgeInsets.all(5.0),
+        //     child: IconButton(
+        //       onPressed: () => Get.to(() => const NotificationSCreen()),
+        //       icon: SvgPicture.asset('assets/images/notification.svg'),
+        //     ),
+        //   ),
+        // ],
+        key: _scaffoldKey,
+        body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Container(
             color: AppColors.appBarTextColor,
             child:
@@ -144,95 +142,132 @@ class _ActiveFilesState extends State<ActiveFiles> {
             if (dataController.isLoading.value) {
               return const Center(child: LoadingPage());
             }
-            if (_activeFilesController.filteredList.isEmpty) {
+
+            final list = _activeFilesController.filteredList;
+
+            if (list.isEmpty) {
               return const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.no_sim, size: 50, color: Colors.grey),
                     SizedBox(height: 16),
-                    Text('No data entries available',
-                        style: TextStyle(fontSize: 16, color: Colors.grey)),
+                    Text(
+                      'No data entries available',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
                   ],
                 ),
               );
             }
-            return RefreshIndicator(
-              onRefresh: () => dataController.refreshData(),
-              child: ListView.builder(
-                  padding: const EdgeInsets.all(10),
-                  itemCount: _activeFilesController.filteredList.length,
-                  itemBuilder: (context, index) {
-                    //  var data = dataController.dataList[index];
-                    var data = _activeFilesController.filteredList[index];
 
-                    return CommonTitleCard(
-                      leading: Obx(
-                        () => SvgPicture.asset(
-                          'assets/images/phone_call.svg',
-                          color: _themeController.primaryColor.value,
-                        ),
-                      ),
-                      onLeadingTap: () {
-                        _dialerController.makePhoneCall(data.mobileNo ?? '',
-                            followUpId: data.id ?? '');
-                        _formController.mobile.value = data.mobileNo ?? "";
-                        _formController.bankName.value = data.bankName ?? "";
-                        _formController.customerName.value =
-                            data.customerName ?? "";
-                        _dialerController.customerName.value =
-                            data.customerName ?? '';
-                        _dialerController.datatype.value = '';
-                        _formController.remark.value = data.comments ?? '';
-                        _dialerController.followup_id.value = data.id ?? '';
-                        _dialerController.excel_id.value = '';
-                      },
-                      title: data.customerName ?? '',
-                      subtitle: data.loginBank ?? '',
-                      status: data.status ?? '',
-                      statusColor: data.dataStatus?.toLowerCase() == 'active'
-                          ? Colors.green.shade400
-                          : Colors.redAccent.shade200,
-                      amount:
-                          CurrencyUtils.formatIndianCurrency(data.loanAmount),
-                      showEdit: StaticStoredData.roleName != 'telecaller',
-                      onEdit: () {
-                        dataController.editLoadData();
-                        Get.to(DataEntryForm(
-                          id: data.id,
-                          tellecallerId: data.teleCallerId,
-                          dsaId: data.dsaName,
-                          bankerId: data.bankerId,
-                        ));
-                      },
-                      children: [
-                        // if (StaticStoredData.roleName == 'teamleader')
-                        //   _buildSingleRow(
-                        //       Icons.person_2_outlined, data.tcName ?? 'NA'),
-                        if (StaticStoredData.roleName != 'telecaller')
-                          _buildDoubleRow(
-                            iconLeft: Icons.headphones_outlined,
-                            valueLeft: data.tcName ?? '',
-                            iconRight: Icons.person_2_outlined,
-                            valueRight: data.tlName ?? '',
-                          ),
-                        _buildDoubleRow(
-                          iconLeft: 'assets/images/call.svg',
-                          valueLeft: maskFirst6Digits(data.mobileNo ?? ''),
-                          iconRight: 'assets/images/calendar.svg',
-                          valueRight: DateFormat('dd-MM-yyyy')
-                              .format(DateTime.parse(data.date.toString())),
-                        ),
-                        _buildSingleRow('assets/images/message_dots_circle.svg',
-                            data.comments ?? 'NA'),
-                      ],
-                    );
-                  }),
+            final totalAmount = list.fold<double>(
+              0,
+              (sum, item) =>
+                  sum + (double.tryParse(item.loanAmount.toString()) ?? 0),
             );
-          }))
-        ],
-      ),
-    );
+
+            return Column(children: [
+              totalSummaryRow(
+                totalCustomers: list.length,
+                totalAmount: CurrencyUtils.formatIndianCurrency(totalAmount),
+              ),
+              Expanded(child: Obx(() {
+                if (dataController.isLoading.value) {
+                  return const Center(child: LoadingPage());
+                }
+                if (_activeFilesController.filteredList.isEmpty) {
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.no_sim, size: 50, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Text('No data entries available',
+                            style: TextStyle(fontSize: 16, color: Colors.grey)),
+                      ],
+                    ),
+                  );
+                }
+                return RefreshIndicator(
+                  onRefresh: () => dataController.refreshData(),
+                  child: ListView.builder(
+                      padding: const EdgeInsets.all(10),
+                      itemCount: _activeFilesController.filteredList.length,
+                      itemBuilder: (context, index) {
+                        //  var data = dataController.dataList[index];
+                        var data = _activeFilesController.filteredList[index];
+
+                        return CommonTitleCard(
+                          leading: Obx(
+                            () => SvgPicture.asset(
+                              'assets/images/phone_call.svg',
+                              color: _themeController.primaryColor.value,
+                            ),
+                          ),
+                          onLeadingTap: () {
+                            _dialerController.makePhoneCall(data.mobileNo ?? '',
+                                followUpId: data.id ?? '');
+                            _formController.mobile.value = data.mobileNo ?? "";
+                            _formController.bankName.value =
+                                data.bankName ?? "";
+                            _formController.customerName.value =
+                                data.customerName ?? "";
+                            _dialerController.customerName.value =
+                                data.customerName ?? '';
+                            _dialerController.datatype.value = '';
+                            _formController.remark.value = data.comments ?? '';
+                            _dialerController.followup_id.value = data.id ?? '';
+                            _dialerController.excel_id.value = '';
+                          },
+                          title: data.customerName ?? '',
+                          subtitle: data.loginBank ?? '',
+                          status: data.status ?? '',
+                          statusColor:
+                              data.dataStatus?.toLowerCase() == 'active'
+                                  ? Colors.green.shade400
+                                  : Colors.redAccent.shade200,
+                          amount: CurrencyUtils.formatIndianCurrency(
+                              data.loanAmount),
+                          showEdit: StaticStoredData.roleName != 'telecaller',
+                          onEdit: () {
+                            dataController.editLoadData();
+                            Get.to(DataEntryForm(
+                              id: data.id,
+                              tellecallerId: data.teleCallerId,
+                              dsaId: data.dsaName,
+                              bankerId: data.bankerId,
+                            ));
+                          },
+                          children: [
+                            // if (StaticStoredData.roleName == 'teamleader')
+                            //   _buildSingleRow(
+                            //       Icons.person_2_outlined, data.tcName ?? 'NA'),
+                            if (StaticStoredData.roleName != 'telecaller')
+                              _buildDoubleRow(
+                                iconLeft: Icons.headphones_outlined,
+                                valueLeft: data.tcName ?? '',
+                                iconRight: Icons.person_2_outlined,
+                                valueRight: data.tlName ?? '',
+                              ),
+                            _buildDoubleRow(
+                              iconLeft: 'assets/images/call.svg',
+                              valueLeft: maskFirst6Digits(data.mobileNo ?? ''),
+                              iconRight: 'assets/images/calendar.svg',
+                              valueRight: DateFormat('dd-MM-yyyy')
+                                  .format(DateTime.parse(data.date.toString())),
+                            ),
+                            _buildSingleRow(
+                                'assets/images/message_dots_circle.svg',
+                                data.comments ?? 'NA'),
+                          ],
+                        );
+                      }),
+                );
+              }))
+            ]);
+          })),
+        ]));
   }
 
   Widget _buildDoubleRow({
@@ -326,5 +361,101 @@ class _ActiveFilesState extends State<ActiveFiles> {
   String maskFirst6Digits(String number) {
     if (number.length < 6) return number; // Handle edge case
     return 'xxxxxx${number.substring(6)}';
+  }
+
+  Widget totalSummaryRow({
+    required int totalCustomers,
+    required String totalAmount,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.primaryColor,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // CUSTOMERS
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.people, color: Colors.white, size: 16),
+              ),
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Customers",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                    ),
+                  ),
+                  Text(
+                    totalCustomers.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          /// DIVIDER
+          Container(
+            height: 28,
+            width: 1,
+            color: Colors.white.withOpacity(.3),
+          ),
+
+          /// AMOUNT
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.currency_rupee,
+                    color: Colors.white, size: 16),
+              ),
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Amount",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                    ),
+                  ),
+                  Text(
+                    totalAmount,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

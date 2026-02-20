@@ -61,6 +61,7 @@ class LoginRequestScreen extends StatelessWidget {
               SearchBarWithClear(
                   controller: controller.searchController,
                   onChanged: (value) => controller.filterLoginRequests(),
+                  showDatePickerIcon: false,
                   onClear: () {
                     controller.clearFilters();
                     controller.filterLoginRequests();
@@ -118,6 +119,10 @@ class LoginRequestScreen extends StatelessWidget {
                             title: data.customerName,
                             subtitle: data.bankName ?? '',
                             status: data.title ?? '',
+                            date: DateFormat('dd-MM-yyyy').format(
+                                DateTime.parse(
+                                    data.loginRequestDate.toString())),
+                            mobNo: maskFirst6Digits(data.contactNumber),
                             statusColor:
                                 (data.title ?? '').toLowerCase() != 'not doable'
                                     ? Colors.green.shade400
@@ -148,13 +153,19 @@ class LoginRequestScreen extends StatelessWidget {
                             },
                             children: [
                               _buildDoubleRow(
-                                  iconLeft: 'assets/images/call.svg',
-                                  valueLeft:
-                                      maskFirst6Digits(data.contactNumber),
-                                  iconRight: 'assets/images/calendar.svg',
-                                  valueRight: DateFormat('dd-MM-yyyy').format(
-                                      DateTime.parse(
-                                          data.loginRequestDate.toString()))),
+                                iconLeft: Icons.headphones_outlined,
+                                valueLeft: data.tellecallerName ?? '',
+                                iconRight: Icons.person_2_outlined,
+                                valueRight: data.tlName ?? '',
+                              ),
+                              // _buildDoubleRow(
+                              //     iconLeft: 'assets/images/call.svg',
+                              //     valueLeft:
+                              //         maskFirst6Digits(data.contactNumber),
+                              //     iconRight: 'assets/images/calendar.svg',
+                              //     valueRight: DateFormat('dd-MM-yyyy').format(
+                              //         DateTime.parse(
+                              //             data.loginRequestDate.toString()))),
                               _buildSingleRow(
                                   'assets/images/message_dots_circle.svg',
                                   data.remark.isEmpty

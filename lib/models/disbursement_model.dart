@@ -28,6 +28,7 @@ class DisbursementData {
   String id;
   String name;
   String? profileImage;
+  String teamleaderId;
   String loginCount;
   String disbursedCount;
   String amount;
@@ -36,6 +37,7 @@ class DisbursementData {
     required this.id,
     required this.name,
     required this.profileImage,
+    required this.teamleaderId,
     required this.loginCount,
     required this.disbursedCount,
     required this.amount,
@@ -46,6 +48,7 @@ class DisbursementData {
         id: json["id"],
         name: json["name"],
         profileImage: json["profile_image"] ?? '',
+        teamleaderId: json['teamleader_id'],
         loginCount: json["login_count"],
         disbursedCount: json["disbursed_count"],
         amount: json["amount"],
@@ -55,6 +58,7 @@ class DisbursementData {
         "id": id,
         "name": name,
         "profileImage": profileImage,
+        "teamleader_id": teamleaderId,
         "login_count": loginCount,
         "disbursed_count": disbursedCount,
         "amount": amount,

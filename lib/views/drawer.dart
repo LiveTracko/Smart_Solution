@@ -4,19 +4,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
-import 'package:smart_solutions/controllers/follow_form_controller.dart';
-import 'package:smart_solutions/controllers/internet_checker.dart';
+
 import 'package:smart_solutions/controllers/profile_controller.dart';
-import 'package:smart_solutions/controllers/theme_controller.dart';
-import 'package:smart_solutions/core/app_bindings.dart';
 import 'package:smart_solutions/views/followBackForm.dart';
 import 'package:smart_solutions/views/forget_password.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_request_screen.dart';
-import 'package:smart_solutions/views/login_screen.dart';
 import 'package:smart_solutions/views/theme_change_screen.dart';
 
-import '../routes/app_routes.dart';
+import '../controllers/theme_controller.dart';
 import '../services/logout_helper.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -28,9 +24,10 @@ class CustomDrawer extends StatefulWidget {
 
 class _CustomDrawerState extends State<CustomDrawer> {
   final ProfileController _profileController = Get.find<ProfileController>();
-  final FollowBackFormController _followBackFormController =
-      Get.find<FollowBackFormController>();
+
   String _userName = "";
+
+  final ThemeController themeController = Get.find<ThemeController>();
 
   @override
   void initState() {
@@ -53,8 +50,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     return SafeArea(
       top: true,
       child: Drawer(
-        width: MediaQuery.of(context).size.width *
-            0.65, // slightly wider for better visibility
+        width: MediaQuery.of(context).size.width * 0.65,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(topRight: Radius.circular(30)),
         ),
@@ -63,60 +59,63 @@ class _CustomDrawerState extends State<CustomDrawer> {
             Column(
               children: [
                 // ================= HEADER =================
-                Container(
-                  height: screenHeight.clamp(500, 900) * 0.25,
-                  width: double.infinity,
-                  padding: EdgeInsets.only(
-                    left: 16.w,
-                    top: 16.h,
-                    right: 16.w,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor,
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(30),
+                Obx(
+                  () => Container(
+                    height: screenHeight.clamp(500, 900) * 0.25,
+                    width: double.infinity,
+                    padding: EdgeInsets.only(
+                      left: 16.w,
+                      top: 16.h,
+                      right: 16.w,
                     ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InkWell(
-                        //onTap: () => Get.to(() => ProfilePage()),
-                        child: CircleAvatar(
-                          radius: screenHeight * 0.05, // responsive avatar
-                          backgroundColor: Colors.white,
-                          backgroundImage: _profileController.imageFile.value !=
-                                  null
-                              ? FileImage(_profileController.imageFile.value!)
-                              : (_profileController
-                                      .profileImageUrl.value.isNotEmpty
-                                  ? NetworkImage(
-                                      _profileController.profileImageUrl.value)
-                                  : const AssetImage(
-                                          "assets/images/app_login.png")
-                                      as ImageProvider),
+                    decoration: BoxDecoration(
+                      color: themeController.primaryColor.value,
+                      borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(30),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          //onTap: () => Get.to(() => ProfilePage()),
+                          child: CircleAvatar(
+                            radius: screenHeight * 0.05, // responsive avatar
+                            backgroundColor: Colors.white,
+                            backgroundImage: _profileController
+                                        .imageFile.value !=
+                                    null
+                                ? FileImage(_profileController.imageFile.value!)
+                                : (_profileController
+                                        .profileImageUrl.value.isNotEmpty
+                                    ? NetworkImage(_profileController
+                                        .profileImageUrl.value)
+                                    : const AssetImage(
+                                            "assets/images/app_login.png")
+                                        as ImageProvider),
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        _userName.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        SizedBox(height: 8.h),
+                        Text(
+                          _userName.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 5.h,
-                      ),
-                      Text(
-                        StaticStoredData.roleName.isEmpty
-                            ? StaticStoredData.roleName.toUpperCase()
-                            : "",
-                        style: TextStyle(
-                            fontSize: 12.sp, color: AppColors.whiteColor),
-                      ),
-                    ],
+                        SizedBox(
+                          height: 5.h,
+                        ),
+                        Text(
+                          StaticStoredData.roleName.isEmpty
+                              ? StaticStoredData.roleName.toUpperCase()
+                              : "",
+                          style: TextStyle(
+                              fontSize: 12.sp, color: AppColors.whiteColor),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -187,19 +186,24 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           'Log Out',
                           () async {
                             // Show a quick confirmation dialog
-                            Get.defaultDialog(
-                                title: "Logout",
-                                middleText: "Are you sure you want to logout?",
-                                textConfirm: "Yes",
-                                textCancel: "No",
-                                confirmTextColor: Colors.white,
-                                onConfirm: () async {
-                                  // Close the dialog
-                                  Get.back();
 
-                                  // Pass the CURRENT context to the helper
-                                  await LogoutHelper.logout(context);
-                                });
+                            showLogoutDialog(context);
+
+                            // Get.defaultDialog(
+                            //     title: "Logout",
+                            //     middleText: "Are you sure you want to logout?",
+                            //     textConfirm: "Yes",
+                            //     textCancel: "No",
+                            //     confirmTextColor: Colors.white,
+                            //     onConfirm: () async {
+                            //       // Close the dialog
+                            //       Get.back();
+
+                            //       // Pass the CURRENT context to the helper
+                            //       await LogoutHelper.logout(context);
+                            //     });
+
+                            //previous logout  on upper side
 
                             // final prefs = await SharedPreferences.getInstance();
                             // await prefs.clear();
@@ -318,4 +322,114 @@ class _CustomDrawerState extends State<CustomDrawer> {
       onTap: onTap,
     );
   }
+}
+
+void showLogoutDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.white,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// 🔵 Icon Circle
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF1976D2).withOpacity(0.1),
+                ),
+                child: const Icon(
+                  Icons.logout_rounded,
+                  color: Color(0xFF1976D2),
+                  size: 32,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                "Logout",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              const Text(
+                "Are you sure you want to logout?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+
+              const SizedBox(height: 25),
+
+              /// Buttons Row
+              Row(
+                children: [
+                  /// Cancel Button
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFF1976D2)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Get.back();
+                      },
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: Color(0xFF1976D2),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  /// Confirm Button
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1976D2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () async {
+                        Get.back();
+                        await LogoutHelper.logout(context);
+                      },
+                      child: const Text(
+                        "Logout",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }

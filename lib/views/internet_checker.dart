@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/internet_checker.dart';
@@ -10,7 +9,7 @@ class InternetChecker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<ConnectivityController>();
+    final controller = Get.put(ConnectivityController());
 
     return Obx(() {
       if (!controller.isOnline.value) {

@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import 'package:smart_solutions/controllers/chartCard_controller.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
 class ChartCardsToggle extends StatelessWidget {
   final List<String> data;
 
-  // 🔥 Custom size parameters
   final double height;
   final double width;
   final double fontSize;

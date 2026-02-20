@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/models/loan_status_model.dart';
 import 'package:smart_solutions/models/login_request_bank_list_model';
 import 'package:smart_solutions/models/login_request_list_model.dart'; // Ensure this model is defined
@@ -47,6 +48,8 @@ class LoginRequestController extends GetxController {
   RxList<dynamic> todayCount = <dynamic>[].obs;
   RxList<dynamic> monthlyCount = <dynamic>[].obs;
 
+  final CommonFilterController filterController =
+      Get.find<CommonFilterController>();
   @override
   void onInit() async {
     super.onInit();
@@ -285,6 +288,11 @@ class LoginRequestController extends GetxController {
     }
   }
 
+  @override
+  void onClose() {
+    filterController.clearFilters();
+    super.onClose();
+  }
 //filter
   // void filterLoginRequests({String query = ''}) {
   //   if (query.isNotEmpty) {
@@ -300,30 +308,78 @@ class LoginRequestController extends GetxController {
   //   }).toList();
   // }
 
+  // void filterLoginRequests() {
+  //   final search = searchController.text.trim().toLowerCase();
+
+  //   // selected chip text
+  //   final selectedIndex = selectedFilter.value;
+  //   final hasChipSelected = selectedIndex != 0;
+  //   final chipText =
+  //       hasChipSelected ? filters[selectedIndex].toLowerCase() : '';
+
+  //   loginRequestList.value = allLoginRequestList.where((item) {
+  //     final name = item.customerName.toLowerCase();
+  //     final mobile = item.contactNumber.toLowerCase();
+  //     final title = (item.title ?? '').toLowerCase();
+
+  //     // 🔍 Search check
+  //     final searchMatch = search.isEmpty ||
+  //         name.contains(search) ||
+  //         mobile.contains(search) ||
+  //         title.contains(search);
+
+  //     // 🟦 Chip check
+  //     final chipMatch = !hasChipSelected || title == chipText;
+
+  //     return searchMatch && chipMatch;
+  //   }).toList();
+  // }
+
   void filterLoginRequests() {
     final search = searchController.text.trim().toLowerCase();
 
-    // selected chip text
     final selectedIndex = selectedFilter.value;
     final hasChipSelected = selectedIndex != 0;
     final chipText =
         hasChipSelected ? filters[selectedIndex].toLowerCase() : '';
+
+    final isDateSelected = filterController.selectedRange.value;
 
     loginRequestList.value = allLoginRequestList.where((item) {
       final name = item.customerName.toLowerCase();
       final mobile = item.contactNumber.toLowerCase();
       final title = (item.title ?? '').toLowerCase();
 
-      // 🔍 Search check
+      /// 🔍 Search check
       final searchMatch = search.isEmpty ||
           name.contains(search) ||
           mobile.contains(search) ||
           title.contains(search);
 
-      // 🟦 Chip check
+      /// 🟦 Chip check
       final chipMatch = !hasChipSelected || title == chipText;
 
-      return searchMatch && chipMatch;
+      /// 📅 Date range check
+      bool dateMatch = true;
+
+      // if (isDateSelected && item.loginRequestDate != null) {
+      //   try {
+      //     final itemDate = DateTime.parse(item.loginRequestDate.toString());
+
+      //     final normalizedItem =
+      //         DateTime(itemDate.year, itemDate.month, itemDate.day);
+      //     final normalizedFrom =
+      //         DateTime(fromDate.year, fromDate.month, fromDate.day);
+      //     final normalizedTo = DateTime(toDate.year, toDate.month, toDate.day);
+
+      //     dateMatch = !normalizedItem.isBefore(normalizedFrom) &&
+      //         !normalizedItem.isAfter(normalizedTo);
+      //   } catch (_) {
+      //     dateMatch = false;
+      //   }
+      // }
+
+      return searchMatch && chipMatch && dateMatch;
     }).toList();
   }
 

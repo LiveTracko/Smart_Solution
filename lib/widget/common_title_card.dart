@@ -18,21 +18,26 @@ class CommonTitleCard extends StatelessWidget {
   final VoidCallback? onLeadingTap;
   final ValueChanged<bool>? onExpansionChanged;
   String? followupdate;
+  final String? date;
+  String? mobNo;
 
-  CommonTitleCard(
-      {super.key,
-      this.leading,
-      required this.title,
-      required this.subtitle,
-      this.status,
-      this.statusColor,
-      required this.amount,
-      required this.children,
-      this.showEdit = false,
-      this.onEdit,
-      this.onLeadingTap,
-      this.onExpansionChanged,
-      this.followupdate});
+  CommonTitleCard({
+    super.key,
+    this.leading,
+    required this.title,
+    required this.subtitle,
+    this.status,
+    this.statusColor,
+    required this.amount,
+    required this.children,
+    this.showEdit = false,
+    this.onEdit,
+    this.onLeadingTap,
+    this.onExpansionChanged,
+    this.followupdate,
+    this.date,
+    this.mobNo,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +59,43 @@ class CommonTitleCard extends StatelessWidget {
         padding: const EdgeInsets.all(4.0),
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (date != null && date!.isNotEmpty)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                    decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(8)),
+                    child: Text(
+                      date.toString(),
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                if (status != null && status!.isNotEmpty)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: statusColor,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                    child: Text(
+                      status ?? '',
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             ExpansionTile(
               minTileHeight: 40,
               tilePadding: EdgeInsets.zero,
@@ -78,10 +120,9 @@ class CommonTitleCard extends StatelessWidget {
                     maxLines: null,
                     overflow: TextOverflow.visible,
                     style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -143,23 +184,26 @@ class CommonTitleCard extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (status != null && status!.isNotEmpty)
-                        Container(
-                          decoration: BoxDecoration(
-                            color: statusColor,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 3),
-                          child: Text(
-                            status ?? '',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
+                      // if (status != null && status!.isNotEmpty)
+                      //   Container(
+                      //     decoration: BoxDecoration(
+                      //       color: statusColor,
+                      //       borderRadius: BorderRadius.circular(6),
+                      //     ),
+                      //     padding: const EdgeInsets.symmetric(
+                      //         horizontal: 5, vertical: 3),
+                      //     child: Text(
+                      //       status ?? '',
+                      //       style: const TextStyle(
+                      //         fontSize: 10,
+                      //         color: Colors.white,
+                      //         fontWeight: FontWeight.bold,
+                      //       ),
+                      //     ),
+                      //   ),
+                      if (mobNo != null && mobNo!.isNotEmpty)
+                        Text(mobNo.toString()),
+
                       showEdit
                           ? GestureDetector(
                               onTap: onEdit,

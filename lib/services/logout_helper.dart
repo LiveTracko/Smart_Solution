@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/routes/app_routes.dart';
-import '../controllers/internet_checker.dart';
-import '../controllers/theme_controller.dart';
+
 import '../constants/static_stored_data.dart';
+import '../controllers/internet_checker.dart';
 
 class LogoutHelper {
   // Add BuildContext as a parameter
@@ -18,18 +19,9 @@ class LogoutHelper {
 
     // 2. Clear GetX state
     // We use force: true to ensure all controllers are removed
-    await Get.deleteAll(force: true);
+    Get.deleteAll(force: true);
 
-    // 3. Navigation using Native Flutter Context
-    // This bypasses "Get.offAll" and its reliance on Get.key
-    if (context.mounted) {
-      // Native navigation doesn't depend on Get.key
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.login,
-        (route) => false, // This clears the entire backstack
-      );
-    }
-
+    Get.offAllNamed(AppRoutes.login);
     // 4. Re-initialize after navigation if needed
     Get.put(ConnectivityController(), permanent: true);
     Get.put(ThemeController(), permanent: true);

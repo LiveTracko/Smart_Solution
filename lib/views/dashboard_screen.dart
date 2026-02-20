@@ -57,7 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   final LoginRequestController _loginRequestController =
       Get.find<LoginRequestController>();
 
-  final DataController _dataController = Get.put(DataController());
+  final DataController _dataController = Get.find<DataController>();
 
   final DisbursementDetailsController _disbursementDetailsController =
       Get.find<DisbursementDetailsController>();
@@ -76,6 +76,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   final ThemeController themeController = Get.find<ThemeController>();
 
   final bool isNotTelecaller = StaticStoredData.roleName != 'telecaller';
+  
 
   @override
   void initState() {
@@ -89,7 +90,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       themeController.loadSavedTheme();
     });
-
+    controller.onInit();
     super.initState();
   }
 
@@ -663,13 +664,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                                     ),
 
                                     primaryYAxis: const NumericAxis(
-                                      labelFormat: '{value}',
-                                      majorGridLines: MajorGridLines(width: 0),
-                                      axisLine: AxisLine(
-                                          width: 1, color: Colors.grey),
-                                      // Add padding to Y axis as well
-                                      plotOffset: 10,
-                                    ),
+                                        labelFormat: '{value}',
+                                        majorGridLines:
+                                            MajorGridLines(width: 0),
+                                        axisLine: AxisLine(
+                                            width: 1, color: Colors.grey),
+                                        // Add padding to Y axis as well
+                                        plotOffset: 10),
                                     tooltipBehavior:
                                         TooltipBehavior(enable: true),
                                     legend: const Legend(
@@ -1057,7 +1058,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                         controller.totalValActive.toString(),
                                     statusColor: Colors.green,
                                     onPress: () {
-                                      Get.to(ActiveFiles(
+                                      Get.to(const ActiveFiles(
                                         title: 'Active Files',
                                         status: 1,
                                         isShowBack: true,
@@ -2676,7 +2677,6 @@ class _DashboardScreenState extends State<DashboardScreen>
         if (date != null) {
           controller.dateRange.value =
               "${date.day}-${date.month}-${date.year},${date.day}-${date.month}-${date.year}";
-          print(controller.dateRange.value);
         }
       }
       await controller.getTimeGraph();

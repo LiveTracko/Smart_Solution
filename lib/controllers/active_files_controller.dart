@@ -6,7 +6,6 @@ import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/models/data_entery_model.dart';
 
 class ActiveFilesController extends GetxController {
-  var dataList = <Data>[].obs;
   var filteredList = <Data>[].obs;
 
   final DataController dataController = Get.find<DataController>();
@@ -24,44 +23,58 @@ class ActiveFilesController extends GetxController {
   void onInit() {
     super.onInit();
 
-    loadData();
+    ever(filterController.selectedRange, (_) {
+      dataController.fetchDataEntryList();
+    });
 
-    // Listen for changes that should trigger filtering
-    ever(dataList, (_) => updateFilteredList());
-    ever(filterController.selectedFilter, (_) => updateFilteredList());
-    ever(filterController.selectedDate, (_) => updateFilteredList());
-    ever(filterController.isDateSelected, (_) => updateFilteredList());
-
-    // Listen to chart card changes
-    ever(_chartCardsController.selectedIndex, (index) {
-      if (index == 0) {
-        currentStatus.value = 1; // Active
-      } else if (index == 1) {
-        currentStatus.value = 2; // Inactive
-      }
-
-      // Reset all filters
-      filterController.clearFilters();
-
-      // Update list
+    ever<List<Data>>(dataController.dataList, (_) {
       updateFilteredList();
     });
 
-    // Initialize
+    ever(filterController.selectedFilter, (_) => updateFilteredList());
+
+    filterController.searchController.addListener(() {
+      dataController.searchText.value = filterController.searchController.text;
+
+      dataController.fetchDataEntryList();
+    });
+
+    ever(_chartCardsController.selectedIndex, (index) {
+      currentStatus.value = index == 0 ? 1 : 2;
+      filterController.clearFilters();
+      updateFilteredList();
+    });
+
     currentStatus.value = 1;
-    updateFilteredList();
   }
+
+  // void _handleDateChange() {
+  //   final from = filterController.fromDate.value;
+  //   final to = filterController.toDate.value;
+
+  //   if (from != null && to != null) {
+  //     if (!dataController.isLoading.value) {
+  //       dataController.fetchDataEntryList();
+  //     }
+  //   }
+
+  //   if (from == null && to == null) {
+  //     if (!dataController.isLoading.value) {
+  //       dataController.fetchDataEntryList();
+  //     }
+  //   }
+  // }
 
   @override
   void onReady() {
     super.onReady();
-    // Listen to search text changes using a different approach
+
     filterController.searchController.addListener(_onSearchTextChanged);
   }
 
   @override
   void onClose() {
-    // Clean up the listener
+    _chartCardsController.selectedIndex.value = 0;
     filterController.searchController.removeListener(_onSearchTextChanged);
     super.onClose();
   }
@@ -70,52 +83,32 @@ class ActiveFilesController extends GetxController {
     updateFilteredList();
   }
 
-  void loadData() {
-    dataList.assignAll(dataController.dataList);
-  }
-
-  void updateFilteredList({String query = ''}) {
+  void updateFilteredList() {
     try {
-      // Step 1: Filter by current status (Active/Inactive)
-      List<Data> tempList = dataList.where((item) {
+      final source = dataController.dataList;
+
+      if (source.isEmpty) {
+        filteredList.clear();
+        return;
+      }
+
+      List<Data> tempList = source.where((item) {
         if (currentStatus.value == 1) {
           return item.dataStatus?.toLowerCase() == 'active';
         } else if (currentStatus.value == 2) {
           return item.dataStatus?.toLowerCase() == 'inactive';
         }
-        return item.dataStatus?.toLowerCase() == 'active';
+        return true;
       }).toList();
 
-      // 1️⃣ Build filter names for chips
       final names = tempList
           .map((e) => e.status ?? '')
           .where((e) => e.isNotEmpty)
           .toSet()
           .toList();
+
       filterController.setFilters(names);
 
-      // 🔥 Clear old list before filtering
-      filteredList.clear();
-
-      if (filterController.isDateSelected.value &&
-          filterController.selectedDate.value != null) {
-        final selectedDate = filterController.selectedDate.value!;
-        tempList = tempList.where((item) {
-          if (item.date == null) return false;
-          try {
-            final itemDate = DateTime.parse(item.date.toString());
-            // Compare only year, month, day (ignore time)
-            return itemDate.year == selectedDate.year &&
-                itemDate.month == selectedDate.month &&
-                itemDate.day == selectedDate.day;
-          } catch (e) {
-            print('Date parsing error: $e');
-            return false;
-          }
-        }).toList();
-      }
-
-      // Step 3: Apply status filter from chips
       if (filterController.selectedFilter.value > 0 &&
           filterController.selectedFilter.value <
               filterController.filters.length) {
@@ -130,23 +123,8 @@ class ActiveFilesController extends GetxController {
         }
       }
 
-      // Step 4: Apply text search
-      final query = filterController.searchController.text.trim().toLowerCase();
-      if (query.isNotEmpty) {
-        tempList = tempList.where((item) {
-          return (item.customerName ?? '').toLowerCase().contains(query) ||
-              (item.tcName ?? '').toLowerCase().contains(query) ||
-              (item.tlName ?? '').toLowerCase().contains(query) ||
-              (item.mobileNo ?? '').toLowerCase().contains(query) ||
-              (item.bankName ?? '').toLowerCase().contains(query) ||
-              (item.comments ?? '').toLowerCase().contains(query);
-        }).toList();
-      }
-
-      // Update the filtered list
       filteredList.assignAll(tempList);
     } catch (e) {
-      print('Error in updateFilteredList: $e');
       filteredList.assignAll([]);
     }
   }

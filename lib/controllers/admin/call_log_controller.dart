@@ -23,12 +23,15 @@ class AdminCallLogController extends GetxController {
 
   // Data
   var teamLeaderList = <TeamleaderData>[].obs;
-  var callLogData = <Datum>[].obs;
+  // var callLogData = <Datum>[].obs;
+
+  RxList<Datum> callLogData = <Datum>[].obs;
+  List<Datum> _originalCallLog = [];
 
   @override
   void onInit() {
     super.onInit();
-    getCallLogData(); // default load
+    getCallLogData(teamLeaderId: StaticStoredData.userId);
   }
 
   // ---------------- TEAM LEADER FILTER API ----------------
@@ -60,17 +63,30 @@ class AdminCallLogController extends GetxController {
   void selectFilter(int index) {
     selectedFilter.value = index;
 
-    if (index == 0) {
-      getCallLogData();
-    } else {
-      final telecallerId = teamLeaderList[index - 1].id;
-      getCallLogData(teamLeaderId: telecallerId);
+    // if (index == 0) {
+    //   getCallLogData();
+    // } else {
+
+    String? teamleader = getSelectedTeamLeaderId();
+    filterCallLogs(teamLeaderId: teamleader);
+    // }
+  }
+
+  String? getSelectedTeamLeaderId() {
+    if (selectedFilter.value == 0) return null; // "All" selected
+
+    if (selectedFilter.value < filters.length) {
+      final selectedName = filters[selectedFilter.value];
+      final tl = teamLeaderList.firstWhereOrNull((e) => e.name == selectedName);
+      return tl?.id;
     }
+    return null;
   }
 
   void clearFilters() {
     selectedFilter.value = 0;
     searchController.clear();
+
     getCallLogData();
   }
 
@@ -88,9 +104,11 @@ class AdminCallLogController extends GetxController {
 
       if (response.statusCode == 200) {
         final model = CallLogModel.fromJson(jsonDecode(response.body));
-        callLogData.assignAll(model.data);
-      } else {
-        callLogData.clear();
+
+        _originalCallLog = model.data;
+
+        // Initially show all data
+        callLogData.assignAll(_originalCallLog);
       }
     } catch (e) {
       debugPrint("Call log API error: $e");
@@ -98,5 +116,27 @@ class AdminCallLogController extends GetxController {
     } finally {
       isCallLogLoading.value = false;
     }
+  }
+
+  void filterCallLogs({
+    String? teamLeaderId,
+    String? searchQuery,
+  }) {
+    List<Datum> filteredList = _originalCallLog;
+
+    // Filter by team leader
+    if (teamLeaderId != null && teamLeaderId.isNotEmpty) {
+      filteredList =
+          filteredList.where((e) => e.teamleaderId == teamLeaderId).toList();
+    }
+
+    // Filter by search
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      filteredList = filteredList.where((e) {
+        return e.name.toLowerCase().contains(searchQuery.toLowerCase());
+      }).toList();
+    }
+
+    callLogData.assignAll(filteredList);
   }
 }

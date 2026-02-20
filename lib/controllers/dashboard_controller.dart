@@ -126,21 +126,6 @@ class DashboardController extends GetxController
   Map<String, dynamic> activeNoCallMap = {};
   Map<String, dynamic> activeAttemptMap = {};
 
-  // List<SalesData> data = [
-  //   SalesData(month: 'jan', data: 300),
-  //   SalesData(month: 'Feb', data: 400),
-  //   SalesData(month: 'Mar', data: 100),
-  //   SalesData(month: 'Apr', data: 600),
-  //   SalesData(month: 'May', data: 200),
-  //   SalesData(month: 'Jun', data: 300),
-  //   SalesData(month: 'Jul', data: 400),
-  //   SalesData(month: 'Aug', data: 100),
-  //   SalesData(month: 'Sep', data: 700),
-  //   SalesData(month: 'Oct', data: 200),
-  //   SalesData(month: 'Nov', data: 1000),
-  //   SalesData(month: 'Dec', data: 200),
-  // ];
-
   List<Color> tileColors = const [
     Color(0xFFE3F2FD),
     Color(0xFFE1F5FE),
@@ -162,32 +147,14 @@ class DashboardController extends GetxController
     isDrawerOpen.value = false;
 
     _loadInitialData();
-    // _attachScrollListener();
-
-    // Future.microtask(() async {
-    //   isLoading.value = true;
-
-    //   try {
-    //     await getTimeGraph();
-    //     await _callLogController.getCallLogData();
-    //     getTopDisburseUser();
-    //     getActiveData(status: 1);
-    //     getActiveData(status: 2);
-    //     loadTodayAndMonthlyData();
-    //     //   await loadtellecallerTabData(0);
-
-    //     // _callLogController.getCallLogData();
-    //   } catch (e) {
-    //     logOutput('Error fetching dashboard data: $e');
-    //   } finally {
-    //     isLoading.value = false;
-    //   }
-    // });
 
     super.onInit();
   }
 
-  /// 🔁 SAFE manual refresh (for tab switch)
+  void resetState() {
+    isLoading.value = true;
+  }
+
   Future<void> refreshDashboard() async {
     if (isLoading.value) return;
     _loadInitialData();

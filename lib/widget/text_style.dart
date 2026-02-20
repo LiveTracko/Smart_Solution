@@ -4,9 +4,8 @@ import 'package:get/get.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import '../controllers/theme_controller.dart';
 
-final ThemeController themeController = Get.find<ThemeController>();
-
 class AppTextStyle {
+  static final ThemeController themeController = Get.find<ThemeController>();
   static const hintText = TextStyle(
       fontSize: 15, color: AppColors.secondayColor, fontFamily: 'Poppins');
 

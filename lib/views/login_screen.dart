@@ -14,7 +14,7 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  final LoginViewModel controller = Get.find();
+  final LoginViewModel controller = Get.find<LoginViewModel>();
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
 
@@ -46,7 +46,8 @@ class _LoginViewState extends State<LoginView> {
 
               Center(
                 child: Image.asset(
-                  'assets/images/app_logo_with_name.png',
+                  'assets/images/app_logo.png',
+                  // 'assets/images/app_logo_with_name.png',
                   fit: BoxFit.contain,
                   height: 80,
                 ),

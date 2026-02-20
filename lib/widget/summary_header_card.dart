@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:smart_solutions/theme/app_theme.dart';
 
 import '../controllers/theme_controller.dart';
 
@@ -113,7 +114,7 @@ class SummaryHeaderCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _totalBadge(title),
+            _totalBadge(title, duration),
             // Expanded(
             //   child: Column(
             //     mainAxisSize: MainAxisSize.min,
@@ -149,7 +150,7 @@ class SummaryHeaderCard extends StatelessWidget {
   }
 }
 
-Widget _totalBadge(int total) {
+Widget _totalBadge(int total, String? duration) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     decoration: BoxDecoration(
@@ -165,18 +166,38 @@ Widget _totalBadge(int total) {
         ),
       ],
     ),
-    child: Row(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Icon(Icons.summarize, color: Colors.white, size: 16),
-        const SizedBox(width: 6),
-        Text(
-          total.toString(),
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
+        Row(
+          children: [
+            const Icon(Icons.summarize, color: Colors.white, size: 16),
+            const SizedBox(width: 6),
+            Text(
+              total.toString(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
+        // duration!.isNotEmpty
+        //     ? Row(
+        //         children: [
+        //           const Icon(Icons.timer, color: Colors.white, size: 16),
+        //           const SizedBox(width: 6),
+        //           Text(
+        //             duration,
+        //             style: const TextStyle(
+        //                 fontSize: 14,
+        //                 fontWeight: FontWeight.w600,
+        //                 color: AppColors.appBarTextColor),
+        //           ),
+        //         ],
+        //       )
+        //     : const SizedBox.shrink()
       ],
     ),
   );

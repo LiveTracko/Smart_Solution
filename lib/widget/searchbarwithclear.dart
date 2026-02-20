@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+
+import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 
 class SearchBarWithClear extends StatefulWidget {
@@ -8,7 +11,7 @@ class SearchBarWithClear extends StatefulWidget {
   final ValueChanged<String> onChanged;
   final TextInputType textInputType;
   final FocusNode? focusNode;
-  final ValueChanged<DateTime?>? onDateSelected;
+  final ValueChanged<DateTimeRange?>? onDateRangeSelected;
   final DateTime? initialDate;
   final DateTime? firstDate;
   final DateTime? lastDate;
@@ -23,7 +26,7 @@ class SearchBarWithClear extends StatefulWidget {
     required this.onChanged,
     this.textInputType = TextInputType.text,
     this.focusNode,
-    this.onDateSelected,
+    this.onDateRangeSelected,
     this.initialDate,
     this.firstDate,
     this.lastDate,
@@ -33,21 +36,19 @@ class SearchBarWithClear extends StatefulWidget {
   }) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _SearchBarWithClearState createState() => _SearchBarWithClearState();
 }
 
 class _SearchBarWithClearState extends State<SearchBarWithClear> {
-  bool _isDateSelected = false;
-  DateTime? _selectedDate;
   final FocusNode _internalFocusNode = FocusNode();
+
+  final CommonFilterController _commonFilterController =
+      Get.find<CommonFilterController>();
 
   @override
   void initState() {
     super.initState();
-    // Use provided focus node or create internal one
-    final focusNode = widget.focusNode ?? _internalFocusNode;
-
-    // Listen to text changes to update UI
     widget.controller.addListener(_onTextChanged);
   }
 
@@ -66,66 +67,35 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
 
   Future<void> _showDatePicker() async {
     final FocusNode focusNode = widget.focusNode ?? _internalFocusNode;
-    focusNode.unfocus(); // Hide keyboard before showing date picker
+    focusNode.unfocus();
 
-    final DateTime? pickedDate = await showDatePicker(
+    final DateTimeRange? pickedRange = await showDateRangePicker(
       context: context,
-      initialDate: _selectedDate ?? widget.initialDate ?? DateTime.now(),
       firstDate: widget.firstDate ?? DateTime(2000),
       lastDate: widget.lastDate ?? DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Theme.of(context).primaryColor,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
-            ),
-            dialogBackgroundColor: Colors.white,
-          ),
-          child: child!,
-        );
-      },
+      initialDateRange: _commonFilterController.selectedRange.value,
     );
 
-    if (pickedDate != null) {
-      setState(() {
-        _isDateSelected = true;
-        _selectedDate = pickedDate;
-        widget.controller.clear(); // Clear any search text
-        widget.onDateSelected?.call(pickedDate);
-      });
-    } else if (pickedDate == null && _isDateSelected) {
-      setState(() {
-        _isDateSelected = false;
-        _selectedDate = null;
-        widget.onDateSelected?.call(null);
-      });
+    if (pickedRange != null) {
+      _commonFilterController.setSelectedDate(
+          pickedRange.start, pickedRange.end);
+
+      widget.onDateRangeSelected?.call(pickedRange);
     }
   }
 
   void _clearDate() {
-    setState(() {
-      _isDateSelected = false;
-      _selectedDate = null;
-      widget.onDateSelected?.call(null);
-    });
+    _commonFilterController.clearDateFilter();
+    _commonFilterController.selectedRange.value = null;
+
+    widget.onDateRangeSelected?.call(null);
   }
 
   void _clearSearchText() {
     widget.controller.clear();
     widget.onChanged('');
     final FocusNode focusNode = widget.focusNode ?? _internalFocusNode;
-    focusNode.requestFocus(); // Keep focus on text field
-  }
-
-  void _handleClearAll() {
-    if (_isDateSelected) {
-      _clearDate();
-    }
-    _clearSearchText();
-    widget.onClear();
+    focusNode.requestFocus();
   }
 
   String _formatDate(DateTime date) {
@@ -142,125 +112,129 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
       child: Row(
         children: [
           Expanded(
-            child: SizedBox(
-              height: 40,
-              child: _isDateSelected
-                  ? Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 10),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(8),
-                        color: Colors.grey.shade50,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.calendar_today,
-                                size: 20,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              SizedBox(width: 8.w),
-                              Text(
-                                _selectedDate != null
-                                    ? _formatDate(_selectedDate!)
-                                    : widget.dateHintText!,
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                          InkWell(
-                            onTap: _clearDate,
-                            borderRadius: BorderRadius.circular(12),
-                            child: Icon(
-                              Icons.close,
-                              color: Colors.grey.shade600,
-                              size: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : TextField(
-                      controller: widget.controller,
-                      focusNode: focusNode,
-                      onChanged: widget.onChanged,
-                      keyboardType: widget.textInputType,
-                      textInputAction: TextInputAction.search,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: Colors.grey.shade600,
+            child: Obx(
+              () => SizedBox(
+                height: 40,
+                child: _commonFilterController.isDateRangeSelected.value
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.grey.shade50,
                         ),
-                        suffixIcon: hasSearchText
-                            ? Padding(
-                                padding: const EdgeInsets.only(right: 4),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    // Animated clear button
-                                    AnimatedOpacity(
-                                      opacity: hasSearchText ? 1.0 : 0.0,
-                                      duration:
-                                          const Duration(milliseconds: 200),
-                                      child: IconButton(
-                                        onPressed: _clearSearchText,
-                                        icon: Icon(
-                                          Icons.cancel,
-                                          color: Colors.grey.shade600,
-                                          size: 20,
-                                        ),
-                                        padding: EdgeInsets.zero,
-                                        constraints: const BoxConstraints(
-                                          minWidth: 36,
-                                          minHeight: 36,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_today,
+                                  size: 20,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  _commonFilterController.selectedRange.value !=
+                                          null
+                                      ? "${_formatDate(_commonFilterController.selectedRange.value!.start)} - "
+                                          "${_formatDate(_commonFilterController.selectedRange.value!.end)}"
+                                      : widget.dateHintText!,
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            InkWell(
+                              onTap: _clearDate,
+                              borderRadius: BorderRadius.circular(12),
+                              child: Icon(
+                                Icons.close,
+                                color: Colors.grey.shade600,
+                                size: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : TextField(
+                        controller: widget.controller,
+                        focusNode: focusNode,
+                        onChanged: widget.onChanged,
+                        keyboardType: widget.textInputType,
+                        textInputAction: TextInputAction.search,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Colors.grey.shade600,
+                          ),
+                          suffixIcon: hasSearchText
+                              ? Padding(
+                                  padding: const EdgeInsets.only(right: 4),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Animated clear button
+                                      AnimatedOpacity(
+                                        opacity: hasSearchText ? 1.0 : 0.0,
+                                        duration:
+                                            const Duration(milliseconds: 200),
+                                        child: IconButton(
+                                          onPressed: _clearSearchText,
+                                          icon: Icon(
+                                            Icons.cancel,
+                                            color: Colors.grey.shade600,
+                                            size: 20,
+                                          ),
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(
+                                            minWidth: 36,
+                                            minHeight: 36,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : null,
-                        hintText: widget.hintText,
-                        hintStyle: TextStyle(
-                          color: Colors.grey.shade500,
-                          fontSize: 14.sp,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade300,
+                                    ],
+                                  ),
+                                )
+                              : null,
+                          hintText: widget.hintText,
+                          hintStyle: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 14.sp,
                           ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade300,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade300,
+                            ),
                           ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(
-                            color: AppColors.blueColor,
-                            width: 1.5,
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade300,
+                            ),
                           ),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 10.h,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: AppColors.blueColor,
+                              width: 1.5,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 12.w,
+                            vertical: 10.h,
+                          ),
                         ),
                       ),
-                    ),
+              ),
             ),
           ),
           if (widget.showDatePickerIcon) ...[
@@ -272,21 +246,21 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: _isDateSelected
+                    color: _commonFilterController.isDateRangeSelected.value
                         ? Theme.of(context).primaryColor
                         : Colors.grey.shade400,
                     width: 1,
                   ),
-                  color: _isDateSelected
+                  color: _commonFilterController.isDateRangeSelected.value
                       ? Theme.of(context).primaryColor.withOpacity(0.1)
                       : Colors.transparent,
-                  boxShadow: _isDateSelected
+                  boxShadow: _commonFilterController.isDateRangeSelected.value
                       ? [
                           BoxShadow(
                             color:
                                 Theme.of(context).primaryColor.withOpacity(0.1),
                             blurRadius: 4,
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                           )
                         ]
                       : null,
@@ -294,7 +268,7 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
                 child: Icon(
                   Icons.calendar_month,
                   size: 22.sp,
-                  color: _isDateSelected
+                  color: _commonFilterController.isDateRangeSelected.value
                       ? Theme.of(context).primaryColor
                       : Theme.of(context).primaryColor.withOpacity(0.7),
                 ),

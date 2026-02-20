@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/theme_controller.dart';
@@ -144,7 +143,7 @@ class _AttendanceModesScreenState extends State<AttendanceModesScreen> {
                 children: [
                   // 1st CARD
                   Card(
-                    color: Color(0xffFFFFFF),
+                    color: const Color(0xffFFFFFF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -203,7 +202,7 @@ class _AttendanceModesScreenState extends State<AttendanceModesScreen> {
 
                   // 3rd CARD (Radio)
                   Card(
-                    color: Color(0xffFFFFFF),
+                    color: const Color(0xffFFFFFF),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -372,7 +371,8 @@ class _AutomationRulesScreenState extends State<AutomationRulesScreen> {
         return Theme(
           data: Theme.of(
             context,
-          ).copyWith(colorScheme: ColorScheme.light(primary: primaryBlue)),
+          ).copyWith(
+              colorScheme: const ColorScheme.light(primary: primaryBlue)),
           child: child!,
         );
       },
@@ -454,7 +454,7 @@ class _AutomationRulesScreenState extends State<AutomationRulesScreen> {
           onChanged: onChanged,
           //ignore:deprecated_member_use
           activeColor: Colors.white,
-          activeTrackColor: Color(0xff12AF69),
+          activeTrackColor: const Color(0xff12AF69),
           inactiveThumbColor: Colors.white,
           inactiveTrackColor: const Color(0xFFF3F4F6),
         ),
@@ -606,10 +606,10 @@ class _AutomationRulesScreenState extends State<AutomationRulesScreen> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(top: 15),
+            padding: const EdgeInsets.only(top: 15),
             child: Stack(
               children: [
-                Container(color: Color(0xffFFFFFF), height: 400),
+                Container(color:const Color(0xffFFFFFF), height: 400),
                 Positioned(
                   bottom: 10,
                   child: Padding(

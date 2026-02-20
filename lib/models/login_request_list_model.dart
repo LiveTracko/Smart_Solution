@@ -15,6 +15,8 @@ class LoginRequest {
   final String? title; // Nullable title
   final String? bankName; // Nullable title
   final String? sourcing;
+  final String? tellecallerName;
+  final String? tlName;
   final String? sourcingTitle;
 
   LoginRequest({
@@ -32,6 +34,8 @@ class LoginRequest {
     this.title, // Optional
     this.bankName,
     required this.sourcing,
+    required this.tellecallerName,
+    required this.tlName,
     this.sourcingTitle,
   });
 
@@ -51,6 +55,8 @@ class LoginRequest {
       title: json['title'] ?? '',
       bankName: json['bank_name'] ?? '',
       sourcing: (json['sourcing'] ?? '') as String,
+      tellecallerName: json['telecaller_name'] ?? '',
+      tlName: (json['teamleader_name'] ?? '') as String,
       sourcingTitle: (json['sourcing_title'] ?? '') as String,
     );
   }
@@ -71,6 +77,8 @@ class LoginRequest {
       'title': title,
       'bank_name': bankName,
       'sourcing': sourcing,
+      'telecaller_name': tellecallerName,
+      'teamleader_name': tlName,
       'sourcing_title': sourcingTitle,
     };
   }

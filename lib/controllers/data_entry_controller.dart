@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/models/banker_details_model.dart';
 import 'package:smart_solutions/models/banker_name_model.dart';
 import 'package:smart_solutions/models/customerData_mobileNumber.dart';
@@ -97,6 +98,9 @@ class DataController extends GetxController {
   RxList<dynamic> todayCount = <dynamic>[].obs;
   RxList<dynamic> monthlyCount = <dynamic>[].obs;
 
+  final CommonFilterController _commonFilterController =
+      Get.find<CommonFilterController>();
+
   @override
   void onInit() {
     super.onInit();
@@ -175,53 +179,37 @@ class DataController extends GetxController {
   Future<void> fetchDataEntryList() async {
     isLoading(true);
     try {
-      DateTime? first;
-      DateTime? second;
-
-      if (dateRangeList.isNotEmpty) {
-        first = dateRangeList.first;
-        second = dateRangeList.last;
-      }
-      DateTime now = DateTime.now();
-      DateTime startDate = DateTime(now.year, now.month, 1);
-
-      String dateRange =
-          '${DateFormat('dd-MM-yyyy').format(startDate)},${DateFormat('dd-MM-yyyy').format(now)}';
-      String selectedDateRange =
-          ' ${DateFormat('dd-MM-yyyy').format(first ?? startDate)},${DateFormat('dd-MM-yyyy').format(second ?? now)}';
-      logOutput('date range is $dateRange and $defaultTelecallerId');
-      if (dateRangeList.isNotEmpty) {
-        logOutput('date range is$selectedDateRange');
-      }
-      // Create form data with required telecaller_id
       final Map<String, dynamic> formData = {
-        'telecaller_id': defaultTelecallerId,
-        'daterange': dateRange.isEmpty ? dateRange : selectedDateRange,
+        'telecaller_id': defaultTelecallerId
       };
 
-      //  Add search filter
+      final range = _commonFilterController.selectedRange.value;
+
+      if (range != null) {
+        formData['daterange'] =
+            "${DateFormat('dd-MM-yyyy').format(range.start)},"
+            "${DateFormat('dd-MM-yyyy').format(range.end)}";
+      }
+
       if (searchText.value.isNotEmpty) {
         formData['search'] = searchText.value.trim();
       }
 
-      //  Add dynamic status list using loop
       if (selectedStatuses.isNotEmpty) {
         for (var i = 0; i < selectedStatuses.length; i++) {
           formData["status[$i]"] = selectedStatuses[i];
         }
       }
-      // Using POST request instead of GET since it requires form-data
-      final response = await _apiService.postRequest(
-        APIUrls.dataEntryFeild,
-        formData,
-      );
-      logOutput("${response.statusCode}");
-      logOutput(response.body);
 
+      final response =
+          await _apiService.postRequest(APIUrls.dataEntryFeild, formData);
+
+      dataList.clear();
+      selectedStatuses.clear();
+      disbursementdata.clear();
+      todayCount.clear();
+      monthlyCount.clear();
       if (response.statusCode == 200) {
-        dataList.clear();
-        selectedStatuses.clear();
-
         final responseData = json.decode(response.body);
         final dataEntryModel = DataEntryModel.fromJson(responseData);
         if (dataEntryModel.data != null) {
@@ -233,11 +221,6 @@ class DataController extends GetxController {
 
           DateTime today = DateTime.now();
 
-// FILTER LOGIN USERS
-          // var loginList =
-          //     dataList.where((e) => e.dataEntryStatus == 'LOGIN').toList();
-
-// TODAY COUNT (from loginList)
           todayCount.value = dataList
               .where((e) {
                 DateTime dt = DateTime.parse(
@@ -249,7 +232,6 @@ class DataController extends GetxController {
               .map((e) => e.teleCallerId)
               .toList();
 
-// MONTHLY COUNT (from loginList)
           monthlyCount.value = dataList
               .where((e) {
                 DateTime dt = DateTime.parse(e.date.toString());
@@ -257,17 +239,9 @@ class DataController extends GetxController {
               })
               .map((e) => e.teleCallerId)
               .toList();
-
-          print('TodayList$todayCount');
-          print('TodayList$monthlyCount');
         }
       } else if (response.statusCode == 204) {
         logOutput('Data Entry Not Available');
-        // Get.snackbar(
-        //   'Opps',
-        //   'No Data Available',
-        //   snackPosition: SnackPosition.BOTTOM,
-        // );
       } else {
         throw Exception('Failed to load data entries');
       }

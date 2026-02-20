@@ -53,7 +53,7 @@ class FollowBackFormController extends GetxController
   late RxList selectedtellecallerName = [].obs;
   var allCustomerName = <Data>[].obs;
   var dateRangeList = <DateTime?>[].obs;
-  late TabController callController;
+  // late TabController callController;
   var selectedIndex = 0.obs;
 
   //dialog var
@@ -82,8 +82,16 @@ class FollowBackFormController extends GetxController
   final CommonFilterController commonFilterController =
       Get.put(CommonFilterController());
 
+  final CommonFilterController filterController =
+      Get.find<CommonFilterController>();
   @override
   void onInit() async {
+    // debounce(filterController.fromDate, (_) => _handleDateChange(),
+    //     time: const Duration(milliseconds: 200));
+
+    // debounce(filterController.toDate, (_) => _handleDateChange(),
+    //     time: const Duration(milliseconds: 200));
+
     ever(followBackList, (_) => updateFilteredList());
     ever(selectedFilter, (_) => updateFilteredList());
 
@@ -101,29 +109,40 @@ class FollowBackFormController extends GetxController
       }
     });
 
-    callController = TabController(length: 4, vsync: this);
-    callController.addListener(() {
-      if (!callController.indexIsChanging) {
-        selectedIndex.value = callController.index;
-      }
-    });
+    // callController = TabController(length: 4, vsync: this);
+    // callController.addListener(() {
+    //   if (!callController.indexIsChanging) {
+    //     selectedIndex.value = callController.index;
+    //   }
+    //  });
 
     // loadData();
 
     super.onInit();
   }
 
+  // void _handleDateChange() {
+  //   final from = filterController.fromDate.value;
+  //   final to = filterController.toDate.value;
+
+  //   if (from != null && to != null) {
+  //     fetchFollowBackList();
+  //   } else if (from == null && to == null) {
+  //     // Date cleared → reload full list
+  //     fetchFollowBackList();
+  //   }
+  // }
+
   @override
   void onClose() {
     // 1. Dispose all controllers properly
     searchController.dispose();
     customerNumberController.dispose(); // Use dispose, not clear
-    fromDateController.dispose();
-    toDateController.dispose();
+
     filterScrollController.dispose();
 
     // 2. TabController must be disposed
-    callController.dispose();
+    //   callController.dispose();
 
     super.onClose();
   }
@@ -222,11 +241,11 @@ class FollowBackFormController extends GetxController
   // var followupDate = DateTime.now().obs;
   // Change followupDate to accept null
   var followupDate = Rx<DateTime?>(null);
-  var fromDate = Rx<DateTime?>(null);
-  var toDate = Rx<DateTime?>(null);
+  // var fromDate = Rx<DateTime?>(null);
+  // var toDate = Rx<DateTime?>(null);
 
-  final fromDateController = TextEditingController(text: "");
-  final toDateController = TextEditingController(text: "");
+  // final fromDateController = TextEditingController(text: "");
+  // final toDateController = TextEditingController(text: "");
 
   var isLoading = false.obs;
   var isFormSubmitted = false.obs;
@@ -256,21 +275,35 @@ class FollowBackFormController extends GetxController
       followBackList.clear();
       allCustomerName.clear();
     }
+    String selectedDateRange;
+    DateTime? first;
+    DateTime? second;
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final secureType = prefs.getInt('secureType');
-    final String dateRage = dateRangeList.isNotEmpty &&
-            dateRangeList.first != null &&
-            dateRangeList.last != null
-        ? "${dateRangeList.first},${dateRangeList.last}"
-        : "";
+    // final String dateRage = dateRangeList.isNotEmpty &&
+    //         dateRangeList.first != null &&
+    //         dateRangeList.last != null
+    //     ? "${dateRangeList.first},${dateRangeList.last}"
+    //     : "";
 
     final Map<String, dynamic> formData = {
       "telecaller_id": StaticStoredData.userId,
-      "daterange": dateRage,
-      "page": currentPage.value.toString(),
-      "secure_type": secureType.toString(),
+      // "daterange": dateRage,
+      // "page": currentPage.value.toString(),
+      // "secure_type": secureType.toString(),
     };
+
+    // if (filterController.isDateRangeSelected.value) {
+    //   first = filterController.fromDate.value;
+    //   second = filterController.toDate.value;
+
+    //   if (first != null && second != null) {
+    //     selectedDateRange = "${DateFormat('dd-MM-yyyy').format(first)},"
+    //         "${DateFormat('dd-MM-yyyy').format(second)}";
+    //     formData.addAll({'daterange': selectedDateRange});
+    //   }
+    // }
 
     if (searchText.value.isNotEmpty) {
       formData['search'] = searchText.value.trim();
@@ -694,20 +727,20 @@ class FollowBackFormController extends GetxController
     _dialerController.followup_id.value = '';
   }
 
-  void setFromDate(DateTime date) {
-    fromDate.value = date;
-    fromDateController.text =
-        DateFormat("yyyy-MM-dd").format(date); // Update TextField
-    update();
-  }
+  // void setFromDate(DateTime date) {
+  //   fromDate.value = date;
+  //   fromDateController.text =
+  //       DateFormat("yyyy-MM-dd").format(date); // Update TextField
+  //   update();
+  // }
 
-  // Function to set To Date
-  void setToDate(DateTime date) {
-    toDate.value = date;
-    toDateController.text =
-        DateFormat("yyyy-MM-dd").format(date); // Update TextField
-    update();
-  }
+  // // Function to set To Date
+  // void setToDate(DateTime date) {
+  //   toDate.value = date;
+  //   toDateController.text =
+  //       DateFormat("yyyy-MM-dd").format(date); // Update TextField
+  //   update();
+  // }
 
   void getDataOnMonth(String toDate, String fromDate) async {
     isLoading.value = true;
@@ -763,41 +796,82 @@ class FollowBackFormController extends GetxController
   }
 
   void updateFilteredList({String query = ''}) {
-    // 1️⃣ Build filter names for chips
-    final names = followBackList
-        .map((e) => e.remarkStatus ?? '')
-        .where((e) => e.isNotEmpty)
-        .toSet()
-        .toList();
-    setFilters(names);
+    try {
+      /// 1️⃣ Build chip filters from API list
+      final names = followBackList
+          .map((e) => e.remarkStatus ?? '')
+          .where((e) => e.isNotEmpty)
+          .toSet()
+          .toList();
 
-    // 2️⃣ Filter by chip + search
-    final search = query.toLowerCase();
-    final selected = selectedFilter.value;
+      setFilters(names);
 
-    // 🔥 Clear old list before filtering
-    filteredFollowBackList.clear();
+      final searchText = query.toLowerCase();
+      final selected = selectedFilter.value;
 
-    filteredFollowBackList.assignAll(followBackList.where((item) {
-      final name = item.customerName?.toLowerCase() ?? '';
-      final mobile = item.contactNumber?.toLowerCase() ?? '';
-      //  final bank = item.bankName?.toLowerCase() ?? '';
-      final remark = item.remarkStatus?.toLowerCase() ?? '';
+      /// 2️⃣ Filter list
+      final result = followBackList.where((item) {
+        final name = item.customerName?.toLowerCase() ?? '';
+        final mobile = item.contactNumber?.toLowerCase() ?? '';
+        final remark = item.remarkStatus?.toLowerCase() ?? '';
 
-      // Search filter
-      final searchMatch =
-          search.isEmpty || name.contains(search) || mobile.contains(search);
-      //|| bank.contains(search);
+        /// Search filter
+        final searchMatch = searchText.isEmpty ||
+            name.contains(searchText) ||
+            mobile.contains(searchText);
 
-      // Chip filter
-      final chipMatch =
-          selected == 0 ? true : remark == names[selected - 1].toLowerCase();
+        /// Chip filter (safe index check)
+        bool chipMatch = true;
+        if (selected > 0 && selected <= names.length) {
+          chipMatch = remark == names[selected - 1].toLowerCase();
+        }
 
-      return searchMatch && chipMatch;
-      //&& dateMatch;
-    }).toList());
-    print(filteredFollowBackList.length);
+        return searchMatch && chipMatch;
+      }).toList();
+
+      /// 3️⃣ Update reactive list
+      filteredFollowBackList.assignAll(result);
+    } catch (e) {
+      filteredFollowBackList.clear();
+    }
   }
+
+  // void updateFilteredList({String query = ''}) {
+  //   // 1️⃣ Build filter names for chips
+  //   final names = followBackList
+  //       .map((e) => e.remarkStatus ?? '')
+  //       .where((e) => e.isNotEmpty)
+  //       .toSet()
+  //       .toList();
+  //   setFilters(names);
+
+  //   // 2️⃣ Filter by chip + search
+  //   final search = query.toLowerCase();
+  //   final selected = selectedFilter.value;
+
+  //   // 🔥 Clear old list before filtering
+  //   filteredFollowBackList.clear();
+
+  //   filteredFollowBackList.assignAll(followBackList.where((item) {
+  //     final name = item.customerName?.toLowerCase() ?? '';
+  //     final mobile = item.contactNumber?.toLowerCase() ?? '';
+  //     //  final bank = item.bankName?.toLowerCase() ?? '';
+  //     final remark = item.remarkStatus?.toLowerCase() ?? '';
+
+  //     // Search filter
+  //     final searchMatch =
+  //         search.isEmpty || name.contains(search) || mobile.contains(search);
+  //     //|| bank.contains(search);
+
+  //     // Chip filter
+  //     final chipMatch =
+  //         selected == 0 ? true : remark == names[selected - 1].toLowerCase();
+
+  //     return searchMatch && chipMatch;
+  //     //&& dateMatch;
+  //   }).toList());
+  //   print(filteredFollowBackList.length);
+  // }
 
   // Method to refresh data (pull to refresh)
 

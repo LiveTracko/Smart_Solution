@@ -8,9 +8,11 @@ import 'package:smart_solutions/views/spacing_constants.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/flutter_chiplist.dart';
 import 'package:smart_solutions/widget/header_title.dart';
-import 'package:smart_solutions/widget/loading_page.dart';
+
 import 'package:smart_solutions/widget/searchbarwithclear.dart';
 import 'package:smart_solutions/widget/text_style.dart';
+
+import '../../constants/static_stored_data.dart';
 
 class AdminDisbursement extends StatefulWidget {
   final String title;
@@ -24,6 +26,9 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _adminDisbursementController = Get.put(DisbursementController());
 
+  final bool isTeamLeader = StaticStoredData.roleName == 'teamleader';
+  final String teamleaderId = StaticStoredData.userId;
+
   @override
   void initState() {
     super.initState();
@@ -33,19 +38,17 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
-      isDrawer: false,
-      showBack: true,
-      title: widget.title,
-      key: _scaffoldKey,
-      body: Obx(() {
-        // Show loading if either team leaders or disbursement data is loading
-        if (_adminDisbursementController.isLoading.value ||
-            _adminDisbursementController.iscallDisbursedLoading.value) {
-          return const LoadingPage();
-        }
+        isDrawer: false,
+        showBack: true,
+        title: widget.title,
+        key: _scaffoldKey,
+        body: Obx(() {
+          // if (_adminDisbursementController.isLoading.value ||
+          //     _adminDisbursementController.iscallDisbursedLoading.value) {
+          //   return const LoadingPage();
+          // }
 
-        return Column(
-          children: [
+          return Column(children: [
             Container(
               color: AppColors.appBarTextColor,
               child: Column(
@@ -60,22 +63,20 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
                     onClear: _adminDisbursementController.clearFilters,
                     onChanged: (value) {
                       _adminDisbursementController.getDisbursementData(
-                          query: value);
+                          query: value, teamleaderId: teamleaderId);
                       // Handle search if needed
                     },
                   ),
                   kVerticalSpace(5),
-                  _buildFilterChips(),
+                  if (!isTeamLeader) _buildFilterChips(),
                   kVerticalSpace(10),
                   _buildTotalSummary(),
                 ],
               ),
             ),
-            Expanded(child: _buildDisbursementList()),
-          ],
-        );
-      }),
-    );
+            Expanded(child: _buildDisbursementList())
+          ]);
+        }));
   }
 
   Widget _buildFilterChips() {
@@ -108,175 +109,6 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
       );
     });
   }
-
-  // Widget _buildTotalSummary() {
-  //   return Obx(() {
-  //     final totalData = _adminDisbursementController.disbursementTotal.value;
-
-  //     if (totalData == null) {
-  //       return const SizedBox.shrink();
-  //     }
-
-  //     final totalSum =
-  //         totalData.loginCountTotal + totalData.disbursedCountTotal;
-
-  //     return SummaryHeaderCard(
-  //       title: 'Total',
-  //       duration: 'Login Files - ${totalData.loginCountTotal}',
-  //       rows: [
-  //         Row(mainAxisSize: MainAxisSize.min, children: [
-  //           Icon(Icons.account_balance_wallet_outlined,
-  //               color: Colors.blue, size: 20),
-  //           const SizedBox(width: 6),
-  //           Text(
-  //             totalSum.toString(),
-  //             style: TextStyle(
-  //               fontSize: 16.sp,
-  //               fontWeight: FontWeight.bold,
-  //             ),
-  //           ),
-  //           const SizedBox(width: 12),
-  //           Text(
-  //             '₹${CurrencyUtils.formatAmount(totalData.amountTotal.toString())}',
-  //             style: TextStyle(
-  //               color: Colors.green,
-  //               fontSize: 14.sp,
-  //               fontWeight: FontWeight.w600,
-  //             ),
-  //           ),
-  //           const SizedBox(width: 12),
-  //           _statChip(
-  //             icon: Icons.login,
-  //             label: "Login",
-  //             value: totalData.loginCountTotal.toString(),
-  //             color: Colors.blue,
-  //           ),
-  //           const SizedBox(width: 6),
-  //           _statChip(
-  //             icon: Icons.check_circle_outline,
-  //             label: "Disbursed",
-  //             value: totalData.disbursedCountTotal.toString(),
-  //             color: Colors.green,
-  //           ),
-  //         ])
-
-  //         // Container(
-  //         //   padding: const EdgeInsets.all(14),
-  //         //   decoration: BoxDecoration(
-  //         //     color: Colors.white,
-  //         //     borderRadius: BorderRadius.circular(16),
-  //         //     boxShadow: [
-  //         //       BoxShadow(
-  //         //         color: Colors.black.withOpacity(.05),
-  //         //         blurRadius: 10,
-  //         //         offset: const Offset(0, 4),
-  //         //       ),
-  //         //     ],
-  //         //   ),
-  //         //   child: Column(
-  //         //     children: [
-  //         //       Icon(Icons.account_balance_wallet_outlined,
-  //         //           color: Colors.blue, size: 26),
-  //         //       const SizedBox(height: 6),
-  //         //       Text(
-  //         //         totalSum.toString(),
-  //         //         style: TextStyle(
-  //         //           fontSize: 22.sp,
-  //         //           fontWeight: FontWeight.bold,
-  //         //         ),
-  //         //       ),
-  //         //       SizedBox(height: 6.h),
-  //         //       Text(
-  //         //         '₹${CurrencyUtils.formatAmount(totalData.amountTotal.toString())}',
-  //         //         style: TextStyle(
-  //         //           color: Colors.green,
-  //         //           fontSize: 16.sp,
-  //         //           fontWeight: FontWeight.w600,
-  //         //         ),
-  //         //       ),
-  //         //       const Divider(height: 18),
-  //         //       Row(
-  //         //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         //         children: [
-  //         //           _statChip(
-  //         //             icon: Icons.login,
-  //         //             label: "Login",
-  //         //             value: totalData.loginCountTotal.toString(),
-  //         //             color: Colors.blue,
-  //         //           ),
-  //         //           _statChip(
-  //         //             icon: Icons.check_circle_outline,
-  //         //             label: "Disbursed",
-  //         //             value: totalData.disbursedCountTotal.toString(),
-  //         //             color: Colors.green,
-  //         //           ),
-  //         //         ],
-  //         //       )
-  //         //     ],
-  //         //   ),
-  //         // ),
-  //       ],
-  //     );
-  //   });
-  // }
-
-  // Widget _buildTotalSummary() {
-  //   return Obx(() {
-  //     final totalData = _adminDisbursementController.disbursementTotal.value;
-
-  //     if (totalData == null) {
-  //       return const SizedBox.shrink();
-  //     }
-
-  //     final totalSum =
-  //         totalData.loginCountTotal + totalData.disbursedCountTotal;
-
-  //     return SummaryHeaderCard(
-  //       title: 'Files: $totalSum',
-  //       //  duration: 'Files: $totalSum',
-  //       rows: [
-  //         Row(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             // const Icon(Icons.summarize_outlined,
-  //             //     size: 18, color: Colors.blue),
-  //             // const SizedBox(width: 4),
-  //             // Text(
-  //             //   totalSum.toString(),
-  //             //   style: TextStyle(
-  //             //     fontWeight: FontWeight.bold,
-  //             //     fontSize: 14.sp,
-  //             //   ),
-  //             // ),
-  //             // const SizedBox(width: 10),
-  //             Text(
-  //               '₹${CurrencyUtils.formatAmount(totalData.amountTotal.toString())}',
-  //               style: TextStyle(
-  //                 color: Colors.green,
-  //                 fontWeight: FontWeight.w600,
-  //                 fontSize: 13.sp,
-  //               ),
-  //             ),
-  //             const SizedBox(width: 10),
-  //             _statChip(
-  //               icon: Icons.login,
-  //               label: "L",
-  //               value: totalData.loginCountTotal.toString(),
-  //               color: Colors.blue,
-  //             ),
-  //             const SizedBox(width: 4),
-  //             _statChip(
-  //               icon: Icons.check_circle_outline,
-  //               label: "D",
-  //               value: totalData.disbursedCountTotal.toString(),
-  //               color: Colors.green,
-  //             ),
-  //           ],
-  //         ),
-  //       ],
-  //     );
-  //   });
-  // }
 
   Widget _buildTotalSummary() {
     return Obx(() {
@@ -391,110 +223,106 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
   }
 
   Widget _buildDisbursementList() {
-    return Obx(() {
-      final data = _adminDisbursementController.disbursementList;
+    final data = _adminDisbursementController.disbursementList;
 
-      if (data.isEmpty) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'No disbursement data available',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16.sp,
-                ),
+    if (data.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'No disbursement data available',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 16.sp,
               ),
-              SizedBox(height: 10.h),
-            ],
-          ),
-        );
-      }
-
-      return ListView.builder(
-        padding: const EdgeInsets.only(top: 6, bottom: 10),
-        itemCount: data.length,
-        itemBuilder: (context, index) {
-          final item = data[index];
-
-          final itemTotal = (int.tryParse(item.loginCount) ?? 0) +
-              (int.tryParse(item.disbursedCount) ?? 0);
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-            child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      dense: true,
-                      leading: const CircleAvatar(
-                        radius: 18,
-                        backgroundColor: Color(0xffEEF2FF),
-                        child: Icon(Icons.person, color: Colors.indigo),
-                      ),
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            item.name.toString(),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            "₹${CurrencyUtils.formatAmount(item.amount)}",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                      subtitle: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Total: $itemTotal",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              _modernStat(
-                                  "Login", item.loginCount, Colors.blue),
-                              const SizedBox(width: 6),
-                              _modernStat("Disbursed", item.disbursedCount,
-                                  Colors.orange),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )),
-          );
-        },
+            ),
+            SizedBox(height: 10.h),
+          ],
+        ),
       );
-    });
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 6, bottom: 10),
+      itemCount: data.length,
+      itemBuilder: (context, index) {
+        final item = data[index];
+
+        final itemTotal = (int.tryParse(item.loginCount) ?? 0) +
+            (int.tryParse(item.disbursedCount) ?? 0);
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+          child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    dense: true,
+                    leading: const CircleAvatar(
+                      radius: 18,
+                      backgroundColor: Color(0xffEEF2FF),
+                      child: Icon(Icons.person, color: Colors.indigo),
+                    ),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          item.name.toString(),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          "₹${CurrencyUtils.formatAmount(item.amount)}",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Total: $itemTotal",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            _modernStat("Login", item.loginCount, Colors.blue),
+                            const SizedBox(width: 6),
+                            _modernStat("Disbursed", item.disbursedCount,
+                                Colors.orange),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              )),
+        );
+      },
+    );
 
     //  Padding(
 

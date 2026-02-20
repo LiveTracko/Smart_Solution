@@ -11,6 +11,8 @@ import 'package:smart_solutions/widget/header_title.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
+import '../../../controllers/theme_controller.dart';
+
 class CallBackData extends StatelessWidget {
   final String title;
   final String headerTitle;
@@ -27,6 +29,7 @@ class CallBackData extends StatelessWidget {
   });
 
   final DialerController _dialerController = Get.find<DialerController>();
+  static final ThemeController themeController = Get.find<ThemeController>();
 
   final CommonRows _commonRows = CommonRows();
 

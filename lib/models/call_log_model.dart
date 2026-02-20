@@ -25,6 +25,7 @@ class Datum {
   String id;
   String name;
   String? profileImage;
+  String? teamleaderId;
   String callAttempt;
   String callContacted;
   String callNotcontact;
@@ -35,6 +36,7 @@ class Datum {
     required this.id,
     required this.name,
     required this.profileImage,
+    required this.teamleaderId,
     required this.callAttempt,
     required this.callContacted,
     required this.callNotcontact,
@@ -46,6 +48,7 @@ class Datum {
         id: json["id"],
         name: json["name"],
         profileImage: json['profile_image'],
+        teamleaderId: json['teamleader_id'],
         callAttempt: json["call_attempt"],
         callContacted: json["call_contacted"],
         callNotcontact: json["call_notcontact"],
@@ -57,6 +60,7 @@ class Datum {
         "id": id,
         "name": name,
         "profile_image": profileImage,
+        "teamleader_id": teamleaderId,
         "call_attempt": callAttempt,
         "call_contacted": callContacted,
         "call_notcontact": callNotcontact,

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/widget/text_style.dart';
@@ -25,33 +26,49 @@ class SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: padding,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: padding,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Container(
             height: 42,
             width: 42,
             decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(.08),
-                borderRadius: BorderRadius.circular(12)),
-            child: Image.network('${APIUrls.imagebaseUrl}$imageUrl',
+              color: Colors.blue.withOpacity(.08),
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: ClipOval(
+              child: CachedNetworkImage(
+                imageUrl: '${APIUrls.imagebaseUrl}$imageUrl',
+                width: 36,
+                height: 36,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.image_not_supported)),
-          ),
+                // placeholder: (_, __) => const SizedBox(
+                //   width: 16,
+                //   height: 16,
+                //   child: CircularProgressIndicator(strokeWidth: 2),
+                // ),
+                errorWidget: (_, __, ___) => const Icon(Icons.person, size: 20),
+              ),
+            ),
+          )
+
+          //  Image.network('${APIUrls.imagebaseUrl}$imageUrl',
+          //     fit: BoxFit.cover,
+          //     errorBuilder: (context, error, stackTrace) =>
+          //         const Icon(Icons.image_not_supported)),
+          ,
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -109,8 +126,6 @@ class SummaryCard extends StatelessWidget {
               ],
             ),
           ),
-        ],
-      ),
-    );
+        ]));
   }
 }

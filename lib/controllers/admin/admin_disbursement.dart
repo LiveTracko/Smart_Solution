@@ -6,6 +6,8 @@ import 'package:smart_solutions/models/disbursement_model.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
 import 'package:smart_solutions/services/api_service.dart';
 
+import '../../constants/static_stored_data.dart';
+
 class DisbursementController extends GetxController {
   final ApiService _apiService = ApiService();
 
@@ -27,11 +29,12 @@ class DisbursementController extends GetxController {
   /// Totals (single object)
   final disbursementTotal = Rxn<disbursementTotals>();
 
+  final String teamleaderId = StaticStoredData.userId;
   @override
   void onInit() {
     super.onInit();
     getteamLeaderData();
-    getDisbursementData(); // initial load (All)
+    getDisbursementData(teamleaderId: teamleaderId); // initial load (All)
   }
 
   // ---------------- TEAM LEADERS ----------------
@@ -55,59 +58,22 @@ class DisbursementController extends GetxController {
     }
   }
 
-  // ---------------- DISBURSEMENT ----------------
-  // Future<void> getDisbursementData() async {
-  //   iscallDisbursedLoading.value = true;
-
-  //   try {
-  //     final response =
-  //         await _apiService.postRequest(APIUrls.getDisbursementForAdmin, {});
-
-  //     debugPrint('📥 Disbursement API Response: ${response.body}');
-
-  //     if (response.statusCode == 200) {
-  //       final json = jsonDecode(response.body);
-
-  //       final model = DisbursementModel.fromJson(json);
-  //       allDisbursementList.assignAll(model.data);
-  //       disbursementList.assignAll(model.data);
-  //     }
-  //   } catch (e) {
-  //     debugPrint('❌ Disbursement error: $e');
-  //   } finally {
-  //     iscallDisbursedLoading.value = false;
-  //   }
-  // }
-
-  Future<void> getDisbursementData({String? query}) async {
+  Future<void> getDisbursementData({
+    String? query,
+    String? teamleaderId,
+  }) async {
     iscallDisbursedLoading.value = true;
 
     try {
-      // Fetch only once
-      if (allDisbursementList.isEmpty) {
-        final response =
-            await _apiService.postRequest(APIUrls.getDisbursementForAdmin, {});
+      final response = await _apiService.postRequest(
+          APIUrls.getDisbursementForAdmin, {"teamleader_id": teamleaderId});
 
-        if (response.statusCode == 200) {
-          final json = jsonDecode(response.body);
-          final model = DisbursementModel.fromJson(json);
-          allDisbursementList.assignAll(model.data);
-        }
-      }
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final model = DisbursementModel.fromJson(json);
 
-      // SEARCH FILTER
-      if (query != null && query.isNotEmpty) {
-        final filtered = allDisbursementList.where((item) {
-          final name = item.name.toLowerCase();
-          // final mobile = item.mobile?.toLowerCase() ?? "";
-
-          return name.contains(query.toLowerCase());
-          //||
-          //  mobile.contains(query.toLowerCase());
-        }).toList();
-
-        disbursementList.assignAll(filtered);
-      } else {
+        // Store original list
+        allDisbursementList.assignAll(model.data);
         disbursementList.assignAll(allDisbursementList);
       }
     } catch (e) {
@@ -117,24 +83,87 @@ class DisbursementController extends GetxController {
     }
   }
 
-  // ---------------- FILTER ----------------
-  void selectFilter(int index) {
-    selectedFilter.value = index;
-    if (index == 0) {
-      disbursementList.assignAll(allDisbursementList);
-      return;
+  void applyFilters({String? query, String? teamleaderId}) {
+    List<DisbursementData> filtered = allDisbursementList;
+
+    if (teamleaderId != null && teamleaderId.isNotEmpty) {
+      filtered =
+          filtered.where((item) => item.teamleaderId == teamleaderId).toList();
     }
 
-    final leader = teamleaderList[index - 1];
+    if (query != null && query.isNotEmpty) {
+      filtered = filtered
+          .where(
+              (item) => item.name.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
 
-    disbursementList.assignAll(
-      allDisbursementList.where((e) => e.id == leader.id).toList(),
-    );
+    disbursementList.assignAll(filtered);
+  }
+
+  // Future<void> getDisbursementData(
+  //     {String? query, String? teamleaderId}) async {
+  //   iscallDisbursedLoading.value = true;
+
+  //   try {
+  //     // Fetch only once
+
+  //     final response =
+  //         await _apiService.postRequest(APIUrls.getDisbursementForAdmin, {});
+
+  //     if (response.statusCode == 200) {
+  //       final json = jsonDecode(response.body);
+  //       final model = DisbursementModel.fromJson(json);
+  //       disbursementList.assignAll(model.data);
+  //     }
+
+  //     if (teamleaderId != null && teamleaderId.isNotEmpty) {
+  //       final filtered = allDisbursementList
+  //           .where((item) => item.teamleaderId == teamleaderId)
+  //           .toList();
+
+  //       disbursementList.assignAll(filtered);
+  //     }
+
+  //     // SEARCH FILTER
+  //     if (query != null && query.isNotEmpty) {
+  //       final filtered = allDisbursementList.where((item) {
+  //         final name = item.name.toLowerCase();
+
+  //         return name.contains(query.toLowerCase());
+  //       }).toList();
+
+  //       disbursementList.assignAll(filtered);
+  //     }
+  //   } catch (e) {
+  //     debugPrint('❌ Disbursement error: $e');
+  //   } finally {
+  //     iscallDisbursedLoading.value = false;
+  //   }
+  // }
+
+  // ---------------- FILTER ----------------
+  void selectFilter(int index) async {
+    selectedFilter.value = index;
+    String? teamleader = getSelectedTeamLeaderId();
+    applyFilters(teamleaderId: teamleader);
+    // await getDisbursementData(teamleaderId: teamleader);
   }
 
   void clearFilters() {
     selectedFilter.value = 0;
     searchController.clear();
     getDisbursementData();
+  }
+
+  String? getSelectedTeamLeaderId() {
+    if (selectedFilter.value == 0) return null; // "All" selected
+
+    if (selectedFilter.value < filters.length) {
+      final selectedName = filters[selectedFilter.value];
+      final tl = teamleaderList.firstWhereOrNull((e) => e.name == selectedName);
+      return tl?.id;
+    }
+    return null;
   }
 }

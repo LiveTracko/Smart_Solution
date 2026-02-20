@@ -48,10 +48,6 @@ class FilterChipList extends StatelessWidget {
                         : [],
                   ),
                   child: ChoiceChip(
-                    // avatar: isSelected
-                    //     ? Icon(Icons.check_circle,
-                    //         size: 16, color: AppColors.textColor)
-                    //     : null,
                     showCheckmark: false,
                     label: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -78,38 +74,7 @@ class FilterChipList extends StatelessWidget {
                 ),
               );
             }),
-          )
-
-          //  Row(
-          //   children: List.generate(filters.length, (index) {
-          //     final isSelected = index == selectedIndex;
-          //     return Padding(
-          //       padding: EdgeInsets.only(left: 15.w),
-          //       child: ChoiceChip(
-          //         label: Text(filters[index]),
-          //         selected: isSelected,
-          //         onSelected: (_) => onSelected(index),
-          //         selectedColor:
-          //             _themeController.primaryColor.value.withOpacity(0.2),
-          //         labelStyle: TextStyle(
-          //           color: isSelected
-          //               ? _themeController.primaryColor.value
-          //               : Colors.grey.shade700,
-          //           fontWeight: FontWeight.w500,
-          //         ),
-          //         shape: StadiumBorder(
-          //           side: BorderSide(
-          //             color: isSelected
-          //                 ? _themeController.primaryColor.value
-          //                 : Colors.grey.shade400,
-          //           ),
-          //         ),
-          //       ),
-          //     );
-          //   }),
-          // ),
-
-          ),
+          )),
     );
   }
 }

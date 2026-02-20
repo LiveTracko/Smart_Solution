@@ -2,15 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
+import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/models/callBack_model.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
 import 'package:smart_solutions/services/api_service.dart';
 import '../../models/admin/admin_loginRequest_model.dart';
-
 class AdminCallBackController extends GetxController {
-  late final String? pageType;
-
-  AdminCallBackController({this.pageType});
   final ApiService _apiService = ApiService();
 
   // ============================
@@ -53,9 +50,14 @@ class AdminCallBackController extends GetxController {
   RxBool loginRequestLoaded = false.obs;
   RxBool loginFilesLoaded = false.obs;
 
-  @override
-  void onInit() {
-    super.onInit();
+  String? pageType;
+
+  void setPageType(String? type) {
+    pageType = type;
+    _loadData();
+  }
+
+  void _loadData() {
     getteamLeaderData();
 
     if (pageType == 'Login Request') {
@@ -63,7 +65,13 @@ class AdminCallBackController extends GetxController {
     } else {
       fetchLoginFilesOnce();
     }
+  }
 
+  @override
+  void onInit() {
+    super.onInit();
+
+    _loadData();
     ever(filteredLoginRequestData, (_) {
       calculateRequestTotal(filteredLoginRequestData);
     });
@@ -75,17 +83,18 @@ class AdminCallBackController extends GetxController {
 
   Future<void> fetchLoginRequestOnce() async {
     if (loginRequestLoaded.value) return;
-    loginRequestLoaded = false.obs;
-    await _fetchLoginRequestData();
-    loginRequestLoaded = true.obs;
+
+    loginRequestLoaded.value = false;
+    await _fetchLoginRequestData(teamleaderId: StaticStoredData.userId);
+    loginRequestLoaded.value = true;
   }
 
   Future<void> fetchLoginFilesOnce() async {
     if (loginFilesLoaded.value) return;
 
-    loginFilesLoaded.value = false; // show loader
-    await _fetchLoginFileData();
-    loginFilesLoaded.value = true; // hide loader
+    loginFilesLoaded.value = false;
+    await _fetchLoginFileData(teamleaderId: StaticStoredData.userId);
+    loginFilesLoaded.value = true;
   }
 
   void filterByTeamLeader({
@@ -186,7 +195,7 @@ class AdminCallBackController extends GetxController {
           debugPrint('Team leaders loaded: ${teamleaderList.length}');
 
           // Load login request data after team leaders are loaded
-          await _fetchLoginRequestData();
+          await _fetchLoginRequestData(teamleaderId: StaticStoredData.userId);
         }
       }
     } catch (e) {
@@ -204,7 +213,9 @@ class AdminCallBackController extends GetxController {
     try {
       final response = await _apiService.postRequest(
         APIUrls.adminLoginRequest,
-        {},
+        {
+          "teamleader_id": teamleaderId,
+        },
       );
 
       if (response.statusCode == 200) {
@@ -216,16 +227,18 @@ class AdminCallBackController extends GetxController {
 
         loginRequestData.assignAll(allData);
 
-        // FILTER HERE
-        if (teamleaderId != null && teamleaderId.isNotEmpty) {
-          filteredLoginRequestData.assignAll(
-              allData.where((item) => item.teamleaderId == teamleaderId));
+        filteredLoginRequestData.assignAll(allData);
 
-          //   calculateRequestTotal(filteredLoginRequestData);
-        } else {
-          filteredLoginRequestData.assignAll(allData);
-          calculateRequestTotal(filteredLoginRequestData);
-        }
+        calculateRequestTotal(filteredLoginRequestData);
+
+        // FILTER HERE
+        // if (teamleaderId != null && teamleaderId.isNotEmpty) {
+        //   filteredLoginRequestData.assignAll(
+        //       allData.where((item) => item.teamleaderId == teamleaderId));
+        // } else {
+        //   filteredLoginRequestData.assignAll(allData);
+        //   calculateRequestTotal(filteredLoginRequestData);
+        // }
       }
     } catch (e) {
       debugPrint('Exception in _fetchLoginRequestData: $e');
@@ -269,7 +282,7 @@ class AdminCallBackController extends GetxController {
     try {
       final response = await _apiService.postRequest(
         APIUrls.adminLoginFiles,
-        {},
+        {'teamleader_id': teamleaderId},
       );
 
       if (response.statusCode == 200) {
@@ -280,6 +293,10 @@ class AdminCallBackController extends GetxController {
         final allData = list.map((e) => Datum.fromJson(e)).toList();
 
         loginFilesData.assignAll(allData);
+
+        filteredLoginFilesData.assignAll(allData);
+
+        calculateRequestTotal(filteredLoginFilesData);
 
         // FILTER HERE
         if (teamleaderId != null && teamleaderId.isNotEmpty) {

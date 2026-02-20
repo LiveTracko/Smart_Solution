@@ -12,6 +12,7 @@ import 'package:smart_solutions/widget/searchbarwithclear.dart';
 import 'package:smart_solutions/widget/summary_card.dart';
 import 'package:smart_solutions/widget/summary_header_card.dart';
 import 'package:smart_solutions/widget/text_style.dart';
+import '../../constants/static_stored_data.dart';
 import '../../controllers/theme_controller.dart';
 
 class DailyMonthlyCount extends StatefulWidget {
@@ -24,23 +25,23 @@ class DailyMonthlyCount extends StatefulWidget {
 
 class _DailyMonthlyCountState extends State<DailyMonthlyCount> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  late final _adminCallBackController =
-      Get.put(AdminCallBackController(pageType: widget.title));
+
+  late final AdminCallBackController _adminCallBackController =
+      AdminCallBackController();
+
   final ThemeController themeController = Get.find<ThemeController>();
+  final bool isTeamLeader = StaticStoredData.roleName == 'teamleader';
 
-  // @override
-  // void initState() {
-  //   super.initState();
+  @override
+  void initState() {
+    super.initState();
+    _adminCallBackController.setPageType(widget.title);
+  }
 
-  //   if (widget.title == 'Login Request') {
-  //     _adminCallBackController.getLoginRequestTeamLeaderData();
-  //   } else {
-  //     _adminCallBackController.getteamLeaderData();
-  //   }
-
-  //   _adminCallBackController.getCallBackData();
-  //   _dataController.fetchDataEntryList();
-  // }
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +83,7 @@ class _DailyMonthlyCountState extends State<DailyMonthlyCount> {
               kVerticalSpace(5),
 
               // FILTER CHIPS
-              _buildFilterChips(),
+              if (!isTeamLeader) _buildFilterChips(),
 
               kVerticalSpace(10),
 
@@ -227,14 +228,14 @@ class _DailyMonthlyCountState extends State<DailyMonthlyCount> {
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               _summaryStat(
                 label: "Today",
                 value: today.toString(),
                 icon: Icons.today_outlined,
                 color: Colors.blue,
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               _summaryStat(
                 label: "Monthly",
                 value: monthly.toString(),
@@ -425,32 +426,34 @@ class _DailyMonthlyCountState extends State<DailyMonthlyCount> {
               kVerticalSpace(5),
 
               // FILTER CHIPS
-              Obx(() {
-                final filterList = _adminCallBackController.filters;
+              if (!isTeamLeader)
+                Obx(() {
+                  final filterList = _adminCallBackController.filters;
 
-                if (filterList.isEmpty) {
-                  return Container(
-                    padding: EdgeInsets.symmetric(vertical: 10.h),
-                    child: const Center(
-                      child: Text(
-                        'Loading filters...',
-                        style: TextStyle(color: Colors.grey),
+                  if (filterList.isEmpty) {
+                    return Container(
+                      padding: EdgeInsets.symmetric(vertical: 10.h),
+                      child: const Center(
+                        child: Text(
+                          'Loading filters...',
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       ),
+                    );
+                  }
+
+                  return SizedBox(
+                    height: 50.h,
+                    child: FilterChipList(
+                      filters: filterList,
+                      controller:
+                          _adminCallBackController.filterScrollController,
+                      selectedIndex:
+                          _adminCallBackController.selectedFilter.value,
+                      onSelected: _adminCallBackController.selectFilter,
                     ),
                   );
-                }
-
-                return SizedBox(
-                  height: 50.h,
-                  child: FilterChipList(
-                    filters: filterList,
-                    controller: _adminCallBackController.filterScrollController,
-                    selectedIndex:
-                        _adminCallBackController.selectedFilter.value,
-                    onSelected: _adminCallBackController.selectFilter,
-                  ),
-                );
-              }),
+                }),
 
               kVerticalSpace(10),
 

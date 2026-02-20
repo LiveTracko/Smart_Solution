@@ -3,15 +3,13 @@ import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smart_solutions/binding/dashboard_binding.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
+import 'package:smart_solutions/routes/app_routes.dart';
 import 'package:smart_solutions/services/api_service.dart';
 import 'package:smart_solutions/utils/error_utils.dart';
-import 'package:smart_solutions/views/navigationbar.dart';
 import 'package:smart_solutions/utils/snackbar_utils.dart';
-import 'package:smart_solutions/widget/text_style.dart';
 import '../constants/services.dart';
 
 class LoginViewModel extends GetxController {
@@ -47,7 +45,19 @@ class LoginViewModel extends GetxController {
 
         if (responseData['profile']['data']['message'] != null) {
           Get.snackbar(
-              'Alert', responseData['profile']['data']['message'].toString());
+            "Login Failed",
+            responseData['profile']['data']['message'].toString(),
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.red.shade600,
+            colorText: Colors.white,
+            borderRadius: 12,
+            margin: const EdgeInsets.all(12),
+            icon: const Icon(Icons.error_outline, color: Colors.white),
+            duration: const Duration(seconds: 3),
+          );
+
+          // Get.snackbar(
+          //     'Alert', responseData['profile']['data']['message'].toString());
         } else {
           String userId = responseData['profile']['data']['profile']
               ['id']; // Adjust according to your API response structure
@@ -85,52 +95,62 @@ class LoginViewModel extends GetxController {
           // Navigate to the MainScreen on successful login
           // dashboardController.fetchDashboardData(false);
           // dashboardController.fetchDashboardData(true);
-          Get.off(() => const MainScreen(), binding: DashboardBinding());
-          showDialog(
-              context: (Get.context!),
-              builder: (context) => AlertDialog(
-                    // backgroundColor: Color(0xffFFE839),
-                    // title: Center(child: const Text("Attendance Marked")),
-                    content: Container(
-                        decoration: BoxDecoration(
-                          // color: Colors.yellow,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Lottie.asset("assets/animations/success.json",
-                                height: 100, width: 100),
-                            const Center(
-                                child: Text(
-                              "Logged In Successfully",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
-                            )),
-                          ],
-                        )),
-                    actions: [
-                      Center(
-                        child: FractionallySizedBox(
-                          widthFactor: 0.6,
-                          child: ElevatedButton(
-                            style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(
-                                    themeController.primaryColor.value)),
-                            onPressed: () {
-                              Get.back();
-                            },
-                            child: const Text(
-                              "Okay",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ));
+
+          showSuccessDialog(
+            "Logged In Successfully",
+            onComplete: () {
+              Get.offAllNamed(AppRoutes.navigationscreen);
+            },
+          );
+
+          //      Get.offAllNamed(AppRoutes.navigationscreen);
+
+          // Get.off(() => const MainScreen(), binding: DashboardBinding());
+          // showDialog(
+          //     context: (Get.context!),
+          //     builder: (context) => AlertDialog(
+          //           // backgroundColor: Color(0xffFFE839),
+          //           // title: Center(child: const Text("Attendance Marked")),
+          //           content: Container(
+          //               decoration: BoxDecoration(
+          //                 // color: Colors.yellow,
+          //                 borderRadius: BorderRadius.circular(20),
+          //               ),
+          //               child: Column(
+          //                 mainAxisSize: MainAxisSize.min,
+          //                 children: [
+          //                   Lottie.asset("assets/animations/success.json",
+          //                       height: 100, width: 100),
+          //                   const Center(
+          //                       child: Text(
+          //                     "Logged In Successfully",
+          //                     style: TextStyle(
+          //                         color: Colors.black,
+          //                         fontSize: 16,
+          //                         fontWeight: FontWeight.bold),
+          //                   )),
+          //                 ],
+          //               )),
+          //           actions: [
+          //             Center(
+          //               child: FractionallySizedBox(
+          //                 widthFactor: 0.6,
+          //                 child: ElevatedButton(
+          //                   style: ButtonStyle(
+          //                       backgroundColor: WidgetStateProperty.all(
+          //                           themeController.primaryColor.value)),
+          //                   onPressed: () {
+          //                     Get.back();
+          //                   },
+          //                   child: const Text(
+          //                     "Okay",
+          //                     style: TextStyle(color: Colors.white),
+          //                   ),
+          //                 ),
+          //               ),
+          //             )
+          //           ],
+          //         ));
         }
 
         //  Get.snackbar('Login','Sucessfully');
@@ -143,10 +163,10 @@ class LoginViewModel extends GetxController {
     } catch (e) {
       logOutput("$e");
 
-      AppSnackbar.error(
-        "Request Failed",
-        getErrorMessage(e),
-      );
+      // AppSnackbar.error(
+      //   "Request Failed",
+      //   getErrorMessage(e),
+      // );
     }
     // logOutput('$e');
     // Get.snackbar('Error', 'Something went wrong. Please try again.');
@@ -156,20 +176,73 @@ class LoginViewModel extends GetxController {
   }
 }
 
-class SuccessDialog extends StatelessWidget {
-  const SuccessDialog({super.key});
+void showSuccessDialog(String message, {VoidCallback? onComplete}) {
+  showDialog(
+    context: Get.context!,
+    barrierDismissible: false,
+    builder: (context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+        ),
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// Animation
+              Lottie.asset(
+                "assets/animations/success.json",
+                height: 120,
+                repeat: false,
+              ),
 
-  @override
-  Widget build(BuildContext context) {
-    return const AlertDialog(
-      content: Row(
-        children: [
-          CircularProgressIndicator(),
-          SizedBox(width: 20),
-          Expanded(
-              child: Text("Login Successful!", style: TextStyle(fontSize: 16))),
-        ],
-      ),
-    );
-  }
+              const SizedBox(height: 15),
+
+              const Text(
+                "Success",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+
+  /// Auto close after 2 seconds
+  Future.delayed(const Duration(seconds: 2), () {
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
+    }
+    if (onComplete != null) {
+      onComplete();
+    }
+  });
 }

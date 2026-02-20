@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final companyList = companyListFromJson(jsonString);
-
 import 'dart:convert';
 
 CompanyList companyListFromJson(String str) =>
@@ -10,7 +6,7 @@ CompanyList companyListFromJson(String str) =>
 String companyListToJson(CompanyList data) => json.encode(data.toJson());
 
 class CompanyList {
-  List<companyData>? data;
+  List<CompanyData>? data;
 
   CompanyList({
     this.data,
@@ -19,8 +15,8 @@ class CompanyList {
   factory CompanyList.fromJson(Map<String, dynamic> json) => CompanyList(
         data: json["data"] == null
             ? []
-            : List<companyData>.from(
-                json["data"]!.map((x) => companyData.fromJson(x))),
+            : List<CompanyData>.from(
+                json["data"]!.map((x) => CompanyData.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -30,7 +26,7 @@ class CompanyList {
       };
 }
 
-class companyData {
+class CompanyData {
   String? id;
   String? dsa;
   String? bankName;
@@ -42,7 +38,7 @@ class companyData {
   String? address;
   String? gstin;
 
-  companyData({
+  CompanyData({
     this.id,
     this.dsa,
     this.bankName,
@@ -55,10 +51,10 @@ class companyData {
     this.gstin,
   });
 
-  factory companyData.fromJson(Map<String, dynamic> json) => companyData(
+  factory CompanyData.fromJson(Map<String, dynamic> json) => CompanyData(
         id: json["id"],
         dsa: json["dsa"],
-        bankName: json["bank_name"]!,
+        bankName: json["bank_name"] ?? '',
         companyName: json["company_name"],
         category: json["category"]!,
         dataType: json["data_type"],

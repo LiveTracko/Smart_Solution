@@ -23,18 +23,18 @@ import 'package:smart_solutions/widget/loading_page.dart';
 import 'package:smart_solutions/widget/searchbarwithclear.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
-// ignore: must_be_immutable
 class ActiveFiles extends StatefulWidget {
-  String title;
-  int status;
-  bool isShowBack = false;
-  bool isDrawer = false;
-  ActiveFiles(
+  final String title;
+  final int status;
+  final bool isShowBack;
+  final bool isDrawer;
+
+  const ActiveFiles(
       {super.key,
       required this.title,
       required this.status,
-      required this.isShowBack,
-      required this.isDrawer});
+      this.isShowBack = false,
+      this.isDrawer = false});
 
   @override
   State<ActiveFiles> createState() => _ActiveFilesState();
@@ -43,7 +43,7 @@ class ActiveFiles extends StatefulWidget {
 class _ActiveFilesState extends State<ActiveFiles> {
   final DataController dataController = Get.find<DataController>();
   final ActiveFilesController _activeFilesController =
-      Get.put(ActiveFilesController());
+      Get.find<ActiveFilesController>();
   final DialerController _dialerController = Get.find<DialerController>();
   final ThemeController _themeController = Get.find<ThemeController>();
   final FollowBackFormController _formController =
@@ -53,6 +53,7 @@ class _ActiveFilesState extends State<ActiveFiles> {
       Get.find<ChartCardsController>();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  static final ThemeController themeController = Get.find<ThemeController>();
 
   @override
   void initState() {
@@ -77,15 +78,6 @@ class _ActiveFilesState extends State<ActiveFiles> {
         title: widget.title,
         isDrawer: widget.isDrawer,
         showBack: widget.isShowBack,
-        // actions: [
-        //   Padding(
-        //     padding: const EdgeInsets.all(5.0),
-        //     child: IconButton(
-        //       onPressed: () => Get.to(() => const NotificationSCreen()),
-        //       icon: SvgPicture.asset('assets/images/notification.svg'),
-        //     ),
-        //   ),
-        // ],
         key: _scaffoldKey,
         body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Container(
@@ -222,6 +214,9 @@ class _ActiveFilesState extends State<ActiveFiles> {
                           },
                           title: data.customerName ?? '',
                           subtitle: data.loginBank ?? '',
+                          date: DateFormat('dd-MM-yyyy')
+                              .format(DateTime.parse(data.date.toString())),
+                          mobNo: maskFirst6Digits(data.mobileNo ?? ''),
                           status: data.status ?? '',
                           statusColor:
                               data.dataStatus?.toLowerCase() == 'active'
@@ -250,13 +245,13 @@ class _ActiveFilesState extends State<ActiveFiles> {
                                 iconRight: Icons.person_2_outlined,
                                 valueRight: data.tlName ?? '',
                               ),
-                            _buildDoubleRow(
-                              iconLeft: 'assets/images/call.svg',
-                              valueLeft: maskFirst6Digits(data.mobileNo ?? ''),
-                              iconRight: 'assets/images/calendar.svg',
-                              valueRight: DateFormat('dd-MM-yyyy')
-                                  .format(DateTime.parse(data.date.toString())),
-                            ),
+                            // _buildDoubleRow(
+                            //   iconLeft: 'assets/images/call.svg',
+                            //   valueLeft: maskFirst6Digits(data.mobileNo ?? ''),
+                            //   iconRight: 'assets/images/calendar.svg',
+                            //   valueRight: DateFormat('dd-MM-yyyy')
+                            //       .format(DateTime.parse(data.date.toString())),
+                            // ),
                             _buildSingleRow(
                                 'assets/images/message_dots_circle.svg',
                                 data.comments ?? 'NA'),
@@ -371,7 +366,7 @@ class _ActiveFilesState extends State<ActiveFiles> {
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.primaryColor,
+        color: themeController.primaryColor.value,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(

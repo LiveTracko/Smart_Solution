@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/controllers/follow_form_controller.dart';
@@ -17,6 +18,7 @@ import 'package:smart_solutions/views/dialer_screen.dart';
 import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_request_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
+import '../controllers/chartCard_controller.dart';
 import 'dashboard_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -37,6 +39,8 @@ class _MainScreenState extends State<MainScreen> {
   late int _previousIndex;
   bool _isCheckingAuth = false;
   final ThemeController themeController = Get.find<ThemeController>();
+  final CommonFilterController _commonFilterController =
+      Get.find<CommonFilterController>();
 
   @override
   void initState() {
@@ -103,8 +107,8 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
         PersistentTabConfig(
-          screen: ActiveFiles(
-            key: const ValueKey('leads_screen'),
+          screen: const ActiveFiles(
+            key: ValueKey('leads_screen'),
             title: 'Leads',
             status: -1,
             isShowBack: false,
@@ -415,6 +419,11 @@ class _MainScreenState extends State<MainScreen> {
   void _onTabChanged(int newIndex) async {
     if (newIndex == _previousIndex) return;
 
+    if (newIndex != _previousIndex) {
+      // Reset chart index when switching tab
+      Get.find<ChartCardsController>().selectedIndex.value = 0;
+    }
+
     final ok = await _ensureLoggedIn();
     if (!ok) {
       Future.microtask(() {
@@ -438,6 +447,8 @@ class _MainScreenState extends State<MainScreen> {
         Get.find<FollowBackFormController>().fetchFollowBackList();
         break;
     }
+
+    _commonFilterController.clearDateFilter();
 
     _previousIndex = newIndex;
   }

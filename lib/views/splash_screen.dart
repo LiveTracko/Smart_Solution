@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/routes/app_routes.dart';
-import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:smart_solutions/widget/text_style.dart';
-
 import '../controllers/theme_controller.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -23,6 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     checkForUpdate();
+    _loadVersion();
     //  _checkLoginStatus(); // Check login status when the splash screen initializes
   }
 
@@ -83,7 +82,6 @@ class _SplashScreenState extends State<SplashScreen> {
         // Force the user to update immediately
         await InAppUpdate.performImmediateUpdate();
       } else {
-        // No update needed
         _checkLoginStatus();
       }
     } catch (e) {
@@ -107,22 +105,107 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
+  String appVersion = '';
+
+  Future<void> _loadVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    setState(() {
+      appVersion = "Version ${info.version}";
+    });
+  }
+
+  static final ThemeController themeController = Get.find<ThemeController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor, // Background color
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Replace this with your app's logo image
-            Image.asset(
-              'assets/images/app_logo_with_name.png',
-              //  'assets/images/splash_logo.png', // Make sure the path matches your image location
-              height: 100.h, // Use responsive height
-              width: 250.w, // Use responsive width
-            ),
-          ],
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF1976D2), // Your theme color
+              Color(0xFF1565C0), // Slight darker shade
+            ],
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TweenAnimationBuilder(
+                duration: const Duration(milliseconds: 900),
+                tween: Tween(begin: 0.7, end: 1.0),
+                curve: Curves.easeOutBack,
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: child,
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(25),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.1),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.3),
+                        blurRadius: 30,
+                        spreadRadius: 5,
+                      ),
+                    ],
+                  ),
+                  child: Image.asset(
+                    'assets/images/app_logo.png',
+                    height: 140.h,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              const Text(
+                "Smart Dial",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              const Text(
+                "Smart Business Tracking",
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              /// Loading Indicator
+              const CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+
+              const SizedBox(height: 20),
+
+              Text(
+                appVersion,
+                style: const TextStyle(
+                  color: Colors.white54,
+                  fontSize: 12,
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

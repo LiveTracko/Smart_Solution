@@ -33,56 +33,56 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
     controller.fetchFollowBackList();
   }
 
-  String _formatDate(String dateString) {
-    try {
-      // Try to parse the date properly, handling different formats
-      DateTime parsedDate = DateFormat('yyyy-M-d').parse(dateString);
-      return DateFormat('dd-MM-yyyy').format(parsedDate);
-    } catch (e) {
-      return 'Invalid Date'; // Handle parsing errors gracefully
-    }
-  }
+  // String _formatDate(String dateString) {
+  //   try {
+  //     // Try to parse the date properly, handling different formats
+  //     DateTime parsedDate = DateFormat('yyyy-M-d').parse(dateString);
+  //     return DateFormat('dd-MM-yyyy').format(parsedDate);
+  //   } catch (e) {
+  //     return 'Invalid Date'; // Handle parsing errors gracefully
+  //   }
+  // }
 
-  Future<void> _selectDate(BuildContext context, bool isFromDate) async {
-    DateTime now = DateTime.now();
-    DateTime initialDate = isFromDate
-        ? controller.fromDate.value ?? now
-        : controller.toDate.value ?? controller.fromDate.value ?? now;
+  // Future<void> _selectDate(BuildContext context, bool isFromDate) async {
+  //   DateTime now = DateTime.now();
+  //   DateTime initialDate = isFromDate
+  //       ? controller.fromDate.value ?? now
+  //       : controller.toDate.value ?? controller.fromDate.value ?? now;
 
-    DateTime firstDate = isFromDate
-        ? DateTime(2000)
-        : controller.fromDate.value ?? DateTime(2000);
-    DateTime lastDate = DateTime(2100);
+  //   DateTime firstDate = isFromDate
+  //       ? DateTime(2000)
+  //       : controller.fromDate.value ?? DateTime(2000);
+  //   DateTime lastDate = DateTime(2100);
 
-    DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: firstDate,
-      lastDate: lastDate,
-    );
+  //   DateTime? pickedDate = await showDatePicker(
+  //     context: context,
+  //     initialDate: initialDate,
+  //     firstDate: firstDate,
+  //     lastDate: lastDate,
+  //   );
 
-    if (pickedDate != null) {
-      if (isFromDate) {
-        controller.setFromDate(pickedDate);
+  //   if (pickedDate != null) {
+  //     if (isFromDate) {
+  //       controller.setFromDate(pickedDate);
 
-        // // Reset `toDate` if it's before `fromDate`
-        // if (controller.toDate.value != null && controller.toDate.value!.isBefore(pickedDate)) {
-        //   controller.setToDate(pickedDate);
-        // }
-      } else {
-        controller.setToDate(pickedDate);
-      }
-    }
+  //       // // Reset `toDate` if it's before `fromDate`
+  //       // if (controller.toDate.value != null && controller.toDate.value!.isBefore(pickedDate)) {
+  //       //   controller.setToDate(pickedDate);
+  //       // }
+  //     } else {
+  //       controller.setToDate(pickedDate);
+  //     }
+  //   }
 
-    debugPrint("pickedDate: $pickedDate");
+  //   debugPrint("pickedDate: $pickedDate");
 
-    if (controller.fromDate.value != null && controller.toDate.value != null) {
-      controller.getDataOnMonth(
-        DateFormat('d-M-yyyy').format(controller.fromDate.value!),
-        DateFormat('d-M-yyyy').format(controller.toDate.value!),
-      );
-    }
-  }
+  //   if (controller.fromDate.value != null && controller.toDate.value != null) {
+  //     controller.getDataOnMonth(
+  //       DateFormat('d-M-yyyy').format(controller.fromDate.value!),
+  //       DateFormat('d-M-yyyy').format(controller.toDate.value!),
+  //     );
+  //   }
+  // }
 
   @override
   void initState() {
@@ -100,59 +100,6 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Obx(() {
-            //   return Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //     crossAxisAlignment: CrossAxisAlignment.center,
-            //     children: [
-            //       // Expanded(
-            //       //   child: SizedBox(
-            //       //     width: 100,
-            //       //     height: 50,
-            //       //     child: TextField(
-            //       //       style: TextStyle(color: Colors.black),
-            //       //       readOnly: true,
-            //       //       decoration: const InputDecoration(
-            //       //         labelText: "From Date",
-            //       //         suffixIcon: Icon(Icons.calendar_today),
-            //       //         border: OutlineInputBorder(),
-            //       //       ),
-            //       //       controller: controller.fromDateController
-            //       //         ..text = DateFormat("yyyy-MM-dd").format(
-            //       //             controller.fromDate.value ?? DateTime.now()),
-            //       //       onTap: () => {_selectDate(context, true)},
-            //       //     ),
-            //       //   ),
-            //       // ),
-            //       // Expanded(
-            //       //   child: SizedBox(
-            //       //     width: 100,
-            //       //     height: 50,
-            //       //     child: TextField(
-            //       //       style: TextStyle(color: Colors.black),
-            //       //       readOnly: true,
-            //       //       decoration: const InputDecoration(
-            //       //         labelText: "to Date",
-            //       //         suffixIcon: Icon(Icons.calendar_today),
-            //       //         border: OutlineInputBorder(),
-            //       //       ),
-            //       //       controller: controller.toDateController
-            //       //         ..text = DateFormat("yyyy-MM-dd").format(
-            //       //             controller.toDate.value ?? DateTime.now()),
-            //       //       onTap: () => {_selectDate(context, false)},
-            //       //     ),
-            //       //   ),
-            //       // ),
-
-            //       // DatePickerDialog(
-
-            //       //     firstDate: DateTime.now(), lastDate: DateTime.now()),
-            //       //    DatePickerDialog(
-            //       //     firstDate: DateTime.now(), lastDate: DateTime.now())
-            //     ],
-            //   );
-            // }),
-
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Obx(
@@ -249,16 +196,6 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
                               ),
                             ],
                           ),
-                    // MonthDropdown(
-                    //   onChanged: (value) {
-                    //     print("val: $value");
-                    //     controller.getDataOnMonth(
-                    //       value,
-                    //       DateTime.now().toString(),
-                    //     );
-                    //   },
-                    // ),
-
                     const Spacer(),
                     Row(
                       children: [
@@ -294,52 +231,13 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
                             )),
                       ],
                     )
-                    // InkWell(
-                    //   onTap: () {
-                    //     controller.clearDateRange();
-                    //     controller.fetchFollowBackList();
-                    //   },
-                    //   child: Container(
-                    //     padding: EdgeInsets.all(5.0.w),
-                    //     decoration: BoxDecoration(
-                    //       color: AppColors.grid1.withOpacity(0.3),
-                    //       borderRadius: BorderRadius.circular(25),
-                    //     ),
-                    //     child: Icon(
-                    //       Icons.close,
-                    //       size: 20.sp,
-                    //     ),
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
-            ), // Search Bar
-            // Padding(
-            //   padding: const EdgeInsets.all(12.0),
-            //   child:
-            //    TextField(
-            //     controller: _searchController,
-            //     style: const TextStyle(color: AppColors.textColor2),
-            //     decoration: InputDecoration(
-            //       hintText: 'Search by name, mobile, or bank...',
-            //       hintStyle: const TextStyle(color: Colors.grey),
-            //       prefixIcon: const Icon(Icons.search, color: Colors.grey),
-            //       filled: true,
-            //       fillColor: Colors.white,
-            //       border: OutlineInputBorder(
-            //         borderRadius: BorderRadius.circular(10),
-            //       ),
-            //     ),
-            //     onChanged: (value) {
-            //       controller.updateFilteredFollowBackList(value);
-            //     },
-            //   ),
-            // ),
-
+            ),
             Expanded(
               child: Obx(() {
-                if (controller.isLoading.value) {
+                if (controller.isInitialLoading.value) {
                   return const Center(child: LoadingPage());
                 }
 
@@ -357,24 +255,11 @@ class _FollowBackListScreenState extends State<FollowBackListScreen> {
                   itemCount: displayedList.length,
                   itemBuilder: (context, index) {
                     final item = displayedList[index];
-                    // DateTime? followbackdate = DateTime.now();
-                    // print(' this is the follow back dat $followbackdate');
-                    // if (item.followupDate != null &&
-                    //     item.followupDate!.isNotEmpty) {
-                    //   followbackdate = DateTime.tryParse(item.followupDate!);
-                    // }
 
-                    // DateTime? FollowUpDate = null;
-                    // if (item.followupDate != null ||
-                    //     item.followupDate!.isNotEmpty ||
-                    //     item.followupDate != "-") {
-                    //   FollowUpDate = DateTime.tryParse(item.followupDate!);
+                    // DateTime? entryDate = DateTime.now();
+                    // if (item.entryDate != null && item.entryDate!.isNotEmpty) {
+                    //   entryDate = DateTime.tryParse(item.entryDate!);
                     // }
-
-                    DateTime? entryDate = DateTime.now();
-                    if (item.entryDate != null && item.entryDate!.isNotEmpty) {
-                      entryDate = DateTime.tryParse(item.entryDate!);
-                    }
                     return Container(
                       margin: const EdgeInsets.symmetric(
                           vertical: 5, horizontal: 4),

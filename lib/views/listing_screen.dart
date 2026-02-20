@@ -95,8 +95,9 @@ class _ListingScreenState extends State<ListingScreen> {
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
+        isDrawer: true,
         title: 'Listing Page',
-        showBack: true,
+        showBack: widget.isShowBack,
         key: _scaffoldKey,
         body: Column(children: [
           Container(
@@ -142,9 +143,10 @@ class _ListingScreenState extends State<ListingScreen> {
                         pincodeController.fetchPincodes(search: "");
                       }
                     },
+
                     onChanged: (value) {
                       if (_debounce?.isActive ?? false) _debounce!.cancel();
-                      _debounce = Timer(const Duration(milliseconds: 400), () {
+                      _debounce = Timer(const Duration(milliseconds: 800), () {
                         final trimmed = value.trim();
 
                         if (_chartCardsController.selectedIndex.value == 0) {
@@ -384,9 +386,11 @@ class _ListingScreenState extends State<ListingScreen> {
 
             final data = list[index];
             return CommonTitleCard(
-                leading: SvgPicture.asset(
-                  'assets/images/bank.svg',
-                  color: themeController.primaryColor.value,
+                leading: Obx(
+                  () => SvgPicture.asset(
+                    'assets/images/bank.svg',
+                    color: themeController.primaryColor.value,
+                  ),
                 ),
                 title: data.bankName.toString(),
                 subtitle: data.companyName.toString(),
@@ -424,9 +428,11 @@ class _ListingScreenState extends State<ListingScreen> {
             final data = list[i];
 
             return CommonTitleCard(
-                leading: SvgPicture.asset(
-                  'assets/images/bank.svg',
-                  color: themeController.primaryColor.value,
+                leading: Obx(
+                  () => SvgPicture.asset(
+                    'assets/images/bank.svg',
+                    color: themeController.primaryColor.value,
+                  ),
                 ),
                 title: data.bankName.toString(),
                 subtitle: data.city.toString(),

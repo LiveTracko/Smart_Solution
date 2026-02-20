@@ -16,6 +16,8 @@ import 'package:smart_solutions/widget/loading_page.dart';
 import 'package:smart_solutions/widget/searchbarwithclear.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
+import '../constants/static_stored_data.dart';
+
 class CallLogPage extends StatefulWidget {
   final String title;
   final bool isRefresh;
@@ -169,6 +171,8 @@ class _CallLogPageState extends State<CallLogPage> {
                           color: _themeController.primaryColor.value,
                         ),
                       ),
+                      date: formatDate(data.entryDate),
+                      mobNo: maskFirst6Digits(data.contactNumber ?? ''),
                       onLeadingTap: () {
                         _diallerController.makePhoneCall(
                             data.contactNumber ?? '',
@@ -187,12 +191,13 @@ class _CallLogPageState extends State<CallLogPage> {
                         _diallerController.excel_id.value = '';
                       },
                       title: data.customerName ?? '',
-                      subtitle: formatDate(data.entryDate),
+                      //   subtitle: formatDate(data.entryDate),
+                      subtitle: data.bankName.toString(),
                       status: data.remarkStatus ?? '',
                       statusColor: data.contactStatus == '1'
                           ? Colors.green.shade400
                           : Colors.redAccent.shade200,
-                      amount: data.bankName.toString(),
+                      amount: data.callDuration.toString(),
                       //     showEdit: StaticStoredData.roleName != 'telecaller',
                       // onEdit: () {
                       //   dataController.editLoadData();
@@ -204,12 +209,12 @@ class _CallLogPageState extends State<CallLogPage> {
                       //   ));
                       // },
                       children: [
-                        _commonRows.buildDoubleRow(
-                          iconLeft: 'assets/images/call.svg',
-                          valueLeft: maskFirst6Digits(data.contactNumber ?? ''),
-                          iconRight: 'assets/images/clock.svg',
-                          valueRight: data.callDuration ?? '',
-                        ),
+                        // _commonRows.buildDoubleRow(
+                        //   iconLeft: 'assets/images/call.svg',
+                        //   valueLeft: maskFirst6Digits(data.contactNumber ?? ''),
+                        //   iconRight: 'assets/images/clock.svg',
+                        //   valueRight: data.callDuration ?? '',
+                        // ),
                         _commonRows.buildSingleRow(
                             'assets/images/message_dots_circle.svg',
                             data.remark ?? 'NA'),

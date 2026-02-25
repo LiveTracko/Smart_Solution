@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
+import 'package:smart_solutions/controllers/active_files_controller.dart';
 import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
@@ -420,8 +421,17 @@ class _MainScreenState extends State<MainScreen> {
     if (newIndex == _previousIndex) return;
 
     if (newIndex != _previousIndex) {
-      // Reset chart index when switching tab
+      Get.find<ActiveFilesController>().filterController.clearFilters();
       Get.find<ChartCardsController>().selectedIndex.value = 0;
+    }
+
+    if (newIndex == 1) {
+      Get.find<ActiveFilesController>().startWorker();
+      Get.find<FollowBackFormController>().stopWorker();
+    }
+    if (newIndex == 3) {
+      Get.find<FollowBackFormController>().startWorker();
+      Get.find<ActiveFilesController>().stopWorker();
     }
 
     final ok = await _ensureLoggedIn();

@@ -21,7 +21,7 @@ class CommonFilterController extends GetxController {
 
   void clearDateFilter() {
     selectedFilter.value = 0;
-
+    selectedRange.value = null;
     isDateRangeSelected.value = false;
   }
 

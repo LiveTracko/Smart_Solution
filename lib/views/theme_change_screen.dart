@@ -105,6 +105,9 @@ class ThemeChangeScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               themeController.changeThemeColor(tempColor);
+              themeController.saveThemeColor(
+                  StaticStoredData.userId, tempColor);
+              // themeController.changeThemeColor(tempColor);
               Get.back();
             },
             child: const Text("Apply"),

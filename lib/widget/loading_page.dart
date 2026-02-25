@@ -9,27 +9,21 @@ class LoadingPage extends StatefulWidget {
   State<LoadingPage> createState() => _LoadingPageState();
 }
 
-ThemeController _themeController = Get.find<ThemeController>();
-
 class _LoadingPageState extends State<LoadingPage> {
+  final ThemeController _themeController = Get.find<ThemeController>();
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: SizedBox(
-      height: 40,
-      width: 40,
-      child: Obx(
-        () => Theme(
-          data: ThemeData(
-            progressIndicatorTheme: ProgressIndicatorThemeData(
-              color: _themeController.primaryColor.value,
-            ),
-          ),
-          child: const CircularProgressIndicator(
-            strokeWidth: 5, // thickness of the circle
-          ),
-        ),
+      child: SizedBox(
+        height: 40,
+        width: 40,
+        child: Obx(() => CircularProgressIndicator(
+              strokeWidth: 5,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                _themeController.primaryColor.value,
+              ),
+            )),
       ),
-    ));
+    );
   }
 }

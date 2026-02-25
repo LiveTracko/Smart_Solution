@@ -16,8 +16,6 @@ import 'package:smart_solutions/widget/loading_page.dart';
 import 'package:smart_solutions/widget/searchbarwithclear.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
-import '../constants/static_stored_data.dart';
-
 class CallLogPage extends StatefulWidget {
   final String title;
   final bool isRefresh;

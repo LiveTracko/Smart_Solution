@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/controllers/remark_status_controller.dart';
@@ -79,23 +78,18 @@ class FollowBackFormController extends GetxController
 
   final TextEditingController searchController = TextEditingController();
 
-  final CommonFilterController commonFilterController =
-      Get.put(CommonFilterController());
-
   final CommonFilterController filterController =
       Get.find<CommonFilterController>();
+
+  Worker? _worker;
+
   @override
   void onInit() async {
-    // debounce(filterController.fromDate, (_) => _handleDateChange(),
-    //     time: const Duration(milliseconds: 200));
-
-    // debounce(filterController.toDate, (_) => _handleDateChange(),
-    //     time: const Duration(milliseconds: 200));
-
+    // _startWorker();
     ever(followBackList, (_) => updateFilteredList());
     ever(selectedFilter, (_) => updateFilteredList());
 
-    await fetchFollowBackList();
+    // await fetchFollowBackList();
     customerNumberController.addListener(() {
       mobile.value = customerNumberController.text;
     });
@@ -121,6 +115,33 @@ class FollowBackFormController extends GetxController
     super.onInit();
   }
 
+  void startWorker() {
+    _worker = ever(filterController.selectedRange, (_) {
+      fetchFollowBackList();
+    });
+  }
+
+  void stopWorker() {
+    _worker?.dispose();
+    _worker = null;
+  }
+
+  void restartWorker() {
+    stopWorker();
+    startWorker();
+  }
+
+  @override
+  void onClose() {
+    stopWorker();
+    super.onClose();
+
+    searchController.dispose();
+    customerNumberController.dispose(); // Use dispose, not clear
+
+    filterScrollController.dispose();
+  }
+
   // void _handleDateChange() {
   //   final from = filterController.fromDate.value;
   //   final to = filterController.toDate.value;
@@ -132,20 +153,6 @@ class FollowBackFormController extends GetxController
   //     fetchFollowBackList();
   //   }
   // }
-
-  @override
-  void onClose() {
-    // 1. Dispose all controllers properly
-    searchController.dispose();
-    customerNumberController.dispose(); // Use dispose, not clear
-
-    filterScrollController.dispose();
-
-    // 2. TabController must be disposed
-    //   callController.dispose();
-
-    super.onClose();
-  }
 
   Future<void> loadData(bool isRefresh) async {
     isBankAndStatusLoading(true);
@@ -275,17 +282,6 @@ class FollowBackFormController extends GetxController
       followBackList.clear();
       allCustomerName.clear();
     }
-    String selectedDateRange;
-    DateTime? first;
-    DateTime? second;
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final secureType = prefs.getInt('secureType');
-    // final String dateRage = dateRangeList.isNotEmpty &&
-    //         dateRangeList.first != null &&
-    //         dateRangeList.last != null
-    //     ? "${dateRangeList.first},${dateRangeList.last}"
-    //     : "";
 
     final Map<String, dynamic> formData = {
       "telecaller_id": StaticStoredData.userId,
@@ -294,16 +290,12 @@ class FollowBackFormController extends GetxController
       // "secure_type": secureType.toString(),
     };
 
-    // if (filterController.isDateRangeSelected.value) {
-    //   first = filterController.fromDate.value;
-    //   second = filterController.toDate.value;
+    final range = filterController.selectedRange.value;
 
-    //   if (first != null && second != null) {
-    //     selectedDateRange = "${DateFormat('dd-MM-yyyy').format(first)},"
-    //         "${DateFormat('dd-MM-yyyy').format(second)}";
-    //     formData.addAll({'daterange': selectedDateRange});
-    //   }
-    // }
+    if (range != null) {
+      formData['daterange'] = "${DateFormat('dd-MM-yyyy').format(range.start)},"
+          "${DateFormat('dd-MM-yyyy').format(range.end)}";
+    }
 
     if (searchText.value.isNotEmpty) {
       formData['search'] = searchText.value.trim();
@@ -316,10 +308,8 @@ class FollowBackFormController extends GetxController
     }
 
     try {
-      var response = await _apiService.postRequest(
-        APIUrls.updatedcalllog,
-        formData,
-      );
+      var response =
+          await _apiService.postRequest(APIUrls.updatedcalllog, formData);
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
@@ -588,7 +578,7 @@ class FollowBackFormController extends GetxController
           tellecallerList.assignAll(teamleader.data);
         } else {
           teamleaderList.assignAll(teamleader.data);
-          commonFilterController.setFilters(
+          filterController.setFilters(
             teamleaderList.map((e) => e.name).toList(),
           );
         }

@@ -115,8 +115,7 @@ class LoginRequestController extends GetxController {
               .map((e) => e.telecallerId)
               .toList();
 
-          print('month count$monthlyCount');
-          print('today count$todayCount');
+
 
           await getRemarks();
           isLoading(false);
@@ -343,7 +342,7 @@ class LoginRequestController extends GetxController {
     final chipText =
         hasChipSelected ? filters[selectedIndex].toLowerCase() : '';
 
-    final isDateSelected = filterController.selectedRange.value;
+
 
     loginRequestList.value = allLoginRequestList.where((item) {
       final name = item.customerName.toLowerCase();

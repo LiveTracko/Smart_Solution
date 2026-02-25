@@ -53,7 +53,6 @@ class _ActiveFilesState extends State<ActiveFiles> {
       Get.find<ChartCardsController>();
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  static final ThemeController themeController = Get.find<ThemeController>();
 
   @override
   void initState() {
@@ -362,94 +361,97 @@ class _ActiveFilesState extends State<ActiveFiles> {
     required int totalCustomers,
     required String totalAmount,
   }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: themeController.primaryColor.value,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // CUSTOMERS
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(.2),
-                  borderRadius: BorderRadius.circular(8),
+    return Obx(
+      () => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: _themeController.primaryColor.value,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // CUSTOMERS
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child:
+                      const Icon(Icons.people, color: Colors.white, size: 16),
                 ),
-                child: const Icon(Icons.people, color: Colors.white, size: 16),
-              ),
-              const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Customers",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 11,
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Customers",
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 11,
+                      ),
                     ),
-                  ),
-                  Text(
-                    totalCustomers.toString(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                    Text(
+                      totalCustomers.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          /// DIVIDER
-          Container(
-            height: 28,
-            width: 1,
-            color: Colors.white.withOpacity(.3),
-          ),
-
-          /// AMOUNT
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(.2),
-                  borderRadius: BorderRadius.circular(8),
+                  ],
                 ),
-                child: const Icon(Icons.currency_rupee,
-                    color: Colors.white, size: 16),
-              ),
-              const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Amount",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 11,
-                    ),
+              ],
+            ),
+
+            /// DIVIDER
+            Container(
+              height: 28,
+              width: 1,
+              color: Colors.white.withOpacity(.3),
+            ),
+
+            /// AMOUNT
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(.2),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  Text(
-                    totalAmount,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                  child: const Icon(Icons.currency_rupee,
+                      color: Colors.white, size: 16),
+                ),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Amount",
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 11,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                    Text(
+                      totalAmount,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

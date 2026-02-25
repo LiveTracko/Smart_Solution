@@ -70,11 +70,10 @@ class _SearchBarWithClearState extends State<SearchBarWithClear> {
     focusNode.unfocus();
 
     final DateTimeRange? pickedRange = await showDateRangePicker(
-      context: context,
-      firstDate: widget.firstDate ?? DateTime(2000),
-      lastDate: widget.lastDate ?? DateTime(2100),
-      initialDateRange: _commonFilterController.selectedRange.value,
-    );
+        context: context,
+        firstDate: widget.firstDate ?? DateTime(2000),
+        lastDate: widget.lastDate ?? DateTime(2100),
+        initialDateRange: null);
 
     if (pickedRange != null) {
       _commonFilterController.setSelectedDate(

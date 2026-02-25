@@ -9,7 +9,6 @@ import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
 import '../constants/services.dart';
-
 class DataEntryForm extends StatefulWidget {
   String? id;
   String? tellecallerId;

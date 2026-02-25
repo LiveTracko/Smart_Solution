@@ -1079,7 +1079,7 @@ class _DashboardScreenState extends State<DashboardScreen>
                                         controller.totalNoValActive.toString(),
                                     statusColor: Colors.red,
                                     onPress: () {
-                                      Get.to(ActiveFiles(
+                                      Get.to(const ActiveFiles(
                                         title: 'InActive Files',
                                         status: 2,
                                         isShowBack: true,

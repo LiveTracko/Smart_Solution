@@ -19,13 +19,17 @@ class ActiveFilesController extends GetxController {
 
   var currentStatus = 0.obs;
 
+  Worker? _worker;
+
   @override
   void onInit() {
     super.onInit();
 
-    ever(filterController.selectedRange, (_) {
-      dataController.fetchDataEntryList();
-    });
+    // ever(filterController.selectedRange, (_) {
+    //   dataController.fetchDataEntryList();
+    // });
+
+   // _startWorker();
 
     ever<List<Data>>(dataController.dataList, (_) {
       updateFilteredList();
@@ -48,6 +52,29 @@ class ActiveFilesController extends GetxController {
     currentStatus.value = 1;
   }
 
+  void startWorker() {
+    _worker = ever(filterController.selectedRange, (_) {
+      dataController.fetchDataEntryList();
+    });
+  }
+
+  void stopWorker() {
+    _worker?.dispose();
+    _worker = null;
+  }
+
+  void restartWorker() {
+    stopWorker();
+    startWorker();
+  }
+
+  @override
+  void onClose() {
+    stopWorker();
+    _chartCardsController.selectedIndex.value = 0;
+    filterController.searchController.removeListener(_onSearchTextChanged);
+    super.onClose();
+  }
   // void _handleDateChange() {
   //   final from = filterController.fromDate.value;
   //   final to = filterController.toDate.value;
@@ -72,12 +99,12 @@ class ActiveFilesController extends GetxController {
     filterController.searchController.addListener(_onSearchTextChanged);
   }
 
-  @override
-  void onClose() {
-    _chartCardsController.selectedIndex.value = 0;
-    filterController.searchController.removeListener(_onSearchTextChanged);
-    super.onClose();
-  }
+  // @override
+  // void onClose() {
+  //   _chartCardsController.selectedIndex.value = 0;
+  //   filterController.searchController.removeListener(_onSearchTextChanged);
+  //   super.onClose();
+  // }
 
   void _onSearchTextChanged() {
     updateFilteredList();

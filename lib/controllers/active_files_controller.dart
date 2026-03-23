@@ -29,7 +29,7 @@ class ActiveFilesController extends GetxController {
     //   dataController.fetchDataEntryList();
     // });
 
-   // _startWorker();
+    // _startWorker();
 
     ever<List<Data>>(dataController.dataList, (_) {
       updateFilteredList();
@@ -40,7 +40,7 @@ class ActiveFilesController extends GetxController {
     filterController.searchController.addListener(() {
       dataController.searchText.value = filterController.searchController.text;
 
-      dataController.fetchDataEntryList();
+      // dataController.fetchDataEntryList();
     });
 
     ever(_chartCardsController.selectedIndex, (index) {
@@ -48,6 +48,15 @@ class ActiveFilesController extends GetxController {
       filterController.clearFilters();
       updateFilteredList();
     });
+
+    debounce(
+      dataController.searchText,
+      (value) {
+        dataController
+            .fetchDataEntryList(); // ⭐ API will call AFTER user stops typing
+      },
+      time: const Duration(milliseconds: 600),
+    );
 
     currentStatus.value = 1;
   }

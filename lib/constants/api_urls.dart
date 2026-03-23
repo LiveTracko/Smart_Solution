@@ -76,4 +76,5 @@ class APIUrls {
   static const String adminLoginRequest = 'Auth/getloginrequestforadmin';
   static const String adminLoginFiles = 'Auth/getloginfilesforadmin';
   static const String loginRequestTeamLeader = 'Auth/getloginrequestteamleader';
+  static const String getMobileDashboardData = 'Auth/getmobiledashboard';
 }

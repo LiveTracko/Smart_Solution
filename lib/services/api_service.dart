@@ -47,8 +47,8 @@ class ApiService {
 
     logOutput(
         'full url -->>> ${APIUrls.newBaseUrl}$companyName/api/index.php/"}$endpoint")');
-    logOutput("status code of $endpoint ${response.statusCode}");
-    logOutput("response of $endpoint ${response.body}");
+    // logOutput("status code of $endpoint ${response.statusCode}");
+    // logOutput("response of $endpoint ${response.body}");
     return response;
   }
 

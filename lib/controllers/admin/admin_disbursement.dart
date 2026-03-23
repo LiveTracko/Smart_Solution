@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/models/disbursement_model.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
 import 'package:smart_solutions/services/api_service.dart';
 
 import '../../constants/static_stored_data.dart';
+import '../common_filter_controller.dart';
 
 class DisbursementController extends GetxController {
   final ApiService _apiService = ApiService();
@@ -30,11 +32,23 @@ class DisbursementController extends GetxController {
   final disbursementTotal = Rxn<disbursementTotals>();
 
   final String teamleaderId = StaticStoredData.userId;
+  final CommonFilterController filterController =
+      Get.find<CommonFilterController>();
   @override
   void onInit() {
     super.onInit();
     getteamLeaderData();
     getDisbursementData(teamleaderId: teamleaderId); // initial load (All)
+
+    ever(filterController.selectedRange, (_) {
+      getDisbursementData(teamleaderId: StaticStoredData.userId);
+    });
+  }
+
+  @override
+  void onClose() {
+    clearFilters();
+    super.onClose();
   }
 
   // ---------------- TEAM LEADERS ----------------
@@ -64,9 +78,18 @@ class DisbursementController extends GetxController {
   }) async {
     iscallDisbursedLoading.value = true;
 
+    final Map<String, dynamic> formData = {'teamleader_id': teamleaderId};
+
+    final range = filterController.selectedRange.value;
+
+    if (range != null) {
+      formData['daterange'] = "${DateFormat('dd-MM-yyyy').format(range.start)},"
+          "${DateFormat('dd-MM-yyyy').format(range.end)}";
+    }
+
     try {
       final response = await _apiService.postRequest(
-          APIUrls.getDisbursementForAdmin, {"teamleader_id": teamleaderId});
+          APIUrls.getDisbursementForAdmin, formData);
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
@@ -153,6 +176,7 @@ class DisbursementController extends GetxController {
   void clearFilters() {
     selectedFilter.value = 0;
     searchController.clear();
+    filterController.clearDateFilter();
     getDisbursementData();
   }
 

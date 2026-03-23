@@ -12,7 +12,6 @@ import 'package:smart_solutions/widget/searchbarwithclear.dart';
 import 'package:smart_solutions/widget/summary_card.dart';
 import 'package:smart_solutions/widget/summary_header_card.dart';
 import 'package:smart_solutions/widget/text_style.dart';
-
 import '../../constants/static_stored_data.dart';
 
 class AdminCallLog extends StatefulWidget {
@@ -58,6 +57,7 @@ class _AdminCallLogState extends State<AdminCallLog> {
                   controller: _controller.searchController,
                   onClear: _controller.clearFilters,
                   onChanged: (_) {
+                    
                     _controller.filterCallLogs(
                         searchQuery: _controller.searchController.text);
                   },

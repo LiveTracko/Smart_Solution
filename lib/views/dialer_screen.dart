@@ -32,11 +32,11 @@ class _DialerScreenState extends State<DialerScreen> {
   int callsToBeHeld = 5;
   final ThemeController themeController = Get.find<ThemeController>();
 
-  @override
-  void initState() {
-    super.initState();
-    _formController.loadData(false);
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _formController.loadData(false);
+  // }
 
   @override
   void dispose() {

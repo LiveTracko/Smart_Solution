@@ -141,6 +141,7 @@ class CallStateService {
       // Determine contacted status
       final bool isContacted = callDuration > 0;
       followController.isDurationAvailable.value = callDuration < 0;
+
       followController.contacted.value = isContacted ? 'Yes' : 'No';
 
       // API status value

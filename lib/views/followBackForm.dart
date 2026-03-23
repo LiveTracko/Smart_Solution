@@ -8,7 +8,6 @@ import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/remark_status_controller.dart';
 import 'package:smart_solutions/controllers/theme_controller.dart';
-
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
@@ -50,10 +49,15 @@ class _FollowBackFormState extends State<FollowBackForm> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _dialerController.fetchLastCallInfoIfNeeded(widget.isgetData);
-    });
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initialLoad();
+    });
+  }
+
+  Future<void> _initialLoad() async {
+    await _dialerController.fetchLastCallInfoIfNeeded(widget.isgetData);
+    await _formController.loadData(false);
   }
 
   @override
@@ -160,14 +164,7 @@ class _FollowBackFormState extends State<FollowBackForm> {
                       }
                     }
                   },
-                  child:
-                      //Obx(() {
-                      // if (_formController.isBankAndStatusLoading.value) {
-                      //   return const Center(child: LoadingPage());
-                      // } else {
-                      //   return
-
-                      Padding(
+                  child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Form(
                       key: _formKey,
@@ -279,8 +276,8 @@ class _FollowBackFormState extends State<FollowBackForm> {
                               // ------- Salary Field -------
                               Expanded(
                                 child: _buildTextField(
-                                  isRead:
-                                      _dialerController.salary.value.isNotEmpty,
+                                  // isRead:
+                                  //     _dialerController.salary.value.isNotEmpty,
                                   inputType: TextInputType.number,
                                   label: 'Salary',
                                   prefixIcon: SvgPicture.asset(
@@ -306,8 +303,8 @@ class _FollowBackFormState extends State<FollowBackForm> {
                               // ------- Loan Amount Field -------
                               Expanded(
                                 child: _buildTextField(
-                                  isRead: _dialerController
-                                      .customerLoan.value.isNotEmpty,
+                                  // isRead: _dialerController
+                                  //     .customerLoan.value.isNotEmpty,
                                   label: 'Loan Amount',
                                   inputType: TextInputType.number,
                                   prefixIcon: SvgPicture.asset(
@@ -395,17 +392,17 @@ class _FollowBackFormState extends State<FollowBackForm> {
         ));
   }
 
-  Widget _buildTextField(
-      {required String label,
-      String? value,
-      TextEditingController? controller,
-      bool? isRead,
-      required ValueChanged<String> onChanged,
-      required String? Function(String?)? validator,
-      Widget? prefixIcon,
-      TextInputType inputType = TextInputType.text,
-      int maxLines = 1,
-      s}) {
+  Widget _buildTextField({
+    required String label,
+    String? value,
+    TextEditingController? controller,
+    bool? isRead,
+    required ValueChanged<String> onChanged,
+    required String? Function(String?)? validator,
+    Widget? prefixIcon,
+    TextInputType inputType = TextInputType.text,
+    int maxLines = 1,
+  }) {
     Widget? decoratedPrefixIcon;
 
     if (prefixIcon != null) {
@@ -903,7 +900,6 @@ class _FollowBackFormState extends State<FollowBackForm> {
         );
       }
 
-      // Add all items from sourcing list
       dropdownItems.addAll(_loginRequestController.sourcingList.map((source) {
         return DropdownMenuItem<String>(
           value: source.id,
@@ -1027,24 +1023,26 @@ class _FollowBackFormState extends State<FollowBackForm> {
               ? null
               : () async {
                   if (_formKey.currentState!.validate()) {
-                    final res = await _formController.submitFollowUp();
+                    //  final res =
+                    await _formController.submitFollowUp();
                     // Hide keyboard first (optional)
                     // FocusManager.instance.primaryFocus?.unfocus();
 
                     // Show snackbar here in the UI
-                    if (res) {
-                      Get.snackbar(
-                        'Success',
-                        'Follow up saved successfully',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor:
-                            themeController.primaryColor.value.withOpacity(0.5),
-                        colorText: Colors.white,
-                        margin: const EdgeInsets.all(12),
-                        borderRadius: 8,
-                        duration: const Duration(seconds: 2),
-                      );
-                    }
+                    // if (res) {
+                    //   Get.back();
+                    //   Get.snackbar(
+                    //     'Success',
+                    //     'Follow up saved successfully',
+                    //     snackPosition: SnackPosition.BOTTOM,
+                    //     backgroundColor:
+                    //         themeController.primaryColor.value.withOpacity(0.5),
+                    //     colorText: Colors.green,
+                    //     margin: const EdgeInsets.all(12),
+                    //     borderRadius: 8,
+                    //     duration: const Duration(seconds: 2),
+                    //   );
+                    // }
                   }
                 },
           style: ElevatedButton.styleFrom(

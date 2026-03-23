@@ -27,7 +27,7 @@ class _DailyMonthlyCountState extends State<DailyMonthlyCount> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   late final AdminCallBackController _adminCallBackController =
-      AdminCallBackController();
+      Get.find<AdminCallBackController>();
 
   final ThemeController themeController = Get.find<ThemeController>();
   final bool isTeamLeader = StaticStoredData.roleName == 'teamleader';
@@ -458,7 +458,7 @@ class _DailyMonthlyCountState extends State<DailyMonthlyCount> {
               kVerticalSpace(10),
 
               // TOTAL SUMMARY
-              _buildDataEntryTotalSummary(),
+              _buildLoginFileTotalSummary(),
             ],
           ),
         ),
@@ -481,82 +481,10 @@ class _DailyMonthlyCountState extends State<DailyMonthlyCount> {
     );
   }
 
-  // Widget _buildDataEntryTotalSummary() {
-  //   return SummaryHeaderCard(
-  //     title: 'Total',
-  //     duration: '',
-  //     rows: [
-  //       Container(
-  //         padding: const EdgeInsets.all(5),
-  //         decoration: BoxDecoration(
-  //           color: AppColors.appBarTextColor,
-  //           borderRadius: BorderRadius.circular(15),
-  //         ),
-  //         child: Row(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             // TODAY
-  //             RichText(
-  //               text: TextSpan(
-  //                 children: [
-  //                   const TextSpan(
-  //                     text: 'Today - ',
-  //                     style: TextStyle(
-  //                       color: Colors.grey,
-  //                       fontSize: 14,
-  //                     ),
-  //                   ),
-  //                   TextSpan(
-  //                     text: _dataController.todayCount.length.toString(),
-  //                     style: const TextStyle(
-  //                       color: Colors.black,
-  //                       fontSize: 14,
-  //                       fontWeight: FontWeight.w600,
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //             const SizedBox(
-  //               height: 20,
-  //               child: VerticalDivider(
-  //                 color: Colors.grey,
-  //                 thickness: 1,
-  //               ),
-  //             ),
-  //             // MONTHLY
-  //             RichText(
-  //               text: TextSpan(
-  //                 children: [
-  //                   const TextSpan(
-  //                     text: 'Monthly - ',
-  //                     style: TextStyle(
-  //                       color: Colors.grey,
-  //                       fontSize: 14,
-  //                     ),
-  //                   ),
-  //                   TextSpan(
-  //                     text: _dataController.monthlyCount.length.toString(),
-  //                     style: const TextStyle(
-  //                       color: Colors.black,
-  //                       fontSize: 14,
-  //                       fontWeight: FontWeight.w600,
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  Widget _buildDataEntryTotalSummary() {
+  Widget _buildLoginFileTotalSummary() {
     return Obx(() {
-      final today = _adminCallBackController.todayTotal.value;
-      final monthly = _adminCallBackController.monthlyTotal.value;
+      final today = _adminCallBackController.logintodayTotal.value;
+      final monthly = _adminCallBackController.loginmonthlyTotal.value;
       final total = today + monthly;
       return SummaryHeaderCard(
         title: total,
@@ -567,14 +495,14 @@ class _DailyMonthlyCountState extends State<DailyMonthlyCount> {
             children: [
               _summaryStat(
                 label: "Today",
-                value: _adminCallBackController.todayTotal.toString(),
+                value: today.toString(),
                 icon: Icons.today_outlined,
                 color: Colors.blue,
               ),
               const SizedBox(width: 12),
               _summaryStat(
                 label: "Monthly",
-                value: _adminCallBackController.monthlyTotal.toString(),
+                value: monthly.toString(),
                 icon: Icons.calendar_month_outlined,
                 color: Colors.deepPurple,
               ),

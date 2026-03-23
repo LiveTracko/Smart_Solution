@@ -14,9 +14,12 @@ import 'package:smart_solutions/controllers/follow_form_controller.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/profile_controller.dart';
 
+import '../services/tab_state_service.dart';
+
 class AppBinding extends Bindings {
   @override
   void dependencies() {
+    Get.put(MainTabService(), permanent: true); // ⭐ ADD THIS
     Get.lazyPut(() => DashboardController(), fenix: true);
     Get.lazyPut(() => ProfileController(), fenix: true);
     Get.lazyPut(() => DialerController(), fenix: true);

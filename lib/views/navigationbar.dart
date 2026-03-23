@@ -9,6 +9,8 @@ import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
 import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/controllers/follow_form_controller.dart';
+import 'package:smart_solutions/controllers/login_request_controller.dart';
+import 'package:smart_solutions/controllers/pin_code_controller.dart';
 import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/core/app_bindings.dart';
 import 'package:smart_solutions/services/api_service.dart';
@@ -20,6 +22,7 @@ import 'package:smart_solutions/views/listing_screen.dart';
 import 'package:smart_solutions/views/login_request_screen.dart';
 import 'package:smart_solutions/views/login_screen.dart';
 import '../controllers/chartCard_controller.dart';
+import '../services/tab_state_service.dart';
 import 'dashboard_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -418,50 +421,73 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onTabChanged(int newIndex) async {
-    if (newIndex == _previousIndex) return;
+    final tab = getTabFromIndex(newIndex);
 
-    if (newIndex != _previousIndex) {
-      Get.find<ActiveFilesController>().filterController.clearFilters();
-      Get.find<ChartCardsController>().selectedIndex.value = 0;
-    }
+    final tabService = Get.find<MainTabService>();
 
-    if (newIndex == 1) {
-      Get.find<ActiveFilesController>().startWorker();
-      Get.find<FollowBackFormController>().stopWorker();
-    }
-    if (newIndex == 3) {
-      Get.find<FollowBackFormController>().startWorker();
-      Get.find<ActiveFilesController>().stopWorker();
-    }
+    if (tabService.currentTab.value == tab) return;
+
+    // 🔥 Clear Filters
+    Get.find<ActiveFilesController>().filterController.clearFilters();
+    Get.find<ChartCardsController>().selectedIndex.value = 0;
+    Get.find<CommonFilterController>().clearDateFilter();
+
+    handleWorkers(tab);
 
     final ok = await _ensureLoggedIn();
-    if (!ok) {
-      Future.microtask(() {
-        if (mounted && _controller.index != _previousIndex) {
-          _controller.jumpToTab(_previousIndex);
-        }
-      });
-      return;
-    }
+    if (!ok) return;
 
-    switch (newIndex) {
-      case 0:
-        Get.find<DashboardController>().refreshDashboard();
-        break;
+    await refreshTab(tab);
 
-      case 1:
-        Get.find<DataController>().refreshData();
-        break;
-
-      case 3:
-        Get.find<FollowBackFormController>().fetchFollowBackList();
-        break;
-    }
-
-    _commonFilterController.clearDateFilter();
-
-    _previousIndex = newIndex;
+    tabService.currentTab.value = tab;
   }
+
+  // void _onTabChanged(int newIndex) async {
+  //   if (newIndex == _previousIndex) return;
+
+  //   if (newIndex != _previousIndex) {
+  //     Get.find<ActiveFilesController>().filterController.clearFilters();
+  //     Get.find<ChartCardsController>().selectedIndex.value = 0;
+  //   }
+
+  //   if (newIndex == 1) {
+  //     Get.find<ActiveFilesController>().startWorker();
+  //     Get.find<FollowBackFormController>().stopWorker();
+  //   }
+
+  //   if (newIndex == 3) {
+  //     Get.find<FollowBackFormController>().startWorker();
+  //     Get.find<ActiveFilesController>().stopWorker();
+  //   }
+
+  //   final ok = await _ensureLoggedIn();
+  //   if (!ok) {
+  //     Future.microtask(() {
+  //       if (mounted && _controller.index != _previousIndex) {
+  //         _controller.jumpToTab(_previousIndex);
+  //       }
+  //     });
+  //     return;
+  //   }
+
+  //   switch (newIndex) {
+  //     case 0:
+  //       Get.find<DashboardController>().refreshDashboard();
+  //       break;
+
+  //     case 1:
+  //       Get.find<DataController>().refreshData();
+  //       break;
+
+  //     case 3:
+  //       Get.find<FollowBackFormController>().fetchFollowBackList();
+  //       break;
+  //   }
+
+  //   _commonFilterController.clearDateFilter();
+
+  //   _previousIndex = newIndex;
+  // }
 
   // void _onTabChanged(int newIndex) async {
   //   if (newIndex == _previousIndex) return;
@@ -487,4 +513,87 @@ class _MainScreenState extends State<MainScreen> {
   //   }
   //   _previousIndex = newIndex;
   // }
+
+  MainTab getTabFromIndex(int index) {
+    final isTelecaller = StaticStoredData.roleName == 'telecaller';
+
+    if (isTelecaller) {
+      switch (index) {
+        case 0:
+          return MainTab.dashboard;
+        case 1:
+          return MainTab.leads;
+        case 2:
+          return MainTab.dialer;
+        case 3:
+          return MainTab.callLog;
+        case 4:
+          return MainTab.request;
+        default:
+          return MainTab.dashboard;
+      }
+    } else {
+      switch (index) {
+        case 0:
+          return MainTab.dashboard;
+        case 1:
+          return MainTab.leads;
+        case 2:
+          return MainTab.listing;
+        case 3:
+          return MainTab.request;
+        default:
+          return MainTab.dashboard;
+      }
+    }
+  }
+
+  Future<void> refreshTab(MainTab tab) async {
+    final tabService = Get.find<MainTabService>();
+
+    if (!tabService.shouldRefresh(tab)) return;
+
+    switch (tab) {
+      case MainTab.dashboard:
+        await Get.find<DashboardController>().refreshDashboard();
+        break;
+
+      case MainTab.leads:
+        await Get.find<DataController>().refreshData();
+        break;
+
+      case MainTab.callLog:
+        await Get.find<FollowBackFormController>().fetchFollowBackList();
+        break;
+
+      case MainTab.listing:
+        await Get.find<PincodeController>().fetchPincodes();
+        break;
+
+      case MainTab.request:
+        await Get.find<LoginRequestController>().getLoginRequestList();
+        break;
+
+      case MainTab.dialer:
+        break;
+    }
+
+    tabService.markRefreshed(tab);
+  }
+
+  void handleWorkers(MainTab tab) {
+    final active = Get.find<ActiveFilesController>();
+    final follow = Get.find<FollowBackFormController>();
+
+    active.stopWorker();
+    follow.stopWorker();
+
+    if (tab == MainTab.leads) {
+      active.startWorker();
+    }
+
+    if (tab == MainTab.callLog) {
+      follow.startWorker();
+    }
+  }
 }

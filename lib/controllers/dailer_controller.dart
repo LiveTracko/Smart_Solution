@@ -53,28 +53,42 @@ class DialerController extends GetxController {
     super.onClose();
   }
 
+  // Future<void> fetchLastCallInfoIfNeeded(bool shouldFetch) async {
+  //   if (!shouldFetch) {
+  //     return;
+  //   }
+
+  //   try {
+  //     isCallInfoLoading.value = true;
+  //     await CallStateService.getLastCallInfo();
+  //   } catch (e) {
+  //     debugPrint('Call info error: $e');
+  //   } finally {
+  //     isCallInfoLoading.value = false;
+  //   }
+  // }
+
   Future<void> fetchLastCallInfoIfNeeded(bool shouldFetch) async {
     if (!shouldFetch) return;
 
+    /// ⭐ Prevent multiple API calls
+    if (isCallInfoLoading.value) return;
+
     try {
-      isCallInfoLoading.value = true;
-      await CallStateService.getLastCallInfo();
+      isCallInfoLoading(true);
+
+      /// ⭐ Reset previous call state (VERY IMPORTANT)
+      // resetDurationState();
+
+      /// ⭐ Add timeout protection
+      await CallStateService.getLastCallInfo()
+          .timeout(const Duration(seconds: 15));
     } catch (e) {
       debugPrint('Call info error: $e');
     } finally {
-      isCallInfoLoading.value = false;
+      isCallInfoLoading(false);
     }
   }
-
-  // void startTimer() {
-  //   // Cancel the previous timer if it's running.
-  //   _timer?.cancel();
-
-  //   // // Initialize the timer to increment by 1 every second.
-  //   // _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-  //   //   elapsedTimeInSeconds.value++;
-  //   // });
-  // }
 
   String formatElapsedTime(int seconds) {
     final hours = (seconds ~/ 3600).toString().padLeft(2, '0');

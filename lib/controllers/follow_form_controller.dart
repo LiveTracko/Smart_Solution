@@ -17,6 +17,7 @@ import 'package:smart_solutions/utils/scroll_utils.dart';
 import '../constants/services.dart';
 import '../services/api_service.dart';
 import '../constants/api_urls.dart';
+
 import 'dailer_controller.dart';
 
 class FollowBackFormController extends GetxController
@@ -86,8 +87,10 @@ class FollowBackFormController extends GetxController
   @override
   void onInit() async {
     // _startWorker();
-    ever(followBackList, (_) => updateFilteredList());
+    //   ever(followBackList, (_) => updateFilteredList());
     ever(selectedFilter, (_) => updateFilteredList());
+
+    ever(followBackList, (_) => updateFilteredList());
 
     // await fetchFollowBackList();
     customerNumberController.addListener(() {
@@ -103,6 +106,15 @@ class FollowBackFormController extends GetxController
       }
     });
 
+    debounce(
+      searchText,
+      (_) {
+        currentPage.value = 1;
+        followBackList.clear();
+        fetchFollowBackList();
+      },
+      time: const Duration(milliseconds: 500),
+    );
     // callController = TabController(length: 4, vsync: this);
     // callController.addListener(() {
     //   if (!callController.indexIsChanging) {
@@ -110,9 +122,14 @@ class FollowBackFormController extends GetxController
     //   }
     //  });
 
-    // loadData();
+    //  loadData();
 
     super.onInit();
+  }
+
+  void resetDurationState() {
+    isDurationAvailable.value = true;
+    contacted.value = 'No';
   }
 
   void startWorker() {
@@ -616,6 +633,8 @@ class FollowBackFormController extends GetxController
         'call_duration': _dialerController
             .formatElapsedTime(_dialerController.elapsedTimeInSeconds.value),
         'salary': _dialerController.salary.value,
+        'loan_amount': _dialerController.customerLoan.value,
+        'data_sourcing': dataType.value,
         'excel_id': _dialerController.excel_id.value,
         'followup_id': _dialerController.followup_id.value,
       };
@@ -626,34 +645,55 @@ class FollowBackFormController extends GetxController
       _dialerController.elapsedTimeInSeconds.value = 0;
       logOutput(response.body);
       if (response.statusCode == 200) {
-        //   final result = FollowUpDetails.fromJson(json.decode(response.body));
-
-        // Wait a bit (simulate save time)
-        // await Future.delayed(const Duration(milliseconds: 500));
-
-        _dialerController.handleFormSubmitAndFetchNext();
-        fetchFollowBackList();
-        Get.showSnackbar(
-          GetSnackBar(
-            title: 'Success',
-            message: 'Follow up saved successfully',
-            duration: const Duration(seconds: 2),
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green.shade400,
-            margin: const EdgeInsets.all(12),
-            borderRadius: 8,
-          ),
-        );
-        Get.back(); // close first
-        // await _dashboardController
-        //     .fetchDashboardData(true); // Fetch monthly data
-        // await _dashboardController.fetchDashboardData(false);
-
+        // fetchFollowBackList()
         clearForm();
-        return true;
-      } else {
-        throw Exception('Failed to submit form');
+
+        Future.delayed(const Duration(milliseconds: 200), () {
+          final context = Get.overlayContext;
+
+          if (context != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text("Follow up saved successfully"),
+                backgroundColor: Colors.green.shade400,
+              ),
+            );
+
+            Future.delayed(const Duration(milliseconds: 400), () {
+              /// ⭐ Close overlay if any
+              if (Get.isOverlaysOpen) {
+                Get.back();
+              }
+
+              /// ⭐ Then close screen
+              if (Get.key.currentState!.canPop()) {
+                Get.back();
+              }
+            });
+          }
+        });
       }
+
+      // if (response.statusCode == 200) {
+      //   Future.delayed(const Duration(milliseconds: 120), () {
+      //     Get.showSnackbar(
+      //       GetSnackBar(
+      //         title: 'Success',
+      //         message: 'Follow up saved successfully',
+      //         duration: const Duration(seconds: 2),
+      //         snackPosition: SnackPosition.BOTTOM,
+      //         backgroundColor: Colors.green.shade400,
+      //         margin: const EdgeInsets.all(12),
+      //         borderRadius: 8,
+      //       ),
+      //     );
+      //   });
+
+      //   clearForm();
+      //   return true;
+      // // } else {
+      // throw Exception('Failed to submit form');
+      return true;
     } catch (e) {
       logOutput('Error submitting form: $e');
       return false;
@@ -698,8 +738,28 @@ class FollowBackFormController extends GetxController
     } finally {}
   }
 
+  // void clearForm() {
+  //   // This should only be called on successful form submit
+  //   customerName.value = '';
+  //   mobile.value = '';
+  //   bankName.value = '';
+  //   dataType.value = '';
+  //   contacted.value = 'No';
+  //   remarkStatus.value = '';
+  //   remark.value = '';
+  //   followupDate.value = null;
+
+  //   customerNumberController.clear();
+
+  //   // Clear dialer data
+  //   _dialerController.customerNameController.text = '';
+  //   _dialerController.datatype.value = '';
+  //   _dialerController.elapsedTimeInSeconds.value = 0;
+  //   _dialerController.followup_id.value = '';
+  // }
+
   void clearForm() {
-    // This should only be called on successful form submit
+    /// ---------- FORM RX VALUES ----------
     customerName.value = '';
     mobile.value = '';
     bankName.value = '';
@@ -709,12 +769,27 @@ class FollowBackFormController extends GetxController
     remark.value = '';
     followupDate.value = null;
 
+    /// ---------- TEXT CONTROLLERS ----------
     customerNumberController.clear();
+    remark.value = '';
 
-    // Clear dialer data
+    /// ---------- DIALER CONTROLLER RESET ----------
+    _dialerController.customerName.value = '';
+    _dialerController.salary.value = '';
+    _dialerController.customerLoan.value = '';
+    _dialerController.phoneNumber.value = '';
+    _dialerController.customerNameController.clear();
+
+    /// ---------- CALLBACK VISIBILITY RESET ----------
+    // _remarkController.isCallback.value = false;
+
+    /// ---------- EXTRA STATE RESET ----------
     _dialerController.datatype.value = '';
     _dialerController.elapsedTimeInSeconds.value = 0;
     _dialerController.followup_id.value = '';
+
+    /// ---------- FORCE UI UPDATE (Important) ----------
+    update(); // if using GetBuilder anywhere
   }
 
   // void setFromDate(DateTime date) {

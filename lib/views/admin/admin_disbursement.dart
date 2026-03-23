@@ -13,6 +13,7 @@ import 'package:smart_solutions/widget/searchbarwithclear.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
 import '../../constants/static_stored_data.dart';
+import '../../widget/loading_page.dart';
 
 class AdminDisbursement extends StatefulWidget {
   final String title;
@@ -43,10 +44,10 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
         title: widget.title,
         key: _scaffoldKey,
         body: Obx(() {
-          // if (_adminDisbursementController.isLoading.value ||
-          //     _adminDisbursementController.iscallDisbursedLoading.value) {
-          //   return const LoadingPage();
-          // }
+          if (_adminDisbursementController.isLoading.value ||
+              _adminDisbursementController.iscallDisbursedLoading.value) {
+            return const LoadingPage();
+          }
 
           return Column(children: [
             Container(
@@ -131,94 +132,255 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
       final totalSum = loginTotal + disbursedTotal;
 
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.white,
-              Colors.blue.shade50,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.white,
+                Colors.blue.shade50,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(.06),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
             ],
           ),
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(.06),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            /// TOTAL COUNT BOX
-            Container(
-              height: 46,
-              width: 46,
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Center(
-                child: Text(
-                  totalSum.toString(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(width: 12),
-
-            /// LOGIN + DISBURSED
-            Expanded(
-              child: Row(
+          child: Column(
+            children: [
+              /// ⭐ TOP ROW (COUNT + AMOUNT)
+              Row(
                 children: [
-                  Icon(Icons.login, size: 16, color: Colors.blue.shade700),
-                  const SizedBox(width: 4),
-                  Text(
-                    "Login: $loginTotal",
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                  /// 🔵 TOTAL COUNT BADGE
+                  Container(
+                    height: 54,
+                    width: 54,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xff4facfe), Color(0xff00f2fe)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blue.withOpacity(.25),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        )
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        totalSum.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18,
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Icon(Icons.check_circle_outline,
-                      size: 16, color: Colors.orange),
-                  const SizedBox(width: 4),
-                  Text(
-                    "Disbursed: $disbursedTotal",
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+
+                  const SizedBox(width: 14),
+
+                  /// 💰 AMOUNT CARD
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(.08),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Colors.green.withOpacity(.25),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.currency_rupee,
+                              size: 20, color: Colors.green),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              CurrencyUtils.formatAmount(
+                                  amountTotal.toString()),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
 
-            /// AMOUNT
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.green.withOpacity(.1),
-                borderRadius: BorderRadius.circular(8),
+              const SizedBox(height: 14),
+
+              /// ⭐ BOTTOM STATS CHIPS
+              Row(
+                children: [
+                  /// LOGIN CHIP
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(.08),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.login,
+                              size: 18, color: Colors.blue.shade700),
+                          const SizedBox(width: 6),
+                          Text(
+                            "Login",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.blue.shade700,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            loginTotal.toString(),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.blue.shade900,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  /// DISBURSED CHIP
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(.08),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.check_circle_outline,
+                              size: 18, color: Colors.orange),
+                          const SizedBox(width: 6),
+                          const Text(
+                            "Disbursed",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.orange,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            "$disbursedTotal",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.orange,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              child: Text(
-                "₹${CurrencyUtils.formatAmount(amountTotal.toString())}",
-                style: const TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+            ],
+          )
+
+          //  Column(
+          //   children: [
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         /// TOTAL COUNT BOX
+          //         Container(
+          //           height: 46,
+          //           width: 46,
+          //           decoration: BoxDecoration(
+          //             color: Colors.blue,
+          //             borderRadius: BorderRadius.circular(12),
+          //           ),
+          //           child: Center(
+          //             child: Text(
+          //               totalSum.toString(),
+          //               style: const TextStyle(
+          //                 color: Colors.white,
+          //                 fontWeight: FontWeight.bold,
+          //                 fontSize: 16,
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+
+          //         const SizedBox(width: 12),
+
+          //         /// AMOUNT
+          //         Container(
+          //           padding:
+          //               const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          //           decoration: BoxDecoration(
+          //             color: Colors.green.withOpacity(.1),
+          //             borderRadius: BorderRadius.circular(8),
+          //           ),
+          //           child: Text(
+          //             "₹${CurrencyUtils.formatAmount(amountTotal.toString())}",
+          //             style: const TextStyle(
+          //               color: Colors.green,
+          //               fontWeight: FontWeight.bold,
+          //               fontSize: 13,
+          //             ),
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+
+          //     /// LOGIN + DISBURSED
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.end,
+          //       children: [
+          //         Icon(Icons.login, size: 16, color: Colors.blue.shade700),
+          //         const SizedBox(width: 4),
+          //         Text(
+          //           "Login: $loginTotal",
+          //           style: const TextStyle(
+          //             fontSize: 13,
+          //             fontWeight: FontWeight.w600,
+          //           ),
+          //         ),
+          //         const SizedBox(width: 12),
+          //         const Icon(Icons.check_circle_outline,
+          //             size: 16, color: Colors.orange),
+          //         const SizedBox(width: 4),
+          //         Text(
+          //           "Disbursed: $disbursedTotal",
+          //           style: const TextStyle(
+          //             fontSize: 13,
+          //             fontWeight: FontWeight.w600,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ],
+          // ),
+          );
     });
   }
 

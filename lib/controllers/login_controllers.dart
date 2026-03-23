@@ -20,6 +20,8 @@ class LoginViewModel extends GetxController {
   final DashboardController dashboardController =
       Get.put(DashboardController(), permanent: true);
 
+  RxnString loginError = RxnString();
+
   void login(String tokenData) async {
     isLoading.value = true;
 
@@ -42,20 +44,21 @@ class LoginViewModel extends GetxController {
         StaticStoredData.userId = "";
 
         if (responseData['profile']['data']['message'] != null) {
-          Get.snackbar(
-            "Login Failed",
-            responseData['profile']['data']['message'].toString(),
-            snackPosition: SnackPosition.TOP,
-            backgroundColor: Colors.red.shade600,
-            colorText: Colors.white,
-            borderRadius: 12,
-            margin: const EdgeInsets.all(12),
-            icon: const Icon(Icons.error_outline, color: Colors.white),
-            duration: const Duration(seconds: 3),
-          );
-
-          // Get.snackbar(
-          //     'Alert', responseData['profile']['data']['message'].toString());
+          loginError.value =
+              responseData['profile']['data']['message'].toString();
+          // Future.delayed(const Duration(milliseconds: 100), () {
+          //   Get.snackbar(
+          //     "Login Failed",
+          //     responseData['profile']['data']['message'].toString(),
+          //     snackPosition: SnackPosition.TOP,
+          //     backgroundColor: Colors.red.shade600,
+          //     colorText: Colors.white,
+          //     borderRadius: 12,
+          //     margin: const EdgeInsets.all(12),
+          //     icon: const Icon(Icons.error_outline, color: Colors.white),
+          //     duration: const Duration(seconds: 3),
+          //   );
+          // });
         } else {
           String userId = responseData['profile']['data']['profile']
               ['id']; // Adjust according to your API response structure
@@ -150,11 +153,6 @@ class LoginViewModel extends GetxController {
           //           ],
           //         ));
         }
-
-        //  Get.snackbar('Login','Sucessfully');
-
-        // Navigate to the MainScreen after dialog closes
-        // await Future.delayed(const Duration(seconds: 2));
       } else {
         Get.snackbar('Error', 'Invalid username or password');
       }
@@ -244,3 +242,5 @@ void showSuccessDialog(String message, {VoidCallback? onComplete}) {
     }
   });
 }
+
+

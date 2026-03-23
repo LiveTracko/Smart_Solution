@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -100,10 +102,10 @@ class _CallLogPageState extends State<CallLogPage> {
                   controller: _followBackController.searchController,
                   onClear: () {
                     _followBackController.clearFilters();
-                    _followBackController.updateFilteredList();
+                    //   _followBackController.updateFilteredList();
                   },
                   onChanged: (value) {
-                    _followBackController.updateFilteredList(query: value);
+                    _followBackController.searchText.value = value;
                   },
                 ),
 

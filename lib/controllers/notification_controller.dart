@@ -3,15 +3,22 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
-import '../constants/services.dart';
 import '../services/api_service.dart';
 import '../constants/api_urls.dart';
 
 class NotificationController extends GetxController {
   final ApiService _apiService = ApiService();
-  List notificationData = [].obs;
+
+  var notificationData = <Map<String, dynamic>>[].obs;
   var isLoading = true.obs;
   Rx<int> unreadCount = 0.obs;
+
+  RxInt notificationPage = 1.obs;
+  RxBool notificationHasMore = true.obs;
+  RxBool notificationInitialLoading = false.obs;
+  RxBool notificationMoreLoading = false.obs;
+
+  final int notificationLimit = 20; // or API limit
 
   @override
   void onInit() {
@@ -19,44 +26,119 @@ class NotificationController extends GetxController {
     super.onInit();
   }
 
-  void getNotificationList() async {
+  Future<void> getNotificationList({bool loadMore = false}) async {
     try {
+      if (loadMore) {
+        if (!notificationHasMore.value) return; // ⭐ stop extra calls
+        notificationMoreLoading.value = true;
+      } else {
+        notificationInitialLoading.value = true;
+        notificationPage.value = 1;
+        notificationHasMore.value = true;
+        notificationData.clear();
+      }
+
       var response = await _apiService.postRequest(
         APIUrls.getnotificationData,
         {
           "telecaller_id": StaticStoredData.userId,
+          "page": notificationPage.value.toString(), // ⭐ pagination param
+          "limit": notificationLimit.toString()
         },
       );
 
-      debugPrint(" data -->  ${response.statusCode} ${response.body}");
+      debugPrint("notification --> ${response.statusCode} ${response.body}");
 
       if (response.statusCode == 200) {
-        try {
-          final responseData = jsonDecode(response.body);
+        final responseData = jsonDecode(response.body);
+        final contacts = responseData['data'];
 
-          final contacts = responseData['data'];
-          if (contacts is List) {
-            notificationData = List<Map<String, dynamic>>.from(contacts);
-            unreadCount.value =
-                notificationData.where((item) => item['is_read'] == '0').length;
-            isLoading.value = false;
+        if (contacts is List) {
+          final newList = List<Map<String, dynamic>>.from(contacts);
+
+          if (loadMore) {
+            notificationData.addAll(newList);
           } else {
-            logOutput("Unexpected format for total_attempt_contact");
-            notificationData = [];
+            notificationData.assignAll(newList);
           }
-        } catch (e) {
-          logOutput("Error decoding or parsing response: $e");
-          notificationData = [];
+
+          /// ⭐ unread count recalc
+          unreadCount.value =
+              notificationData.where((e) => e['is_read'] == '0').length;
+
+          /// ⭐ hasMore logic
+          notificationHasMore.value = newList.length >= notificationLimit;
+
+          if (newList.isNotEmpty) {
+            notificationPage.value++;
+          }
+
+          /// ⭐ mark read only on first load
+          if (!loadMore) {
+            Future.microtask(() => markAllAsRead());
+          }
         }
       } else if (response.statusCode == 204) {
-        notificationData.clear();
+        notificationHasMore.value = false;
       }
     } catch (e) {
       print(e);
+    } finally {
+      notificationInitialLoading.value = false;
+      notificationMoreLoading.value = false;
     }
   }
 
-  void updateNotificatioData() async {
+  // Future<void> getNotificationList({bool loadMore = false}) async {
+  //   try {
+  //     if (loadMore) {
+  //       if (!notificationHasMore.value) return; // ⭐ stop extra calls
+  //       notificationMoreLoading.value = true;
+  //     } else {
+  //       notificationInitialLoading.value = true;
+  //       notificationPage.value = 1;
+  //       notificationHasMore.value = true;
+  //       notificationData.clear();
+  //     }
+
+  //     var response = await _apiService.postRequest(
+  //       APIUrls.getnotificationData,
+  //       {
+  //         "telecaller_id": StaticStoredData.userId,
+  //       },
+  //     );
+
+  //     debugPrint(" data -->  ${response.statusCode} ${response.body}");
+
+  //     if (response.statusCode == 200) {
+  //       final responseData = jsonDecode(response.body);
+  //       final contacts = responseData['data'];
+
+  //       if (contacts is List) {
+  //         // 🔥 VERY IMPORTANT (Use assignAll for RxList)
+  //         notificationData.assignAll(
+  //           List<Map<String, dynamic>>.from(contacts),
+  //         );
+
+  //         unreadCount.value =
+  //             notificationData.where((item) => item['is_read'] == '0').length;
+
+  //         Future.microtask(() => markAllAsRead());
+  //       } else {
+  //         notificationData.clear();
+  //       }
+  //     } else if (response.statusCode == 204) {
+  //       notificationData.clear();
+  //       unreadCount.value = 0;
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // }
+
+  Future<void> markAllAsRead() async {
     try {
       var response = await _apiService.postRequest(
         APIUrls.updatenotificationData,
@@ -65,13 +147,22 @@ class NotificationController extends GetxController {
         },
       );
 
-      debugPrint(" data -->  ${response.statusCode} ${response.body}");
-
       if (response.statusCode == 200) {
-        print('Notification updated successfull');
+        // ⭐ Update local list instantly
+        for (var item in notificationData) {
+          item['is_read'] = '1';
+        }
+
+        // ⭐ Refresh RxList UI
+        notificationData.refresh();
+
+        // ⭐ Update count
+        unreadCount.value = 0;
+
+        debugPrint("✅ All notifications marked as read");
       }
     } catch (e) {
-      print('update notification data $e');
+      debugPrint("Mark read error $e");
     }
   }
 }

@@ -5,17 +5,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/constants/api_urls.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
-import 'package:smart_solutions/controllers/admin/admin_disbursement.dart';
-import 'package:smart_solutions/controllers/admin/call_log_controller.dart';
 import 'package:smart_solutions/controllers/all_disbursement_controller.dart';
 import 'package:smart_solutions/controllers/chartCard_controller.dart';
 import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/controllers/dashboard_controller.dart';
-import 'package:smart_solutions/controllers/data_entry_controller.dart';
 import 'package:smart_solutions/controllers/follow_form_controller.dart';
-import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/notification_controller.dart';
-import 'package:smart_solutions/controllers/profile_controller.dart';
 import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/feature/views/callback/today_callback.dart';
 import 'package:smart_solutions/models/dashBoardToday_model.dart';
@@ -49,15 +44,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  AdminCallLogController? _callLogController;
-
-  final DisbursementController _disbursementController =
-      Get.find<DisbursementController>();
-
-  final LoginRequestController _loginRequestController =
-      Get.find<LoginRequestController>();
-
-  final DataController _dataController = Get.find<DataController>();
+  FollowBackFormController? followBackFormController;
 
   final DisbursementDetailsController _disbursementDetailsController =
       Get.find<DisbursementDetailsController>();
@@ -67,25 +54,18 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   // Core UI Controllers (Use Put)
   final DashboardController controller = Get.find<DashboardController>();
-  final ProfileController profileController = Get.find<ProfileController>();
+
   final ChartCardsController chartCardsController =
       Get.find<ChartCardsController>();
-  final FollowBackFormController followBackFormController =
-      Get.find<FollowBackFormController>();
 
   final ThemeController themeController = Get.find<ThemeController>();
 
   final bool isNotTelecaller = StaticStoredData.roleName != 'telecaller';
-  
 
   @override
   void initState() {
-    if (StaticStoredData.roleName != 'telecaller') {
-      _callLogController = Get.find<AdminCallLogController>();
-    }
-
-    if (StaticStoredData.roleName != 'telecaller') {
-      _callLogController = Get.find<AdminCallLogController>();
+    if (StaticStoredData.roleName == 'telecaller') {
+      followBackFormController = Get.find<FollowBackFormController>();
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       themeController.loadSavedTheme();
@@ -106,7 +86,6 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   @override
   Widget build(BuildContext context) {
-    final DashboardController controller = Get.put(DashboardController());
     final NotificationController notificationController =
         Get.put(NotificationController());
 
@@ -227,8 +206,6 @@ class _DashboardScreenState extends State<DashboardScreen>
           onRefresh: () async {
             controller.onInit();
             _disbursementDetailsController.fetchDisbursementDetails();
-            // await controller.fetchDashboardData(true); // Refresh monthly data
-            // await controller.fetchDashboardData(false); // Refresh today's data
           },
           child: Obx(
             () => controller.isLoading.value
@@ -499,92 +476,86 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   },
                                 ),
                               ),
-                              followBackFormController
-                                      .selectedtellecaller.isNotEmpty
-                                  ? Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        const Spacer(),
-                                        SizedBox(
-                                          height: 40,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width -
-                                              35.w,
-                                          child: ListView.builder(
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: followBackFormController
-                                                .selectedtellecaller.length,
-                                            itemBuilder: (context, index) {
-                                              final name = followBackFormController
-                                                      .selectedtellecallerName[
-                                                  index];
-                                              final id =
-                                                  followBackFormController
-                                                          .selectedtellecaller[
-                                                      index];
+                              if (followBackFormController
+                                      ?.selectedtellecaller.isNotEmpty ??
+                                  false)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    const Spacer(),
+                                    SizedBox(
+                                      height: 40,
+                                      width: MediaQuery.of(context).size.width -
+                                          35.w,
+                                      child: ListView.builder(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: followBackFormController!
+                                            .selectedtellecaller.length,
+                                        itemBuilder: (context, index) {
+                                          final name = followBackFormController!
+                                              .selectedtellecallerName[index];
+                                          final id = followBackFormController!
+                                              .selectedtellecaller[index];
 
-                                              return Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 4),
-                                                child: Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(horizontal: 8),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.grey[200],
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20),
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4),
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8),
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[200],
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    name,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Colors.black,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Text(
-                                                        name,
-                                                        style: const TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: Colors.black,
-                                                        ),
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      const SizedBox(width: 3),
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          // Remove name and id from controller
-                                                          followBackFormController
-                                                              .selectedtellecaller
-                                                              .remove(id);
-                                                          followBackFormController
-                                                              .selectedtellecallerName
-                                                              .remove(name);
+                                                  const SizedBox(width: 3),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      // Remove name and id from controller
+                                                      followBackFormController!
+                                                          .selectedtellecaller
+                                                          .remove(id);
+                                                      followBackFormController!
+                                                          .selectedtellecallerName
+                                                          .remove(name);
 
-                                                          followBackFormController
-                                                              .getAllDashboardData(
-                                                            dashboardController:
-                                                                controller,
-                                                          );
-                                                        },
-                                                        child: const Icon(
-                                                          Icons.close,
-                                                          size: 16,
-                                                          color: Colors.red,
-                                                        ),
-                                                      ),
-                                                    ],
+                                                      followBackFormController!
+                                                          .getAllDashboardData(
+                                                        dashboardController:
+                                                            controller,
+                                                      );
+                                                    },
+                                                    child: const Icon(
+                                                      Icons.close,
+                                                      size: 16,
+                                                      color: Colors.red,
+                                                    ),
                                                   ),
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  : const SizedBox.shrink(),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
                               // Row(
                               //   mainAxisAlignment: MainAxisAlignment.end,
                               //   children: [
@@ -906,25 +877,68 @@ class _DashboardScreenState extends State<DashboardScreen>
                         verticalSpace(15.h),
                         headerTitleWithContainer('Disbursement'),
                         verticalSpace(15.h),
-                        SizedBox(
-                          height: 80.h,
-                          child: ListView.builder(
-                            itemCount: _disbursementDetailsController
-                                .disbursementList.length,
-                            scrollDirection: Axis.horizontal, //
-                            reverse: true,
-                            itemBuilder: (context, index) {
-                              final data = _disbursementDetailsController
-                                  .disbursementList[index];
-                              return Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 5.w),
-                                  child: disbursementCard(
+
+                        ...[
+                          if (_disbursementDetailsController
+                              .disbursementList.isNotEmpty)
+                            SizedBox(
+                              height: 80.h,
+                              child: ListView.builder(
+                                itemCount: _disbursementDetailsController
+                                    .disbursementList.length,
+                                scrollDirection: Axis.horizontal,
+                                reverse: true,
+                                itemBuilder: (context, index) {
+                                  final data = _disbursementDetailsController
+                                      .disbursementList[index];
+
+                                  return Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 5.w),
+                                    child: disbursementCard(
                                       '${data.monthName} ${data.year}',
-                                      data.amount.toString()));
-                            },
-                          ),
-                        ),
+                                      data.amount.toString(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                          else
+                            SizedBox(
+                              height: 80.h,
+                              child: Center(
+                                child: Text(
+                                  "No Data Available",
+                                  style: TextStyle(
+                                      fontSize: 14.sp, color: Colors.grey),
+                                ),
+                              ),
+                            ),
+                        ],
+                        // ...[
+                        //   if (_disbursementDetailsController
+                        //       .disbursementList.isNotEmpty)
+                        //     SizedBox(
+                        //       height: 80.h,
+                        //       child: ListView.builder(
+                        //         itemCount: _disbursementDetailsController
+                        //             .disbursementList.length,
+                        //         scrollDirection: Axis.horizontal, //
+                        //         reverse: true,
+                        //         itemBuilder: (context, index) {
+                        //           final data = _disbursementDetailsController
+                        //               .disbursementList[index];
+                        //           return Padding(
+                        //               padding:
+                        //                   EdgeInsets.symmetric(horizontal: 5.w),
+                        //               child: disbursementCard(
+                        //                   '${data.monthName} ${data.year}',
+                        //                   data.amount.toString()));
+                        //         },
+                        //       ),
+                        //     ),
+
+                        // ],
                         verticalSpace(15.h),
                         customContainer(20.h),
                         verticalSpace(15.h),
@@ -1042,55 +1056,73 @@ class _DashboardScreenState extends State<DashboardScreen>
                         // if (controller.isActiveLoaded.value) ...[
                         headerTitleWithContainer('Login File Status'),
                         verticalSpace(15.h),
+
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.only(right: 8.w),
-                                  child: FileStatusCard(
-                                    title: "Active Files",
-                                    fileCount:
-                                        controller.totalActiveCount.toString(),
-                                    amount:
-                                        controller.totalValActive.toString(),
-                                    statusColor: Colors.green,
-                                    onPress: () {
-                                      Get.to(const ActiveFiles(
-                                        title: 'Active Files',
-                                        status: 1,
-                                        isShowBack: true,
-                                        isDrawer: false,
-                                      ));
-                                    },
+                          child: Obx(() {
+                            if (controller.loginFileStatusCount.isEmpty) {
+                              return SizedBox(
+                                height: 80.h,
+                                child: Center(
+                                  child: Text(
+                                    "No Data Available",
+                                    style: TextStyle(
+                                        fontSize: 14.sp, color: Colors.grey),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.only(left: 8.w),
-                                  child: FileStatusCard(
-                                    title: "Inactive Files",
-                                    fileCount: controller.totalInActiveCount
-                                        .toString(),
-                                    amount:
-                                        controller.totalNoValActive.toString(),
-                                    statusColor: Colors.red,
-                                    onPress: () {
-                                      Get.to(const ActiveFiles(
-                                        title: 'InActive Files',
-                                        status: 2,
-                                        isShowBack: true,
-                                        isDrawer: false,
-                                      ));
-                                    },
+                              );
+                            }
+
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.only(right: 8.w),
+                                    child: FileStatusCard(
+                                      title: "Active Files",
+                                      fileCount: controller.loginFileStatusCount
+                                          .first.activefilecount
+                                          .toString(),
+                                      amount: controller.loginFileStatusCount
+                                          .first.activeloanamount,
+                                      statusColor: Colors.green,
+                                      onPress: () {
+                                        Get.to(const ActiveFiles(
+                                          title: 'Active Files',
+                                          status: 1,
+                                          isShowBack: true,
+                                          isDrawer: false,
+                                        ));
+                                      },
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.only(left: 8.w),
+                                    child: FileStatusCard(
+                                      title: "Inactive Files",
+                                      fileCount: controller.loginFileStatusCount
+                                          .first.inactivefilecount
+                                          .toString(),
+                                      amount: controller.loginFileStatusCount
+                                          .first.inactiveloanamount,
+                                      statusColor: Colors.red,
+                                      onPress: () {
+                                        Get.to(const ActiveFiles(
+                                          title: 'InActive Files',
+                                          status: 2,
+                                          isShowBack: true,
+                                          isDrawer: false,
+                                        ));
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
                         ),
                         verticalSpace(15.h),
                         customContainer(20.h),
@@ -1131,13 +1163,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                                             items: [
                                               IncentiveItem(
                                                   "Today",
-                                                  _loginRequestController
-                                                      .todayCount.length
+                                                  controller
+                                                      .loginFileRequestCount
+                                                      .first
+                                                      .todaycount
                                                       .toString()),
                                               IncentiveItem(
                                                   "Monthly",
-                                                  _loginRequestController
-                                                      .monthlyCount.length
+                                                  controller
+                                                      .loginFileRequestCount
+                                                      .first
+                                                      .monthlycount
                                                       .toString()),
                                             ],
                                             statusColor: AppColors.greenCOlor),
@@ -1157,13 +1193,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                                             items: [
                                               IncentiveItem(
                                                   "Today",
-                                                  _dataController
-                                                      .todayCount.length
+                                                  controller.loginFileCount
+                                                      .first.todaycount
                                                       .toString()),
                                               IncentiveItem(
                                                   "Monthly",
-                                                  _dataController
-                                                      .monthlyCount.length
+                                                  controller.loginFileCount
+                                                      .first.monthlycount
                                                       .toString()),
                                             ],
                                             statusColor: AppColors.greenCOlor),
@@ -1173,27 +1209,30 @@ class _DashboardScreenState extends State<DashboardScreen>
                                   SizedBox(height: 10.h),
                                   if (StaticStoredData.roleName !=
                                           'telecaller' &&
-                                      _callLogController != null &&
-                                      _callLogController!
-                                          .callLogData.isNotEmpty) ...[
+                                      controller.callLogCount.isNotEmpty) ...[
                                     IncentiveCard(
                                       title: 'Call Log',
-                                      duration: _callLogController!
-                                          .callLogData.first.totalCallTime,
+                                      duration: controller
+                                          .callLogCount.first.totalCallTime,
                                       isNextPage: true,
                                       onTap: () => Get.to(const AdminCallLog(
                                           title: 'Call Log')),
                                       items: [
                                         IncentiveItem(
-                                            "Attempted",
-                                            controller.callTimeModel
-                                                .callTimeModel!.totalAttempt
+                                          "Attempted",
+                                          controller
+                                              .callLogCount.first.callAttempt
+                                              .toString(),
+                                        ),
+                                        IncentiveItem(
+                                            "Connected",
+                                            controller.callLogCount.first
+                                                .callContacted
                                                 .toString()),
-                                        IncentiveItem("Connected",
-                                            controller.totalPicked.toString()),
                                         IncentiveItem(
                                             "Not Connected",
-                                            controller.totalNotPicked
+                                            controller.callLogCount.first
+                                                .callNotcontact
                                                 .toString()),
                                       ],
                                       statusColor: AppColors.greenCOlor,
@@ -1206,17 +1245,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                                     children: [
                                       FileStatusCard(
                                         title: "Disbursement",
-                                        fileCount: (_disbursementController
-                                                    .disbursementTotal
-                                                    .value
-                                                    ?.disbursedCountTotal ??
-                                                0)
+                                        fileCount: (controller
+                                                .loginFileStatusCount
+                                                .first
+                                                .disbursedfilecount)
                                             .toString(),
-                                        amount: (_disbursementController
-                                                    .disbursementTotal
-                                                    .value
-                                                    ?.amountTotal ??
-                                                "0")
+                                        amount: (controller.loginFileStatusCount
+                                                .first.disbursedamount)
                                             .toString(),
                                         statusColor: Colors.blue,
                                         onPress: () {
@@ -1238,80 +1273,86 @@ class _DashboardScreenState extends State<DashboardScreen>
                             : Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 8),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .spaceBetween, // Changed to match Active/Inactive Files
-                                      children: [
-                                        // Today card
-                                        SizedBox(
-                                          width: (MediaQuery.of(context)
-                                                      .size
-                                                      .width -
-                                                  32) /
-                                              2, // Half width minus padding
-                                          child: FileStatusCard(
-                                            title: "Today",
-                                            fileCount: followBackFormController
-                                                .dailycallbackData.length
-                                                .toString(),
-                                            statusColor: Colors.green,
-                                            onPress: () {
-                                              Get.to(CallBackData(
-                                                  title: 'Today',
-                                                  headerTitle: 'Today',
-                                                  controller:
-                                                      followBackFormController,
-                                                  getDataList: () =>
-                                                      followBackFormController
-                                                          .dailycallbackData));
-                                            },
+                                child: Obx(
+                                  () => Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          SizedBox(
+                                            width: (MediaQuery.of(context)
+                                                        .size
+                                                        .width -
+                                                    32) /
+                                                2,
+                                            child: FileStatusCard(
+                                              title: "Today",
+                                              fileCount: controller
+                                                  .callBackCount
+                                                  .first
+                                                  .todayCallback
+                                                  .toString(),
+                                              statusColor: Colors.green,
+                                              onPress: () {
+                                                Get.to(CallBackData(
+                                                    title: 'Today',
+                                                    headerTitle: 'Today',
+                                                    controller:
+                                                        followBackFormController,
+                                                    getDataList: () =>
+                                                        followBackFormController!
+                                                            .dailycallbackData));
+                                              },
+                                            ),
                                           ),
-                                        ),
-                                        // Monthly card
-                                        SizedBox(
-                                          width: (MediaQuery.of(context)
-                                                      .size
-                                                      .width -
-                                                  32) /
-                                              2, // Half width minus padding
-                                          child: FileStatusCard(
-                                            title: "Monthly",
-                                            fileCount: followBackFormController
-                                                .monthlybackData.length
-                                                .toString(),
-                                            statusColor: Colors.blue,
-                                            onPress: () {
-                                              Get.to(CallBackData(
-                                                  title: 'Monthly Callback',
-                                                  headerTitle: 'Monthly',
-                                                  controller:
-                                                      followBackFormController,
-                                                  getDataList: () =>
-                                                      followBackFormController
-                                                          .monthlybackData));
-                                            },
+                                          // Monthly card
+                                          SizedBox(
+                                            width: (MediaQuery.of(context)
+                                                        .size
+                                                        .width -
+                                                    32) /
+                                                2, // Half width minus padding
+                                            child: FileStatusCard(
+                                              title: "Monthly",
+                                              fileCount: controller
+                                                  .callBackCount
+                                                  .first
+                                                  .monthlyCallback
+                                                  .toString(),
+                                              statusColor: Colors.blue,
+                                              onPress: () {
+                                                Get.to(CallBackData(
+                                                    title: 'Monthly Callback',
+                                                    headerTitle: 'Monthly',
+                                                    controller:
+                                                        followBackFormController,
+                                                    getDataList: () =>
+                                                        followBackFormController!
+                                                            .monthlybackData));
+                                              },
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10.h),
-                                    IncentiveCard(
-                                        title: 'Incentives',
-                                        items: [
-                                          IncentiveItem("Target", "₹0"),
-                                          IncentiveItem(
-                                            "Achievement",
-                                            _disbursementDetailsController
-                                                    .disbursementList.isNotEmpty
-                                                ? "₹${CurrencyUtils.formatAmount(_disbursementDetailsController.disbursementList.first.amount)}"
-                                                : "₹0",
-                                          ),
-                                          IncentiveItem("Incentive", "₹0"),
                                         ],
-                                        statusColor: AppColors.greenCOlor)
-                                  ],
+                                      ),
+                                      SizedBox(height: 10.h),
+                                      IncentiveCard(
+                                          title: 'Incentives',
+                                          items: [
+                                            IncentiveItem("Target", "₹0"),
+                                            IncentiveItem(
+                                              "Achievement",
+                                              _disbursementDetailsController
+                                                      .disbursementList
+                                                      .isNotEmpty
+                                                  ? "₹${CurrencyUtils.formatAmount(_disbursementDetailsController.disbursementList.first.amount)}"
+                                                  : "₹0",
+                                            ),
+                                            IncentiveItem("Incentive", "₹0"),
+                                          ],
+                                          statusColor: AppColors.greenCOlor)
+                                    ],
+                                  ),
                                 ),
                               ),
 

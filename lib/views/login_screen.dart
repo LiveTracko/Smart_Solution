@@ -42,6 +42,29 @@ class _LoginViewState extends State<LoginView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Obx(() {
+                final msg = controller.loginError.value;
+
+                if (msg != null) {
+                  Future.microtask(() {
+                    print('object');
+                    Get.snackbar(
+                      "Login Failed",
+                      msg,
+                      snackPosition: SnackPosition.TOP,
+                      backgroundColor: Colors.red.shade600,
+                      colorText: Colors.white,
+                      margin: const EdgeInsets.all(12),
+                      duration: const Duration(seconds: 3),
+                    );
+
+                    controller.loginError.value = null;
+                  });
+                }
+
+                return const SizedBox();
+              }),
+
               const SizedBox(height: 50),
 
               Center(

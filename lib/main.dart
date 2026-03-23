@@ -13,24 +13,45 @@ import 'core/app_bindings.dart';
 import 'routes/app_routes.dart';
 
 void main() async {
+  // 1. Ensure the engine is ready
   WidgetsFlutterBinding.ensureInitialized();
-
-  // 🌐 Global controllers (alive for whole app)
   Get.put(ConnectivityController(), permanent: true);
   Get.put(ThemeController(), permanent: true);
 
-  // 🔔 Firebase & notifications
-  await FireBaseNotificatinService.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  await LocalNotificationService.initLocalNotification();
+  // 2. Initialize Firebase & Notifications first
+  try {
+    await FireBaseNotificatinService.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    await LocalNotificationService.initLocalNotification();
+  } catch (e) {
+    debugPrint("Initialization Error: $e");
+  }
 
-  // 🔒 Force portrait mode
+  // 3. Set Orientations and THEN run the app
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
-  ]);
+  ]).then((_) {
+    runApp(const MyApp());
+  });
+  // WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(const MyApp());
+  // // 🌐 Global controllers (alive for whole app)
+  // Get.put(ConnectivityController(), permanent: true);
+  // Get.put(ThemeController(), permanent: true);
+
+  // // 🔔 Firebase & notifications
+  // await FireBaseNotificatinService.initializeApp();
+  // FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  // await LocalNotificationService.initLocalNotification();
+
+  // // 🔒 Force portrait mode
+  // SystemChrome.setPreferredOrientations([
+  //   DeviceOrientation.portraitUp,
+  //   DeviceOrientation.portraitDown,
+  // ]);
+
+  // runApp(const MyApp());
 }
 
 @pragma('vm:entry-point')
@@ -51,43 +72,44 @@ class MyApp extends StatelessWidget {
       designSize: const Size(375, 812),
       minTextAdapt: true,
       builder: (context, child) {
-        return Obx(() => GetMaterialApp(
-              debugShowCheckedModeBanner: false,
-              title: 'Smart Solutions',
-              initialBinding: AppBinding(),
-              initialRoute: AppRoutes.splashScreen,
-              getPages: AppRoutes.pages,
+        return GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          navigatorKey: Get.key,
+          title: 'Smart Solutions',
+          initialBinding: AppBinding(),
+          initialRoute: AppRoutes.splashScreen,
+          getPages: AppRoutes.pages,
 
-              // 🎨 Dynamic theme
-              theme: ThemeData(
-                fontFamily: 'Poppins',
-                primaryColor: themeController.primaryColor.value,
-                scaffoldBackgroundColor: Colors.white,
-                cardColor: Colors.white,
-                appBarTheme: AppBarTheme(
-                  backgroundColor: themeController.primaryColor.value,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                ),
-                elevatedButtonTheme: ElevatedButtonThemeData(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: themeController.primaryColor.value,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-                  ),
-                ),
-                textButtonTheme: TextButtonThemeData(
-                  style: TextButton.styleFrom(
-                      textStyle: const TextStyle(color: Colors.white)),
-                ),
-                colorScheme: ColorScheme.fromSeed(
-                    seedColor: themeController.primaryColor.value,
-                    brightness: Brightness.light),
+          // 🎨 Dynamic theme
+          theme: ThemeData(
+            fontFamily: 'Poppins',
+            primaryColor: themeController.primaryColor.value,
+            scaffoldBackgroundColor: Colors.white,
+            cardColor: Colors.white,
+            appBarTheme: AppBarTheme(
+              backgroundColor: themeController.primaryColor.value,
+              foregroundColor: Colors.white,
+              elevation: 0,
+            ),
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: themeController.primaryColor.value,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
               ),
-            ));
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                  textStyle: const TextStyle(color: Colors.white)),
+            ),
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: themeController.primaryColor.value,
+                brightness: Brightness.light),
+          ),
+        );
       },
     );
   }

@@ -7,6 +7,7 @@ import 'package:smart_solutions/models/callBack_model.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
 import 'package:smart_solutions/services/api_service.dart';
 import '../../models/admin/admin_loginRequest_model.dart';
+
 class AdminCallBackController extends GetxController {
   final ApiService _apiService = ApiService();
 
@@ -47,6 +48,9 @@ class AdminCallBackController extends GetxController {
   RxInt todayTotal = 0.obs;
   RxInt monthlyTotal = 0.obs;
 
+  RxInt logintodayTotal = 0.obs;
+  RxInt loginmonthlyTotal = 0.obs;
+
   RxBool loginRequestLoaded = false.obs;
   RxBool loginFilesLoaded = false.obs;
 
@@ -77,7 +81,7 @@ class AdminCallBackController extends GetxController {
     });
 
     ever(filteredLoginFilesData, (_) {
-      calculateRequestTotal(filteredLoginFilesData);
+      calculateLoginTotal(filteredLoginFilesData);
     });
   }
 
@@ -296,18 +300,18 @@ class AdminCallBackController extends GetxController {
 
         filteredLoginFilesData.assignAll(allData);
 
-        calculateRequestTotal(filteredLoginFilesData);
+        calculateLoginTotal(filteredLoginFilesData);
 
-        // FILTER HERE
-        if (teamleaderId != null && teamleaderId.isNotEmpty) {
-          filteredLoginFilesData.assignAll(
-              allData.where((item) => item.teamleaderId == teamleaderId));
+        // // // FILTER HERE
+        // if (teamleaderId != null && teamleaderId.isNotEmpty) {
+        //   filteredLoginFilesData.assignAll(
+        //       allData.where((item) => item.teamleaderId == teamleaderId));
 
-          //    calculateRequestTotal(filteredLoginFilesData);
-        } else {
-          filteredLoginFilesData.assignAll(allData);
-          calculateRequestTotal(filteredLoginFilesData);
-        }
+        //   //    calculateRequestTotal(filteredLoginFilesData);
+        // } else {
+        //   filteredLoginFilesData.assignAll(allData);
+        //   calculateRequestTotal(filteredLoginFilesData);
+        // }
       }
     } catch (e) {
       debugPrint('Exception in _fetchLoginRequestData: $e');
@@ -327,7 +331,7 @@ class AdminCallBackController extends GetxController {
                 .toList(),
       );
 
-      calculateRequestTotal(filteredLoginFilesData);
+      calculateLoginTotal(filteredLoginFilesData);
       return;
     }
 
@@ -340,7 +344,7 @@ class AdminCallBackController extends GetxController {
     }).toList();
 
     filteredLoginFilesData.assignAll(result);
-    calculateRequestTotal(filteredLoginFilesData);
+    calculateLoginTotal(filteredLoginFilesData);
   }
 
   // Future<void> _fetchLoginRequestDataForSelectedFilter() async {
@@ -535,8 +539,17 @@ class AdminCallBackController extends GetxController {
       0,
       (sum, item) => sum + (int.tryParse(item.monthlycount ?? '0') ?? 0),
     );
+  }
 
-    print(todayTotal);
-    print(monthlyTotal);
+  void calculateLoginTotal(List<Datum> data) {
+    logintodayTotal.value = data.fold<int>(
+      0,
+      (sum, item) => sum + (int.tryParse(item.todaycount ?? '0') ?? 0),
+    );
+
+    loginmonthlyTotal.value = data.fold<int>(
+      0,
+      (sum, item) => sum + (int.tryParse(item.monthlycount ?? '0') ?? 0),
+    );
   }
 }

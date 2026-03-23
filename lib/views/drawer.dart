@@ -14,6 +14,7 @@ import 'package:smart_solutions/views/theme_change_screen.dart';
 
 import '../controllers/theme_controller.dart';
 import '../services/logout_helper.dart';
+import 'hrms/hrm_screen.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -161,12 +162,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         //   'Reset Password',
                         //   () => Get.to(() => const ForgetView()),
                         // ),
-                        // if (StaticStoredData.roleName == 'telecaller')
-                        //   _drawerSvgTile(
-                        //     'assets/drawer/hrm.svg',
-                        //     'HRM',
-                        //     () => Get.to(() => HrmScreen()),
-                        //   ),
+                        if (StaticStoredData.roleName == 'telecaller')
+                          _drawerSvgTile(
+                            'assets/drawer/hrm.svg',
+                            'HRM',
+                            () => Get.to(() => HrmScreen()),
+                          ),
                         // if (StaticStoredData.roleName == 'telecaller')
                         _drawerSvgTile(
                           'assets/drawer/theme.svg',

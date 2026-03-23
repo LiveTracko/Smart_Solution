@@ -13,6 +13,7 @@ import 'package:smart_solutions/models/top_disburse_model.dart';
 import 'package:smart_solutions/services/api_service.dart';
 import '../components/dashboardgrid.dart';
 import '../constants/services.dart';
+import '../models/admin/dashboard_model.dart';
 
 class DashboardController extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -36,6 +37,13 @@ class DashboardController extends GetxController
   var isApiCalled = false.obs;
 
   var topDisburserUser = <TopDisburseUser>[].obs;
+  var totaDashboardCount = <DasboardModel>[].obs;
+
+  var loginFileStatusCount = <LoginFileStatus>[].obs;
+  var loginFileCount = <Login>[].obs;
+  var loginFileRequestCount = <Login>[].obs;
+  var callLogCount = <Getcalllogcount>[].obs;
+  var callBackCount = <Gettelecallercallback>[].obs;
 
   final ScrollController scrollController = ScrollController();
 
@@ -173,7 +181,8 @@ class DashboardController extends GetxController
       await Future.wait<void>([
         getTimeGraph(),
         getTopDisburseUser(),
-        _loadActiveData(),
+        getDashboardTotalCount(),
+        loadTodayAndMonthlyData(),
       ]);
     } finally {
       isLoading.value = false;
@@ -197,13 +206,13 @@ class DashboardController extends GetxController
   //   });
   // }
 
-  Future<void> _loadActiveData() async {
-    await Future.wait<void>([
-      getActiveData(status: 1),
-      getActiveData(status: 2),
-      loadTodayAndMonthlyData(),
-    ]);
-  }
+  // Future<void> _loadActiveData() async {
+  //   await Future.wait<void>([
+  //     // getActiveData(status: 1),
+  //     // getActiveData(status: 2),
+  //     loadTodayAndMonthlyData(),
+  //   ]);
+  // }
 
   // Future<void> loadTabData(int index) async {
   //   switch (index) {
@@ -730,6 +739,34 @@ class DashboardController extends GetxController
       logOutput("Exception while fetching follow-back list: $e");
     } finally {
       //  isLoading.value = false;
+    }
+  }
+
+  Future<void> getDashboardTotalCount() async {
+    final formdata = {'telecaller_id': StaticStoredData.userId};
+
+    try {
+      final response = await _apiService.postRequest(
+          APIUrls.getMobileDashboardData, formdata);
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final dashboardCount = DasboardModel.fromJson(responseData);
+
+        loginFileStatusCount.assign(dashboardCount.loginFileStatus!);
+
+        loginFileRequestCount.assign(dashboardCount.loginRequestFile!);
+        loginFileCount.assign(dashboardCount.loginFileCount!);
+        callLogCount.assign(dashboardCount.getcalllogcount!);
+        callBackCount.assign(dashboardCount.gettelecallercallback!);
+        // totaDashboardCount.assign(dashboardCount);
+      } else {
+        logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");
+      }
+    } catch (e) {
+      logOutput("Exception while fetching follow-back list: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 

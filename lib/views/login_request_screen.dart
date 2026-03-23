@@ -37,19 +37,24 @@ class LoginRequestScreen extends StatelessWidget {
 
     final ThemeController themeController = Get.find<ThemeController>();
 
+    final bool istelecaller = StaticStoredData.roleName == 'telecaller';
+
     return CommonScaffold(
         title: title,
         showBack: isShowBack,
         isDrawer: isDrawer,
+        
         actions: [
-          IconButton(
-            icon: SvgPicture.asset('assets/images/user_plus.svg'),
-            onPressed: () {
-              controller.isEdit.value = true;
-              controller.isNew.value = true;
-              Get.to(() => LoginRequestForm());
-            },
-          )
+          istelecaller
+              ? IconButton(
+                  icon: SvgPicture.asset('assets/images/user_plus.svg'),
+                  onPressed: () {
+                    controller.isEdit.value = true;
+                    controller.isNew.value = true;
+                    Get.to(() => LoginRequestForm());
+                  },
+                )
+              : const SizedBox.shrink()
         ],
         key: _scaffoldKey,
         body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

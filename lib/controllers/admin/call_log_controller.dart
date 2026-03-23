@@ -7,6 +7,8 @@ import 'package:smart_solutions/models/call_log_model.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
 import 'package:smart_solutions/services/api_service.dart';
 
+import '../common_filter_controller.dart';
+
 class AdminCallLogController extends GetxController {
   final ApiService _apiService = ApiService();
 
@@ -27,6 +29,9 @@ class AdminCallLogController extends GetxController {
 
   RxList<Datum> callLogData = <Datum>[].obs;
   List<Datum> _originalCallLog = [];
+
+  final CommonFilterController filterController =
+      Get.find<CommonFilterController>();
 
   @override
   void onInit() {

@@ -57,7 +57,6 @@ class _AdminCallLogState extends State<AdminCallLog> {
                   controller: _controller.searchController,
                   onClear: _controller.clearFilters,
                   onChanged: (_) {
-                    
                     _controller.filterCallLogs(
                         searchQuery: _controller.searchController.text);
                   },

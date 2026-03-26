@@ -62,11 +62,9 @@ class NotificationController extends GetxController {
             notificationData.assignAll(newList);
           }
 
-          /// ⭐ unread count recalc
           unreadCount.value =
               notificationData.where((e) => e['is_read'] == '0').length;
 
-          /// ⭐ hasMore logic
           notificationHasMore.value = newList.length >= notificationLimit;
 
           if (newList.isNotEmpty) {
@@ -74,9 +72,9 @@ class NotificationController extends GetxController {
           }
 
           /// ⭐ mark read only on first load
-          if (!loadMore) {
-            Future.microtask(() => markAllAsRead());
-          }
+          // if (!loadMore) {
+          //   Future.microtask(() => markAllAsRead());
+          // }
         }
       } else if (response.statusCode == 204) {
         notificationHasMore.value = false;

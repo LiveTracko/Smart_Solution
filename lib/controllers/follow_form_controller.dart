@@ -92,6 +92,8 @@ class FollowBackFormController extends GetxController
 
     ever(followBackList, (_) => updateFilteredList());
 
+    ever(filterController.isDateRangeSelected, (_) => fetchFollowBackList());
+
     // await fetchFollowBackList();
     customerNumberController.addListener(() {
       mobile.value = customerNumberController.text;

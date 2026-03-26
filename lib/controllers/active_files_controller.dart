@@ -25,9 +25,9 @@ class ActiveFilesController extends GetxController {
   void onInit() {
     super.onInit();
 
-    // ever(filterController.selectedRange, (_) {
-    //   dataController.fetchDataEntryList();
-    // });
+    ever(filterController.selectedRange, (_) {
+      dataController.fetchDataEntryList();
+    });
 
     // _startWorker();
 
@@ -52,8 +52,7 @@ class ActiveFilesController extends GetxController {
     debounce(
       dataController.searchText,
       (value) {
-        dataController
-            .fetchDataEntryList(); // ⭐ API will call AFTER user stops typing
+        dataController.fetchDataEntryList();
       },
       time: const Duration(milliseconds: 600),
     );

@@ -39,7 +39,6 @@ class ActiveFiles extends StatefulWidget {
   @override
   State<ActiveFiles> createState() => _ActiveFilesState();
 }
-
 class _ActiveFilesState extends State<ActiveFiles> {
   final DataController dataController = Get.find<DataController>();
   final ActiveFilesController _activeFilesController =

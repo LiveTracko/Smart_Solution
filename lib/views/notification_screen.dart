@@ -36,6 +36,7 @@ class _NotificationSCreenState extends State<NotificationSCreen> {
     });
 
     /// ⭐ first load
+    notificationController.markAllAsRead();
     notificationController.getNotificationList();
   }
 

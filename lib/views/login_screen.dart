@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:smart_solutions/controllers/login_controllers.dart';
 import 'package:smart_solutions/services/firbase_notifications.dart';
-import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/views/forget_password.dart';
 
 class LoginView extends StatefulWidget {
@@ -34,406 +33,664 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      body: SafeArea(
-        child: SingleChildScrollView(
-            child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Obx(() {
-                final msg = controller.loginError.value;
-
-                if (msg != null) {
-                  Future.microtask(() {
-                    print('object');
-                    Get.snackbar(
-                      "Login Failed",
-                      msg,
-                      snackPosition: SnackPosition.TOP,
-                      backgroundColor: Colors.red.shade600,
-                      colorText: Colors.white,
-                      margin: const EdgeInsets.all(12),
-                      duration: const Duration(seconds: 3),
-                    );
-
-                    controller.loginError.value = null;
-                  });
-                }
-
-                return const SizedBox();
-              }),
-
-              const SizedBox(height: 50),
-
-              Center(
-                child: Image.asset(
-                  'assets/images/app_logo.png',
-                  // 'assets/images/app_logo_with_name.png',
-                  fit: BoxFit.contain,
-                  height: 80,
-                ),
-              ),
-              const SizedBox(height: 15),
-
-              /// WELCOME TEXT
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Welcome Back 👋",
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black87),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    "Login to continue",
-                    style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w400),
-                  ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF1976D2),
+                  Color(0xFF1976D2),
                 ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
-
-              const SizedBox(height: 25),
-
-              /// LOAN SELECTOR
-              LoanTypeSelector(),
-
-              const SizedBox(height: 20),
-
-              /// FORM CARD
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 12,
-                      offset: const Offset(0, 3),
-                      spreadRadius: 0,
-                      color: Colors.black.withOpacity(.08),
-                    ),
-                  ],
-                ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text("Mobile Number",
-                              style: TextStyle(fontWeight: FontWeight.w600))),
-                      const SizedBox(height: 6),
-                      TextFormField(
-                        controller: controller.usernameController,
-                        keyboardType: TextInputType.phone,
-                        maxLength: 10,
-                        decoration: InputDecoration(
-                            suffixIcon: const SizedBox(width: 0),
-                            isDense: true,
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 10.w, vertical: 10.h),
-                            hintText: "Enter Mobile Number",
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12))),
-                        validator: (value) {
-                          if (value!.isEmpty) return "Enter number";
-                          if (value.length != 10) {
-                            return "Enter valid 10 digit number";
-                          }
-                          return null;
-                        },
+            ),
+          ),
+          Positioned(
+            top: -120,
+            left: -40,
+            right: -40,
+            child: Container(
+              height: 260,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(.15),
+                borderRadius: BorderRadius.circular(180),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 18.w),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 50),
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 30,
+                            color: Colors.black.withOpacity(.25),
+                            offset: const Offset(0, 12),
+                          )
+                        ],
                       ),
-                      const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text("Password",
-                              style: TextStyle(fontWeight: FontWeight.w600))),
-                      const SizedBox(height: 6),
-                      TextFormField(
-                        controller: controller.passwordController,
-                        obscureText: !_isPasswordVisible,
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10.w,
-                            vertical: 10.h,
-                          ),
-                          hintText: "Enter Password",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isPasswordVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
+                      child: Image.asset(
+                        'assets/images/app_logo.png',
+                        height: 60,
+                      ),
+                    ),
+                    const SizedBox(height: 25),
+                    const Text(
+                      "Welcome Back 👋",
+                      style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      "Login to continue",
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.white.withOpacity(.9),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    LoanTypeSelector(),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(.95),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 30,
+                            color: Colors.black.withOpacity(.2),
+                            offset: const Offset(0, 15),
+                          )
+                        ],
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            /// MOBILE FIELD
+                            TextFormField(
+                              controller: controller.usernameController,
+                              keyboardType: TextInputType.phone,
+                              maxLength: 10,
+                              decoration: InputDecoration(
+                                counterText: "",
+                                hintText: "Mobile Number",
+                                filled: true,
+                                fillColor: const Color(0xFFF3F6FB),
+                                prefixIcon: const Icon(Icons.phone,
+                                    color: Color(0xFF1976D2)),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  // borderSide: BorderSide.none,
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value!.isEmpty) return "Enter number";
+                                if (value.length != 10) {
+                                  return "Enter valid number";
+                                }
+                                return null;
+                              },
                             ),
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              });
-                            },
+
+                            const SizedBox(height: 16),
+
+                            /// PASSWORD FIELD
+                            TextFormField(
+                              controller: controller.passwordController,
+                              obscureText: !_isPasswordVisible,
+                              decoration: InputDecoration(
+                                hintText: "Password",
+                                filled: true,
+                                fillColor: const Color(0xFFF3F6FB),
+                                prefixIcon: const Icon(Icons.lock,
+                                    color: Color(0xFF1976D2)),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _isPasswordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isPasswordVisible = !_isPasswordVisible;
+                                    });
+                                  },
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  //  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Enter Password";
+                                }
+                                return null;
+                              },
+                            ),
+
+                            const SizedBox(height: 24),
+
+                            /// ===== LOGIN BUTTON =====
+                            SizedBox(
+                              height: 52,
+                              width: double.infinity,
+                              child: Obx(() {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFF1976D2),
+                                        Color(0xFF3F8CFF),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      shadowColor: Colors.transparent,
+                                    ),
+                                    onPressed: controller.isLoading.value
+                                        ? null
+                                        : () {
+                                            if (_formKey.currentState!
+                                                .validate()) {
+                                              controller.login(token!);
+                                            }
+                                          },
+                                    child: controller.isLoading.value
+                                        ? const SizedBox(
+                                            height: 22,
+                                            width: 22,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : const Text(
+                                            "Login",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                  ),
+                                );
+                              }),
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            TextButton(
+                              onPressed: () {
+                                Get.to(() => const ForgetView());
+                              },
+                              child: const Text(
+                                "Forgot Password?",
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(.15),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Text(
+                            "Powered by Smart Dial CRM",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Enter Password";
-                          }
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 22),
-
-                      SizedBox(
-                        width: double.infinity,
-                        height: 45,
-                        child: Obx(() {
-                          return ElevatedButton(
-                            onPressed: controller.isLoading.value
-                                ? null
-                                : () {
-                                    if (_formKey.currentState!.validate()) {
-                                      controller.login(token!);
-                                    }
-                                  },
-                            child: controller.isLoading.value
-                                ? const SizedBox(
-                                    height: 22,
-                                    width: 22,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Text("Login"),
-                          );
-                        }),
-                      )
-
-                      // SizedBox(
-                      //   width: double.infinity,
-                      //   height: 48,
-                      //   child: ElevatedButton(
-                      //     style: ElevatedButton.styleFrom(
-                      //       shape: RoundedRectangleBorder(
-                      //           borderRadius: BorderRadius.circular(12)),
-                      //     ),
-                      //     onPressed: () {
-                      //       if (_formKey.currentState!.validate()) {
-                      //         controller.login(token!);
-                      //       }
-                      //     },
-                      //     child:const Text(
-                      //       "Login",
-                      //       style: TextStyle(
-                      //           fontSize: 18, fontWeight: FontWeight.w600),
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
-                  ),
+                        const SizedBox(height: 6),
+                        Text(
+                          "Version 1.0.0",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(.75),
+                            fontSize: 11,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    )
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 15),
-
-              TextButton(
-                  onPressed: () {
-                    Get.to(() => const ForgetView());
-                  },
-                  child: const Text("Forgot Password?",
-                      style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.blue,
-                          fontWeight: FontWeight.w600))),
-
-              const SizedBox(height: 20),
-            ],
-          ),
-        )
-
-            // Stack(
-            //   children: [
-            //     Image.asset(
-            //       'assets/images/login_image_1.png',
-            //       width: double.infinity,
-            //       height: MediaQuery.of(context).size.height,
-            //       fit: BoxFit.contain,
-            //     ),
-
-            //     // White Login Card - FIXED POSITION
-            //     Positioned(
-            //       bottom: -20,
-            //       left: 0,
-            //       right: 0,
-            //       child: Container(
-            //         width: double.infinity,
-            //         padding:
-            //             const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            //         decoration: const BoxDecoration(
-            //           color: Colors.white,
-            //           boxShadow: [
-            //             BoxShadow(
-            //               color: Colors.black12,
-            //               blurRadius: 10,
-            //               offset: Offset(0, -5),
-            //             ),
-            //           ],
-            //         ),
-            //         child:
-
-            //         //  Column(
-            //         //   crossAxisAlignment: CrossAxisAlignment.start,
-            //         //   children: [
-            //         //     Row(
-            //         //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //         //       children: [
-            //         //         const Column(
-            //         //           crossAxisAlignment: CrossAxisAlignment.start,
-            //         //           children: [
-            //         //             SizedBox(height: 10),
-            //         //             Text("Welcome Back!",
-            //         //                 style: AppTextStyle.headerTitle),
-            //         //             SizedBox(height: 2),
-            //         //             Row(
-            //         //               mainAxisAlignment:
-            //         //                   MainAxisAlignment.spaceBetween,
-            //         //               children: [
-            //         //                 Text(
-            //         //                   "Login To Your Account",
-            //         //                   style: AppTextStyle.body,
-            //         //                 ),
-            //         //               ],
-            //         //             )
-            //         //           ],
-            //         //         ),
-            //         //         Image.asset(
-            //         //           'assets/images/app_logo_with_name.png',
-            //         //           height: 150,
-            //         //         )
-            //         //         // SvgPicture.asset(
-            //         //         //   'assets/images/app_logo_with_name.svg',
-            //         //         //   height: 30,
-            //         //         // )
-            //         //       ],
-            //         //     ),
-
-            //         //     const SizedBox(height: 10),
-
-            //         //     LoanTypeSelector(),
-
-            //         //     // Loan Type Selection
-            //         //     const SizedBox(height: 10),
-
-            //         //     Form(
-            //         //       key: _formKey,
-            //         //       child: Column(
-            //         //         crossAxisAlignment: CrossAxisAlignment.start,
-            //         //         children: [
-            //         //           const Text("Mobile Number"),
-            //         //           kVerticalSpace(5),
-            //         //           TextFormField(
-            //         //             controller: controller.usernameController,
-            //         //             style: AppTextStyle.hintText,
-            //         //             maxLength: 10,
-            //         //             keyboardType: TextInputType.phone,
-            //         //             decoration: InputDecoration(
-            //         //                 contentPadding: const EdgeInsets.symmetric(
-            //         //                     horizontal: 16, vertical: 12),
-            //         //                 hintText: "Enter Mobile Number",
-            //         //                 isDense: true,
-            //         //                 border: OutlineInputBorder(
-            //         //                     borderRadius: BorderRadius.circular(10))),
-            //         //             validator: (value) {
-            //         //               if (value == null || value.isEmpty) {
-            //         //                 return 'Please enter username';
-            //         //               }
-            //         //               if (value.length < 3) {
-            //         //                 return 'Username must be at least 3 characters';
-            //         //               }
-            //         //               return null;
-            //         //             },
-            //         //           ),
-            //         //           const SizedBox(height: 10),
-            //         //           const Text("Password"),
-            //         //           kVerticalSpace(5),
-            //         //           TextFormField(
-            //         //             obscureText: true,
-            //         //             controller: controller.passwordController,
-            //         //             style: AppTextStyle.hintText,
-            //         //             decoration: InputDecoration(
-            //         //               hintText: "Enter password",
-            //         //               isDense: true,
-            //         //               suffixIcon: const Icon(
-            //         //                 Icons.visibility_off,
-            //         //                 size: 20,
-            //         //               ),
-            //         //               contentPadding: const EdgeInsets.symmetric(
-            //         //                   horizontal: 16, vertical: 12),
-            //         //               border: OutlineInputBorder(
-            //         //                   borderRadius: BorderRadius.circular(10)),
-            //         //             ),
-            //         //             validator: (value) {
-            //         //               if (value == null || value.isEmpty) {
-            //         //                 return 'Please enter password';
-            //         //               }
-            //         //               if (value.length < 6) {
-            //         //                 return 'Password must be at least 6 characters';
-            //         //               }
-            //         //               return null;
-            //         //             },
-            //         //           ),
-            //         //           const SizedBox(height: 15),
-            //         //           SizedBox(
-            //         //             width: double.infinity,
-            //         //             height: 40,
-            //         //             child: ElevatedButton(
-            //         //               style: ElevatedButton.styleFrom(
-            //         //                 backgroundColor: const Color(0xFF0F5DFF),
-            //         //                 shape: RoundedRectangleBorder(
-            //         //                     borderRadius: BorderRadius.circular(10)),
-            //         //               ),
-            //         //               onPressed: () {
-            //         //                 if (_formKey.currentState!.validate()) {
-            //         //                   controller.login(token!);
-            //         //                   controller.usernameController.clear();
-            //         //                   controller.passwordController.clear();
-            //         //                 }
-            //         //               },
-            //         //               child: const Text("Login",
-            //         //                   style: TextStyle(
-            //         //                       color: Colors.white, fontSize: 16)),
-            //         //             ),
-            //         //           ),
-            //         //         ],
-            //         //       ),
-            //         //     ),
-
-            //         //     Center(
-            //         //       child: TextButton(
-            //         //         onPressed: () {},
-            //         //         child: const Text(
-            //         //           "Forgot Password?",
-            //         //           style: TextStyle(color: Colors.blue),
-            //         //         ),
-            //         //       ),
-            //         //     )
-            //         //   ],
-            //         // ),
-
-            //       ),
-            //     )
-
             ),
+          ),
+        ],
       ),
     );
   }
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     backgroundColor: AppColors.backgroundColor,
+  //     body: SafeArea(
+  //       child: SingleChildScrollView(
+  //           child: Padding(
+  //         padding: EdgeInsets.symmetric(horizontal: 16.w),
+  //         child: Column(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           children: [
+  //             Obx(() {
+  //               final msg = controller.loginError.value;
+
+  //               if (msg != null) {
+  //                 Future.microtask(() {
+  //                   print('object');
+  //                   Get.snackbar(
+  //                     "Login Failed",
+  //                     msg,
+  //                     snackPosition: SnackPosition.TOP,
+  //                     backgroundColor: Colors.red.shade600,
+  //                     colorText: Colors.white,
+  //                     margin: const EdgeInsets.all(12),
+  //                     duration: const Duration(seconds: 3),
+  //                   );
+
+  //                   controller.loginError.value = null;
+  //                 });
+  //               }
+
+  //               return const SizedBox();
+  //             }),
+
+  //             const SizedBox(height: 50),
+
+  //             Center(
+  //               child: Image.asset(
+  //                 'assets/images/app_logo.png',
+  //                 // 'assets/images/app_logo_with_name.png',
+  //                 fit: BoxFit.contain,
+  //                 height: 80,
+  //               ),
+  //             ),
+  //             const SizedBox(height: 15),
+
+  //             /// WELCOME TEXT
+  //             const Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   "Welcome Back 👋",
+  //                   style: TextStyle(
+  //                       fontSize: 24,
+  //                       fontWeight: FontWeight.w700,
+  //                       color: Colors.black87),
+  //                 ),
+  //                 SizedBox(height: 4),
+  //                 Text(
+  //                   "Login to continue",
+  //                   style: TextStyle(
+  //                       fontSize: 15,
+  //                       color: Colors.black54,
+  //                       fontWeight: FontWeight.w400),
+  //                 ),
+  //               ],
+  //             ),
+
+  //             const SizedBox(height: 25),
+
+  //             /// LOAN SELECTOR
+  //             LoanTypeSelector(),
+
+  //             const SizedBox(height: 20),
+
+  //             /// FORM CARD
+  //             Container(
+  //               padding: const EdgeInsets.all(18),
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white,
+  //                 borderRadius: BorderRadius.circular(16),
+  //                 boxShadow: [
+  //                   BoxShadow(
+  //                     blurRadius: 12,
+  //                     offset: const Offset(0, 3),
+  //                     spreadRadius: 0,
+  //                     color: Colors.black.withOpacity(.08),
+  //                   ),
+  //                 ],
+  //               ),
+  //               child: Form(
+  //                 key: _formKey,
+  //                 child: Column(
+  //                   children: [
+  //                     const Align(
+  //                         alignment: Alignment.centerLeft,
+  //                         child: Text("Mobile Number",
+  //                             style: TextStyle(fontWeight: FontWeight.w600))),
+  //                     const SizedBox(height: 6),
+  //                     TextFormField(
+  //                       controller: controller.usernameController,
+  //                       keyboardType: TextInputType.phone,
+  //                       maxLength: 10,
+  //                       decoration: InputDecoration(
+  //                           suffixIcon: const SizedBox(width: 0),
+  //                           isDense: true,
+  //                           contentPadding: EdgeInsets.symmetric(
+  //                               horizontal: 10.w, vertical: 10.h),
+  //                           hintText: "Enter Mobile Number",
+  //                           border: OutlineInputBorder(
+  //                               borderRadius: BorderRadius.circular(12))),
+  //                       validator: (value) {
+  //                         if (value!.isEmpty) return "Enter number";
+  //                         if (value.length != 10) {
+  //                           return "Enter valid 10 digit number";
+  //                         }
+  //                         return null;
+  //                       },
+  //                     ),
+  //                     const Align(
+  //                         alignment: Alignment.centerLeft,
+  //                         child: Text("Password",
+  //                             style: TextStyle(fontWeight: FontWeight.w600))),
+  //                     const SizedBox(height: 6),
+  //                     TextFormField(
+  //                       controller: controller.passwordController,
+  //                       obscureText: !_isPasswordVisible,
+  //                       decoration: InputDecoration(
+  //                         isDense: true,
+  //                         contentPadding: EdgeInsets.symmetric(
+  //                           horizontal: 10.w,
+  //                           vertical: 10.h,
+  //                         ),
+  //                         hintText: "Enter Password",
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(12),
+  //                         ),
+  //                         suffixIcon: IconButton(
+  //                           icon: Icon(
+  //                             _isPasswordVisible
+  //                                 ? Icons.visibility
+  //                                 : Icons.visibility_off,
+  //                           ),
+  //                           onPressed: () {
+  //                             setState(() {
+  //                               _isPasswordVisible = !_isPasswordVisible;
+  //                             });
+  //                           },
+  //                         ),
+  //                       ),
+  //                       validator: (value) {
+  //                         if (value == null || value.isEmpty) {
+  //                           return "Enter Password";
+  //                         }
+  //                         return null;
+  //                       },
+  //                     ),
+
+  //                     const SizedBox(height: 22),
+
+  //                     SizedBox(
+  //                       width: double.infinity,
+  //                       height: 45,
+  //                       child: Obx(() {
+  //                         return ElevatedButton(
+  //                           onPressed: controller.isLoading.value
+  //                               ? null
+  //                               : () {
+  //                                   if (_formKey.currentState!.validate()) {
+  //                                     controller.login(token!);
+  //                                   }
+  //                                 },
+  //                           child: controller.isLoading.value
+  //                               ? const SizedBox(
+  //                                   height: 22,
+  //                                   width: 22,
+  //                                   child: CircularProgressIndicator(
+  //                                     strokeWidth: 2,
+  //                                   ),
+  //                                 )
+  //                               : const Text("Login"),
+  //                         );
+  //                       }),
+  //                     )
+
+  //                     // SizedBox(
+  //                     //   width: double.infinity,
+  //                     //   height: 48,
+  //                     //   child: ElevatedButton(
+  //                     //     style: ElevatedButton.styleFrom(
+  //                     //       shape: RoundedRectangleBorder(
+  //                     //           borderRadius: BorderRadius.circular(12)),
+  //                     //     ),
+  //                     //     onPressed: () {
+  //                     //       if (_formKey.currentState!.validate()) {
+  //                     //         controller.login(token!);
+  //                     //       }
+  //                     //     },
+  //                     //     child:const Text(
+  //                     //       "Login",
+  //                     //       style: TextStyle(
+  //                     //           fontSize: 18, fontWeight: FontWeight.w600),
+  //                     //     ),
+  //                     //   ),
+  //                     // ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+
+  //             const SizedBox(height: 15),
+
+  //             TextButton(
+  //                 onPressed: () {
+  //                   Get.to(() => const ForgetView());
+  //                 },
+  //                 child: const Text("Forgot Password?",
+  //                     style: TextStyle(
+  //                         fontSize: 15,
+  //                         color: Colors.blue,
+  //                         fontWeight: FontWeight.w600))),
+
+  //             const SizedBox(height: 20),
+  //           ],
+  //         ),
+  //       )
+
+  //           // Stack(
+  //           //   children: [
+  //           //     Image.asset(
+  //           //       'assets/images/login_image_1.png',
+  //           //       width: double.infinity,
+  //           //       height: MediaQuery.of(context).size.height,
+  //           //       fit: BoxFit.contain,
+  //           //     ),
+
+  //           //     // White Login Card - FIXED POSITION
+  //           //     Positioned(
+  //           //       bottom: -20,
+  //           //       left: 0,
+  //           //       right: 0,
+  //           //       child: Container(
+  //           //         width: double.infinity,
+  //           //         padding:
+  //           //             const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+  //           //         decoration: const BoxDecoration(
+  //           //           color: Colors.white,
+  //           //           boxShadow: [
+  //           //             BoxShadow(
+  //           //               color: Colors.black12,
+  //           //               blurRadius: 10,
+  //           //               offset: Offset(0, -5),
+  //           //             ),
+  //           //           ],
+  //           //         ),
+  //           //         child:
+
+  //           //         //  Column(
+  //           //         //   crossAxisAlignment: CrossAxisAlignment.start,
+  //           //         //   children: [
+  //           //         //     Row(
+  //           //         //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           //         //       children: [
+  //           //         //         const Column(
+  //           //         //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           //         //           children: [
+  //           //         //             SizedBox(height: 10),
+  //           //         //             Text("Welcome Back!",
+  //           //         //                 style: AppTextStyle.headerTitle),
+  //           //         //             SizedBox(height: 2),
+  //           //         //             Row(
+  //           //         //               mainAxisAlignment:
+  //           //         //                   MainAxisAlignment.spaceBetween,
+  //           //         //               children: [
+  //           //         //                 Text(
+  //           //         //                   "Login To Your Account",
+  //           //         //                   style: AppTextStyle.body,
+  //           //         //                 ),
+  //           //         //               ],
+  //           //         //             )
+  //           //         //           ],
+  //           //         //         ),
+  //           //         //         Image.asset(
+  //           //         //           'assets/images/app_logo_with_name.png',
+  //           //         //           height: 150,
+  //           //         //         )
+  //           //         //         // SvgPicture.asset(
+  //           //         //         //   'assets/images/app_logo_with_name.svg',
+  //           //         //         //   height: 30,
+  //           //         //         // )
+  //           //         //       ],
+  //           //         //     ),
+
+  //           //         //     const SizedBox(height: 10),
+
+  //           //         //     LoanTypeSelector(),
+
+  //           //         //     // Loan Type Selection
+  //           //         //     const SizedBox(height: 10),
+
+  //           //         //     Form(
+  //           //         //       key: _formKey,
+  //           //         //       child: Column(
+  //           //         //         crossAxisAlignment: CrossAxisAlignment.start,
+  //           //         //         children: [
+  //           //         //           const Text("Mobile Number"),
+  //           //         //           kVerticalSpace(5),
+  //           //         //           TextFormField(
+  //           //         //             controller: controller.usernameController,
+  //           //         //             style: AppTextStyle.hintText,
+  //           //         //             maxLength: 10,
+  //           //         //             keyboardType: TextInputType.phone,
+  //           //         //             decoration: InputDecoration(
+  //           //         //                 contentPadding: const EdgeInsets.symmetric(
+  //           //         //                     horizontal: 16, vertical: 12),
+  //           //         //                 hintText: "Enter Mobile Number",
+  //           //         //                 isDense: true,
+  //           //         //                 border: OutlineInputBorder(
+  //           //         //                     borderRadius: BorderRadius.circular(10))),
+  //           //         //             validator: (value) {
+  //           //         //               if (value == null || value.isEmpty) {
+  //           //         //                 return 'Please enter username';
+  //           //         //               }
+  //           //         //               if (value.length < 3) {
+  //           //         //                 return 'Username must be at least 3 characters';
+  //           //         //               }
+  //           //         //               return null;
+  //           //         //             },
+  //           //         //           ),
+  //           //         //           const SizedBox(height: 10),
+  //           //         //           const Text("Password"),
+  //           //         //           kVerticalSpace(5),
+  //           //         //           TextFormField(
+  //           //         //             obscureText: true,
+  //           //         //             controller: controller.passwordController,
+  //           //         //             style: AppTextStyle.hintText,
+  //           //         //             decoration: InputDecoration(
+  //           //         //               hintText: "Enter password",
+  //           //         //               isDense: true,
+  //           //         //               suffixIcon: const Icon(
+  //           //         //                 Icons.visibility_off,
+  //           //         //                 size: 20,
+  //           //         //               ),
+  //           //         //               contentPadding: const EdgeInsets.symmetric(
+  //           //         //                   horizontal: 16, vertical: 12),
+  //           //         //               border: OutlineInputBorder(
+  //           //         //                   borderRadius: BorderRadius.circular(10)),
+  //           //         //             ),
+  //           //         //             validator: (value) {
+  //           //         //               if (value == null || value.isEmpty) {
+  //           //         //                 return 'Please enter password';
+  //           //         //               }
+  //           //         //               if (value.length < 6) {
+  //           //         //                 return 'Password must be at least 6 characters';
+  //           //         //               }
+  //           //         //               return null;
+  //           //         //             },
+  //           //         //           ),
+  //           //         //           const SizedBox(height: 15),
+  //           //         //           SizedBox(
+  //           //         //             width: double.infinity,
+  //           //         //             height: 40,
+  //           //         //             child: ElevatedButton(
+  //           //         //               style: ElevatedButton.styleFrom(
+  //           //         //                 backgroundColor: const Color(0xFF1976D2),
+  //           //         //                 shape: RoundedRectangleBorder(
+  //           //         //                     borderRadius: BorderRadius.circular(10)),
+  //           //         //               ),
+  //           //         //               onPressed: () {
+  //           //         //                 if (_formKey.currentState!.validate()) {
+  //           //         //                   controller.login(token!);
+  //           //         //                   controller.usernameController.clear();
+  //           //         //                   controller.passwordController.clear();
+  //           //         //                 }
+  //           //         //               },
+  //           //         //               child: const Text("Login",
+  //           //         //                   style: TextStyle(
+  //           //         //                       color: Colors.white, fontSize: 16)),
+  //           //         //             ),
+  //           //         //           ),
+  //           //         //         ],
+  //           //         //       ),
+  //           //         //     ),
+
+  //           //         //     Center(
+  //           //         //       child: TextButton(
+  //           //         //         onPressed: () {},
+  //           //         //         child: const Text(
+  //           //         //           "Forgot Password?",
+  //           //         //           style: TextStyle(color: Colors.blue),
+  //           //         //         ),
+  //           //         //       ),
+  //           //         //     )
+  //           //         //   ],
+  //           //         // ),
+
+  //           //       ),
+  //           //     )
+
+  //           ),
+  //     ),
+  //   );
+  // }
 }
 
 // import 'package:flutter/gestures.dart';
@@ -1165,89 +1422,184 @@ class LoanTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 12,
-            offset: const Offset(0, 3),
-            spreadRadius: 0,
-            color: Colors.black.withOpacity(.08),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // PERSONAL LOAN
-          Expanded(
-            child: InkWell(
-              onTap: () => controller.secureType.value = 0,
-              child: Obx(() {
-                final isSelected = controller.secureType.value == 0;
-
-                return Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: isSelected ? Colors.blue : Colors.grey,
-                    ),
-                    color: isSelected
-                        ? Colors.blue.withOpacity(.12)
-                        : Colors.white,
+    return Obx(() {
+      return Container(
+        height: 55,
+        padding: const EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(.95),
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 20,
+              color: Colors.black.withOpacity(.08),
+              offset: const Offset(0, 6),
+            )
+          ],
+        ),
+        child: Stack(
+          children: [
+            AnimatedAlign(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              alignment: controller.secureType.value == 0
+                  ? Alignment.centerLeft
+                  : Alignment.centerRight,
+              child: Container(
+                width: MediaQuery.of(context).size.width / 2.6,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF1976D2),
+                      Color(0xFF3F8CFF),
+                    ],
                   ),
-                  child: Center(
-                    child: Text(
-                      "Unsecure",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: isSelected ? Colors.blue : Colors.black,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 15,
+                      color: Colors.blue.withOpacity(.4),
+                      offset: const Offset(0, 6),
+                    )
+                  ],
+                ),
+              ),
+            ),
+
+            /// 🔥 TEXT BUTTONS
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => controller.secureType.value = 0,
+                    child: Center(
+                      child: Text(
+                        "Unsecure",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: controller.secureType.value == 0
+                              ? Colors.white
+                              : Colors.black54,
+                        ),
                       ),
                     ),
                   ),
-                );
-              }),
-            ),
-          ),
-
-          const SizedBox(width: 10),
-
-          // HOME LOAN
-          Expanded(
-            child: InkWell(
-              onTap: () => controller.secureType.value = 1,
-              child: Obx(() {
-                final isSelected = controller.secureType.value == 1;
-
-                return Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: isSelected ? Colors.blue : Colors.grey,
-                    ),
-                    color: isSelected
-                        ? Colors.blue.withOpacity(.12)
-                        : Colors.white,
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Secure",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: isSelected ? Colors.blue : Colors.black,
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => controller.secureType.value = 1,
+                    child: Center(
+                      child: Text(
+                        "Secure",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: controller.secureType.value == 1
+                              ? Colors.white
+                              : Colors.black54,
+                        ),
                       ),
                     ),
                   ),
-                );
-              }),
-            ),
-          ),
-        ],
-      ),
-    );
+                ),
+              ],
+            )
+          ],
+        ),
+      );
+    });
   }
 }
+
+// class LoanTypeSelector extends StatelessWidget {
+//   LoanTypeSelector({super.key});
+
+//   final LoginViewModel controller = Get.find<LoginViewModel>();
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       padding: const EdgeInsets.all(10),
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         borderRadius: BorderRadius.circular(16),
+//         boxShadow: [
+//           BoxShadow(
+//             blurRadius: 12,
+//             offset: const Offset(0, 3),
+//             spreadRadius: 0,
+//             color: Colors.black.withOpacity(.08),
+//           ),
+//         ],
+//       ),
+//       child: Row(
+//         children: [
+//           // PERSONAL LOAN
+//           Expanded(
+//             child: InkWell(
+//               onTap: () => controller.secureType.value = 0,
+//               child: Obx(() {
+//                 final isSelected = controller.secureType.value == 0;
+
+//                 return Container(
+//                   padding: const EdgeInsets.symmetric(vertical: 8),
+//                   decoration: BoxDecoration(
+//                     borderRadius: BorderRadius.circular(10),
+//                     border: Border.all(
+//                       color: isSelected ? Colors.blue : Colors.grey,
+//                     ),
+//                     color: isSelected
+//                         ? Colors.blue.withOpacity(.12)
+//                         : Colors.white,
+//                   ),
+//                   child: Center(
+//                     child: Text(
+//                       "Unsecure",
+//                       style: TextStyle(
+//                         fontWeight: FontWeight.w600,
+//                         color: isSelected ? Colors.blue : Colors.black,
+//                       ),
+//                     ),
+//                   ),
+//                 );
+//               }),
+//             ),
+//           ),
+
+//           const SizedBox(width: 10),
+
+//           // HOME LOAN
+//           Expanded(
+//             child: InkWell(
+//               onTap: () => controller.secureType.value = 1,
+//               child: Obx(() {
+//                 final isSelected = controller.secureType.value == 1;
+
+//                 return Container(
+//                   padding: const EdgeInsets.symmetric(vertical: 12),
+//                   decoration: BoxDecoration(
+//                     borderRadius: BorderRadius.circular(10),
+//                     border: Border.all(
+//                       color: isSelected ? Colors.blue : Colors.grey,
+//                     ),
+//                     color: isSelected
+//                         ? Colors.blue.withOpacity(.12)
+//                         : Colors.white,
+//                   ),
+//                   child: Center(
+//                     child: Text(
+//                       "Secure",
+//                       style: TextStyle(
+//                         fontWeight: FontWeight.w600,
+//                         color: isSelected ? Colors.blue : Colors.black,
+//                       ),
+//                     ),
+//                   ),
+//                 );
+//               }),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

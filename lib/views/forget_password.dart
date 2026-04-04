@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/views/otp_view.dart';
 import 'package:smart_solutions/widget/common_form_field.dart';
 import 'package:smart_solutions/widget/text_style.dart';
+
+import '../controllers/forget_password_controller.dart';
 
 class ForgetView extends StatefulWidget {
   const ForgetView({super.key});
@@ -16,6 +19,8 @@ class ForgetView extends StatefulWidget {
 class ForgetViewState extends State<ForgetView> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
+  ForgetPasswordController forgetPasswordController =
+      Get.put(ForgetPasswordController());
 
   @override
   Widget build(BuildContext context) {
@@ -24,27 +29,35 @@ class ForgetViewState extends State<ForgetView> {
       child: Scaffold(
         backgroundColor: Colors.white,
         resizeToAvoidBottomInset: true,
-
-        /// 🔽 BUTTON FIXED AT BOTTOM
         bottomNavigationBar: Padding(
           padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 16.h),
           child: SizedBox(
             height: 45.h,
-            child: ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  Get.to(
-                    () => const OtpView(),
-                    transition: Transition.rightToLeft,
-                    duration: const Duration(milliseconds: 300),
-                  );
-                }
-              },
-              child: const Text("Verify"),
+            child: Obx(
+              () => ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    final data = await forgetPasswordController
+                        .verifyMobileNo(emailController.text);
+
+                    if (data == true) {
+                      Get.to(
+                        () => OtpView(mobileNo: emailController.text),
+                        transition: Transition.rightToLeft,
+                        duration: const Duration(milliseconds: 300),
+                      );
+                    }
+                  }
+                },
+                child: forgetPasswordController.isverifying.value
+                    ? const CircularProgressIndicator(
+                        color: AppColors.appBarTextColor,
+                      )
+                    : const Text("Verify"),
+              ),
             ),
           ),
         ),
-
         body: SingleChildScrollView(
           padding: EdgeInsets.only(
             bottom: 100.h,
@@ -85,9 +98,9 @@ class ForgetViewState extends State<ForgetView> {
                 ),
                 SizedBox(height: 24.h),
                 CommonTextField(
-                  label: "Enter Email Or Mobile No.",
+                  label: "Enter Mobile No.",
                   controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
+                  keyboardType: TextInputType.number,
                   validator: (v) {
                     if (v == null || v.isEmpty) {
                       return "This field is required";
@@ -105,7 +118,7 @@ class ForgetViewState extends State<ForgetView> {
                       return "Enter a valid email or 10 digit mobile number";
                     }
                     return null;
-                  },  
+                  },
                 ),
               ],
             ),

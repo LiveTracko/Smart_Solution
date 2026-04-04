@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
@@ -11,7 +11,6 @@ import 'package:smart_solutions/models/data_entery_model.dart';
 import 'package:smart_solutions/models/data_entry_bank_list.dart';
 import 'package:smart_solutions/models/dsa_bank_list.dart';
 import 'package:smart_solutions/models/dsa_name_model.dart';
-
 import 'package:smart_solutions/models/leads_status_group.dart';
 import 'package:smart_solutions/models/product_type.dart';
 import 'package:smart_solutions/models/source_model.dart';
@@ -26,11 +25,13 @@ class DataController extends GetxController {
   final ApiService _apiService = ApiService();
   var dateRangeList = <DateTime?>[].obs;
   var isLoading = true.obs;
+  var isDataEntryLoading = true.obs;
 
   var iseditLoading = true.obs;
   var dataList = <Data>[].obs;
   var disbursementdata = <Data>[].obs;
   var errorMessage = ''.obs;
+  RxBool isSaveLoading = false.obs;
   // TEAM LEADER FILTER
   var teamLeaderList = <TeamleaderData>[].obs;
   var selectedTeamLeaderIds = <String>[].obs;
@@ -39,12 +40,19 @@ class DataController extends GetxController {
 
   var allBankNamesList = <DataEntryBankList>[].obs;
 
+  var selectedBanktransactionType = 'No'.obs;
+
+  var selectedDemandDraftStatus = 'Closed'.obs;
+
   var dsaName = ''.obs;
   RxString tellecallerId = ''.obs;
   RxString dataId = ''.obs;
   RxString dsaId = ''.obs;
-  RxString Id = ''.obs;
-  RxString admin_subadmin_name = ''.obs;
+  RxString id = ''.obs;
+  RxList<CommentData> commentList = <CommentData>[].obs;
+  RxString newComment = ''.obs;
+
+  RxString adminSubadminName = ''.obs;
   var dsaNameList = <DsaModel>[].obs;
   var filterLeadStatus = <GetLeadStatusGroup>[].obs;
   var dsaBankList = <DsaBank>[].obs;
@@ -74,12 +82,14 @@ class DataController extends GetxController {
 
 //  var loginBank = ''.obs;
   var bankName = ''.obs;
+  var bankId = ''.obs;
 //  var bankerName = ''.obs;
   var bankerMobile = ''.obs;
   var bankerEmail = ''.obs;
   var losNo = ''.obs;
   var telecaller = ''.obs;
   var teamleader = ''.obs;
+  var teamleaderId = ''.obs;
   var status = ''.obs;
   var source = ''.obs;
   var caseStudy = ''.obs;
@@ -105,6 +115,12 @@ class DataController extends GetxController {
   void onInit() {
     super.onInit();
 
+    ever(selectedBankName, (value) {
+      if (value != null && value.toString().isNotEmpty) {
+        getBankerNameByloginBank(dsaId.value, value.toString());
+      }
+    });
+
     _loadAllData();
   }
 
@@ -122,9 +138,24 @@ class DataController extends GetxController {
     refreshData(); // 👈 reload without filter
   }
 
+  void addComment() {
+    // if (newComment.value.trim().isEmpty) return;
+
+    commentList.add(
+      CommentData(
+        comment: newComment.value,
+        userId: StaticStoredData.userId,
+        date: DateTime.now().toString(),
+        isLocal: true,
+      ),
+    );
+
+    newComment.value = '';
+  }
+
   Future<void> _loadAllData() async {
     try {
-      // isLoading(true);
+      isLoading(true);
       await Future.wait([
         getLeadsFilterData(),
         fetchDataEntryList(),
@@ -135,8 +166,9 @@ class DataController extends GetxController {
       ]);
     } catch (e) {
       logOutput("Error loading data: $e");
+      isLoading(false); // Ensure loading is stopped on error
     } finally {
-      //isLoading(false); // 👈 stop loading in all cases
+      isLoading(false); // 👈 stop loading in all cases
     }
   }
 
@@ -166,22 +198,21 @@ class DataController extends GetxController {
     }
   }
 
-  Future<void> applyStatusFilter() async {
-    try {
-      isLoading(true);
-      dataList.clear();
-      await fetchDataEntryList();
-    } finally {
-      isLoading(false);
-    }
-  }
+  // Future<void> applyStatusFilter() async {
+  //   try {
+  //     isLoading(true);
+  //     dataList.clear();
+  //     await fetchDataEntryList();
+  //   } finally {
+  //     isLoading(false);
+  //   }
+  // }
 
   Future<void> fetchDataEntryList() async {
     isLoading(true);
     try {
       final Map<String, dynamic> formData = {
         'telecaller_id': defaultTelecallerId
-        
       };
 
       final range = _commonFilterController.selectedRange.value;
@@ -253,8 +284,9 @@ class DataController extends GetxController {
         errorMessage.value,
         snackPosition: SnackPosition.BOTTOM,
       );
-    } finally {
       isLoading(false);
+    } finally {
+      isDataEntryLoading(false);
     }
   }
 
@@ -323,34 +355,59 @@ class DataController extends GetxController {
 
   // Save login request
   Future<void> saveDataEntryForm() async {
+    isSaveLoading(true);
     try {
       // Prepare the fields map
       var fields = {
-        'dsaName': dsaId.value,
-        'date': date.value,
+        'id': id.value,
+        'dsaName': dsaName.value,
+        'date': DateFormat('yyyy-MM-dd HH:mm:ss').format(
+          DateFormat('dd-MM-yy HH:mm:ss').parse(date.value),
+        ),
         'mobile_no': contactNumber.value,
         "customer_name": customerName.value,
-        'customer_id': customerName.value,
+        // 'customer_id': id.value,
         'income': income.value,
         'company_name': companyName.value,
         'caseType': selectedCaseType.value,
+        'case_study': caseStudy.value,
+        'dob': dob.value,
         'loanAmount': loanAmount.value,
         'loginBank': bankName.value,
+        'bankerid': bankId.value,
         'bankerName': selectedBankerName.value,
         'bankerMobile': bankerMobile.value,
         'bankerEmail': bankerEmail.value,
-        'caseStudy': caseStudy.value,
+        'losNo': losNo.value,
+        'teleCallerid': tellecallerId.value,
+        'teamLeader': teamleaderId.value,
         'product_type': selectedproductType.value,
         'sourcing': selectedSource.value,
-        'dob': dob.value,
-        'losNo': losNo.value,
-        'telecallerid': tellecallerId.value,
-        'teamLeader': teamleader.value,
         'status': selectedStatus.value,
-        'id': Id.value,
+        'balancetransfer':
+            selectedBanktransactionType.value == 'Yes' ? "1" : "2",
+        'demand_draft_status':
+            selectedDemandDraftStatus.value == 'Open' ? "1" : "2",
+        'demand_draft_remark': '',
       };
 
+      // for (int i = 0; i < commentList.length; i++) {
+      //   fields['comment_status[]'] = commentList[i].commentStatus.toString();
+      //   fields['user_id[]'] = commentList[i].userId.toString();
+      //   fields['comments[]'] = commentList[i].comment.toString();
+      //   fields['comment_id[]'] = commentList[i].id.toString();
+      // }
+
+      for (int i = 0; i < commentList.length; i++) {
+        fields.addAll({
+          'comment_status[$i]': commentList[i].commentStatus ?? '',
+          'user_id[$i]': commentList[i].userId ?? '',
+          'comment[$i]': commentList[i].comment ?? '',
+          'comment_id[$i]': commentList[i].id ?? '',
+        });
+      }
       logOutput('Request fields: $fields');
+      logOutput('Request fields: ${json.encode(fields)}');
 
       // Make the API request
       final response =
@@ -371,14 +428,27 @@ class DataController extends GetxController {
         // remarksList.value = []; // To hold multiple remarks
         // id = ''.obs;
         // sourceId.value = '';
+
         Get.back();
-        Get.snackbar('Success', 'Data Entry saved successfully!');
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(
+            content: Text('Data Entry saved successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
       } else {
-        Get.snackbar('Error', 'Failed to save login request.');
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to save Data Entry!'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
       logOutput("An error occurred while saving the login request: $e");
+      isSaveLoading(false);
     } finally {
+      isSaveLoading(false);
       // Stop loading
     }
   }
@@ -478,7 +548,7 @@ class DataController extends GetxController {
           selectedBankerName.value = bankername.first.bankerName.toString();
           bankerMobile.value = bankername.first.mobile.toString();
           bankerEmail.value = bankername.first.email.toString();
-          //      bankerNameList.assignAll(bankername);
+          //bankerNameList.assignAll(bankername);
         }
       }
     } catch (e) {
@@ -550,6 +620,7 @@ class DataController extends GetxController {
   }
 
   Future<void> fetchDataEntryListSpecificId() async {
+    isDataEntryLoading(true);
     try {
       Map<String, dynamic> body = {"telecaller_id": tellecallerId.value};
       var response =
@@ -564,7 +635,7 @@ class DataController extends GetxController {
           );
 
           // Assigning values to observables
-          Id.value = entry.id.toString();
+          id.value = entry.id.toString();
           dsaName.value = entry.dsaName.toString();
           contactNumber.value = entry.mobileNo.toString();
           customerName.value = entry.customerName ?? '';
@@ -572,18 +643,22 @@ class DataController extends GetxController {
           companyName.value = entry.companyName ?? '';
           selectedCaseType.value = entry.caseType.toString();
           loanAmount.value = entry.loanAmount.toString();
-          date.value = entry.date.toString();
-          dob.value = entry.dob.toString();
+          date.value =
+              formatDate(entry.date?.toString(), 'dd-MM-yyyy HH:mm:ss');
+          dob.value = formatDate(entry.dob?.toString(), 'dd-MM-yyyy');
           selectedproductType.value = entry.productType ?? '';
+          bankerMobile.value = entry.bankerMobile ?? '';
           selectedBankName.value = entry.loginBank ?? '';
           selectedBankerName.value = entry.bankerName ?? '';
           selectedStatus.value = entry.status ?? '';
           selectedSource.value = entry.sourcing ?? '';
-          admin_subadmin_name.value = entry.adminSubAdminName ?? '';
+          commentList.assignAll(entry.commentData ?? []);
+          adminSubadminName.value = entry.adminSubAdminName ?? '';
 
           //      loginBank.value = entry.loginBank ?? '';
 
-          bankName.value = entry.bankName ?? '';
+          bankName.value = entry.loginBank ?? '';
+          bankId.value = entry.bankerId ?? '';
           //   bankerName.value = entry.bankerName ?? '';
           bankerMobile.value = entry.bankerMobile ?? '';
           bankerEmail.value = entry.bankerEmail ?? '';
@@ -591,6 +666,7 @@ class DataController extends GetxController {
           selectTelecallerName.value = entry.teleCallerId ?? '';
           //    telecaller.value = entry.teleCallerName ?? '';
           teamleader.value = entry.tlName ?? '';
+          teamleaderId.value = entry.teamLeader ?? '';
           //     status.value = entry.status ?? '';
           //    source.value = entry.sourcing ?? '';
           caseStudy.value = entry.caseStudy ?? '';
@@ -598,7 +674,10 @@ class DataController extends GetxController {
         }
       }
     } catch (e) {
+      isDataEntryLoading(false);
       logOutput('An error occurred while fetching source list: $e');
+    } finally {
+      isDataEntryLoading(false);
     }
   }
 
@@ -640,6 +719,17 @@ class DataController extends GetxController {
       }
     } catch (e) {
       logOutput('An error occurred while fetching source list: $e');
+    }
+  }
+
+  String formatDate(String? date, String format) {
+    if (date == null || date.isEmpty) return '';
+
+    try {
+      final parsedDate = DateTime.parse(date);
+      return DateFormat(format).format(parsedDate);
+    } catch (e) {
+      return ''; // fallback if invalid
     }
   }
 }

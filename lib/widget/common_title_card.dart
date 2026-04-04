@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import 'package:smart_solutions/views/spacing_constants.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
@@ -14,7 +13,9 @@ class CommonTitleCard extends StatelessWidget {
   final String amount;
   final List<Widget> children;
   final bool showEdit;
+  final bool showMoveToLogin;
   final VoidCallback? onEdit;
+  final VoidCallback? onMoveToLogin;
   final VoidCallback? onLeadingTap;
   final ValueChanged<bool>? onExpansionChanged;
   String? followupdate;
@@ -31,7 +32,9 @@ class CommonTitleCard extends StatelessWidget {
     required this.amount,
     required this.children,
     this.showEdit = false,
+    this.showMoveToLogin = false,
     this.onEdit,
+    this.onMoveToLogin,
     this.onLeadingTap,
     this.onExpansionChanged,
     this.followupdate,
@@ -204,15 +207,27 @@ class CommonTitleCard extends StatelessWidget {
                       if (mobNo != null && mobNo!.isNotEmpty)
                         Text(mobNo.toString()),
 
-                      showEdit
-                          ? GestureDetector(
-                              onTap: onEdit,
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Icon(Icons.edit, size: 18),
-                              ),
-                            )
-                          : const SizedBox.shrink(),
+                      buildActions(),
+
+                      // showEdit
+                      //     ? GestureDetector(
+                      //         onTap: onEdit,
+                      //         child: const Padding(
+                      //           padding: EdgeInsets.symmetric(horizontal: 8),
+                      //           child: Icon(Icons.edit, size: 18),
+                      //         ),
+                      //       )
+                      //     : const SizedBox.shrink(),
+
+                      // showMoveToLogin
+                      //     ? GestureDetector(
+                      //         onTap: onMoveToLogin,
+                      //         child: const Padding(
+                      //           padding: EdgeInsets.symmetric(horizontal: 8),
+                      //           child: Icon(Icons.login, size: 18),
+                      //         ),
+                      //       )
+                      //     : const SizedBox.shrink(),
                     ],
                   ),
                   // showEdit
@@ -301,5 +316,95 @@ class CommonTitleCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget buildActions() {
+    if (showEdit && showMoveToLogin) {
+      return SizedBox(
+        width: 25,
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: Container(
+            height: 15,
+            width: 28,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                )
+              ],
+            ),
+            child: PopupMenuButton<String>(
+              padding: EdgeInsets.zero,
+              icon:
+                  const Icon(Icons.more_vert, size: 16, color: Colors.black87),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              color: Colors.white,
+              elevation: 6,
+              splashRadius: 18,
+              onSelected: (value) {
+                if (value == 'edit') onEdit?.call();
+                if (value == 'login') onMoveToLogin?.call();
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'edit',
+                  height: 36,
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, size: 18, color: Colors.blue),
+                      SizedBox(width: 10),
+                      Text('Edit'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'login',
+                  height: 36,
+                  child: Row(
+                    children: [
+                      Icon(Icons.login, size: 18, color: Colors.green),
+                      SizedBox(width: 10),
+                      Text('Move to Login'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // 🔹 ONLY EDIT
+    if (showEdit) {
+      return GestureDetector(
+        onTap: onEdit,
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Icon(Icons.edit, size: 18),
+        ),
+      );
+    }
+
+    // 🔹 ONLY LOGIN
+    if (showMoveToLogin) {
+      return GestureDetector(
+        onTap: onMoveToLogin,
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Icon(Icons.login, size: 18),
+        ),
+      );
+    }
+
+    // 🔹 NONE
+    return const SizedBox.shrink();
   }
 }

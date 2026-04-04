@@ -49,6 +49,7 @@ class Data {
   String? sourcing;
   String? status;
   String? comments;
+  List<CommentData>? commentData;
   String? invoiceId;
   String? paidStatus;
   String? tcName;
@@ -90,6 +91,7 @@ class Data {
     this.sourcing,
     this.status,
     this.comments,
+    this.commentData,
     this.invoiceId,
     this.paidStatus,
     this.tcName,
@@ -102,7 +104,6 @@ class Data {
     this.dataEntryStatus,
   });
 
-  // Factory constructor for JSON parsing
   factory Data.fromJson(Map<String, dynamic> json) {
     return Data(
       id: json['id'],
@@ -134,6 +135,10 @@ class Data {
       sourcing: json['sourcing'],
       status: json['status'],
       comments: json['comment_data'],
+      commentData: json['comment_alldata'] != null
+          ? List<CommentData>.from(
+              json['comment_alldata'].map((v) => CommentData.fromJson(v)))
+          : [],
       invoiceId: json['invoice_id'],
       paidStatus: json['paid_status'],
       tcName: json['tcname'],
@@ -179,6 +184,7 @@ class Data {
       'sourcing': sourcing,
       'status': status,
       'comment_data': comments,
+      'comment_alldata': commentData, // Convert comment data to JSON
       'invoice_id': invoiceId,
       'paid_status': paidStatus,
       'tcname': tcName,
@@ -189,6 +195,55 @@ class Data {
       'bank_name': bankName,
       'data_status_text': dataStatus,
       'data_entry_status': dataEntryStatus,
+    };
+  }
+}
+
+class CommentData {
+  String? id;
+  String? dataEntryId;
+  String? commentStatus;
+  String? userId;
+  String? comment;
+  String? date;
+  String? name;
+
+  bool isLocal; 
+  
+
+  CommentData({
+    this.id,
+    this.dataEntryId,
+    this.commentStatus,
+    this.userId,
+    this.comment,
+    this.date,
+    this.name,
+     this.isLocal = false,
+  });
+
+  factory CommentData.fromJson(Map<String, dynamic> json) {
+    return CommentData(
+      id: json['id']?.toString(),
+      dataEntryId: json['data_entry_id']?.toString(),
+      commentStatus: json['comment_status']?.toString(),
+      userId: json['user_id']?.toString(),
+      comment: json['comment']?.toString(),
+      date: json['date']?.toString(),
+      name: json['name']?.toString(),
+            isLocal: false, 
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'data_entry_id': dataEntryId,
+      'comment_status': commentStatus,
+      'user_id': userId,
+      'comment': comment,
+      'date': date,
+      'name': name,
     };
   }
 }

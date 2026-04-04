@@ -39,6 +39,7 @@ class ActiveFiles extends StatefulWidget {
   @override
   State<ActiveFiles> createState() => _ActiveFilesState();
 }
+
 class _ActiveFilesState extends State<ActiveFiles> {
   final DataController dataController = Get.find<DataController>();
   final ActiveFilesController _activeFilesController =
@@ -98,7 +99,7 @@ class _ActiveFilesState extends State<ActiveFiles> {
                   controller:
                       _activeFilesController.filterController.searchController,
                   onChanged: (value) {
-                    _activeFilesController.updateFilteredList();
+                    //    _activeFilesController.updateFilteredList();
                   },
                   onClear: () {
                     _activeFilesController.filterController.clearFilters();
@@ -129,7 +130,7 @@ class _ActiveFilesState extends State<ActiveFiles> {
             ]),
           ),
           Expanded(child: Obx(() {
-            if (dataController.isLoading.value) {
+            if (_activeFilesController.isLoading.value) {
               return const Center(child: LoadingPage());
             }
 
@@ -163,7 +164,7 @@ class _ActiveFilesState extends State<ActiveFiles> {
                 totalAmount: CurrencyUtils.formatIndianCurrency(totalAmount),
               ),
               Expanded(child: Obx(() {
-                if (dataController.isLoading.value) {
+                if (_activeFilesController.isLoading.value) {
                   return const Center(child: LoadingPage());
                 }
                 if (_activeFilesController.filteredList.isEmpty) {
@@ -180,12 +181,11 @@ class _ActiveFilesState extends State<ActiveFiles> {
                   );
                 }
                 return RefreshIndicator(
-                  onRefresh: () => dataController.refreshData(),
+                  onRefresh: () => _activeFilesController.refreshData(),
                   child: ListView.builder(
                       padding: const EdgeInsets.all(10),
                       itemCount: _activeFilesController.filteredList.length,
                       itemBuilder: (context, index) {
-                        //  var data = dataController.dataList[index];
                         var data = _activeFilesController.filteredList[index];
 
                         return CommonTitleCard(

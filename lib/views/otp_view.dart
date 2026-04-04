@@ -3,15 +3,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
+import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/views/reset_password.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
+import '../controllers/forget_password_controller.dart';
+
 class OtpView extends StatefulWidget {
-  const OtpView({super.key});
+  final String mobileNo;
+  const OtpView({super.key, required this.mobileNo});
 
   @override
   State<OtpView> createState() => _OtpViewState();
 }
+
+ForgetPasswordController _forgetPasswordController =
+    Get.find<ForgetPasswordController>();
 
 class _OtpViewState extends State<OtpView> {
   String enteredOtp = "";
@@ -34,22 +41,45 @@ class _OtpViewState extends State<OtpView> {
           child: SizedBox(
             height: 45.h,
             child: ElevatedButton(
-              onPressed: () {
-                if (enteredOtp.length == 4) {
-                  // 🔐 Call verify OTP API here
+              onPressed: () async {
+                final bool isValid = await _forgetPasswordController.verifyOtp(
+                    widget.mobileNo, enteredOtp);
+
+                if (isValid) {
                   Get.to(
-                    () => const ChangePasswordScreen(),
+                    () => ChangePasswordScreen(mobileNo: widget.mobileNo),
                     transition: Transition.rightToLeft,
+                    duration: const Duration(milliseconds: 300),
                   );
                 } else {
                   Get.snackbar(
                     "Invalid OTP",
-                    "Please enter 4 digit OTP",
+                    "Please enter the correct 4 digit OTP",
                     snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: Colors.red,
+                    colorText: Colors.white,
                   );
                 }
+
+                // if (enteredOtp.length == 4) {
+                //   // 🔐 Call verify OTP API here
+                //   Get.to(
+                //     () => const ChangePasswordScreen(),
+                //     transition: Transition.rightToLeft,
+                //   );
+                // } else {
+                //   Get.snackbar(
+                //     "Invalid OTP",
+                //     "Please enter 4 digit OTP",
+                //     snackPosition: SnackPosition.BOTTOM,
+                //   );
+                // }
               },
-              child: const Text("Verify"),
+              child: _forgetPasswordController.isverifyingotp.value
+                  ? const CircularProgressIndicator(
+                      color: AppColors.appBarTextColor,
+                    )
+                  : const Text("Verify"),
             ),
           ),
         ),

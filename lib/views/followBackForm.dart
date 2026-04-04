@@ -57,7 +57,7 @@ class _FollowBackFormState extends State<FollowBackForm> {
 
   Future<void> _initialLoad() async {
     await _dialerController.fetchLastCallInfoIfNeeded(widget.isgetData);
-    await _formController.loadData(false);
+    await _formController.loadData(widget.isRefresh);
   }
 
   @override
@@ -1023,26 +1023,20 @@ class _FollowBackFormState extends State<FollowBackForm> {
               ? null
               : () async {
                   if (_formKey.currentState!.validate()) {
-                    //  final res =
-                    await _formController.submitFollowUp();
-                    // Hide keyboard first (optional)
-                    // FocusManager.instance.primaryFocus?.unfocus();
+                    final success = await _formController.submitFollowUp();
 
-                    // Show snackbar here in the UI
-                    // if (res) {
-                    //   Get.back();
-                    //   Get.snackbar(
-                    //     'Success',
-                    //     'Follow up saved successfully',
-                    //     snackPosition: SnackPosition.BOTTOM,
-                    //     backgroundColor:
-                    //         themeController.primaryColor.value.withOpacity(0.5),
-                    //     colorText: Colors.green,
-                    //     margin: const EdgeInsets.all(12),
-                    //     borderRadius: 8,
-                    //     duration: const Duration(seconds: 2),
-                    //   );
-                    // }
+                    if (!mounted) return; // 🔥 important in StatefulWidget
+
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Follow up saved successfully"),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+
+                      Navigator.pop(context); // or Get.back()
+                    }
                   }
                 },
           style: ElevatedButton.styleFrom(

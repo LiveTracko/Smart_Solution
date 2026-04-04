@@ -23,14 +23,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final controller = Get.find<ProfileController>();
   final ThemeController themeController = Get.find<ThemeController>();
 
-  ImageProvider profileImage() {
+  ImageProvider? profileImage() {
     if (controller.imageFile.value != null) {
       return FileImage(controller.imageFile.value!);
-    }
-    if (controller.profileImageUrl.value.isNotEmpty) {
+    } else if (controller.profileImageUrl.value.isNotEmpty) {
       return NetworkImage(controller.profileImageUrl.value);
+    } else {
+      return null;
     }
-    return const AssetImage("assets/images/app_login.png");
   }
 
   Widget buildSectionTile(
@@ -88,15 +88,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Stack(
                     children: [
-                      CircleAvatar(
-                        radius: 55,
-                        backgroundImage: profileImage(),
+                      Obx(
+                        () => CircleAvatar(
+                          radius: 55,
+                          backgroundImage: profileImage(),
+                        ),
                       ),
                       Positioned(
                         bottom: 0,
                         right: 0,
                         child: GestureDetector(
-                          onTap: _openProfileImageBottomSheet,
+                          onTap: controller.pickImage,
+                          // _openProfileImageBottomSheet,
                           child: CircleAvatar(
                             radius: 16,
                             backgroundColor: themeController.primaryColor.value,
@@ -112,14 +115,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                   const SizedBox(width: 16),
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Ashwini", style: AppTextStyle.headerTitle),
-                      SizedBox(height: 6),
-                      Text("+91 9876543210", style: AppTextStyle.bodyBoldTxt),
-                      SizedBox(height: 6),
-                      Text("Admin", style: AppTextStyle.label),
+                      Text(controller.nameController.text,
+                          style: AppTextStyle.headerTitle),
+                      const SizedBox(height: 6),
+                      Text(controller.usernameController.text,
+                          style: AppTextStyle.bodyBoldTxt),
+                      const SizedBox(height: 6),
+                      // Text(controller.roleController.text,
+                      //     style: AppTextStyle.label),
                     ],
                   ),
                 ],
@@ -185,62 +191,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _openProfileImageBottomSheet() {
-    if (Get.isBottomSheetOpen == true) return;
+  // void _openProfileImageBottomSheet() {
+  //   if (Get.isBottomSheetOpen == true) return;
 
-    Get.bottomSheet(
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              height: 4,
-              width: 40,
-              margin: const EdgeInsets.only(bottom: 15),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade400,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    "Upload Profile Photo",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () => Get.back(),
-                  child: const Icon(Icons.close, color: Colors.grey),
-                ),
-              ],
-            ),
-            const SizedBox(height: 15),
-            ListTile(
-              leading: SvgPicture.asset("assets/hrms/gallery.svg"),
-              title: const Text("Gallery"),
-              onTap: () {
-                Get.back();
-                controller.pickImage();
-              },
-            ),
-            ListTile(
-              leading: SvgPicture.asset("assets/hrms/camera.svg"),
-              title: const Text("Camera"),
-              onTap: () {
-                Get.back();
-                controller.pickImage();
-              },
-            ),
-          ],
-        ),
-      ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      backgroundColor: Colors.white,
-    );
-  }
+  //   Get.bottomSheet(
+  //     Padding(
+  //       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Container(
+  //             height: 4,
+  //             width: 40,
+  //             margin: const EdgeInsets.only(bottom: 15),
+  //             decoration: BoxDecoration(
+  //               color: Colors.grey.shade400,
+  //               borderRadius: BorderRadius.circular(10),
+  //             ),
+  //           ),
+  //           Row(
+  //             children: [
+  //               const Expanded(
+  //                 child: Text(
+  //                   "Upload Profile Photo",
+  //                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+  //                 ),
+  //               ),
+  //               GestureDetector(
+  //                 onTap: () => Get.back(),
+  //                 child: const Icon(Icons.close, color: Colors.grey),
+  //               ),
+  //             ],
+  //           ),
+  //           const SizedBox(height: 15),
+  //           ListTile(
+  //             leading: SvgPicture.asset("assets/hrms/gallery.svg"),
+  //             title: const Text("Gallery"),
+  //             onTap: () {
+  //               Get.back();
+  //               controller.pickImage();
+  //             },
+  //           ),
+  //           ListTile(
+  //             leading: SvgPicture.asset("assets/hrms/camera.svg"),
+  //             title: const Text("Camera"),
+  //             onTap: () {
+  //               Get.back();
+  //               controller.pickImage();
+  //             },
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  //     ),
+  //     backgroundColor: Colors.white,
+  //   );
+  // }
 }

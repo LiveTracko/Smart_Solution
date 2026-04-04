@@ -210,9 +210,23 @@ class _LoginViewState extends State<LoginView> {
                                         : () {
                                             if (_formKey.currentState!
                                                 .validate()) {
-                                              controller.login(token!);
+                                              if (token != null) {
+                                                controller.login(token!);
+                                              } else {
+                                                Get.snackbar("Error",
+                                                    "Device token not ready. Please try again.");
+                                              }
                                             }
                                           },
+
+                                    // controller.isLoading.value
+                                    //     ? null
+                                    //     : () {
+                                    //         if (_formKey.currentState!
+                                    //             .validate()) {
+                                    //           controller.login(token!);
+                                    //         }
+                                    //       },
                                     child: controller.isLoading.value
                                         ? const SizedBox(
                                             height: 22,

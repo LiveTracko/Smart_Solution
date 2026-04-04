@@ -31,22 +31,30 @@ class ApiService {
       {String? type}) async {
     SharedPreferences shared = await SharedPreferences.getInstance();
     final companyName = shared.get("companyname");
-    final response = await http.post(
-      Uri.parse(
-        companyName == null
+
+    final url = type == "reset"
+        ? "${APIUrls.baseUrl}$endpoint"
+        : companyName == null
             ? "${APIUrls.baseUrl}$endpoint"
-            : "${APIUrls.newBaseUrl}$companyName/api/index.php/$endpoint",
-      ),
+            : "${APIUrls.newBaseUrl}$companyName/api/index.php/$endpoint";
+
+    final response = await http.post(
+      Uri.parse(url),
       headers: {
         "Accept": "application/json",
         'User-Agent': 'SmartDialApp/1.0',
-        "x-api-key": type == "login" ? APIUrls.loginApiKey : APIUrls.apiKey,
+        "x-api-key": type == "login"
+            ? APIUrls.loginApiKey
+            : type == "reset"
+                ? APIUrls.loginApiKey
+                : APIUrls.apiKey,
       },
       body: data,
     );
 
-    logOutput(
-        'full url -->>> ${APIUrls.newBaseUrl}$companyName/api/index.php/"}$endpoint")');
+    print("full url -->>> $url");
+    // logOutput(
+    //     'full url -->>> ${APIUrls.newBaseUrl}$companyName/api/index.php/"}$endpoint")');
     // logOutput("status code of $endpoint ${response.statusCode}");
     // logOutput("response of $endpoint ${response.body}");
     return response;

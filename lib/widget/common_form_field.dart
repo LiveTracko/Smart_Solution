@@ -15,15 +15,17 @@ class CommonFormStyles {
     return themeController.primaryColor.value;
   }
 
-  static Color errorColor(BuildContext context) => Theme.of(context).colorScheme.error;
-  
+  static Color errorColor(BuildContext context) =>
+      Theme.of(context).colorScheme.error;
+
   static Color labelColor(BuildContext context) {
     return Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7);
   }
-  
+
   static Color hintColor(BuildContext context) => Theme.of(context).hintColor;
-  
-  static Color textColor(BuildContext context) => Theme.of(context).textTheme.bodyMedium!.color!;
+
+  static Color textColor(BuildContext context) =>
+      Theme.of(context).textTheme.bodyMedium!.color!;
 }
 
 /// ================= LABEL =================
@@ -86,10 +88,14 @@ class CommonTextField extends StatelessWidget {
             controller: controller,
             validator: validator,
             keyboardType: keyboardType,
-            style: TextStyle(color: textColor ?? CommonFormStyles.textColor(context)),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            maxLength: keyboardType == TextInputType.number ? 10 : null,
+            style: TextStyle(
+                color: textColor ?? CommonFormStyles.textColor(context)),
             decoration: InputDecoration(
               filled: filled,
-              fillColor: fillColor ?? (filled ? theme.cardColor : Colors.transparent),
+              fillColor:
+                  fillColor ?? (filled ? theme.cardColor : Colors.transparent),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
                 borderSide: BorderSide(
@@ -99,7 +105,8 @@ class CommonTextField extends StatelessWidget {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
                 borderSide: BorderSide(
-                  color: focusedBorderColor ?? CommonFormStyles.focusedBorderColor(context),
+                  color: focusedBorderColor ??
+                      CommonFormStyles.focusedBorderColor(context),
                   width: 1.5,
                 ),
               ),
@@ -111,11 +118,13 @@ class CommonTextField extends StatelessWidget {
               ),
               focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide (color: CommonFormStyles.errorColor(context),
+                borderSide: BorderSide(
+                  color: CommonFormStyles.errorColor(context),
                 ),
               ),
               isDense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             ),
           ),
         ],
@@ -170,10 +179,11 @@ class CommonDropdownField extends StatelessWidget {
               child: DropdownButton<String>(
                 value: value,
                 isExpanded: true,
-                icon: Icon(Icons.keyboard_arrow_down, 
-                  color: CommonFormStyles.textColor(context)),
+                icon: Icon(Icons.keyboard_arrow_down,
+                    color: CommonFormStyles.textColor(context)),
                 dropdownColor: theme.cardColor,
-                style: TextStyle(color: textColor ?? CommonFormStyles.textColor(context)),
+                style: TextStyle(
+                    color: textColor ?? CommonFormStyles.textColor(context)),
                 items: items
                     .map((e) => DropdownMenuItem(
                           value: e,
@@ -237,7 +247,9 @@ class CommonDateField extends StatelessWidget {
                 children: [
                   Text(
                     value,
-                    style: TextStyle(color: textColor ?? CommonFormStyles.textColor(context)),
+                    style: TextStyle(
+                        color:
+                            textColor ?? CommonFormStyles.textColor(context)),
                   ),
                   SvgPicture.asset(
                     "assets/hrms/calander_date.svg",
@@ -300,7 +312,8 @@ class CommonAddressField extends StatelessWidget {
               controller: controller,
               validator: validator,
               maxLines: null,
-              style: TextStyle(color: textColor ?? CommonFormStyles.textColor(context)),
+              style: TextStyle(
+                  color: textColor ?? CommonFormStyles.textColor(context)),
               decoration: const InputDecoration(
                 border: InputBorder.none,
               ),
@@ -381,7 +394,9 @@ class CommonTextFieldWithPrefixIcon extends StatelessWidget {
                     validator: validator,
                     readOnly: readOnly,
                     keyboardType: keyboardType,
-                    style: TextStyle(color: textColor ?? CommonFormStyles.textColor(context)),
+                    style: TextStyle(
+                        color:
+                            textColor ?? CommonFormStyles.textColor(context)),
                     decoration: InputDecoration(
                       hintText: hintText,
                       hintStyle: TextStyle(
@@ -457,7 +472,8 @@ class _CommonCountryPhoneFieldState extends State<CommonCountryPhoneField> {
                 decoration: BoxDecoration(
                   color: widget.fillColor ?? theme.cardColor,
                   border: Border.all(
-                    color: widget.borderColor ?? CommonFormStyles.borderColor(context),
+                    color: widget.borderColor ??
+                        CommonFormStyles.borderColor(context),
                   ),
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -467,7 +483,8 @@ class _CommonCountryPhoneFieldState extends State<CommonCountryPhoneField> {
                     isExpanded: true,
                     dropdownColor: theme.cardColor,
                     style: TextStyle(
-                      color: widget.textColor ?? CommonFormStyles.textColor(context),
+                      color: widget.textColor ??
+                          CommonFormStyles.textColor(context),
                     ),
                     items: countries.keys.map((code) {
                       return DropdownMenuItem(
@@ -499,7 +516,8 @@ class _CommonCountryPhoneFieldState extends State<CommonCountryPhoneField> {
                   decoration: BoxDecoration(
                     color: widget.fillColor ?? theme.cardColor,
                     border: Border.all(
-                      color: widget.borderColor ?? CommonFormStyles.borderColor(context),
+                      color: widget.borderColor ??
+                          CommonFormStyles.borderColor(context),
                     ),
                     borderRadius: BorderRadius.circular(6),
                   ),
@@ -508,7 +526,9 @@ class _CommonCountryPhoneFieldState extends State<CommonCountryPhoneField> {
                     controller: widget.controller,
                     keyboardType: TextInputType.number,
                     validator: widget.validator,
-                    style: TextStyle(color: widget.textColor ?? CommonFormStyles.textColor(context)),
+                    style: TextStyle(
+                        color: widget.textColor ??
+                            CommonFormStyles.textColor(context)),
                     decoration: InputDecoration(
                       hintText: '9156046848',
                       hintStyle: TextStyle(

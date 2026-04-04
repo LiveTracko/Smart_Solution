@@ -8,10 +8,8 @@ import 'package:smart_solutions/views/spacing_constants.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/flutter_chiplist.dart';
 import 'package:smart_solutions/widget/header_title.dart';
-
 import 'package:smart_solutions/widget/searchbarwithclear.dart';
 import 'package:smart_solutions/widget/text_style.dart';
-
 import '../../constants/static_stored_data.dart';
 import '../../widget/loading_page.dart';
 
@@ -43,41 +41,44 @@ class _AdminDisbursementState extends State<AdminDisbursement> {
         showBack: true,
         title: widget.title,
         key: _scaffoldKey,
-        body: Obx(() {
-          if (_adminDisbursementController.isLoading.value ||
-              _adminDisbursementController.iscallDisbursedLoading.value) {
-            return const LoadingPage();
-          }
-
-          return Column(children: [
-            Container(
-              color: AppColors.appBarTextColor,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  HeaderTitle(
-                    title: widget.title,
-                    style: AppTextStyle.headerTitle,
-                  ),
-                  SearchBarWithClear(
-                    controller: _adminDisbursementController.searchController,
-                    onClear: _adminDisbursementController.clearFilters,
-                    onChanged: (value) {
-                      _adminDisbursementController.getDisbursementData(
-                          query: value, teamleaderId: teamleaderId);
-                      // Handle search if needed
-                    },
-                  ),
-                  kVerticalSpace(5),
-                  if (!isTeamLeader) _buildFilterChips(),
-                  kVerticalSpace(10),
-                  _buildTotalSummary(),
-                ],
-              ),
+        body: Column(children: [
+          Container(
+            color: AppColors.appBarTextColor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HeaderTitle(
+                  title: widget.title,
+                  style: AppTextStyle.headerTitle,
+                ),
+                SearchBarWithClear(
+                  controller: _adminDisbursementController.searchController,
+                  onClear: _adminDisbursementController.clearFilters,
+                  showDatePickerIcon: true,
+                  onChanged: (value) {
+                    // _adminDisbursementController.getDisbursementData(
+                    //     query: value, teamleaderId: teamleaderId);
+                    // // Handle search if needed
+                  },
+                ),
+                kVerticalSpace(5),
+                if (!isTeamLeader) _buildFilterChips(),
+                kVerticalSpace(10),
+                _buildTotalSummary(),
+              ],
             ),
-            Expanded(child: _buildDisbursementList())
-          ]);
-        }));
+          ),
+          // Expanded(child: _buildDisbursementList())
+          /// ⭐ VERY IMPORTANT
+          Expanded(child: Obx(() {
+            if (_adminDisbursementController.isLoading.value ||
+                _adminDisbursementController.iscallDisbursedLoading.value) {
+              return const LoadingPage();
+            }
+
+            return _buildDisbursementList();
+          }))
+        ]));
   }
 
   Widget _buildFilterChips() {

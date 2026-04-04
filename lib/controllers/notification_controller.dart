@@ -22,6 +22,7 @@ class NotificationController extends GetxController {
 
   @override
   void onInit() {
+    getNotificationCount();
     getNotificationList();
     super.onInit();
   }
@@ -62,8 +63,8 @@ class NotificationController extends GetxController {
             notificationData.assignAll(newList);
           }
 
-          unreadCount.value =
-              notificationData.where((e) => e['is_read'] == '0').length;
+          // unreadCount.value =
+          //     notificationData.where((e) => e['is_read'] == '0').length;
 
           notificationHasMore.value = newList.length >= notificationLimit;
 
@@ -86,55 +87,6 @@ class NotificationController extends GetxController {
       notificationMoreLoading.value = false;
     }
   }
-
-  // Future<void> getNotificationList({bool loadMore = false}) async {
-  //   try {
-  //     if (loadMore) {
-  //       if (!notificationHasMore.value) return; // ⭐ stop extra calls
-  //       notificationMoreLoading.value = true;
-  //     } else {
-  //       notificationInitialLoading.value = true;
-  //       notificationPage.value = 1;
-  //       notificationHasMore.value = true;
-  //       notificationData.clear();
-  //     }
-
-  //     var response = await _apiService.postRequest(
-  //       APIUrls.getnotificationData,
-  //       {
-  //         "telecaller_id": StaticStoredData.userId,
-  //       },
-  //     );
-
-  //     debugPrint(" data -->  ${response.statusCode} ${response.body}");
-
-  //     if (response.statusCode == 200) {
-  //       final responseData = jsonDecode(response.body);
-  //       final contacts = responseData['data'];
-
-  //       if (contacts is List) {
-  //         // 🔥 VERY IMPORTANT (Use assignAll for RxList)
-  //         notificationData.assignAll(
-  //           List<Map<String, dynamic>>.from(contacts),
-  //         );
-
-  //         unreadCount.value =
-  //             notificationData.where((item) => item['is_read'] == '0').length;
-
-  //         Future.microtask(() => markAllAsRead());
-  //       } else {
-  //         notificationData.clear();
-  //       }
-  //     } else if (response.statusCode == 204) {
-  //       notificationData.clear();
-  //       unreadCount.value = 0;
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
 
   Future<void> markAllAsRead() async {
     try {
@@ -161,6 +113,25 @@ class NotificationController extends GetxController {
       }
     } catch (e) {
       debugPrint("Mark read error $e");
+    }
+  }
+
+  Future<void> getNotificationCount() async {
+    try {
+      var response = await _apiService.postRequest(
+        APIUrls.getnotificationCount,
+        {"telecaller_id": StaticStoredData.userId},
+      );
+
+      debugPrint(
+          "notification count --> ${response.statusCode} ${response.body}");
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        unreadCount.value = int.tryParse(responseData['data'].toString()) ?? 0;
+      }
+    } catch (e) {
+      debugPrint("Get count error $e");
     }
   }
 }

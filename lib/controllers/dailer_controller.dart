@@ -13,6 +13,7 @@ import 'package:smart_solutions/views/followBackForm.dart';
 import '../constants/services.dart';
 import '../services/CallHelper.dart';
 import '../services/call_state_service.dart';
+import 'follow_form_controller.dart';
 
 class DialerController extends GetxController {
   var dialNumber = ''.obs;
@@ -68,8 +69,21 @@ class DialerController extends GetxController {
   //   }
   // }
 
-  Future<void> fetchLastCallInfoIfNeeded(bool shouldFetch) async {
-    if (!shouldFetch) return;
+  Future<void> fetchLastCallInfoIfNeeded(bool manualContact) async {
+    final FollowBackFormController formController =
+        Get.find<FollowBackFormController>();
+
+    if (!manualContact) {
+      if (!formController.isDurationAvailable.value) {
+        formController.isDurationAvailable.value = true;
+      }
+
+      if (formController.contacted.value != 'No') {
+        formController.contacted.value = 'No';
+      }
+
+      return;
+    }
 
     /// ⭐ Prevent multiple API calls
     if (isCallInfoLoading.value) return;

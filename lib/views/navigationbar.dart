@@ -559,7 +559,7 @@ class _MainScreenState extends State<MainScreen> {
         break;
 
       case MainTab.leads:
-        await Get.find<DataController>().refreshData();
+        await Get.find<ActiveFilesController>().refreshData();
         break;
 
       case MainTab.callLog:

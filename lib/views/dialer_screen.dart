@@ -78,25 +78,19 @@ class _DialerScreenState extends State<DialerScreen> {
                       HeaderTitle(
                           title: dialerTitle, style: AppTextStyle.headerTitle),
                       Row(
-                        mainAxisSize: MainAxisSize
-                            .min, // Ensures the row only takes the necessary width
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            isActive
-                                ? "Manual Mode"
-                                : "Auto Mode", // Short text to fit the compact design
+                            isActive ? "Manual Mode" : "Auto Mode",
                             style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
-                              fontSize: 14
-                                  .h, // Maintain a small but readable font size
+                              fontSize: 14.h,
                             ),
                           ),
-
-                          const SizedBox(
-                              width: 8), // Small gap between text and switch
+                          const SizedBox(width: 8),
                           Transform.scale(
-                            scale: 0.8, // Ensuring the switch remains compact
+                            scale: 0.8,
                             child: Switch(
                               activeColor: themeController.primaryColor.value,
                               inactiveTrackColor: Colors.grey.shade100,

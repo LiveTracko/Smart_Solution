@@ -15,6 +15,8 @@ class ActiveFilesController extends GetxController {
   final CommonFilterController filterController =
       Get.find<CommonFilterController>();
 
+  RxBool isLoading = false.obs;
+
   final ScrollController filterScrollController = ScrollController();
 
   var currentStatus = 0.obs;
@@ -54,7 +56,7 @@ class ActiveFilesController extends GetxController {
       (value) {
         dataController.fetchDataEntryList();
       },
-      time: const Duration(milliseconds: 600),
+      time: const Duration(milliseconds: 1000),
     );
 
     currentStatus.value = 1;
@@ -83,6 +85,25 @@ class ActiveFilesController extends GetxController {
     filterController.searchController.removeListener(_onSearchTextChanged);
     super.onClose();
   }
+
+  Future<void> refreshData() async {
+    if (isLoading.value) return;
+    
+    isLoading(true);
+    try {
+      currentStatus.value = 0;
+
+      await dataController.fetchDataEntryList();
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        "Failed to refresh data: $e",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
   // void _handleDateChange() {
   //   final from = filterController.fromDate.value;
   //   final to = filterController.toDate.value;
@@ -107,18 +128,12 @@ class ActiveFilesController extends GetxController {
     filterController.searchController.addListener(_onSearchTextChanged);
   }
 
-  // @override
-  // void onClose() {
-  //   _chartCardsController.selectedIndex.value = 0;
-  //   filterController.searchController.removeListener(_onSearchTextChanged);
-  //   super.onClose();
-  // }
-
   void _onSearchTextChanged() {
     updateFilteredList();
   }
 
   void updateFilteredList() {
+    isLoading(true);
     try {
       final source = dataController.dataList;
 
@@ -160,7 +175,10 @@ class ActiveFilesController extends GetxController {
 
       filteredList.assignAll(tempList);
     } catch (e) {
+      isLoading(false);
       filteredList.assignAll([]);
+    } finally {
+      isLoading(false);
     }
   }
 }

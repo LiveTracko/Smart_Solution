@@ -9,12 +9,14 @@ import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
 import '../constants/services.dart';
+import '../controllers/theme_controller.dart';
+
 class DataEntryForm extends StatefulWidget {
-  String? id;
-  String? tellecallerId;
-  String? dsaId;
-  String? bankerId;
-  DataEntryForm(
+  final String? id;
+  final String? tellecallerId;
+  final String? dsaId;
+  final String? bankerId;
+  const DataEntryForm(
       {super.key,
       required this.id,
       required this.tellecallerId,
@@ -30,22 +32,53 @@ class _DataEntryFormState extends State<DataEntryForm> {
 
   final _formKey = GlobalKey<FormState>();
 
+  final ThemeController themeController = Get.find<ThemeController>();
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      initialLoad(); // ✅ SAFE
+    });
+    // controller.tellecallerId.value = widget.tellecallerId ?? '';
+    // controller.dataId.value = widget.id ?? '';
+    // controller.dsaId.value = widget.dsaId ?? '';
+
+    // controller.fetchDataEntryListSpecificId();
+    // controller.getSourcingList();
+    // controller.getDsaBankList(widget.dsaId ?? '');
+    // controller.getBankerNameByloginBank(
+    //     widget.dsaId.toString(), controller.selectedBankName.toString());
+    // // controller.getBankerDetailsName(widget.bankerId ?? '');
+    // controller.getMobileByCustomerData(controller.contactNumber.value);
+    // controller.getTeamLeadById(widget.tellecallerId.toString());
+  }
+
+  initialLoad() {
+    controller.isLoading.value = true;
     controller.tellecallerId.value = widget.tellecallerId ?? '';
     controller.dataId.value = widget.id ?? '';
     controller.dsaId.value = widget.dsaId ?? '';
 
-    // Call APIs here
     controller.fetchDataEntryListSpecificId();
     controller.getSourcingList();
     controller.getDsaBankList(widget.dsaId ?? '');
+    controller.getBankerNameByloginBank(
+        widget.dsaId.toString(), controller.selectedBankName.toString());
     // controller.getBankerDetailsName(widget.bankerId ?? '');
     controller.getMobileByCustomerData(controller.contactNumber.value);
     controller.getTeamLeadById(widget.tellecallerId.toString());
   }
 
+  List<DropdownMenuItem<String>> yesNoItems = const [
+    DropdownMenuItem(value: 'Yes', child: Text('Yes')),
+    DropdownMenuItem(value: 'No', child: Text('No')),
+  ];
+
+  List<DropdownMenuItem<String>> openorClose = const [
+    DropdownMenuItem(value: 'Open', child: Text('Open')),
+    DropdownMenuItem(value: 'Closed', child: Text('Closed')),
+  ];
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -114,297 +147,463 @@ class _DataEntryFormState extends State<DataEntryForm> {
             //   ],
             // ),
             body: Obx(() {
-              if (controller.iseditLoading.value) {
+              if (controller.isDataEntryLoading.value) {
                 return const LoadingPage();
               }
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 10.h),
-                        _buildTextField(
-                            content: controller.date,
+              return Container(
+                color: const Color(0xffF5F7FB), // light modern background
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 5.h),
+                          titileWithIcon(
+                              title: 'Customer Information',
+                              iconPath: 'assets/images/basic_info.svg'),
+                          SizedBox(height: 10.h),
+
+                          _buildTextField(
+                            label: 'Mobile Number',
                             prefixIcon: SvgPicture.asset(
-                                'assets/images/calendar.svg',
-                                height: 20,
-                                width: 20),
-                            label: 'Date',
-                            validator: (value) => _validatePhone(value),
-                            onChanged: (value) =>
-                                controller.date.value = value),
-
-                        SizedBox(height: 10.h),
-                        _buildDsaDropdown(),
-
-                        // _buildDateField(
-                        //   label: 'Date',
-                        //   content: controller.date,
-                        //   context: context,
-                        // ),
-                        // _buildDateField(
-                        //     label: 'Date',
-                        //     content:controller.dob.map((date) => DateFormat('yyyy-MM-dd').format(date)),
-                        //     onChanged: (value) =>
-                        //         controller.date.value = DateTime.parse(value),
-                        //     inputType: TextInputType.phone,
-                        //     validator: _validatePhone),
-
-                        _buildTextField(
-                          label: 'Mobile Number',
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/phone.svg',
-                            height: 20,
-                            width: 20,
-                          ),
-                          content: controller.contactNumber,
-                          onChanged: (value) =>
-                              controller.contactNumber.value = value,
-                          inputType: TextInputType.phone,
-                          validator: _validatePhone,
-                        ),
-                        Obx(
-                          () => _buildTextField(
-                            label: 'Customer Name',
-                            prefixIcon: SvgPicture.asset(
-                              'assets/images/user.svg',
+                              'assets/images/phone.svg',
+                              color: themeController.primaryColor.value,
                               height: 20,
                               width: 20,
                             ),
-                            content: controller.customerName,
+                            content: controller.contactNumber,
                             onChanged: (value) =>
-                                controller.customerName.value = value,
+                                controller.contactNumber.value = value,
+                            inputType: TextInputType.phone,
+                            validator: _validatePhone,
+                          ),
+                          Obx(
+                            () => _buildTextField(
+                              label: 'Customer Name',
+                              prefixIcon: SvgPicture.asset(
+                                'assets/images/user.svg',
+                                color: themeController.primaryColor.value,
+                                height: 20,
+                                width: 20,
+                              ),
+                              content: controller.customerName,
+                              onChanged: (value) =>
+                                  controller.customerName.value = value,
+                              inputType: TextInputType.phone,
+                              validator: _validateNotEmpty,
+                            ),
+                          ),
+
+                          _buildTextField(
+                            content: controller.dob,
+                            prefixIcon: SvgPicture.asset(
+                              'assets/images/dob.svg',
+                              color: themeController.primaryColor.value,
+                              height: 20,
+                              width: 20,
+                            ),
+                            label: 'DOB',
+                            //   validator: (value) => _validateNotEmpty(value),
+                            onChanged: (value) => controller.dob.value = value,
+                          ),
+                          _buildTextField(
+                            label: 'Company Name',
+                            prefixIcon: SvgPicture.asset(
+                              'assets/images/company_name.svg',
+                              color: themeController.primaryColor.value,
+                              height: 20,
+                              width: 20,
+                            ),
+                            content: controller.companyName,
+                            onChanged: (value) =>
+                                controller.companyName.value = value,
                             inputType: TextInputType.phone,
                             validator: _validateNotEmpty,
                           ),
-                        ),
 
-                        _buildTextField(
-                          label: 'Income',
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/data_type.svg',
-                            height: 20,
-                            width: 20,
-                          ),
-                          content: controller.income,
-                          onChanged: (value) => controller.income.value = value,
-                          inputType: TextInputType.phone,
-                          validator: _validateNotEmpty,
-                        ),
-
-                        _buildTextField(
-                          label: 'Company Name',
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/company_name.svg',
-                            height: 20,
-                            width: 20,
-                          ),
-                          content: controller.companyName,
-                          onChanged: (value) =>
-                              controller.companyName.value = value,
-                          inputType: TextInputType.phone,
-                          validator: _validateNotEmpty,
-                        ),
-                        _buildCaseTypeDropdown(),
-                        const SizedBox(height: 10),
-                        _buildTextField(
-                          label: 'Loan Amount',
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/rupees.svg',
-                            height: 20,
-                            width: 20,
-                          ),
-                          content: controller.loanAmount,
-                          formatAsCurrency: true,
-                          // CurrencyUtils.formatIndianCurrency(
-                          //     controller.loanAmount.value),
-                          onChanged: (value) {
-                            // Remove commas to get the numeric value before formatting
-                            String plainTextValue = value.replaceAll(',', '');
-                            controller.loanAmount.value = plainTextValue;
-
-                            // Format the numeric value back to the Indian format
-                            String formattedValue = NumberFormat.currency(
-                                    locale: 'en_IN',
-                                    symbol: '',
-                                    decimalDigits: 0)
-                                .format(int.tryParse(plainTextValue) ?? 0);
-
-                            controller.loanAmount.value = formattedValue;
-                          },
-                          inputType: TextInputType.number,
-                          validator: _validateNumber,
-                        ),
-
-                        const SizedBox(height: 10),
-                        _buildTextField(
-                          content: controller.dob,
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/dob.svg',
-                            height: 20,
-                            width: 20,
-                          ),
-                          label: 'DOB',
-                          validator: (value) => _validateNotEmpty(value),
-                          onChanged: (value) => controller.dob.value = value,
-                        ),
-
-                        // _buildDateField(
-                        //     label: 'DOB',
-                        //     content: controller.dob,
-                        //     // onChanged: (value) =>
-                        //     //     controller.dob.value = DateTime.parse(value),
-                        //     context: context
-                        //     // validator: _validateNotEmpty,
-                        //     ),
-                        const SizedBox(height: 10),
-
-                        _buildProductTypeDropdown(),
-                        const SizedBox(height: 10),
-
-                        _buildloginBankDropdown(),
-                        const SizedBox(height: 10),
-
-                        _buildBankerNameDropdown(),
-                        const SizedBox(height: 10),
-
-                        _buildTextField(
-                          label: 'Banker Mobile',
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/phone.svg',
-                            height: 20,
-                            width: 20,
-                          ),
-                          content: controller.bankerMobile,
-                          onChanged: (value) =>
-                              controller.bankerMobile.value = value,
-                          // validator: _validateNotEmpty,
-                        ),
-
-                        _buildTextField(
-                            label: 'Banker Email',
+                          _buildTextField(
+                            label: 'Income',
                             prefixIcon: SvgPicture.asset(
-                              'assets/images/email.svg',
+                              'assets/images/data_type.svg',
+                              height: 20,
+                              width: 20,
+                              color: themeController.primaryColor.value,
+                            ),
+                            content: controller.income,
+                            onChanged: (value) =>
+                                controller.income.value = value,
+                            inputType: TextInputType.phone,
+                            validator: _validateNotEmpty,
+                          ),
+
+                          titileWithIcon(
+                              title: 'Sourcing Details',
+                              iconPath: 'assets/images/basic_info.svg'),
+
+                          _buildDsaDropdown(),
+
+                          _buildTextField(
+                              content: controller.date,
+                              prefixIcon: SvgPicture.asset(
+                                  'assets/images/calendar.svg',
+                                  color: themeController.primaryColor.value,
+                                  height: 20,
+                                  width: 20),
+                              label: 'Entry Date',
+                              validator: (value) => _validatePhone(value),
+                              onChanged: (value) =>
+                                  controller.date.value = value),
+
+                          _buildTeleCallerDropdown(),
+
+                          _buildTextField(
+                            label: 'Team Leader',
+                            prefixIcon: SvgPicture.asset(
+                              'assets/images/teamleader.svg',
+                              height: 20,
+                              width: 20,
+                              color: themeController.primaryColor.value,
+                            ),
+                            content: controller.teamleader,
+                            onChanged: (value) =>
+                                controller.teamleader.value = value,
+                            // validator: _validateNotEmpty,
+                          ),
+
+                          _buildSourcingDropdown(),
+
+                          titileWithIcon(
+                              title: 'Loan & Case Details',
+                              iconPath: 'assets/images/basic_info.svg'),
+
+                          const SizedBox(height: 10),
+
+                          _buildProductTypeDropdown(),
+
+                          Obx(
+                            () => buildCommonDropdown(
+                              hint: 'Balance Transfer',
+                              items: yesNoItems,
+                              iconPath: 'assets/images/teamleader.svg',
+                              value:
+                                  controller.selectedBanktransactionType.value,
+                              onChanged: (newValue) {
+                                if (newValue != null) {
+                                  controller.selectedBanktransactionType.value =
+                                      newValue;
+
+                                  if (newValue == 'Yes') {
+                                    controller.selectedDemandDraftStatus.value =
+                                        'Open';
+                                  } else if (newValue == 'No') {
+                                    controller.selectedDemandDraftStatus.value =
+                                        'Closed';
+                                  }
+                                }
+                              },
+                            ),
+                          ),
+
+                          Obx(
+                            () => buildCommonDropdown(
+                                hint: 'Demand Draft Status',
+                                items: openorClose,
+                                iconPath: 'assets/images/teamleader.svg',
+                                value:
+                                    controller.selectedDemandDraftStatus.value,
+                                onChanged: (newValue) {
+                                  if (newValue != null) {
+                                    controller.selectedDemandDraftStatus.value =
+                                        newValue;
+                                  }
+                                }),
+                          ),
+
+                          //   _buildCaseTypeDropdown(),
+
+                          titileWithIcon(
+                              title: 'Bank Information',
+                              iconPath: 'assets/images/basic_info.svg'),
+
+                          const SizedBox(height: 10),
+
+                          _buildloginBankDropdown(),
+                          const SizedBox(height: 10),
+
+                          _buildBankerNameDropdown(),
+                          const SizedBox(height: 10),
+
+                          _buildTextField(
+                            label: 'Banker Mobile',
+                            prefixIcon: SvgPicture.asset(
+                              'assets/images/phone.svg',
+                              color: themeController.primaryColor.value,
                               height: 20,
                               width: 20,
                             ),
-                            content: controller.bankerEmail,
+                            content: controller.bankerMobile,
                             onChanged: (value) =>
-                                controller.bankerEmail.value = value),
-                        const SizedBox(height: 10),
-
-                        _buildTextField(
-                          label: 'LOS No.',
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/company_name.svg',
-                            height: 20,
-                            width: 20,
+                                controller.bankerMobile.value = value,
+                            // validator: _validateNotEmpty,
                           ),
-                          content: controller.losNo,
-                          onChanged: (value) => controller.losNo.value = value,
-                          // validator: _validateNotEmpty,
-                        ),
-                        const SizedBox(height: 10),
 
-                        _buildTeleCallerDropdown(),
-                        const SizedBox(height: 10),
+                          _buildTextField(
+                              label: 'Banker Email',
+                              prefixIcon: SvgPicture.asset(
+                                'assets/images/email.svg',
+                                color: themeController.primaryColor.value,
+                                height: 20,
+                                width: 20,
+                              ),
+                              content: controller.bankerEmail,
+                              onChanged: (value) =>
+                                  controller.bankerEmail.value = value),
 
-                        _buildTextField(
-                          label: 'Team Leader',
-                          prefixIcon: SvgPicture.asset(
-                            'assets/images/teamleader.svg',
-                            height: 20,
-                            width: 20,
+                          _buildTextField(
+                            label: 'Loan Amount',
+                            prefixIcon: SvgPicture.asset(
+                              'assets/images/rupees.svg',
+                              color: themeController.primaryColor.value,
+                              height: 20,
+                              width: 20,
+                            ),
+                            content: controller.loanAmount,
+                            formatAsCurrency: true,
+                            // CurrencyUtils.formatIndianCurrency(
+                            //     controller.loanAmount.value),
+                            onChanged: (value) {
+                              // Remove commas to get the numeric value before formatting
+                              String plainTextValue = value.replaceAll(',', '');
+                              controller.loanAmount.value = plainTextValue;
+
+                              // Format the numeric value back to the Indian format
+                              String formattedValue = NumberFormat.currency(
+                                      locale: 'en_IN',
+                                      symbol: '',
+                                      decimalDigits: 0)
+                                  .format(int.tryParse(plainTextValue) ?? 0);
+
+                              controller.loanAmount.value = formattedValue;
+                            },
+                            inputType: TextInputType.number,
+                            validator: _validateNumber,
                           ),
-                          content: controller.teamleader,
-                          onChanged: (value) =>
-                              controller.teamleader.value = value,
-                          // validator: _validateNotEmpty,
-                        ),
 
-                        const SizedBox(height: 10),
-
-                        _buildStatusDropdown(),
-                        const SizedBox(height: 10),
-
-                        _buildSourcingDropdown(),
-                        const SizedBox(height: 10),
-
-                        _buildTextField(
-                          label: 'Case Study ',
-                          content: controller.caseStudy,
-
-                          onChanged: (value) =>
-                              controller.caseStudy.value = value,
-                          // validator: _validateNotEmpty,
-                        ),
-                        const SizedBox(height: 10),
-
-                        _buildTextField(
-                          label: 'Comments ',
-                          content: controller.comments,
-                          onChanged: (value) =>
-                              controller.comments.value = value,
-                          // validator: _validateNotEmpty,
-                        ),
-                        const SizedBox(height: 5),
-                        Container(
-                          alignment: Alignment.bottomRight,
-                          child: Text(
-                            textAlign: TextAlign.end,
-                            'By ${controller.admin_subadmin_name}',
-                            //on ${DateFormat('dd-MM-yy HH:mm:ss').format(DateTime.parse(controller.date.toString()))}',
-                            style: const TextStyle(
-                                fontSize: 15, color: Colors.grey),
+                          _buildTextField(
+                            label: 'LOS No.',
+                            prefixIcon: SvgPicture.asset(
+                              'assets/images/company_name.svg',
+                              color: themeController.primaryColor.value,
+                              height: 20,
+                              width: 20,
+                            ),
+                            content: controller.losNo,
+                            onChanged: (value) =>
+                                controller.losNo.value = value,
+                            // validator: _validateNotEmpty,
                           ),
-                        ),
+                          const SizedBox(height: 10),
 
-                        const SizedBox(height: 20),
+                          _buildStatusDropdown(),
+                          const SizedBox(height: 10),
 
-                        // // _buildLoanStatusDropdown(),
-                        // // const SizedBox(height: 10),
-                        // _buildAllBankNamesDropdown(),
-                        // const SizedBox(height: 10),
+                          titileWithIcon(
+                              title: 'Case Study & Comments',
+                              iconPath: 'assets/images/basic_info.svg'),
 
-                        // _buildSourcingDropdown(),
-                        // const SizedBox(height: 10),
+                          _buildTextField(
+                            label: 'Case Study ',
+                            content: controller.caseStudy,
 
-                        // _buildTextField(
-                        //   label: 'Common remark',
-                        //   content: controller.commonRemark.value,
-                        //   onChanged: (value) => controller.commonRemark.value = value,
-                        //   // validator: _validateNotEmpty,
-                        // ),
-                        // const SizedBox(height: 10),
-                        // // Dynamic Remarks Section
-                        // _buildRemarksSection(),
-                        // const SizedBox(height: 20),
+                            onChanged: (value) =>
+                                controller.caseStudy.value = value,
+                            // validator: _validateNotEmpty,
+                          ),
 
-                        Center(
-                          child: Obx(() => ElevatedButton(
-                                onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    controller
-                                        .saveDataEntryForm(); // Call save method
-                                    //        controller.getLoginRequestList();
-                                  }
-                                },
-                                child: controller.isLoading.value
-                                    ? const LoadingPage()
-                                    : const Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 24.0),
-                                        child: Text(
+                          Obx(
+                            () => ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: controller.commentList.length,
+                              itemBuilder: (context, index) {
+                                final comment = controller.commentList[index];
+
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xffF5F5F5),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: _buildTextField(
+                                              content:
+                                                  (comment.comment ?? '').obs,
+                                              label: 'Comment',
+                                              onChanged: (value) =>
+                                                  comment.comment = value,
+                                            ),
+                                          ),
+
+                                          /// ✅ Show cross ONLY for new comments
+                                          if (comment.isLocal)
+                                            GestureDetector(
+                                              onTap: () {
+                                                controller.commentList
+                                                    .removeAt(index);
+                                              },
+                                              child: const Icon(
+                                                Icons.close,
+                                                size: 18,
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 8.0),
+                                            child: Text(
+                                              'By ${comment.name ?? 'N/A'} '
+                                              'on ${DateFormat('MMM dd, yyyy hh:mm:ss').format(DateTime.parse(comment.date ?? ''))}',
+                                              style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: ElevatedButton(
+                              onPressed: controller.addComment,
+                              child: const Text('Add Comment'),
+                            ),
+                          ),
+
+                          // _buildTextField(
+                          //   label: 'Comments ',
+                          //   content: controller.comments,
+                          //   onChanged: (value) =>
+                          //       controller.comments.value = value,
+                          //   // validator: _validateNotEmpty,
+                          // ),
+                          // const SizedBox(height: 5),
+                          // Container(
+                          //   alignment: Alignment.bottomRight,
+                          //   child: Text(
+                          //     textAlign: TextAlign.end,
+                          //     'By ${controller.adminSubadminName.value.isNotEmpty ? controller.adminSubadminName.value : 'N/A'}  ',
+                          //     //on ${DateFormat('dd-MM-yy HH:mm:ss').format(DateTime.parse(controller.date.toString()))}',
+                          //     style: const TextStyle(
+                          //         fontSize: 15, color: Colors.grey),
+                          //   ),
+                          // ),
+
+                          const SizedBox(height: 20),
+
+                          // // _buildLoanStatusDropdown(),
+                          // // const SizedBox(height: 10),
+                          // _buildAllBankNamesDropdown(),
+                          // const SizedBox(height: 10),
+
+                          // _buildSourcingDropdown(),
+                          // const SizedBox(height: 10),
+
+                          // _buildTextField(
+                          //   label: 'Common remark',
+                          //   content: controller.commonRemark.value,
+                          //   onChanged: (value) => controller.commonRemark.value = value,
+                          //   // validator: _validateNotEmpty,
+                          // ),
+                          // const SizedBox(height: 10),
+                          // // Dynamic Remarks Section
+                          // _buildRemarksSection(),
+                          // const SizedBox(height: 20),
+
+                          Center(
+                            child: Obx(() => ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    minimumSize: const Size(120, 45),
+                                  ),
+                                  onPressed: controller.isDataEntryLoading.value
+                                      ? null
+                                      : () async {
+                                          if (_formKey.currentState!
+                                              .validate()) {
+                                            await controller
+                                                .saveDataEntryForm();
+                                          }
+                                        },
+                                  child: controller.isSaveLoading.value
+                                      ? const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            SizedBox(
+                                              height: 18,
+                                              width: 18,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            SizedBox(width: 10),
+                                            Text(
+                                              "Submitting...",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ],
+                                        )
+                                      : const Text(
                                           'Submit',
                                           style: TextStyle(color: Colors.white),
                                         ),
-                                      ),
-                              )),
-                        ),
-                      ],
+                                )),
+                          )
+
+                          // Center(
+                          //   child: Obx(() => ElevatedButton(
+                          //         onPressed: () {
+                          //           if (_formKey.currentState!.validate()) {
+                          //             controller
+                          //                 .saveDataEntryForm(); // Call save method
+                          //             //        controller.getLoginRequestList();
+                          //           }
+                          //         },
+                          //         child: controller.isDataEntryLoading.value
+                          //             ? const LoadingPage()
+                          //             : const Padding(
+                          //                 padding: EdgeInsets.symmetric(
+                          //                     horizontal: 24.0),
+                          //                 child: Text(
+                          //                   'Submit',
+                          //                   style:
+                          //                       TextStyle(color: Colors.white),
+                          //                 ),
+                          //               ),
+                          //       )),
+                          // ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -418,7 +617,6 @@ class _DataEntryFormState extends State<DataEntryForm> {
     required ValueChanged<String> onChanged,
     Widget? prefixIcon,
     TextInputType inputType = TextInputType.text,
-    int maxLines = 1,
     String? Function(String?)? validator,
     bool formatAsCurrency = false, // optional flag
   }) {
@@ -436,14 +634,15 @@ class _DataEntryFormState extends State<DataEntryForm> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 10.0, right: 8.0),
-            child: prefixIcon,
-          ),
-          const SizedBox(
+              padding: const EdgeInsets.only(left: 10.0, right: 8.0),
+              child: prefixIcon),
+          SizedBox(
             height: 50,
             width: 5,
             child: VerticalDivider(
-                width: 1, thickness: 1, color: AppColors.primaryColor),
+                width: 1,
+                thickness: 1,
+                color: themeController.primaryColor.value),
           ),
         ],
       );
@@ -462,32 +661,40 @@ class _DataEntryFormState extends State<DataEntryForm> {
 
       return Padding(
           padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            keyboardType: inputType,
-            maxLines: maxLines,
-            readOnly: !controller.isEdit.value,
-            controller: textController,
-            //  initialValue: content.isNotEmpty ? content : null,
-            decoration: InputDecoration(
-              prefixIcon: decoratedPrefixIcon,
-              hintText: label,
-              labelStyle: const TextStyle(color: AppColors.secondayColor),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(20.0)),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: const BorderSide(color: AppColors.primaryColor),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label,
+                  style: const TextStyle(color: AppColors.secondayColor)),
+              TextFormField(
+                keyboardType: inputType,
+                maxLines: null,
+                readOnly: !controller.isEdit.value,
+                controller: textController,
+                //  initialValue: content.isNotEmpty ? content : null,
+                decoration: InputDecoration(
+                  prefixIcon: decoratedPrefixIcon,
+                  hintText: "Enter $label",
+                  labelStyle: const TextStyle(color: AppColors.secondayColor),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide:
+                        BorderSide(color: themeController.primaryColor.value),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide(
+                          color: themeController.primaryColor.value, width: 2)),
+                  filled: true,
+                  fillColor: AppColors.backgroundColor,
+                ),
+                style: TextStyle(color: AppColors.secondayColor),
+                onChanged: onChanged,
+                validator: validator,
               ),
-              focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  borderSide: const BorderSide(
-                      color: AppColors.primaryColor, width: 2)),
-              filled: true,
-              fillColor: AppColors.backgroundColor,
-            ),
-            style: const TextStyle(color: AppColors.primaryColor),
-            onChanged: onChanged,
-            validator: validator,
+            ],
           ));
     });
   }
@@ -504,7 +711,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
     if (value == null || value.isEmpty) {
       return 'This field cannot be empty';
     }
-    final numeric = value.replaceAll(',', '');
+    final numeric = value.replaceAll(RegExp(r'[^\d]'), '');
     if (double.tryParse(numeric) == null) {
       return 'Please enter a valid number';
     }
@@ -532,16 +739,18 @@ class _DataEntryFormState extends State<DataEntryForm> {
                 decoration: InputDecoration(
                   labelStyle: const TextStyle(color: AppColors.secondayColor),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
-                    borderSide: const BorderSide(color: AppColors.primaryColor),
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: themeController.primaryColor.value,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0.r),
-                    borderSide: const BorderSide(
-                      color: AppColors.primaryColor,
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: themeController.primaryColor.value,
                       width: 2,
                     ),
                   ),
@@ -602,64 +811,75 @@ class _DataEntryFormState extends State<DataEntryForm> {
     return Obx(
       () => Padding(
         padding: const EdgeInsets.all(8.0),
-        child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          decoration: InputDecoration(
-            hintText: 'Select Source',
-            prefixIcon: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset('assets/images/source.svg',
-                        height: 20, width: 20),
-                    SizedBox(width: 5.w),
-                    const VerticalDivider(
-                      thickness: 1,
-                      color: AppColors.primaryColor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Source',
+                style: TextStyle(color: AppColors.secondayColor)),
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              decoration: InputDecoration(
+                hintText: 'Select Source',
+                prefixIcon: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset('assets/images/data_type.svg',
+                            color: themeController.primaryColor.value,
+                            height: 20,
+                            width: 20),
+                        SizedBox(width: 5.w),
+                        VerticalDivider(
+                          thickness: 1,
+                          color: themeController.primaryColor.value,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
+                labelStyle: const TextStyle(color: AppColors.secondayColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: themeController.primaryColor.value,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: themeController.primaryColor.value,
+                    width: 2,
+                  ),
+                ),
+                filled: true,
+                fillColor: AppColors.backgroundColor,
               ),
-            ),
-            labelStyle: const TextStyle(color: AppColors.secondayColor),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(color: AppColors.primaryColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(
-                color: AppColors.primaryColor,
-                width: 2,
+              value: _getInitialSourceValue(),
+              hint: const Text(
+                'Select Source',
+                style: TextStyle(color: Colors.grey),
               ),
-            ),
-            filled: true,
-            fillColor: AppColors.backgroundColor,
-          ),
-          value: _getInitialSourceValue(),
-          hint: const Text(
-            'Select Source',
-            style: TextStyle(color: Colors.grey),
-          ),
-          items: _buildSourceDropdownItems(),
-          onChanged: controller.isEdit.value
-              ? (newValue) {
-                  if (newValue != null) {
-                    controller.source.value = newValue;
-                  }
+              items: _buildSourceDropdownItems(),
+              onChanged: controller.isEdit.value
+                  ? (newValue) {
+                      if (newValue != null) {
+                        controller.source.value = newValue;
+                      }
+                    }
+                  : null,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a Source';
                 }
-              : null,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please select a Source';
-            }
-            return null;
-          },
+                return null;
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -669,79 +889,89 @@ class _DataEntryFormState extends State<DataEntryForm> {
     return Obx(
       () => Padding(
         padding: const EdgeInsets.all(8.0),
-        child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          decoration: InputDecoration(
-            hintText: 'DSA Name',
-            prefixIcon: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/images/bank.svg',
-                      height: 20,
-                      width: 20,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('DSA Name',
+                style: TextStyle(color: AppColors.secondayColor)),
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              decoration: InputDecoration(
+                hintText: 'DSA Name',
+                prefixIcon: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/images/bank.svg',
+                          color: themeController.primaryColor.value,
+                          height: 20,
+                          width: 20,
+                        ),
+                        SizedBox(width: 5.w),
+                        VerticalDivider(
+                          thickness: 1,
+                          color: themeController.primaryColor.value,
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 5.w),
-                    const VerticalDivider(
-                      thickness: 1,
-                      color: AppColors.primaryColor,
-                    ),
-                  ],
+                  ),
                 ),
+                labelStyle: const TextStyle(color: AppColors.secondayColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: themeController.primaryColor.value,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: themeController.primaryColor.value,
+                    width: 2,
+                  ),
+                ),
+                filled: true,
+                fillColor: AppColors.backgroundColor,
               ),
-            ),
-            labelStyle: const TextStyle(color: AppColors.secondayColor),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(color: AppColors.primaryColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(
-                color: AppColors.primaryColor,
-                width: 2,
+              value: _getInitialDsaValue(),
+              hint: const Text(
+                'Select DSA Name',
+                style: TextStyle(color: Colors.grey),
               ),
-            ),
-            filled: true,
-            fillColor: AppColors.backgroundColor,
-          ),
-          value: _getInitialDsaValue(),
-          hint: const Text(
-            'Select DSA Name',
-            style: TextStyle(color: Colors.grey),
-          ),
-          items: _buildDsaDropdownItems(),
-          onChanged: controller.isEdit.value
-              ? (newValue) {
-                  if (newValue != null) {
-                    controller.dsaName.value = newValue;
-                    controller.selectedDsaId.value = newValue;
-                    controller.caseType.clear();
-                    controller.producttypeList.clear();
-                    controller.selectedBankName.value = '';
-                    controller.dsaName.value = '';
-                    controller.bankerNameList.clear();
-                    controller.bankerMobile.value = '';
-                    controller.bankerEmail.value = '';
-                    controller.telecaller.value = '';
-                    controller.teamleader.value = '';
-                    controller.status.value = '';
-                    controller.getDsaBankList(newValue);
-                  }
+              items: _buildDsaDropdownItems(),
+              onChanged: controller.isEdit.value
+                  ? (newValue) {
+                      if (newValue != null) {
+                        controller.dsaName.value = newValue;
+                        controller.selectedDsaId.value = newValue;
+                        controller.caseType.clear();
+                        controller.producttypeList.clear();
+                        controller.selectedBankName.value = '';
+                        controller.dsaName.value = '';
+                        controller.bankerNameList.clear();
+                        controller.bankerMobile.value = '';
+                        controller.bankerEmail.value = '';
+                        controller.telecaller.value = '';
+                        controller.teamleader.value = '';
+                        controller.status.value = '';
+                        controller.getDsaBankList(newValue);
+                      }
+                    }
+                  : null,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a Source';
                 }
-              : null,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please select a Source';
-            }
-            return null;
-          },
+                return null;
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -765,11 +995,12 @@ class _DataEntryFormState extends State<DataEntryForm> {
                       'assets/images/case_type.svg',
                       height: 24,
                       width: 24,
+                      color: themeController.primaryColor.value,
                     ),
                     SizedBox(width: 5.w),
-                    const VerticalDivider(
+                    VerticalDivider(
                       thickness: 1,
-                      color: AppColors.primaryColor,
+                      color: themeController.primaryColor.value,
                     ),
                   ],
                 ),
@@ -777,16 +1008,18 @@ class _DataEntryFormState extends State<DataEntryForm> {
             ),
             labelStyle: const TextStyle(color: AppColors.secondayColor),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
+              borderRadius: BorderRadius.circular(10),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(color: AppColors.primaryColor),
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: themeController.primaryColor.value,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(
-                color: AppColors.primaryColor,
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: themeController.primaryColor.value,
                 width: 2,
               ),
             ),
@@ -821,67 +1054,77 @@ class _DataEntryFormState extends State<DataEntryForm> {
     return Obx(
       () => Padding(
         padding: const EdgeInsets.all(8.0),
-        child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          decoration: InputDecoration(
-            hintText: 'Product Type',
-            prefixIcon: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/images/product_type.svg',
-                      height: 24,
-                      width: 24,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Product Type',
+                style: TextStyle(color: AppColors.secondayColor)),
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              decoration: InputDecoration(
+                hintText: 'Product Type',
+                prefixIcon: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/images/loan_amount.svg',
+                          color: themeController.primaryColor.value,
+                          height: 24,
+                          width: 24,
+                        ),
+                        SizedBox(width: 5.w),
+                        VerticalDivider(
+                          thickness: 1,
+                          color: themeController.primaryColor.value,
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 5.w),
-                    const VerticalDivider(
-                      thickness: 1,
-                      color: AppColors.primaryColor,
-                    ),
-                  ],
+                  ),
                 ),
+                labelStyle: const TextStyle(color: AppColors.secondayColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: themeController.primaryColor.value,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: themeController.primaryColor.value,
+                    width: 2,
+                  ),
+                ),
+                filled: true,
+                fillColor: AppColors.backgroundColor,
               ),
-            ),
-            labelStyle: const TextStyle(color: AppColors.secondayColor),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(color: AppColors.primaryColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(
-                color: AppColors.primaryColor,
-                width: 2,
+              value: _getInitialProductTypeValue(),
+              hint: const Text(
+                'Select Product Type',
+                style: TextStyle(color: Colors.grey),
               ),
-            ),
-            filled: true,
-            fillColor: AppColors.backgroundColor,
-          ),
-          value: _getInitialProductTypeValue(),
-          hint: const Text(
-            'Select Product Type',
-            style: TextStyle(color: Colors.grey),
-          ),
-          items: _buildProductTypeDropdownItems(),
-          onChanged: controller.isEdit.value
-              ? (newValue) {
-                  if (newValue != null) {
-                    controller.selectedproductType.value = newValue;
-                  }
+              items: _buildProductTypeDropdownItems(),
+              onChanged: controller.isEdit.value
+                  ? (newValue) {
+                      if (newValue != null) {
+                        controller.selectedproductType.value = newValue;
+                      }
+                    }
+                  : null,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a Product type';
                 }
-              : null,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please select a Product type';
-            }
-            return null;
-          },
+                return null;
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -891,67 +1134,77 @@ class _DataEntryFormState extends State<DataEntryForm> {
     return Obx(
       () => Padding(
         padding: const EdgeInsets.all(8.0),
-        child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          decoration: InputDecoration(
-            prefixIcon: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset('assets/images/bank.svg',
-                        height: 24, width: 24),
-                    SizedBox(width: 5.w),
-                    const VerticalDivider(
-                      thickness: 1,
-                      color: AppColors.primaryColor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Login Bank',
+                style: TextStyle(color: AppColors.secondayColor)),
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              decoration: InputDecoration(
+                prefixIcon: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset('assets/images/bank.svg',
+                            color: themeController.primaryColor.value,
+                            height: 24,
+                            width: 24),
+                        SizedBox(width: 5.w),
+                        VerticalDivider(
+                          thickness: 1,
+                          color: themeController.primaryColor.value,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
+                hintText: 'Login Bank',
+                labelStyle: const TextStyle(color: AppColors.secondayColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: themeController.primaryColor.value,
+                    )),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: themeController.primaryColor.value,
+                    width: 2,
+                  ),
+                ),
+                filled: true,
+                fillColor: AppColors.backgroundColor,
               ),
-            ),
-            hintText: 'Login Bank',
-            labelStyle: const TextStyle(color: AppColors.secondayColor),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(color: AppColors.primaryColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(
-                color: AppColors.primaryColor,
-                width: 2,
+              value: _getInitialloginBankValue(),
+              hint: const Text(
+                'Select Bank Name ',
+                style: TextStyle(color: Colors.grey),
               ),
-            ),
-            filled: true,
-            fillColor: AppColors.backgroundColor,
-          ),
-          value: _getInitialloginBankValue(),
-          hint: const Text(
-            'Select Bank Name ',
-            style: TextStyle(color: Colors.grey),
-          ),
-          items: _buildDsaBankloginNameDropdownItems(),
-          onChanged: controller.isEdit.value
-              ? (newValue) {
-                  if (newValue != null) {
-                    controller.selectedBankName.value = newValue;
-                    controller.getBankerNameByloginBank(
-                        controller.selectedDsaId.toString(),
-                        controller.selectedBankName.toString());
-                  }
+              items: _buildDsaBankloginNameDropdownItems(),
+              onChanged: controller.isEdit.value
+                  ? (newValue) {
+                      if (newValue != null) {
+                        controller.selectedBankName.value = newValue;
+                        controller.getBankerNameByloginBank(
+                            controller.selectedDsaId.toString(),
+                            controller.selectedBankName.toString());
+                      }
+                    }
+                  : null,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a Source';
                 }
-              : null,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please select a Source';
-            }
-            return null;
-          },
+                return null;
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -961,69 +1214,156 @@ class _DataEntryFormState extends State<DataEntryForm> {
     return Obx(
       () => Padding(
         padding: const EdgeInsets.all(8.0),
-        child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          decoration: InputDecoration(
-            hintText: 'Banker Name',
-            prefixIcon: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/images/user.svg',
-                      height: 20,
-                      width: 20,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Banker Name',
+                style: TextStyle(color: AppColors.secondayColor)),
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              decoration: InputDecoration(
+                hintText: 'Banker Name',
+                prefixIcon: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/images/user.svg',
+                          height: 20,
+                          width: 20,
+                          color: themeController.primaryColor.value,
+                        ),
+                        SizedBox(width: 5.w),
+                        VerticalDivider(
+                          thickness: 1,
+                          color: themeController.primaryColor.value,
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 5.w),
-                    const VerticalDivider(
-                      thickness: 1,
-                      color: AppColors.primaryColor,
-                    ),
-                  ],
+                  ),
+                ),
+                labelStyle: const TextStyle(color: AppColors.secondayColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: themeController.primaryColor.value,
+                    )),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                      color: themeController.primaryColor.value, width: 2),
+                ),
+                filled: true,
+                fillColor: AppColors.backgroundColor,
+              ),
+              value: _getInitialBankerValue(),
+              hint: const Text(
+                'Select Banker Name ',
+                style: TextStyle(color: Colors.grey),
+              ),
+              items: _buildBankerNameDropdownItems(),
+              onChanged: controller.isEdit.value
+                  ? (newValue) {
+                      if (newValue != null) {
+                        controller.bankName.value = newValue;
+                        controller.getBankerDetailsName(newValue.toString());
+                      }
+                    }
+                  : null,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a Banker Name';
+                }
+                return null;
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildCommonDropdown({
+    required String hint,
+    required String? value,
+    required List<DropdownMenuItem<String>> items,
+    required Function(String?)? onChanged,
+    required String iconPath,
+    String? Function(String?)? validator,
+    bool isEnabled = true,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(hint, style: const TextStyle(color: AppColors.secondayColor)),
+          DropdownButtonFormField<String>(
+            isExpanded: true,
+            value: value,
+            items: items,
+            onChanged: isEnabled ? onChanged : null,
+            validator: validator,
+            decoration: InputDecoration(
+              hintText: hint,
+
+              /// SAME PREFIX DESIGN ✅
+              prefixIcon: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SvgPicture.asset(
+                        iconPath,
+                        color: themeController.primaryColor.value,
+                        height: 20,
+                        width: 20,
+                      ),
+                      const SizedBox(width: 6),
+                      VerticalDivider(
+                        thickness: 1,
+                        color: themeController.primaryColor.value,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            labelStyle: const TextStyle(color: AppColors.secondayColor),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(color: AppColors.primaryColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(
-                color: AppColors.primaryColor,
-                width: 2,
+
+              labelStyle: const TextStyle(color: AppColors.secondayColor),
+
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
+
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: themeController.primaryColor.value,
+                  )),
+
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: themeController.primaryColor.value,
+                  width: 2,
+                ),
+              ),
+
+              filled: true,
+              fillColor: AppColors.backgroundColor,
             ),
-            filled: true,
-            fillColor: AppColors.backgroundColor,
+            hint: Text(
+              hint,
+              style: const TextStyle(color: Colors.grey),
+            ),
           ),
-          value: _getInitialBankerValue(),
-          hint: const Text(
-            'Select Banker Name ',
-            style: TextStyle(color: Colors.grey),
-          ),
-          items: _buildBankerNameDropdownItems(),
-          onChanged: controller.isEdit.value
-              ? (newValue) {
-                  if (newValue != null) {
-                    controller.bankName.value = newValue;
-                    controller.getBankerDetailsName(newValue.toString());
-                  }
-                }
-              : null,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please select a Banker Name';
-            }
-            return null;
-          },
-        ),
+        ],
       ),
     );
   }
@@ -1032,67 +1372,76 @@ class _DataEntryFormState extends State<DataEntryForm> {
     return Obx(
       () => Padding(
         padding: const EdgeInsets.all(8.0),
-        child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          decoration: InputDecoration(
-            hintText: 'Tele Caller',
-            prefixIcon: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/images/telecaller_call.svg',
-                      height: 24,
-                      width: 24,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('TeleCaller',
+                style: TextStyle(color: AppColors.secondayColor)),
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              decoration: InputDecoration(
+                hintText: 'TeleCaller',
+                prefixIcon: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/images/telecaller_call.svg',
+                          height: 24,
+                          width: 24,
+                          color: themeController.primaryColor.value,
+                        ),
+                        SizedBox(width: 5.w),
+                        VerticalDivider(
+                          thickness: 1,
+                          color: themeController.primaryColor.value,
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 5.w),
-                    const VerticalDivider(
-                      thickness: 1,
-                      color: AppColors.primaryColor,
-                    ),
-                  ],
+                  ),
                 ),
+                labelStyle: const TextStyle(color: AppColors.secondayColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: themeController.primaryColor.value,
+                    )),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: themeController.primaryColor.value,
+                    width: 2,
+                  ),
+                ),
+                filled: true,
+                fillColor: AppColors.backgroundColor,
               ),
-            ),
-            labelStyle: const TextStyle(color: AppColors.secondayColor),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(color: AppColors.primaryColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(
-                color: AppColors.primaryColor,
-                width: 2,
+              value: _getInitialTellecallerValue(),
+              hint: const Text(
+                'Select TeleCaller',
+                style: TextStyle(color: Colors.grey),
               ),
-            ),
-            filled: true,
-            fillColor: AppColors.backgroundColor,
-          ),
-          value: _getInitialTellecallerValue(),
-          hint: const Text(
-            'Select Tele Caller',
-            style: TextStyle(color: Colors.grey),
-          ),
-          items: _buildTellecallerNameDropdownItems(),
-          onChanged: controller.isEdit.value
-              ? (newValue) {
-                  if (newValue != null) {
-                    controller.telecaller.value = newValue;
-                  }
+              items: _buildTellecallerNameDropdownItems(),
+              onChanged: controller.isEdit.value
+                  ? (newValue) {
+                      if (newValue != null) {
+                        controller.telecaller.value = newValue;
+                      }
+                    }
+                  : null,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a Tellecaller';
                 }
-              : null,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please select a Tellecaller';
-            }
-            return null;
-          },
+                return null;
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -1102,67 +1451,77 @@ class _DataEntryFormState extends State<DataEntryForm> {
     return Obx(
       () => Padding(
         padding: const EdgeInsets.all(8.0),
-        child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          decoration: InputDecoration(
-            hintText: 'Status',
-            prefixIcon: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 5.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/images/status.svg',
-                      height: 24,
-                      width: 24,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Status',
+                style: TextStyle(color: AppColors.secondayColor)),
+            DropdownButtonFormField<String>(
+              isExpanded: true,
+              decoration: InputDecoration(
+                hintText: 'Status',
+                prefixIcon: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 5.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/images/status.svg',
+                          height: 24,
+                          width: 24,
+                          color: themeController.primaryColor.value,
+                        ),
+                        SizedBox(width: 5.w),
+                        VerticalDivider(
+                          thickness: 1,
+                          color: themeController.primaryColor.value,
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 5.w),
-                    const VerticalDivider(
-                      thickness: 1,
-                      color: AppColors.primaryColor,
-                    ),
-                  ],
+                  ),
                 ),
+                labelStyle: const TextStyle(color: AppColors.secondayColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: themeController.primaryColor.value,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: themeController.primaryColor.value,
+                    width: 2,
+                  ),
+                ),
+                filled: true,
+                fillColor: AppColors.backgroundColor,
               ),
-            ),
-            labelStyle: const TextStyle(color: AppColors.secondayColor),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(color: AppColors.primaryColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20.0.r),
-              borderSide: const BorderSide(
-                color: AppColors.primaryColor,
-                width: 2,
+              value: _getInitialStatusValue(),
+              hint: const Text(
+                'Select Status',
+                style: TextStyle(color: Colors.grey),
               ),
-            ),
-            filled: true,
-            fillColor: AppColors.backgroundColor,
-          ),
-          value: _getInitialStatusValue(),
-          hint: const Text(
-            'Select Status',
-            style: TextStyle(color: Colors.grey),
-          ),
-          items: _buildStatusDropdownItems(),
-          onChanged: controller.isEdit.value
-              ? (newValue) {
-                  if (newValue != null) {
-                    controller.status.value = newValue;
-                  }
+              items: _buildStatusDropdownItems(),
+              onChanged: controller.isEdit.value
+                  ? (newValue) {
+                      if (newValue != null) {
+                        controller.status.value = newValue;
+                      }
+                    }
+                  : null,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a Source';
                 }
-              : null,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please select a Source';
-            }
-            return null;
-          },
+                return null;
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -1329,5 +1688,60 @@ class _DataEntryFormState extends State<DataEntryForm> {
           controller.selectedCaseType.value.toLowerCase().trim(),
     );
     return existing;
+  }
+
+  Widget titileWithIcon({
+    required String title,
+    required String iconPath,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: themeController.primaryColor.value,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          /// Icon Box
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppColors.appBarTextColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: SvgPicture.asset(
+              iconPath,
+              height: 18,
+              width: 18,
+              color: themeController.primaryColor.value,
+            ),
+          ),
+
+          SizedBox(width: 10.w),
+
+          /// Title
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.appBarTextColor),
+            ),
+          ),
+
+          /// Optional small divider line (modern touch)
+          Container(
+            width: 30,
+            height: 2,
+            decoration: BoxDecoration(
+              color: themeController.primaryColor.value,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

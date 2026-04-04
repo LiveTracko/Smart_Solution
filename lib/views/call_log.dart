@@ -28,14 +28,18 @@ class CallLogPage extends StatefulWidget {
 }
 
 class _CallLogPageState extends State<CallLogPage> {
-  String formatDate(String? dateString) {
-    if (dateString == null || dateString.isEmpty) return '';
+  String? formatDate(String? dateString) {
+    if (dateString == null ||
+        dateString.trim().isEmpty ||
+        dateString.trim() == '-') {
+      return null; // ⭐ VERY IMPORTANT
+    }
 
     try {
       final date = DateTime.parse(dateString);
       return DateFormat('dd-MM-yyyy hh:mm:ss').format(date);
     } catch (e) {
-      return dateString; // if parsing fails, show original
+      return dateString;
     }
   }
 
@@ -172,6 +176,7 @@ class _CallLogPageState extends State<CallLogPage> {
                         ),
                       ),
                       date: formatDate(data.entryDate),
+                      followupdate: formatDate(data.followupDate),
                       mobNo: maskFirst6Digits(data.contactNumber ?? ''),
                       onLeadingTap: () {
                         _diallerController.makePhoneCall(

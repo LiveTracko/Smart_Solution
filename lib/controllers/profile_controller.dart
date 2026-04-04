@@ -3,27 +3,24 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:smart_solutions/constants/api_urls.dart';
-import 'package:smart_solutions/constants/services.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
-import 'package:smart_solutions/routes/app_routes.dart';
-import 'package:smart_solutions/services/api_service.dart';
-
-
+import '../constants/api_urls.dart';
+import '../constants/services.dart';
+import '../services/api_service.dart';
 class ProfileController extends GetxController {
-  // Observables
+  
   var imageFile = Rx<File?>(null);
-  var nameController = TextEditingController();
-  var usernameController = TextEditingController();
+
+  final nameController = TextEditingController();
+  final usernameController = TextEditingController();
+
   var isLoading = false.obs;
   var profileImageUrl = "".obs;
 
   @override
-  onInit() async {
+  void onInit() {
     super.onInit();
-    usernameController.text = StaticStoredData.number;
-    imageFile.value = null;
-    await getProfileData(StaticStoredData.userId);
+    getProfileData(StaticStoredData.userId);
   }
 
   Future<void> pickImage() async {
@@ -40,10 +37,16 @@ class ProfileController extends GetxController {
               onTap: () async {
                 final pickedFile =
                     await picker.pickImage(source: ImageSource.gallery);
+
                 if (pickedFile != null) {
                   imageFile.value = File(pickedFile.path);
+
+                  Get.back();
+                  // ✅ AUTO SAVE AFTER SELECT
+                  await saveProfile();
+                } else {
+                  Get.back();
                 }
-                Get.back(); // Close bottom sheet
               },
             ),
             ListTile(
@@ -52,10 +55,16 @@ class ProfileController extends GetxController {
               onTap: () async {
                 final pickedFile =
                     await picker.pickImage(source: ImageSource.camera);
+
                 if (pickedFile != null) {
                   imageFile.value = File(pickedFile.path);
+
+                  Get.back(); // Close the bottom sheet before saving
+                  // ✅ AUTO SAVE AFTER SELECT
+                  await saveProfile();
+                } else {
+                  Get.back();
                 }
-                Get.back(); // Close bottom sheet
               },
             ),
           ],
@@ -64,95 +73,105 @@ class ProfileController extends GetxController {
     );
   }
 
-  // Save login request
-  Future<void> saveProfile(
-    String telecallerId,
-    String name,
-    String mobileNo,
-  ) async {
-    isLoading(true);
+  // ✅ Save Profile (ONLY on button click)
+  Future<void> saveProfile() async {
+    if (isLoading.value) return;
+
     try {
-      // Prepare the fields map
+      isLoading.value = true;
+
       var fields = {
-        "telecaller_id": telecallerId,
-        "name": name,
-        "mobileno": mobileNo,
+        "telecaller_id": StaticStoredData.userId,
+        "name": nameController.text.trim(),
+        "mobileno": usernameController.text.trim(),
       };
 
-      // If image is selected, include it in multipart
       File? image = imageFile.value;
 
-      // ignore: prefer_typing_uninitialized_variables
-      var response;
+      var response =
+          await ApiService().postRequest(APIUrls.profileUpdate, fields);
+
       if (image != null) {
         response = await ApiService().multipartPostRequest(
           APIUrls.profileUpdate,
           fields,
-          imageFile.value,
+          image,
           'profile_image',
         );
       } else {
-        // Without image
         response =
             await ApiService().postRequest(APIUrls.profileUpdate, fields);
       }
 
-      // Handle the response
       if (response.statusCode == 200) {
-        Get.snackbar(
-          "Profile Updated",
-          "Name: $name",
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.withOpacity(0.2),
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Profile updated successfully",
+            ),
+            backgroundColor: Colors.green,
+          ),
         );
 
-        Get.offAll(AppRoutes.home);
-        // Get.offAll(() => const DashboardScreen());
+        await getProfileData(StaticStoredData.userId);
+
+
+        //   Get.offAllNamed(AppRoutes.home);
       } else {
-        Get.snackbar('Error', 'Failed to update profile.');
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(
+            content: Text("Failed to update profile"),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
-      logOutput("An error occurred while saving the login request: $e");
+      logOutput("Profile error: $e");
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          content: Text("Something went wrong"),
+        ),
+      );
     } finally {
-      isLoading(false); // Stop loading
+      isLoading.value = false;
     }
   }
 
-  Future<void> getProfileData(String telecallerId) async {
-    isLoading(true);
+  // ✅ Fetch Profile
+  Future<void> getProfileData(String id) async {
     try {
-      var fields = {
-        "telecaller_id": telecallerId,
-      };
+      isLoading.value = true;
 
-      // Call GET or POST depending on backend
-      var response =
-          await ApiService().postRequest(APIUrls.fetchProfileImage, fields);
+      var response = await ApiService().postRequest(
+        APIUrls.fetchProfileImage,
+        {"telecaller_id": id},
+      );
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
 
         nameController.text = data["data"]["name"] ?? "";
-        //    usernameController.text = data["data"]["username"] ?? "";
-        // Case 1: profile_image is a string (URL or filename)
-        if (data["data"]["profile_image"] is String) {
-          profileImageUrl.value =
-              APIUrls.imagebaseUrl + data["data"]["profile_image"];
-        }
+        usernameController.text = data["data"]["username"] ?? "";
 
-        // Case 2: profile_image is an object with "url"
-        else if (data["data"]["profile_image"] is Map &&
-            data["data"]["profile_image"]["url"] != null) {
-          profileImageUrl.value =
-              APIUrls.imagebaseUrl + data["data"]["profile_image"]["url"];
+        final imageData = data["data"]["profile_image"];
+
+        if (imageData is String && imageData.isNotEmpty) {
+          profileImageUrl.value = APIUrls.imagebaseUrl + imageData;
+        } else if (imageData is Map && imageData["url"] != null) {
+          profileImageUrl.value = APIUrls.imagebaseUrl + imageData["url"];
         }
-      } else {
-        Get.snackbar('Error', 'Failed to fetch profile.');
       }
     } catch (e) {
-      logOutput("Error fetching profile: $e");
+      logOutput("Fetch error: $e");
     } finally {
-      isLoading(false);
+      isLoading.value = false;
     }
+  }
+
+  @override
+  void onClose() {
+    nameController.dispose();
+    usernameController.dispose();
+    super.onClose();
   }
 }

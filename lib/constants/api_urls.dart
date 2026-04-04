@@ -77,4 +77,11 @@ class APIUrls {
   static const String adminLoginFiles = 'Auth/getloginfilesforadmin';
   static const String loginRequestTeamLeader = 'Auth/getloginrequestteamleader';
   static const String getMobileDashboardData = 'Auth/getmobiledashboard';
+
+  // notification
+  static const String getnotificationCount = 'Auth/notificationcountlist';
+  //forget password
+  static const String verifyMobileNo = 'Auth/verifymobileno';
+  static const String verifyOtp = 'Auth/verifyotp';
+  static const String resetPassword = 'Auth/resetpassword';
 }

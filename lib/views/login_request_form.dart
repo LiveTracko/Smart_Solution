@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -104,6 +105,10 @@ class LoginRequestForm extends StatelessWidget {
                               },
                               inputType: TextInputType.phone,
                               validator: _validatePhone,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(10),
+                              ],
                             ),
                             const SizedBox(height: 10),
                             SuggestionTextField(
@@ -261,6 +266,7 @@ class LoginRequestForm extends StatelessWidget {
     TextInputType inputType = TextInputType.text,
     int maxLines = 1,
     String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters, // ⭐ add this
   }) {
     Widget? decoratedPrefixIcon;
 
@@ -318,9 +324,10 @@ class LoginRequestForm extends StatelessWidget {
               filled: true,
               fillColor: AppColors.backgroundColor,
             ),
-            style:const TextStyle(color: Colors.black),
+            style: const TextStyle(color: Colors.black),
             onChanged: onChanged,
             validator: validator,
+            inputFormatters: inputFormatters,
           ),
         ));
   }

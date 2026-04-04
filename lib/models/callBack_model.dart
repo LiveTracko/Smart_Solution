@@ -30,6 +30,7 @@ class CallBackData {
   String id;
   String name;
   String profileImage;
+  String teamleaderId;
   String todayCallbackCount;
   String monthlyCallbackCount;
 
@@ -37,6 +38,7 @@ class CallBackData {
     required this.id,
     required this.name,
     required this.profileImage,
+    required this.teamleaderId,
     required this.todayCallbackCount,
     required this.monthlyCallbackCount,
   });
@@ -45,6 +47,7 @@ class CallBackData {
         id: json["id"],
         name: json["name"],
         profileImage: json["profile_image"] ?? '',
+        teamleaderId: json["team_leader"] ?? '',
         todayCallbackCount: json["today_callback_count"],
         monthlyCallbackCount: json["monthly_callback_count"],
       );
@@ -53,6 +56,7 @@ class CallBackData {
         "id": id,
         "name": name,
         "profile_images": profileImage,
+        "team_leader": teamleaderId,
         "today_callback_count": todayCallbackCount,
         "monthly_callback_count": monthlyCallbackCount,
       };

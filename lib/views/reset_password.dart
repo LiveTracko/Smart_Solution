@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smart_solutions/controllers/forget_password_controller.dart';
 
 import 'package:smart_solutions/controllers/reset_password_controller.dart';
-import 'package:smart_solutions/views/login_screen.dart';
+import 'package:smart_solutions/routes/app_routes.dart';
 import 'package:smart_solutions/widget/common_form_field.dart';
 import 'package:smart_solutions/widget/text_style.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
-  const ChangePasswordScreen({super.key});
+  final String mobileNo;
+  const ChangePasswordScreen({super.key, required this.mobileNo});
 
   @override
   State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
@@ -25,7 +27,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
-  String userName = "Rinka Chaurasiya";
+  String userName = "User Name";
+  final ForgetPasswordController _forgetPasswordController =
+      Get.find<ForgetPasswordController>();
 
   @override
   void initState() {
@@ -40,25 +44,21 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     });
   }
 
-  void _submit() {
+  void _submit() async {
     if (_formKey.currentState!.validate()) {
-      Get.offAll(
-        () => const LoginView(),
-        transition: Transition.rightToLeft,
-      );
+      final bool isReset = await _forgetPasswordController.resetPassword(
+          widget.mobileNo, newPasswordController.text);
 
-      Get.snackbar(
-        "Success",
-        "Password changed successfully",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      if (isReset) {
+        Get.offAllNamed(AppRoutes.login);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      top: false,
+      top: true,
       child: Scaffold(
         backgroundColor: Colors.white,
         resizeToAvoidBottomInset: true,
@@ -73,10 +73,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             height: 48.h,
             child: ElevatedButton(
               onPressed: _submit,
-              child: Text(
-                "Change Password",
-                style: TextStyle(fontSize: 16.sp),
-              ),
+              child: _forgetPasswordController.isresetting.value
+                  ? const CircularProgressIndicator(
+                      color: Colors.white,
+                    )
+                  : const Text(
+                      "Change Password",
+                      style: TextStyle(fontSize: 16),
+                    ),
             ),
           ),
         ),
@@ -161,7 +165,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       return "Minimum 6 characters required";
                     }
                     return null;
-                  },   
+                  },
                 ),
 
                 SizedBox(height: 10.h),
@@ -178,7 +182,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       return "Passwords do not match";
                     }
                     return null;
-                  },   
+                  },
                 ),
 
                 SizedBox(height: 120.h),

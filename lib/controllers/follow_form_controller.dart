@@ -36,11 +36,14 @@ class FollowBackFormController extends GetxController
   var callLogData = <Datum>[].obs;
 
   var callBackData = <CallBackData>[].obs;
+  var allCallBackData = <CallBackData>[].obs;
   var callBackTotalData = <Totals>[].obs;
 
   var dailyfollowBackList = <Data>[].obs;
   var monthlyfollowBackList = <Data>[].obs;
   var filteredFollowBackList = <Data>[].obs;
+
+  var filterCallBackData = [].obs;
 
   var disbursementList = <DisbursementData>[].obs;
   var disbursementTotal = <disbursementTotals>[].obs;
@@ -62,6 +65,7 @@ class FollowBackFormController extends GetxController
 // search variables
   var showSearchField = false.obs;
   var searchText = "".obs;
+  var searchCallBackText = "".obs;
   double itemHeight = 45.h;
   double tellececalleritemHeight = 55.h;
   final customerNumberController = TextEditingController();
@@ -75,6 +79,7 @@ class FollowBackFormController extends GetxController
   final ScrollController filterScrollController = ScrollController();
 
   final RxBool isInitialLoading = true.obs;
+  final RxBool isCallBackLoading = true.obs;
   final RxBool isMoreLoading = true.obs;
 
   final TextEditingController searchController = TextEditingController();
@@ -86,9 +91,10 @@ class FollowBackFormController extends GetxController
 
   @override
   void onInit() async {
+    getCallBackData();
     // _startWorker();
     //   ever(followBackList, (_) => updateFilteredList());
-    ever(selectedFilter, (_) => updateFilteredList());
+    // ever(selectedFilter, (_) => updateCallBackFilteredList());
 
     ever(followBackList, (_) => updateFilteredList());
 
@@ -457,6 +463,7 @@ class FollowBackFormController extends GetxController
         final totaldata = Totals.fromJson(responseData['totals']);
 
         callBackData.assignAll(data.data);
+        allCallBackData.assignAll(data.data);
         callBackTotalData.assign(totaldata);
       } else if (response.statusCode == 204) {
         monthlybackData.clear(); // No data
@@ -468,6 +475,20 @@ class FollowBackFormController extends GetxController
     } finally {
       iscallBackLoading.value = false;
     }
+  }
+
+  void applyLocalFilter() {
+    // If nothing selected → show all data
+    if (selectedtellecaller.isEmpty) {
+      callBackData.assignAll(allCallBackData);
+      return;
+    }
+
+    final filteredList = allCallBackData.where((item) {
+      return selectedtellecaller.contains(item.id);
+    }).toList();
+
+    callBackData.assignAll(filteredList);
   }
 
   Future<void> getCallLogData() async {
@@ -575,6 +596,18 @@ class FollowBackFormController extends GetxController
     }
   }
 
+  String? getSelectedTeamLeaderId() {
+    if (selectedFilter.value == 0) return null; // "All" selected
+
+    if (selectedFilter.value < filters.length) {
+      final selectedName = filters[selectedFilter.value];
+      final tl =
+          tellecallerList.firstWhereOrNull((e) => e.name == selectedName);
+      return tl?.id;
+    }
+    return null;
+  }
+
   Future<void> getteamLeaderData([String? teamleaderId]) async {
     isLoading.value = true;
 
@@ -593,12 +626,10 @@ class FollowBackFormController extends GetxController
         final responseData = jsonDecode(response.body);
         final teamleader = TealLeaderModel.fromJson(responseData);
 
-        if (teamleaderId != null && teamleaderId.isNotEmpty) {
+        if (teamleader != null) {
           tellecallerList.assignAll(teamleader.data);
-        } else {
-          teamleaderList.assignAll(teamleader.data);
-          filterController.setFilters(
-            teamleaderList.map((e) => e.name).toList(),
+          setFilters(
+            tellecallerList.map((e) => e.name).toList(),
           );
         }
       } else {
@@ -611,6 +642,79 @@ class FollowBackFormController extends GetxController
     }
   }
 
+  // Future<bool> submitFollowUp() async {
+  //   try {
+  //     isFormSubmitted(true);
+
+  //     final Map<String, dynamic> formData = {
+  //       'mobile': mobile.value,
+  //       'name': _dialerController.customerName.value,
+  //       'data_type': dataType.value,
+  //       'bank_name':
+  //           bankName.value.isEmpty ? allBankNamesList.first.id : bankName.value,
+  //       // 'followup_date':
+  //       //     '${followupDate.value.year}-${followupDate.value.month}-${followupDate.value.day}',
+
+  //       'followup_date': followupDate.value != null
+  //           ? '${followupDate.value!.year}-${followupDate.value!.month}-${followupDate.value!.day}'
+  //           : '-',
+
+  //       'contact_status': contactStatus,
+  //       'remark_status': remarkStatus.value,
+  //       'remark': remark.value,
+  //       'telecaller_id': telecallerId.value,
+  //       'call_duration': _dialerController
+  //           .formatElapsedTime(_dialerController.elapsedTimeInSeconds.value),
+  //       'salary': _dialerController.salary.value,
+  //       'loan_amount': _dialerController.customerLoan.value,
+  //       'data_sourcing': dataType.value,
+  //       'excel_id': _dialerController.excel_id.value,
+  //       'followup_id': _dialerController.followup_id.value,
+  //     };
+  //     logOutput("$formData");
+  //     final response =
+  //         await _apiService.postRequest(APIUrls.followListData, formData);
+
+  //     _dialerController.elapsedTimeInSeconds.value = 0;
+  //     logOutput(response.body);
+  //     if (response.statusCode == 200) {
+  //       // fetchFollowBackList()
+  //       clearForm();
+
+  //       Future.delayed(const Duration(milliseconds: 200), () {
+  //         final context = Get.overlayContext;
+
+  //         if (context != null) {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             SnackBar(
+  //               content: const Text("Follow up saved successfully"),
+  //               backgroundColor: Colors.green.shade400,
+  //             ),
+  //           );
+
+  //           /// ⭐ Close overlay if any
+  //           if (Get.isOverlaysOpen) {
+  //             Get.back();
+  //           }
+
+  //           /// ⭐ Then close screen
+  //           if (Get.key.currentState!.canPop()) {
+  //             Get.back();
+  //           }
+  //         }
+  //       });
+  //     }
+
+  //     return true;
+  //   } catch (e) {
+  //     logOutput('Error submitting form: $e');
+  //     return false;
+  //     //  Get.snackbar('Error', 'Failed to submit follow up form');
+  //   } finally {
+  //     isFormSubmitted(false);
+  //   }
+  // }
+
   Future<bool> submitFollowUp() async {
     try {
       isFormSubmitted(true);
@@ -621,13 +725,9 @@ class FollowBackFormController extends GetxController
         'data_type': dataType.value,
         'bank_name':
             bankName.value.isEmpty ? allBankNamesList.first.id : bankName.value,
-        // 'followup_date':
-        //     '${followupDate.value.year}-${followupDate.value.month}-${followupDate.value.day}',
-
         'followup_date': followupDate.value != null
             ? '${followupDate.value!.year}-${followupDate.value!.month}-${followupDate.value!.day}'
             : '-',
-
         'contact_status': contactStatus,
         'remark_status': remarkStatus.value,
         'remark': remark.value,
@@ -640,66 +740,21 @@ class FollowBackFormController extends GetxController
         'excel_id': _dialerController.excel_id.value,
         'followup_id': _dialerController.followup_id.value,
       };
-      logOutput("$formData");
+
       final response =
           await _apiService.postRequest(APIUrls.followListData, formData);
 
       _dialerController.elapsedTimeInSeconds.value = 0;
-      logOutput(response.body);
+
       if (response.statusCode == 200) {
-        // fetchFollowBackList()
         clearForm();
-
-        Future.delayed(const Duration(milliseconds: 200), () {
-          final context = Get.overlayContext;
-
-          if (context != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text("Follow up saved successfully"),
-                backgroundColor: Colors.green.shade400,
-              ),
-            );
-
-            Future.delayed(const Duration(milliseconds: 400), () {
-              /// ⭐ Close overlay if any
-              if (Get.isOverlaysOpen) {
-                Get.back();
-              }
-
-              /// ⭐ Then close screen
-              if (Get.key.currentState!.canPop()) {
-                Get.back();
-              }
-            });
-          }
-        });
+        return true; // ✅ SUCCESS
       }
 
-      // if (response.statusCode == 200) {
-      //   Future.delayed(const Duration(milliseconds: 120), () {
-      //     Get.showSnackbar(
-      //       GetSnackBar(
-      //         title: 'Success',
-      //         message: 'Follow up saved successfully',
-      //         duration: const Duration(seconds: 2),
-      //         snackPosition: SnackPosition.BOTTOM,
-      //         backgroundColor: Colors.green.shade400,
-      //         margin: const EdgeInsets.all(12),
-      //         borderRadius: 8,
-      //       ),
-      //     );
-      //   });
-
-      //   clearForm();
-      //   return true;
-      // // } else {
-      // throw Exception('Failed to submit form');
-      return true;
+      return false;
     } catch (e) {
       logOutput('Error submitting form: $e');
       return false;
-      //  Get.snackbar('Error', 'Failed to submit follow up form');
     } finally {
       isFormSubmitted(false);
     }
@@ -857,8 +912,8 @@ class FollowBackFormController extends GetxController
 
       // Follow back form related API calls
       await getCallBackData();
-      await getCallLogData();
-      await getDisbursementData();
+      // await getCallLogData();
+      // await getDisbursementData();
     });
   }
 
@@ -957,6 +1012,31 @@ class FollowBackFormController extends GetxController
 
   void selectFilter(int index) {
     selectedFilter.value = index;
+
+    String? teamleader = getSelectedTeamLeaderId();
+    filtercallBack(teamLeaderId: teamleader);
+  }
+
+  void filtercallBack({
+    String? teamLeaderId,
+    String? searchQuery,
+  }) {
+    List<CallBackData> filteredList = allCallBackData;
+
+    // Filter by team leader
+    if (teamLeaderId != null && teamLeaderId.isNotEmpty) {
+      filteredList =
+          filteredList.where((e) => e.teamleaderId == teamLeaderId).toList();
+    }
+
+    // Filter by search
+    if (searchQuery != null && searchQuery.isNotEmpty) {
+      filteredList = filteredList.where((e) {
+        return e.name.toLowerCase().contains(searchQuery.toLowerCase());
+      }).toList();
+    }
+
+    callBackData.assignAll(filteredList);
   }
 
   void clearFilters() {

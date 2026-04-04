@@ -53,18 +53,20 @@ class _SplashScreenState extends State<SplashScreen> {
     }
     // Navigate to the appropriate screen after a delay
     Future.delayed(const Duration(seconds: 3), () {
-      if (userId != null) {
-        StaticStoredData.userId = userId;
-        StaticStoredData.roleName = roleName ?? '';
-        StaticStoredData.number = number ?? '';
-        StaticStoredData.themeColor = colorCode ?? '';
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (userId != null) {
+          StaticStoredData.userId = userId;
+          StaticStoredData.roleName = roleName ?? '';
+          StaticStoredData.number = number ?? '';
+          StaticStoredData.themeColor = colorCode ?? '';
 
-        Get.offAllNamed(AppRoutes.navigationscreen);
-      } else {
-        StaticStoredData.userId = '';
-        StaticStoredData.roleName = '';
-        Get.offAllNamed(AppRoutes.login);
-      }
+          Get.offAllNamed(AppRoutes.navigationscreen);
+        } else {
+          StaticStoredData.userId = '';
+          StaticStoredData.roleName = '';
+          Get.offAllNamed(AppRoutes.login);
+        }
+      });
     });
   }
 

@@ -114,7 +114,12 @@ class SummaryHeaderCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _totalBadge(title, duration),
+            title != 0
+                ? _totalBadge(title, duration)
+                : const Text(
+                    'Total',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
             // Expanded(
             //   child: Column(
             //     mainAxisSize: MainAxisSize.min,

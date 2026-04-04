@@ -504,11 +504,6 @@ class AdminCallBackController extends GetxController {
 
         final allData = list.map((e) => Datum.fromJson(e)).toList();
 
-        // if (responseData.containsKey('totals')) {
-        //   final totaldata = Totals.fromJson(responseData['totals']);
-        //   callBackTotalData.assign(totaldata);
-        // }
-
         filteredLoginFilesData.assignAll(allData);
 
         // FILTER HERE

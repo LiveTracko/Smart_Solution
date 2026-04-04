@@ -9,6 +9,7 @@ import 'package:smart_solutions/services/api_service.dart';
 
 import '../../constants/static_stored_data.dart';
 import '../common_filter_controller.dart';
+import '../data_entry_controller.dart';
 
 class DisbursementController extends GetxController {
   final ApiService _apiService = ApiService();
@@ -34,19 +35,43 @@ class DisbursementController extends GetxController {
   final String teamleaderId = StaticStoredData.userId;
   final CommonFilterController filterController =
       Get.find<CommonFilterController>();
+  RxString searchText = ''.obs;
+
+  late Worker _searchWorker;
+
   @override
   void onInit() {
     super.onInit();
     getteamLeaderData();
-    getDisbursementData(teamleaderId: teamleaderId); // initial load (All)
+    getDisbursementData(); // initial load (All)
 
     ever(filterController.selectedRange, (_) {
-      getDisbursementData(teamleaderId: StaticStoredData.userId);
+      getDisbursementData();
     });
+
+    searchController.addListener(_onSearchChanged);
+
+    _searchWorker = debounce(
+      searchText,
+      (value) async {
+        if (isLoading.value) return;
+
+        await getDisbursementData(
+          query: value.trim(),
+        );
+      },
+      time: const Duration(milliseconds: 600),
+    );
+  }
+
+  void _onSearchChanged() {
+    searchText.value = searchController.text;
   }
 
   @override
   void onClose() {
+    searchController.removeListener(_onSearchChanged);
+    _searchWorker.dispose();
     clearFilters();
     super.onClose();
   }
@@ -72,15 +97,23 @@ class DisbursementController extends GetxController {
     }
   }
 
+
   Future<void> getDisbursementData({
     String? query,
-    String? teamleaderId,
   }) async {
+    if (iscallDisbursedLoading.value) return;
+
     iscallDisbursedLoading.value = true;
 
-    final Map<String, dynamic> formData = {'teamleader_id': teamleaderId};
+    final Map<String, dynamic> formData = {
+      'teamleader_id': StaticStoredData.userId
+    };
 
     final range = filterController.selectedRange.value;
+
+    if (query != null && query.trim().isNotEmpty) {
+      formData['search'] = query.trim();
+    }
 
     if (range != null) {
       formData['daterange'] = "${DateFormat('dd-MM-yyyy').format(range.start)},"

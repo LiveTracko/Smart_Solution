@@ -32,6 +32,7 @@ class AppRoutes {
         binding: LoginBinding()),
     GetPage(
         name: home,
-        page: () => const InternetChecker(child: DashboardScreen())),
+        page: () => const InternetChecker(child: DashboardScreen()),
+        binding: AppBinding()),
   ];
 }

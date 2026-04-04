@@ -18,6 +18,7 @@ import 'package:smart_solutions/models/incentive_model.dart';
 import 'package:smart_solutions/theme/app_theme.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
 import 'package:smart_solutions/views/active_files.dart';
+import 'package:smart_solutions/views/admin/admin_call_back.dart';
 import 'package:smart_solutions/views/admin/admin_call_log.dart';
 import 'package:smart_solutions/views/admin/admin_disbursement.dart';
 import 'package:smart_solutions/views/admin/daily_monthly_count.dart';
@@ -64,9 +65,9 @@ class _DashboardScreenState extends State<DashboardScreen>
 
   @override
   void initState() {
-    if (StaticStoredData.roleName == 'telecaller') {
-      followBackFormController = Get.find<FollowBackFormController>();
-    }
+    // if (StaticStoredData.roleName == 'telecaller') {
+    followBackFormController = Get.find<FollowBackFormController>();
+    // }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       themeController.loadSavedTheme();
     });
@@ -1060,19 +1061,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: Obx(() {
-                            if (controller.loginFileStatusCount.isEmpty) {
-                              return SizedBox(
-                                height: 80.h,
-                                child: Center(
-                                  child: Text(
-                                    "No Data Available",
-                                    style: TextStyle(
-                                        fontSize: 14.sp, color: Colors.grey),
-                                  ),
-                                ),
-                              );
-                            }
-
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -1082,10 +1070,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                                     child: FileStatusCard(
                                       title: "Active Files",
                                       fileCount: controller.loginFileStatusCount
-                                          .first.activefilecount
-                                          .toString(),
+                                              .first.activefilecount.isNotEmpty
+                                          ? controller.loginFileStatusCount
+                                              .first.activefilecount
+                                              .toString()
+                                          : '0',
                                       amount: controller.loginFileStatusCount
-                                          .first.activeloanamount,
+                                              .first.activeloanamount.isNotEmpty
+                                          ? controller.loginFileStatusCount
+                                              .first.activeloanamount
+                                              .toString()
+                                          : '0',
                                       statusColor: Colors.green,
                                       onPress: () {
                                         Get.to(const ActiveFiles(
@@ -1103,11 +1098,24 @@ class _DashboardScreenState extends State<DashboardScreen>
                                     margin: EdgeInsets.only(left: 8.w),
                                     child: FileStatusCard(
                                       title: "Inactive Files",
-                                      fileCount: controller.loginFileStatusCount
-                                          .first.inactivefilecount
-                                          .toString(),
-                                      amount: controller.loginFileStatusCount
-                                          .first.inactiveloanamount,
+                                      fileCount: controller
+                                              .loginFileStatusCount
+                                              .first
+                                              .inactivefilecount
+                                              .isNotEmpty
+                                          ? controller.loginFileStatusCount
+                                              .first.inactivefilecount
+                                              .toString()
+                                          : '0',
+                                      amount: controller
+                                              .loginFileStatusCount
+                                              .first
+                                              .inactiveloanamount
+                                              .isNotEmpty
+                                          ? controller.loginFileStatusCount
+                                              .first.inactiveloanamount
+                                              .toString()
+                                          : '0',
                                       statusColor: Colors.red,
                                       onPress: () {
                                         Get.to(const ActiveFiles(
@@ -1144,6 +1152,101 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 8),
                                 child: Column(children: [
+                                  IncentiveCard(
+                                    title: 'Call Back',
+                                    duration: '',
+                                    isNextPage: true,
+                                    onTap: () => Get.to(const AdminCallBack(
+                                        title: 'Call Back')),
+                                    items: [
+                                      IncentiveItem(
+                                        "Today",
+                                        followBackFormController!
+                                                .callBackTotalData.isNotEmpty
+                                            ? followBackFormController!
+                                                .callBackTotalData
+                                                .first
+                                                .todayCallbackTotal
+                                                .toString()
+                                            : '0',
+                                      ),
+                                      IncentiveItem(
+                                        "Monthly",
+                                        followBackFormController!
+                                                .callBackTotalData.isNotEmpty
+                                            ? followBackFormController!
+                                                .callBackTotalData
+                                                .first
+                                                .monthlyCallbackTotal
+                                                .toString()
+                                            : '0',
+                                      )
+                                    ],
+                                    statusColor: AppColors.greenCOlor,
+                                  ),
+
+                                  // Row(
+                                  //   mainAxisAlignment:
+                                  //       MainAxisAlignment.spaceBetween,
+                                  //   children: [
+                                  //     SizedBox(
+                                  //       width:
+                                  //           (MediaQuery.of(context).size.width -
+                                  //                   32) /
+                                  //               2,
+                                  //       child: FileStatusCard(
+                                  //         title: "Today Callback",
+                                  //         fileCount: controller
+                                  //                 .callBackCount.isNotEmpty
+                                  //             ? controller.callBackCount.first
+                                  //                 .todayCallback
+                                  //                 .toString()
+                                  //             : '0',
+                                  //         statusColor: Colors.green,
+                                  //         onPress: () {
+                                  //           Get.to(AdminCallBack(
+                                  //             title: 'Today',
+                                  //             //   headerTitle: 'Today',
+                                  //             // controller:
+                                  //             //     followBackFormController,
+                                  //             // getDataList: () =>
+                                  //             //     followBackFormController!
+                                  //             //         .dailycallbackData
+                                  //           ));
+                                  //         },
+                                  //       ),
+                                  //     ),
+                                  //     // Monthly card
+                                  //     SizedBox(
+                                  //       width:
+                                  //           (MediaQuery.of(context).size.width -
+                                  //                   32) /
+                                  //               2, // Half width minus padding
+                                  //       child: FileStatusCard(
+                                  //         title: "Monthly ",
+                                  //         fileCount: controller
+                                  //                 .callBackCount.isNotEmpty
+                                  //             ? controller.callBackCount.first
+                                  //                 .monthlyCallback
+                                  //                 .toString()
+                                  //             : '0',
+                                  //         statusColor: Colors.blue,
+                                  //         onPress: () {
+                                  //           Get.to(CallBackData(
+                                  //               title: 'Monthly Callback',
+                                  //               headerTitle: 'Monthly',
+                                  //               controller:
+                                  //                   followBackFormController,
+                                  //               getDataList: () =>
+                                  //                   followBackFormController!
+                                  //                       .monthlybackData));
+                                  //         },
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
+
+                                  SizedBox(height: 10.h),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -1164,17 +1267,17 @@ class _DashboardScreenState extends State<DashboardScreen>
                                               IncentiveItem(
                                                   "Today",
                                                   controller
-                                                      .loginFileRequestCount
-                                                      .first
-                                                      .todaycount
-                                                      .toString()),
+                                                          .loginFileRequestCount
+                                                          .first
+                                                          .todaycount ??
+                                                      '0'),
                                               IncentiveItem(
                                                   "Monthly",
                                                   controller
-                                                      .loginFileRequestCount
-                                                      .first
-                                                      .monthlycount
-                                                      .toString()),
+                                                          .loginFileRequestCount
+                                                          .first
+                                                          .monthlycount ??
+                                                      '0'),
                                             ],
                                             statusColor: AppColors.greenCOlor),
                                       ),
@@ -1194,13 +1297,13 @@ class _DashboardScreenState extends State<DashboardScreen>
                                               IncentiveItem(
                                                   "Today",
                                                   controller.loginFileCount
-                                                      .first.todaycount
-                                                      .toString()),
+                                                          .first.todaycount ??
+                                                      '0'),
                                               IncentiveItem(
                                                   "Monthly",
                                                   controller.loginFileCount
-                                                      .first.monthlycount
-                                                      .toString()),
+                                                          .first.monthlycount ??
+                                                      '0'),
                                             ],
                                             statusColor: AppColors.greenCOlor),
                                       ),
@@ -1289,10 +1392,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                                             child: FileStatusCard(
                                               title: "Today",
                                               fileCount: controller
-                                                  .callBackCount
-                                                  .first
-                                                  .todayCallback
-                                                  .toString(),
+                                                      .callBackCount.isNotEmpty
+                                                  ? controller.callBackCount
+                                                      .first.todayCallback
+                                                      .toString()
+                                                  : '0',
                                               statusColor: Colors.green,
                                               onPress: () {
                                                 Get.to(CallBackData(
@@ -1316,10 +1420,11 @@ class _DashboardScreenState extends State<DashboardScreen>
                                             child: FileStatusCard(
                                               title: "Monthly",
                                               fileCount: controller
-                                                  .callBackCount
-                                                  .first
-                                                  .monthlyCallback
-                                                  .toString(),
+                                                      .callBackCount.isNotEmpty
+                                                  ? controller.callBackCount
+                                                      .first.monthlyCallback
+                                                      .toString()
+                                                  : '0',
                                               statusColor: Colors.blue,
                                               onPress: () {
                                                 Get.to(CallBackData(

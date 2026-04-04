@@ -85,7 +85,7 @@ class CallBackData extends StatelessWidget {
                     color: themeController.primaryColor.value,
                   ),
                 ),
-                followupdate: data.followupDate.toString(),
+                followupdate: formatDate(data.followupDate.toString()),
                 onLeadingTap: () {
                   if (!_dialerController.isCallOngoing.value) {
                     _dialerController.makePhoneCall(
@@ -128,9 +128,30 @@ class CallBackData extends StatelessWidget {
   String formatDateTime(String dateString) {
     try {
       DateTime dateTime = DateTime.parse(dateString);
-      return DateFormat('dd/MM/yy - HH:mm:ss').format(dateTime);
+      return DateFormat('dd-MM-yy - HH:mm:ss').format(dateTime);
     } catch (e) {
       return dateString; // Return original if parsing fails
+    }
+  }
+
+  String formatDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return "-";
+
+    try {
+      // ⭐ Normalize date first
+      List parts = dateString.split('-');
+
+      String year = parts[0];
+      String month = parts[1].padLeft(2, '0');
+      String day = parts[2].padLeft(2, '0');
+
+      String fixedDate = "$year-$month-$day";
+
+      DateTime dt = DateTime.parse(fixedDate);
+
+      return DateFormat('dd-MM-yy').format(dt);
+    } catch (e) {
+      return dateString;
     }
   }
 }

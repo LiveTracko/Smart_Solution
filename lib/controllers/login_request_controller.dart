@@ -115,8 +115,6 @@ class LoginRequestController extends GetxController {
               .map((e) => e.telecallerId)
               .toList();
 
-
-
           await getRemarks();
           isLoading(false);
         } else {
@@ -341,8 +339,6 @@ class LoginRequestController extends GetxController {
     final hasChipSelected = selectedIndex != 0;
     final chipText =
         hasChipSelected ? filters[selectedIndex].toLowerCase() : '';
-
-
 
     loginRequestList.value = allLoginRequestList.where((item) {
       final name = item.customerName.toLowerCase();

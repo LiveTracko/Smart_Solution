@@ -753,12 +753,12 @@ class DashboardController extends GetxController
         final responseData = jsonDecode(response.body);
         final dashboardCount = DasboardModel.fromJson(responseData);
 
-        loginFileStatusCount.assign(dashboardCount.loginFileStatus!);
+        loginFileStatusCount.assign(dashboardCount.loginFileStatus);
 
-        loginFileRequestCount.assign(dashboardCount.loginRequestFile!);
-        loginFileCount.assign(dashboardCount.loginFileCount!);
-        callLogCount.assign(dashboardCount.getcalllogcount!);
-        callBackCount.assign(dashboardCount.gettelecallercallback!);
+        loginFileRequestCount.assign(dashboardCount.loginRequestFile);
+        loginFileCount.assign(dashboardCount.loginFileCount);
+        callLogCount.assign(dashboardCount.getcalllogcount);
+        callBackCount.assign(dashboardCount.gettelecallercallback);
         // totaDashboardCount.assign(dashboardCount);
       } else {
         logOutput("Error: ${response.statusCode} - ${response.reasonPhrase}");

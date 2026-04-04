@@ -7,6 +7,7 @@ import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/login_request_controller.dart';
 import 'package:smart_solutions/controllers/theme_controller.dart';
 import 'package:smart_solutions/utils/currency_util.dart';
+import 'package:smart_solutions/views/data_entry_form.dart';
 import 'package:smart_solutions/views/login_request_form.dart';
 import 'package:smart_solutions/views/spacing_constants.dart';
 import 'package:smart_solutions/widget/common_scaffold.dart';
@@ -18,9 +19,9 @@ import 'package:smart_solutions/widget/searchbarwithclear.dart';
 import '../widget/text_style.dart';
 
 class LoginRequestScreen extends StatelessWidget {
-  String title;
-  bool isShowBack = false;
-  bool isDrawer = false;
+  final String title;
+  final bool isShowBack;
+  final bool isDrawer;
 
   LoginRequestScreen(
       {super.key,
@@ -43,7 +44,6 @@ class LoginRequestScreen extends StatelessWidget {
         title: title,
         showBack: isShowBack,
         isDrawer: isDrawer,
-        
         actions: [
           istelecaller
               ? IconButton(
@@ -135,6 +135,15 @@ class LoginRequestScreen extends StatelessWidget {
                             amount: CurrencyUtils.formatIndianCurrency(
                                 data.loanAmount),
                             showEdit: StaticStoredData.roleName != 'telecaller',
+                            showMoveToLogin:
+                                StaticStoredData.roleName != 'telecaller',
+                            onMoveToLogin: () async {
+                              await Get.to(() => DataEntryForm(
+                                  id: data.id,
+                                  tellecallerId: data.telecallerId,
+                                  dsaId: data.sourcing.toString(),
+                                  bankerId: data.bankId.toString()));
+                            },
                             onEdit: () async {
                               controller.currentId.value = data.id;
                               controller.customerName.value = data.customerName;

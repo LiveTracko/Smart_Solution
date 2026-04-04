@@ -36,6 +36,7 @@ class LoginViewModel extends GetxController {
     }
     logOutput(loginData.toString());
     try {
+      FocusManager.instance.primaryFocus?.unfocus();
       final response = await _apiService
           .postRequest(APIUrls.loginUrl, loginData, type: 'login');
       var responseData = jsonDecode(response.body);
@@ -46,19 +47,37 @@ class LoginViewModel extends GetxController {
         if (responseData['profile']['data']['message'] != null) {
           loginError.value =
               responseData['profile']['data']['message'].toString();
-          // Future.delayed(const Duration(milliseconds: 100), () {
-          //   Get.snackbar(
-          //     "Login Failed",
-          //     responseData['profile']['data']['message'].toString(),
-          //     snackPosition: SnackPosition.TOP,
-          //     backgroundColor: Colors.red.shade600,
-          //     colorText: Colors.white,
-          //     borderRadius: 12,
-          //     margin: const EdgeInsets.all(12),
-          //     icon: const Icon(Icons.error_outline, color: Colors.white),
-          //     duration: const Duration(seconds: 3),
-          //   );
-          // });
+
+          ScaffoldMessenger.of(Get.context!).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      responseData['profile']['data']['message']?.toString() ??
+                          "Login Failed",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.red.shade700,
+              behavior:
+                  SnackBarBehavior.floating, // Makes it float above the UI
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              elevation: 6,
+              duration: const Duration(seconds: 3),
+            ),
+          );
         } else {
           String userId = responseData['profile']['data']['profile']
               ['id']; // Adjust according to your API response structure
@@ -93,9 +112,6 @@ class LoginViewModel extends GetxController {
 
           await prefs.setString(
               'companyname', responseData['profile']['companyname'].toString());
-          // Navigate to the MainScreen on successful login
-          // dashboardController.fetchDashboardData(false);
-          // dashboardController.fetchDashboardData(true);
 
           showSuccessDialog(
             "Logged In Successfully",
@@ -154,7 +170,8 @@ class LoginViewModel extends GetxController {
           //         ));
         }
       } else {
-        Get.snackbar('Error', 'Invalid username or password');
+        Get.snackbar('Error', 'Invalid username or password',
+            backgroundColor: Colors.red, colorText: Colors.white);
       }
     } catch (e) {
       logOutput("$e");
@@ -242,5 +259,3 @@ void showSuccessDialog(String message, {VoidCallback? onComplete}) {
     }
   });
 }
-
-

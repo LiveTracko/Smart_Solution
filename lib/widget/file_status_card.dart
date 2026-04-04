@@ -55,6 +55,8 @@ class FileStatusCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     Text(
                       title,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,

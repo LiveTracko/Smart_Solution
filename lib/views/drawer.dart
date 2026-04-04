@@ -15,6 +15,8 @@ import 'package:smart_solutions/views/theme_change_screen.dart';
 import '../controllers/theme_controller.dart';
 import '../services/logout_helper.dart';
 import 'hrms/hrm_screen.dart';
+import 'hrms/profile_screen.dart';
+import 'profile_view.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -79,7 +81,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         InkWell(
-                          //onTap: () => Get.to(() => ProfilePage()),
+                          onTap: () => Get.to(() => const ProfileScreen()),
                           child: CircleAvatar(
                             radius: screenHeight * 0.05, // responsive avatar
                             backgroundColor: Colors.white,

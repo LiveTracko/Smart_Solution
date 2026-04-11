@@ -16,6 +16,7 @@ import 'package:smart_solutions/widget/flutter_chiplist.dart';
 import 'package:smart_solutions/widget/header_title.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
 import 'package:smart_solutions/widget/searchbarwithclear.dart';
+import '../controllers/data_entry_controller.dart';
 import '../widget/text_style.dart';
 
 class LoginRequestScreen extends StatelessWidget {
@@ -35,6 +36,8 @@ class LoginRequestScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final LoginRequestController controller =
         Get.find<LoginRequestController>();
+
+    final DataController _dataController = Get.find<DataController>();
 
     final ThemeController themeController = Get.find<ThemeController>();
 
@@ -104,9 +107,7 @@ class LoginRequestScreen extends StatelessWidget {
             return RefreshIndicator(
                 onRefresh: () => controller.getLoginRequestList(),
                 child: Obx(() => controller.isLoading.value
-                    ? const Center(
-                        child: LoadingPage(),
-                      )
+                    ? const Center(child: LoadingPage())
                     : ListView.builder(
                         padding:
                             const EdgeInsets.all(8), // Add padding to the list
@@ -139,10 +140,12 @@ class LoginRequestScreen extends StatelessWidget {
                                 StaticStoredData.roleName != 'telecaller',
                             onMoveToLogin: () async {
                               await Get.to(() => DataEntryForm(
-                                  id: data.id,
-                                  tellecallerId: data.telecallerId,
-                                  dsaId: data.sourcing.toString(),
-                                  bankerId: data.bankId.toString()));
+                                    id: data.id,
+                                    tellecallerId: data.telecallerId,
+                                    dsaId: data.sourcing.toString(),
+                                    bankerId: data.bankId.toString(),
+                                    isMovetoLogin: true,
+                                  ));
                             },
                             onEdit: () async {
                               controller.currentId.value = data.id;

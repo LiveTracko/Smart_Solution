@@ -184,6 +184,9 @@ class DashboardController extends GetxController
         getDashboardTotalCount(),
         loadTodayAndMonthlyData(),
       ]);
+    } catch (e) {
+      isLoading.value = false;
+      logOutput("Exception while fetching follow-back list: $e");
     } finally {
       isLoading.value = false;
     }

@@ -12,7 +12,6 @@ import 'package:smart_solutions/models/login_request_list_model.dart'; // Ensure
 import 'package:smart_solutions/models/remark_list.dart';
 import 'package:smart_solutions/models/source_model.dart';
 import 'package:smart_solutions/services/api_service.dart';
-
 import '../constants/services.dart';
 
 class LoginRequestController extends GetxController {
@@ -21,6 +20,9 @@ class LoginRequestController extends GetxController {
   var loanStatusList = <LoanStatus>[].obs;
   List<RemarkList> remarks = [];
   var isLoading = false.obs;
+  RxBool isSubmitting = false.obs;
+  RxBool isBankLoading = false.obs;
+  RxBool isSourcingLoading = false.obs;
   var iseditLoading = false.obs;
   var currentId = ''.obs;
   var isEdit = false.obs;
@@ -80,7 +82,6 @@ class LoginRequestController extends GetxController {
 
   // Fetch the login request list
   Future<void> getLoginRequestList() async {
-    final today = DateTime.now();
     try {
       isLoading(true);
       var body = {
@@ -92,32 +93,66 @@ class LoginRequestController extends GetxController {
 
       if (response.statusCode == 200) {
         var resData = jsonDecode(response.body);
-        if (resData['data'] != null && resData['data'] is List) {
-          var loginData = (resData['data'] as List)
-              .map((json) => LoginRequest.fromJson(json))
-              .toList();
+        if (resData['data'] is List) {
+          final List list = resData['data'];
 
-          // log('raw -->>> ${resData['data'] }');
-          allLoginRequestList.value = loginData; // store original
-          loginRequestList.value = loginData;
+          final loginData = list.map((e) => LoginRequest.fromJson(e)).toList();
 
-          monthlyCount.value = allLoginRequestList
-              .where((e) => e.loginRequestDate.month == today.month)
-              .map((e) => e.telecallerId)
-              .toList();
+          allLoginRequestList.assignAll(loginData);
+          loginRequestList.assignAll(loginData);
 
-          todayCount.value = allLoginRequestList
+          final today = DateTime.now();
+
+          monthlyCount.value = loginData
               .where((e) =>
-                  // e.loginRequestDate.year == today.year &&
-                  e.loginRequestDate.day == today.day)
-              //&&
-              //e.loginRequestDate.day == today.day)
-              .map((e) => e.telecallerId)
+                  e.loginRequestDate != null && // ✅ NULL CHECK
+                  e.loginRequestDate.year == today.year &&
+                  e.loginRequestDate.month == today.month)
+              .map((e) => e.telecallerId ?? '') // ✅ SAFE
               .toList();
 
-          await getRemarks();
+          todayCount.value = loginData
+              .where((e) =>
+                  e.loginRequestDate != null && // ✅ NULL CHECK
+                  e.loginRequestDate.year == today.year &&
+                  e.loginRequestDate.month == today.month &&
+                  e.loginRequestDate.day == today.day)
+              .map((e) => e.telecallerId ?? '') // ✅ SAFE
+              .toList();
+
+          if (currentId.value.isNotEmpty) {
+            await getRemarks();
+          }
+
           isLoading(false);
-        } else {
+        }
+        // if (resData['data'] != null && resData['data'] is List) {
+        //   var loginData = (resData['data'] as List)
+        //       .map((json) => LoginRequest.fromJson(json))
+        //       .toList();
+
+        //   // log('raw -->>> ${resData['data'] }');
+        //   allLoginRequestList.value = loginData; // store original
+        //   loginRequestList.value = loginData;
+
+        //   monthlyCount.value = allLoginRequestList
+        //       .where((e) => e.loginRequestDate.month == today.month)
+        //       .map((e) => e.telecallerId)
+        //       .toList();
+
+        //   todayCount.value = allLoginRequestList
+        //       .where((e) =>
+        //           // e.loginRequestDate.year == today.year &&
+        //           e.loginRequestDate.day == today.day)
+        //       //&&
+        //       //e.loginRequestDate.day == today.day)
+        //       .map((e) => e.telecallerId)
+        //       .toList();
+
+        //   await getRemarks();
+        //   isLoading(false);
+        // }
+        else {
           logOutput("No data found");
           isLoading(false);
         }
@@ -177,8 +212,9 @@ class LoginRequestController extends GetxController {
   }
 
   // Save login request
-  Future<void> saveLoginRequest() async {
-    isLoading(true);
+  Future<bool> saveLoginRequest() async {
+    isSubmitting.value = true;
+
     try {
       // Prepare the fields map
       var fields = {
@@ -215,7 +251,7 @@ class LoginRequestController extends GetxController {
 
       // Handle the response
       if (response.statusCode == 200) {
-        getLoginRequestList();
+        await getLoginRequestList();
         currentId.value = '';
 
         loginRequestDate = DateTime.now().obs;
@@ -229,15 +265,17 @@ class LoginRequestController extends GetxController {
         remarksList.value = []; // To hold multiple remarks
         //    id = ''.obs;
         sourceId.value = '';
-        Get.back();
-        Get.snackbar('Success', 'Login request saved successfully!');
+
+        return true;
       } else {
         Get.snackbar('Error', 'Failed to save login request.');
+        return false;
       }
     } catch (e) {
       logOutput("An error occurred while saving the login request: $e");
+      return false;
     } finally {
-      isLoading(false); // Stop loading
+      isSubmitting.value = false;
     }
   }
 

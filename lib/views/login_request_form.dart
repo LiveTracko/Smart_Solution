@@ -102,6 +102,32 @@ class LoginRequestForm extends StatelessWidget {
                               content: controller.contactNumber.value,
                               onChanged: (value) {
                                 controller.contactNumber.value = value;
+
+                                if (value.length != 10) return;
+
+                                final matchedCustomer =
+                                    _followBackFormController.allCustomerName
+                                        .firstWhereOrNull(
+                                  (e) => e.contactNumber == value,
+                                );
+
+                                if (matchedCustomer != null) {
+                                  controller.customerName.value =
+                                      matchedCustomer.customerName ?? '';
+
+                                  customerNameController.text =
+                                      matchedCustomer.customerName ?? '';
+
+                                  /// 🔥 SET SOURCE DIRECTLY (no second search needed)
+                                  controller.sourceId.value =
+                                      matchedCustomer.dataType ?? '';
+
+                                  _getInitialSourceValue();
+                                } else {
+                                  controller.customerName.value = '';
+                                  customerNameController.clear();
+                                  controller.sourceId.value = '';
+                                }
                               },
                               inputType: TextInputType.phone,
                               validator: _validatePhone,
@@ -121,51 +147,25 @@ class LoginRequestForm extends StatelessWidget {
                                       _followBackFormController.allCustomerName
                                           .firstWhereOrNull(
                                     (e) =>
-                                        e.customerName ==
-                                        controller.customerName.value,
+                                        (e.customerName ?? '')
+                                            .toLowerCase()
+                                            .trim() ==
+                                        value.toLowerCase().trim(),
                                   );
 
-                                  final sourceTitle =
-                                      matchedCustomer?.dataType ?? '';
+                                  if (matchedCustomer != null) {
+                                    controller.contactNumber.value =
+                                        matchedCustomer.contactNumber ?? '';
 
-                                  // 🔍 find match by name (case-insensitive)
-                                  final matchedSource = controller.sourcingList
-                                      .firstWhereOrNull((source) =>
-                                          (source.id ?? '')
-                                              .toLowerCase()
-                                              .trim() ==
-                                          sourceTitle.toLowerCase().trim());
-
-                                  if (matchedSource != null) {
-                                    // ✅ update values when name matches
+                                    /// Optional: update source
                                     controller.sourceId.value =
-                                        matchedSource.sourcingTitle.toString();
-                                    // controller.sourceId.value =
-                                    //     matchedSource.sourcingTitle ?? '';
-                                    log('Matched: ${matchedSource.sourcingTitle} (ID: ${matchedSource.id})');
+                                        matchedCustomer.dataType ?? '';
                                     _getInitialSourceValue();
-                                  } else {
-                                    // ❌ clear if no match found
-                                    controller.sourceId.value = '';
-
-                                    log('No matching source found for name: $value');
                                   }
                                 },
                                 controller: customerNameController,
                                 suggestions: filteredNames),
 
-                            // _buildTextField(
-                            //   label: 'Customer Name',
-                            //   prefixIcon: SvgPicture.asset(
-                            //     'assets/images/user.svg',
-                            //     height: 24,
-                            //     width: 24,
-                            //   ),
-                            //   content: controller.customerName.value,
-                            //   onChanged: (value) =>
-                            //       controller.customerName.value = value,
-                            //   validator: _validateNotEmpty,
-                            // ),
                             const SizedBox(height: 10),
 
                             _buildTextField(
@@ -228,22 +228,38 @@ class LoginRequestForm extends StatelessWidget {
                               child: Obx(() => SizedBox(
                                     width: double.infinity,
                                     child: ElevatedButton(
-                                      onPressed: () {
-                                        if (_formKey.currentState!.validate()) {
-                                          controller
-                                              .saveLoginRequest(); // Call save method
-                                          controller.getLoginRequestList();
-                                        }
-                                      },
-                                      child: controller.isLoading.value
+                                      onPressed: controller.isSubmitting.value
+                                          ? null
+                                          : () async {
+                                              if (_formKey.currentState!
+                                                  .validate()) {
+                                                bool success = await controller
+                                                    .saveLoginRequest();
+
+                                                if (success) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                          "Login request saved successfully!"),
+                                                      backgroundColor:
+                                                          Colors.green,
+                                                    ),
+                                                  );
+
+                                                  await Future.delayed(
+                                                      const Duration(
+                                                          milliseconds: 500));
+                                                  Navigator.pop(context);
+                                                } else {
+                                                  Get.snackbar('Error',
+                                                      'Failed to save login request');
+                                                }
+                                              }
+                                            },
+                                      child: controller.isSubmitting.value
                                           ? const LoadingPage()
-                                          : const Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 24.0),
-                                              child: Text(
-                                                'Save Request',
-                                              ),
-                                            ),
+                                          : const Text('Save Request'),
                                     ),
                                   )),
                             ),
@@ -410,7 +426,7 @@ class LoginRequestForm extends StatelessWidget {
 
   Widget _buildAllBankNamesDropdown() {
     return Obx(
-      () => controller.isLoading.value
+      () => controller.isBankLoading.value
           ? const Center(child: LoadingPage())
           : Padding(
               padding: const EdgeInsets.all(8.0),
@@ -511,7 +527,7 @@ class LoginRequestForm extends StatelessWidget {
   //
   Widget _buildSourcingDropdown() {
     return Obx(
-      () => controller.isLoading.value
+      () => controller.isSourcingLoading.value
           ? const Center(child: LoadingPage())
           : Padding(
               padding: const EdgeInsets.all(8.0),
@@ -557,9 +573,7 @@ class LoginRequestForm extends StatelessWidget {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0.r),
                     borderSide: BorderSide(
-                      color: themeController.primaryColor.value,
-                      width: 2,
-                    ),
+                        color: themeController.primaryColor.value, width: 2),
                   ),
                   filled: true,
                   fillColor: AppColors.backgroundColor,
@@ -607,7 +621,7 @@ class LoginRequestForm extends StatelessWidget {
 
     final existingSource = controller.sourcingList.firstWhereOrNull(
       (source) =>
-          source.sourcingTitle?.toLowerCase().trim() ==
+          source.id?.toLowerCase().trim() ==
           controller.sourceId.value.toLowerCase().trim(),
     );
 

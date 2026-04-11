@@ -71,7 +71,6 @@ class APIUrls {
       "Auth/getCurrentYearMonthlyDisbursedAmounts";
 
   static const getDisbursementForAdmin = "Auth/getdisbursementforadmin";
-
   static const String themeColor = "Auth/updatethemecolor";
   static const String adminLoginRequest = 'Auth/getloginrequestforadmin';
   static const String adminLoginFiles = 'Auth/getloginfilesforadmin';
@@ -84,4 +83,6 @@ class APIUrls {
   static const String verifyMobileNo = 'Auth/verifymobileno';
   static const String verifyOtp = 'Auth/verifyotp';
   static const String resetPassword = 'Auth/resetpassword';
+
+  static const String getMoveToLoginData = 'Auth/getmovetologindata';
 }

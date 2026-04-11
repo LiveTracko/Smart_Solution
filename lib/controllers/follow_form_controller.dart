@@ -347,6 +347,16 @@ class FollowBackFormController extends GetxController
           followBackList.assignAll(newItems);
         }
 
+        Map<String, Data> uniqueMap = {};
+
+        for (var item in followBackList) {
+          if (item.contactNumber != null) {
+            uniqueMap[item.contactNumber!] = item;
+          }
+        }
+
+        allCustomerName.assignAll(uniqueMap.values.toList());
+
         hasMore.value = newItems.length >= limit;
         if (newItems.isNotEmpty) currentPage++;
       } else {

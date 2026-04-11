@@ -53,7 +53,6 @@ class _DashboardScreenState extends State<DashboardScreen>
   final CommonFilterController commonFilterController =
       Get.find<CommonFilterController>();
 
-  // Core UI Controllers (Use Put)
   final DashboardController controller = Get.find<DashboardController>();
 
   final ChartCardsController chartCardsController =
@@ -216,22 +215,46 @@ class _DashboardScreenState extends State<DashboardScreen>
                 : SingleChildScrollView(
                     controller: controller.scrollController,
                     child: Obx(() {
+                      // final List<Map<String, dynamic>> dashboardItems = [
+                      //   {
+                      //     "icon": "assets/images/dashboard_attempted.svg",
+                      //     "value": (controller.callTimeModel.callTimeModel
+                      //                 ?.totalAttempt ??
+                      //             0)
+                      //         .toString(),
+                      //     "label": "Attempted",
+                      //     "textColor": AppColors.blueColor
+                      //     // 'duration': (controller.totalDuration).toString()
+                      //   },
+                      //   {
+                      //     "icon": "assets/images/dashboard_connected.svg",
+                      //     "value": controller.totalPicked.value.toString(),
+                      //     "label": "Connected",
+                      //     //'duration': (controller.totalDuration).toString()
+                      //     "textColor": AppColors.greenCOlor
+                      //   },
+                      //   {
+                      //     "icon": "assets/images/dashboard_not_connected.svg",
+                      //     "value": controller.totalNotPicked.value.toString(),
+                      //     "label": "Not Connected",
+                      //     "textColor": AppColors.redColor
+                      //     //'duration': '00:00:00'
+                      //   },
+                      // ];
+
+                      final callData = controller.callTimeModel.callTimeModel;
+
                       final List<Map<String, dynamic>> dashboardItems = [
                         {
                           "icon": "assets/images/dashboard_attempted.svg",
-                          "value": (controller.callTimeModel.callTimeModel
-                                      ?.totalAttempt ??
-                                  0)
-                              .toString(),
+                          "value": (callData?.totalAttempt ?? 0).toString(),
                           "label": "Attempted",
                           "textColor": AppColors.blueColor
-                          // 'duration': (controller.totalDuration).toString()
                         },
                         {
                           "icon": "assets/images/dashboard_connected.svg",
                           "value": controller.totalPicked.value.toString(),
                           "label": "Connected",
-                          //'duration': (controller.totalDuration).toString()
                           "textColor": AppColors.greenCOlor
                         },
                         {
@@ -239,12 +262,8 @@ class _DashboardScreenState extends State<DashboardScreen>
                           "value": controller.totalNotPicked.value.toString(),
                           "label": "Not Connected",
                           "textColor": AppColors.redColor
-                          //'duration': '00:00:00'
                         },
                       ];
-                      // if (controller.isLoading.value) {
-                      //   return const Center(child: LoadingPage());
-                      // } else {
                       return Column(children: [
                         Container(
                           color: AppColors.appBarTextColor,

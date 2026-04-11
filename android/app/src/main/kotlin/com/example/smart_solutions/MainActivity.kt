@@ -128,8 +128,8 @@ private fun getLastCallInfo(): Map<String, Any?> {
             if (type == CallLog.Calls.INCOMING_TYPE || type == CallLog.Calls.OUTGOING_TYPE)   
              {
                 duration = callDuration
-                callerName = name ?: "Unknown"
-                callerNumber = number ?: "Unknown"
+                callerName = name ?: ""
+                callerNumber = number ?: ""
 
                 callType = when (type) {
                     CallLog.Calls.INCOMING_TYPE -> "incoming"

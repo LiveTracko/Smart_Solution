@@ -49,7 +49,7 @@ class LoginRequest {
       loanStatus: json['loan_status'], // Nullable field
       bankId: json['bank_id'] as String,
       loanAmount: json['loan_amount'] as String,
-      commonRemark: json['common_remark'] as String,
+      commonRemark: json['common_remark'] ?? '',
       remark: json['remark'] as String,
       created: DateTime.parse(json['created']),
       title: json['title'] ?? '',

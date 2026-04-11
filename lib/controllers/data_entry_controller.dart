@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
@@ -12,6 +11,7 @@ import 'package:smart_solutions/models/data_entry_bank_list.dart';
 import 'package:smart_solutions/models/dsa_bank_list.dart';
 import 'package:smart_solutions/models/dsa_name_model.dart';
 import 'package:smart_solutions/models/leads_status_group.dart';
+import 'package:smart_solutions/models/move_to_login_model.dart';
 import 'package:smart_solutions/models/product_type.dart';
 import 'package:smart_solutions/models/source_model.dart';
 import 'package:smart_solutions/models/status_list_model.dart';
@@ -49,7 +49,10 @@ class DataController extends GetxController {
   RxString dataId = ''.obs;
   RxString dsaId = ''.obs;
   RxString id = ''.obs;
+  RxString loginRequestId = ''.obs;
   RxList<CommentData> commentList = <CommentData>[].obs;
+  RxList<MoveToLoginModel> moveToLoginList =
+      <MoveToLoginModel>[].obs; // LOGIN REQUEST LIST>
   RxString newComment = ''.obs;
 
   RxString adminSubadminName = ''.obs;
@@ -68,6 +71,7 @@ class DataController extends GetxController {
   var customerName = ''.obs;
   var income = ''.obs;
   var companyName = ''.obs;
+
   var caseType = ['BT & Topup', 'Fresh', 'OD'].obs;
   RxString selectedCaseType = ''.obs; // the selected value
   var loanAmount = ''.obs;
@@ -108,6 +112,8 @@ class DataController extends GetxController {
   RxList<dynamic> todayCount = <dynamic>[].obs;
   RxList<dynamic> monthlyCount = <dynamic>[].obs;
 
+  RxBool isMovetoLogin = false.obs;
+
   final CommonFilterController _commonFilterController =
       Get.find<CommonFilterController>();
 
@@ -139,15 +145,12 @@ class DataController extends GetxController {
   }
 
   void addComment() {
-    // if (newComment.value.trim().isEmpty) return;
-
     commentList.add(
       CommentData(
-        comment: newComment.value,
-        userId: StaticStoredData.userId,
-        date: DateTime.now().toString(),
-        isLocal: true,
-      ),
+          comment: newComment.value,
+          userId: StaticStoredData.userId,
+          date: DateTime.now().toString(),
+          isLocal: true),
     );
 
     newComment.value = '';
@@ -159,10 +162,6 @@ class DataController extends GetxController {
       await Future.wait([
         getLeadsFilterData(),
         fetchDataEntryList(),
-        // getDsaNameList(),
-        // getProductTypeList(),
-        // getTelecallerData(),
-        // getStatusData(),
       ]);
     } catch (e) {
       logOutput("Error loading data: $e");
@@ -353,13 +352,41 @@ class DataController extends GetxController {
     }
   }
 
+  String? _getStatusNameFromId() {
+    final existing = statuslist.firstWhereOrNull(
+      (e) => e.id == status.value,
+    );
+    return existing?.dataEntryStatus;
+  }
+
+  // String? _getProductNameFromId() {
+  //   final existing = producttypeList.firstWhereOrNull(
+  //     (e) => e.id == selectedproductType.value,
+  //   );
+  //   return existing?.name;
+  // }
+
+  // String? _getSourceNameFromId() {
+  //   final existing = sourcingList.firstWhereOrNull(
+  //     (e) => e.id == source.value,
+  //   );
+  //   return existing?.sourcingTitle;
+  // }
+
   // Save login request
-  Future<void> saveDataEntryForm() async {
+  Future<bool> saveDataEntryForm() async {
     isSaveLoading(true);
+
+    final statusName = _getStatusNameFromId();
+
+    // final productTypeName = _getProductNameFromId();
+
+    // final sourceName = _getSourceNameFromId();
+
     try {
       // Prepare the fields map
       var fields = {
-        'id': id.value,
+        // 'id': id.value,
         'dsaName': dsaName.value,
         'date': DateFormat('yyyy-MM-dd HH:mm:ss').format(
           DateFormat('dd-MM-yy HH:mm:ss').parse(date.value),
@@ -369,7 +396,7 @@ class DataController extends GetxController {
         // 'customer_id': id.value,
         'income': income.value,
         'company_name': companyName.value,
-        'caseType': selectedCaseType.value,
+        // 'caseType': selectedCaseType.value,
         'case_study': caseStudy.value,
         'dob': dob.value,
         'loanAmount': loanAmount.value,
@@ -382,27 +409,25 @@ class DataController extends GetxController {
         'teleCallerid': tellecallerId.value,
         'teamLeader': teamleaderId.value,
         'product_type': selectedproductType.value,
-        'sourcing': selectedSource.value,
-        'status': selectedStatus.value,
+        'sourcing': source.value,
+        'status': statusName,
         'balancetransfer':
             selectedBanktransactionType.value == 'Yes' ? "1" : "2",
         'demand_draft_status':
             selectedDemandDraftStatus.value == 'Open' ? "1" : "2",
         'demand_draft_remark': '',
+        'telecaller_id': StaticStoredData.userId,
       };
 
-      // for (int i = 0; i < commentList.length; i++) {
-      //   fields['comment_status[]'] = commentList[i].commentStatus.toString();
-      //   fields['user_id[]'] = commentList[i].userId.toString();
-      //   fields['comments[]'] = commentList[i].comment.toString();
-      //   fields['comment_id[]'] = commentList[i].id.toString();
-      // }
+      if (!isMovetoLogin.value) {
+        fields['id'] = id.value;
+      }
 
       for (int i = 0; i < commentList.length; i++) {
         fields.addAll({
           'comment_status[$i]': commentList[i].commentStatus ?? '',
           'user_id[$i]': commentList[i].userId ?? '',
-          'comment[$i]': commentList[i].comment ?? '',
+          'comments[$i]': commentList[i].comment ?? '',
           'comment_id[$i]': commentList[i].id ?? '',
         });
       }
@@ -429,27 +454,22 @@ class DataController extends GetxController {
         // id = ''.obs;
         // sourceId.value = '';
 
-        Get.back();
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          const SnackBar(
-            content: Text('Data Entry saved successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        return true;
       } else {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to save Data Entry!'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        return false;
+        // ScaffoldMessenger.of(Get.context!).showSnackBar(
+        //   const SnackBar(
+        //     content: Text('Failed to save Data Entry!'),
+        //     backgroundColor: Colors.red,
+        //   ),
+        // );
       }
     } catch (e) {
       logOutput("An error occurred while saving the login request: $e");
       isSaveLoading(false);
+      return false;
     } finally {
       isSaveLoading(false);
-      // Stop loading
     }
   }
 
@@ -473,7 +493,8 @@ class DataController extends GetxController {
 
   Future<void> getProductTypeList() async {
     try {
-      var response = await ApiService().getRequest(APIUrls.productTypeList);
+      var response = await ApiService().postRequest(
+          APIUrls.productTypeList, {'telecaller_id': StaticStoredData.userId});
 
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body)['data'];
@@ -619,6 +640,32 @@ class DataController extends GetxController {
     }
   }
 
+  Future<void> fetchmoveToLoginData(String id) async {
+    try {
+      Map<String, dynamic> data = {"login_id": id};
+      var response =
+          await ApiService().postRequest(APIUrls.getMoveToLoginData, data);
+
+      if (response.statusCode == 200) {
+        final moveToLoginModel = moveToLoginModelFromJson(response.body);
+        final data = moveToLoginModel.data;
+
+        contactNumber.value = data.contactNumber;
+        selectedSource.value = data.sourcing;
+        loanAmount.value = data.loanAmount;
+        tellecallerId.value = data.telecallerId;
+        loginRequestId.value = data.loginRequestId;
+
+        customerName.value = data.customerLoginModel.customerName;
+        dob.value = data.customerLoginModel.dob;
+        companyName.value = data.customerLoginModel.companyName;
+        income.value = data.customerLoginModel.netIncome;
+      }
+    } catch (e) {
+      logOutput('An error occurred while fetching source list: $e');
+    }
+  }
+
   Future<void> fetchDataEntryListSpecificId() async {
     isDataEntryLoading(true);
     try {
@@ -630,9 +677,8 @@ class DataController extends GetxController {
         final responseData = json.decode(response.body);
         final dataEntryModel = DataEntryModel.fromJson(responseData);
         if (dataEntryModel.data != null) {
-          final entry = dataEntryModel.data!.firstWhere(
-            (entry) => entry.id == dataId.toString(),
-          );
+          final entry = dataEntryModel.data!
+              .firstWhere((entry) => entry.id == dataId.toString());
 
           // Assigning values to observables
           id.value = entry.id.toString();
@@ -656,7 +702,6 @@ class DataController extends GetxController {
           adminSubadminName.value = entry.adminSubAdminName ?? '';
 
           //      loginBank.value = entry.loginBank ?? '';
-
           bankName.value = entry.loginBank ?? '';
           bankId.value = entry.bankerId ?? '';
           //   bankerName.value = entry.bankerName ?? '';

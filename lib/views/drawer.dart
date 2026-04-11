@@ -168,7 +168,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           _drawerSvgTile(
                             'assets/drawer/hrm.svg',
                             'HRM',
-                            () => Get.to(() => HrmScreen()),
+                            () => Get.to(() => const HrmScreen()),
                           ),
                         // if (StaticStoredData.roleName == 'telecaller')
                         _drawerSvgTile(
@@ -391,11 +391,10 @@ void showLogoutDialog(BuildContext context) {
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Color(0xFF1976D2)),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                            borderRadius: BorderRadius.circular(10)),
                       ),
                       onPressed: () {
-                        Get.back();
+                        Navigator.of(context).pop();
                       },
                       child: const Text(
                         "Cancel",

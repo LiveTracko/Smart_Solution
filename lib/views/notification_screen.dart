@@ -7,6 +7,8 @@ import 'package:smart_solutions/widget/common_scaffold.dart';
 import 'package:smart_solutions/widget/loading_page.dart';
 import 'package:smart_solutions/widget/no_data_available.dart';
 
+import '../controllers/theme_controller.dart';
+
 class NotificationSCreen extends StatefulWidget {
   const NotificationSCreen({super.key});
 
@@ -17,6 +19,8 @@ class NotificationSCreen extends StatefulWidget {
 class _NotificationSCreenState extends State<NotificationSCreen> {
   final NotificationController notificationController =
       Get.find<NotificationController>();
+
+  final ThemeController themeController = Get.find<ThemeController>();
 
   late ScrollController _scrollController;
 
@@ -232,10 +236,10 @@ class _NotificationSCreenState extends State<NotificationSCreen> {
                   color: AppColors.primaryColor.withOpacity(.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.notifications_active,
                   size: 16,
-                  color: AppColors.primaryColor,
+                  color: themeController.primaryColor.value,
                 ),
               ),
 

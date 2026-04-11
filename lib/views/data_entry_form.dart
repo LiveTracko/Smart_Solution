@@ -16,12 +16,14 @@ class DataEntryForm extends StatefulWidget {
   final String? tellecallerId;
   final String? dsaId;
   final String? bankerId;
+  final bool isMovetoLogin;
   const DataEntryForm(
       {super.key,
       required this.id,
       required this.tellecallerId,
       required this.dsaId,
-      required this.bankerId});
+      required this.bankerId,
+      this.isMovetoLogin = false});
 
   @override
   State<DataEntryForm> createState() => _DataEntryFormState();
@@ -29,7 +31,6 @@ class DataEntryForm extends StatefulWidget {
 
 class _DataEntryFormState extends State<DataEntryForm> {
   final DataController controller = Get.find<DataController>();
-
   final _formKey = GlobalKey<FormState>();
 
   final ThemeController themeController = Get.find<ThemeController>();
@@ -55,12 +56,16 @@ class _DataEntryFormState extends State<DataEntryForm> {
   }
 
   initialLoad() {
+    controller.isMovetoLogin.value = widget.isMovetoLogin ?? false;
     controller.isLoading.value = true;
     controller.tellecallerId.value = widget.tellecallerId ?? '';
     controller.dataId.value = widget.id ?? '';
     controller.dsaId.value = widget.dsaId ?? '';
-
-    controller.fetchDataEntryListSpecificId();
+    if (widget.isMovetoLogin == true) {
+      controller.fetchmoveToLoginData(widget.id.toString());
+    } else {
+      controller.fetchDataEntryListSpecificId();
+    }
     controller.getSourcingList();
     controller.getDsaBankList(widget.dsaId ?? '');
     controller.getBankerNameByloginBank(
@@ -192,7 +197,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                               content: controller.customerName,
                               onChanged: (value) =>
                                   controller.customerName.value = value,
-                              inputType: TextInputType.phone,
+                              inputType: TextInputType.text,
                               validator: _validateNotEmpty,
                             ),
                           ),
@@ -549,8 +554,32 @@ class _DataEntryFormState extends State<DataEntryForm> {
                                       : () async {
                                           if (_formKey.currentState!
                                               .validate()) {
-                                            await controller
+                                            final success = await controller
                                                 .saveDataEntryForm();
+
+                                            if (!mounted) return;
+
+                                            if (success) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                      'Data Entry saved successfully!'),
+                                                  backgroundColor: Colors.green,
+                                                ),
+                                              );
+
+                                              Navigator.pop(context); // ✅ SAFE
+                                            } else {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                      'Failed to save data'),
+                                                  backgroundColor: Colors.red,
+                                                ),
+                                              );
+                                            }
                                           }
                                         },
                                   child: controller.isSaveLoading.value
@@ -1529,7 +1558,6 @@ class _DataEntryFormState extends State<DataEntryForm> {
 
   // // Helper method to build dropdown items
   List<DropdownMenuItem<String>> _buildDsaDropdownItems() {
-    print(controller.dsaNameList.first);
     for (final item in controller.dsaNameList) {
       print('ID: ${item.id}, Name: ${item.dsaName}');
     }

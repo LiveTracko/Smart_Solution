@@ -47,11 +47,11 @@ class _SplashScreenState extends State<SplashScreen> {
     String? number = prefs.getString('userName');
     String? colorCode = prefs.getString('themeColor');
 
-    // Apply theme immediately
     if (colorCode != null && colorCode.isNotEmpty) {
+      StaticStoredData.themeColor = colorCode;
       themeController.loadSavedTheme();
     }
-    // Navigate to the appropriate screen after a delay
+
     Future.delayed(const Duration(seconds: 3), () {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (userId != null) {

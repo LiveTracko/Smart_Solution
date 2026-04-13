@@ -321,65 +321,111 @@ class CommonTitleCard extends StatelessWidget {
   Widget buildActions() {
     if (showEdit && showMoveToLogin) {
       return SizedBox(
-        width: 25,
-        child: Align(
-          alignment: Alignment.centerRight,
-          child: Container(
-            height: 15,
-            width: 28,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                )
-              ],
-            ),
-            child: PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              icon:
-                  const Icon(Icons.more_vert, size: 16, color: Colors.black87),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              color: Colors.white,
-              elevation: 6,
-              splashRadius: 18,
-              onSelected: (value) {
-                if (value == 'edit') onEdit?.call();
-                if (value == 'login') onMoveToLogin?.call();
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'edit',
-                  height: 36,
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit, size: 18, color: Colors.blue),
-                      SizedBox(width: 10),
-                      Text('Edit'),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: 'login',
-                  height: 36,
-                  child: Row(
-                    children: [
-                      Icon(Icons.login, size: 18, color: Colors.green),
-                      SizedBox(width: 10),
-                      Text('Move to Login'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+        width: 22,
+        height: 22,
+        child: PopupMenuButton<String>(
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(), // 🔥 removes default size
+          iconSize: 16,
+          icon: const Icon(Icons.more_vert, size: 14),
+
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
           ),
+          elevation: 4,
+
+          onSelected: (value) {
+            if (value == 'edit') onEdit?.call();
+            if (value == 'login') onMoveToLogin?.call();
+          },
+
+          itemBuilder: (context) => [
+            const PopupMenuItem(
+              value: 'edit',
+              height: 30,
+              child: Row(
+                children: [
+                  Icon(Icons.edit, size: 14),
+                  SizedBox(width: 6),
+                  Text('Edit', style: TextStyle(fontSize: 12)),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'login',
+              height: 30,
+              child: Row(
+                children: [
+                  Icon(Icons.login, size: 14),
+                  SizedBox(width: 6),
+                  Text('Login', style: TextStyle(fontSize: 12)),
+                ],
+              ),
+            ),
+          ],
         ),
       );
+
+      // return SizedBox(
+      //   width: 25,
+      //   child: Align(
+      //     alignment: Alignment.centerRight,
+      //     child: Container(
+      //       height: 15,
+      //       width: 28,
+      //       decoration: BoxDecoration(
+      //         color: Colors.grey.shade100,
+      //         borderRadius: BorderRadius.circular(8),
+      //         boxShadow: [
+      //           BoxShadow(
+      //             color: Colors.black.withOpacity(0.05),
+      //             blurRadius: 4,
+      //             offset: const Offset(0, 2),
+      //           )
+      //         ],
+      //       ),
+      //       child: PopupMenuButton<String>(
+      //         padding: EdgeInsets.zero,
+      //         icon:
+      //             const Icon(Icons.more_vert, size: 16, color: Colors.black87),
+      //         shape: RoundedRectangleBorder(
+      //           borderRadius: BorderRadius.circular(12),
+      //         ),
+      //         color: Colors.white,
+      //         elevation: 6,
+      //         splashRadius: 18,
+      //         onSelected: (value) {
+      //           if (value == 'edit') onEdit?.call();
+      //           if (value == 'login') onMoveToLogin?.call();
+      //         },
+      //         itemBuilder: (context) => [
+      //           const PopupMenuItem(
+      //             value: 'edit',
+      //             height: 36,
+      //             child: Row(
+      //               children: [
+      //                 Icon(Icons.edit, size: 18, color: Colors.blue),
+      //                 SizedBox(width: 10),
+      //                 Text('Edit'),
+      //               ],
+      //             ),
+      //           ),
+      //           const PopupMenuItem(
+      //             value: 'login',
+      //             height: 36,
+      //             child: Row(
+      //               children: [
+      //                 Icon(Icons.login, size: 18, color: Colors.green),
+      //                 SizedBox(width: 10),
+      //                 Text('Move to Login'),
+      //               ],
+      //             ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // );
     }
 
     // 🔹 ONLY EDIT

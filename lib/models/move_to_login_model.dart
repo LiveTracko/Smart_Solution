@@ -45,12 +45,13 @@ class LoginModel {
   });
 
   factory LoginModel.fromJson(Map<String, dynamic> json) => LoginModel(
-        contactNumber: json["contact_number"],
-        sourcing: json["sourcing"],
-        loanAmount: json["loan_amount"],
-        telecallerId: json["telecaller_id"],
-        loginRequestId: json["login_request_id"],
-        customerLoginModel: CustomerLoginModel.fromJson(json["customer_data"]),
+        contactNumber: json["contact_number"] ?? "",
+        sourcing: json["sourcing"] ?? "",
+        loanAmount: json["loan_amount"] ?? "",
+        telecallerId: json["telecaller_id"] ?? "",
+        loginRequestId: json["login_request_id"] ?? "",
+        customerLoginModel:
+            CustomerLoginModel.fromJson(json["customer_data"] ?? {}),
       );
 
   Map<String, dynamic> toJson() => {
@@ -78,10 +79,10 @@ class CustomerLoginModel {
 
   factory CustomerLoginModel.fromJson(Map<String, dynamic> json) =>
       CustomerLoginModel(
-        customerName: json["customer_name"],
-        dob: json["dob"],
-        companyName: json["companyName"],
-        netIncome: json["netIncome"],
+        customerName: json["customer_name"] ?? "",
+        dob: json["dob"] ?? "",
+        companyName: json["companyName"] ?? "",
+        netIncome: json["netIncome"] ?? "",
       );
 
   Map<String, dynamic> toJson() => {

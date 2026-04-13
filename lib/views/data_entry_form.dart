@@ -41,6 +41,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       initialLoad(); // ✅ SAFE
     });
+
     // controller.tellecallerId.value = widget.tellecallerId ?? '';
     // controller.dataId.value = widget.id ?? '';
     // controller.dsaId.value = widget.dsaId ?? '';
@@ -55,16 +56,16 @@ class _DataEntryFormState extends State<DataEntryForm> {
     // controller.getTeamLeadById(widget.tellecallerId.toString());
   }
 
-  initialLoad() {
+  initialLoad() async {
     controller.isMovetoLogin.value = widget.isMovetoLogin ?? false;
     controller.isLoading.value = true;
     controller.tellecallerId.value = widget.tellecallerId ?? '';
     controller.dataId.value = widget.id ?? '';
     controller.dsaId.value = widget.dsaId ?? '';
     if (widget.isMovetoLogin == true) {
-      controller.fetchmoveToLoginData(widget.id.toString());
+      await controller.fetchmoveToLoginData(widget.id.toString());
     } else {
-      controller.fetchDataEntryListSpecificId();
+      await controller.fetchDataEntryListSpecificId();
     }
     controller.getSourcingList();
     controller.getDsaBankList(widget.dsaId ?? '');
@@ -87,25 +88,44 @@ class _DataEntryFormState extends State<DataEntryForm> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-        onPopInvoked: (didPop) {
-          if (didPop) {
+        canPop: false, // ❗ Prevent auto pop
+        onPopInvoked: (didPop) async {
+          if (didPop) return;
+
+          final shouldPop = await showDialog<bool>(
+            context: Get.context!,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Confirm'),
+                content: const Text('Are you sure you want to go back?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('Cancel'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text('Yes'),
+                  ),
+                ],
+              );
+            },
+          );
+
+          if (shouldPop == true) {
+            /// ✅ CLEAR DATA
             controller.dsaName.value = '';
             controller.date.value = '';
             controller.contactNumber.value = '';
             controller.customerName.value = '';
-
-            // controller.date = ''.obs;
-            // controller.telecallerId = StaticStoredData.userId.obs;
-            controller.customerName.value = '';
             controller.income.value = '';
-            controller.companyName.value = ''; // Default loan status
-            //    controller.caseType.value = '';
-            controller.loanAmount.value = '';
+            controller.companyName.value = '';
+            controller.loanAmountController.text = '';
             controller.dob.value = '';
+            controller.selectedStatus.value = '';
             controller.selectedCaseType.value = '';
-            controller.selectedproductType.value =
-                ''; // To hold multiple remarks
-            controller.bankName = ''.obs;
+            controller.selectedproductType.value = '';
+            controller.bankName.value = '';
             controller.bankerMobile.value = '';
             controller.bankerEmail.value = '';
             controller.losNo.value = '';
@@ -115,8 +135,44 @@ class _DataEntryFormState extends State<DataEntryForm> {
             controller.caseStudy.value = '';
             controller.comments.value = '';
             controller.teamleader.value = '';
+
+            /// ✅ GO BACK
+            Navigator.pop(context);
           }
         },
+
+        //  PopScope(
+        //     onPopInvoked: (didPop) {
+        //       if (didPop) {
+        //         controller.dsaName.value = '';
+        //         controller.date.value = '';
+        //         controller.contactNumber.value = '';
+        //         controller.customerName.value = '';
+
+        //         // controller.date = ''.obs;
+        //         // controller.telecallerId = StaticStoredData.userId.obs;
+        //         controller.customerName.value = '';
+        //         controller.income.value = '';
+        //         controller.companyName.value = ''; // Default loan status
+        //         //    controller.caseType.value = '';
+        //         controller.loanAmountController.text = '';
+        //         controller.dob.value = '';
+        //         controller.selectedStatus.value = '';
+        //         controller.selectedCaseType.value = '';
+        //         controller.selectedproductType.value =
+        //             ''; // To hold multiple remarks
+        //         controller.bankName = ''.obs;
+        //         controller.bankerMobile.value = '';
+        //         controller.bankerEmail.value = '';
+        //         controller.losNo.value = '';
+        //         controller.telecaller.value = '';
+        //         controller.status.value = '';
+        //         controller.source.value = '';
+        //         controller.caseStudy.value = '';
+        //         controller.comments.value = '';
+        //         controller.teamleader.value = '';
+        //       }
+        //     },
         child: CommonScaffold(
             title: 'Data Entry Form',
             actions: [
@@ -152,7 +208,8 @@ class _DataEntryFormState extends State<DataEntryForm> {
             //   ],
             // ),
             body: Obx(() {
-              if (controller.isDataEntryLoading.value) {
+              if (controller.isDataEntryLoading.value &&
+                  controller.isloginRequestDataEntryLoading.value) {
                 return const LoadingPage();
               }
               return Container(
@@ -172,6 +229,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                           SizedBox(height: 10.h),
 
                           _buildTextField(
+                            controller: controller.mobileController,
                             label: 'Mobile Number',
                             prefixIcon: SvgPicture.asset(
                               'assets/images/phone.svg',
@@ -187,6 +245,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                           ),
                           Obx(
                             () => _buildTextField(
+                              controller: controller.nameController,
                               label: 'Customer Name',
                               prefixIcon: SvgPicture.asset(
                                 'assets/images/user.svg',
@@ -203,7 +262,10 @@ class _DataEntryFormState extends State<DataEntryForm> {
                           ),
 
                           _buildTextField(
-                            content: controller.dob,
+                            controller: controller.dobController,
+                            content: controller
+                                .formatDate(controller.dob.value, 'dd-MM-yyyy')
+                                .obs,
                             prefixIcon: SvgPicture.asset(
                               'assets/images/dob.svg',
                               color: themeController.primaryColor.value,
@@ -215,6 +277,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                             onChanged: (value) => controller.dob.value = value,
                           ),
                           _buildTextField(
+                            controller: controller.companyController,
                             label: 'Company Name',
                             prefixIcon: SvgPicture.asset(
                               'assets/images/company_name.svg',
@@ -231,6 +294,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
 
                           _buildTextField(
                             label: 'Income',
+                            controller: controller.incomeController,
                             prefixIcon: SvgPicture.asset(
                               'assets/images/data_type.svg',
                               height: 20,
@@ -251,6 +315,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                           _buildDsaDropdown(),
 
                           _buildTextField(
+                              controller: controller.dateController,
                               content: controller.date,
                               prefixIcon: SvgPicture.asset(
                                   'assets/images/calendar.svg',
@@ -265,6 +330,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                           _buildTeleCallerDropdown(),
 
                           _buildTextField(
+                            controller: controller.teamleaderController,
                             label: 'Team Leader',
                             prefixIcon: SvgPicture.asset(
                               'assets/images/teamleader.svg',
@@ -293,8 +359,11 @@ class _DataEntryFormState extends State<DataEntryForm> {
                               hint: 'Balance Transfer',
                               items: yesNoItems,
                               iconPath: 'assets/images/teamleader.svg',
-                              value:
-                                  controller.selectedBanktransactionType.value,
+                              value: controller
+                                      .selectedBanktransactionType.value.isEmpty
+                                  ? null
+                                  : controller
+                                      .selectedBanktransactionType.value,
                               onChanged: (newValue) {
                                 if (newValue != null) {
                                   controller.selectedBanktransactionType.value =
@@ -314,17 +383,27 @@ class _DataEntryFormState extends State<DataEntryForm> {
 
                           Obx(
                             () => buildCommonDropdown(
-                                hint: 'Demand Draft Status',
-                                items: openorClose,
-                                iconPath: 'assets/images/teamleader.svg',
-                                value:
-                                    controller.selectedDemandDraftStatus.value,
-                                onChanged: (newValue) {
-                                  if (newValue != null) {
-                                    controller.selectedDemandDraftStatus.value =
-                                        newValue;
-                                  }
-                                }),
+                              hint: 'Demand Draft Status',
+                              items: openorClose,
+                              iconPath: 'assets/images/teamleader.svg',
+
+                              value: controller
+                                      .selectedDemandDraftStatus.value.isEmpty
+                                  ? null
+                                  : controller.selectedDemandDraftStatus.value,
+
+                              // 🔥 Disable when Balance Transfer = NO
+                              isEnabled: controller
+                                      .selectedBanktransactionType.value ==
+                                  'Yes',
+
+                              onChanged: (newValue) {
+                                if (newValue != null) {
+                                  controller.selectedDemandDraftStatus.value =
+                                      newValue;
+                                }
+                              },
+                            ),
                           ),
 
                           //   _buildCaseTypeDropdown(),
@@ -342,6 +421,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                           const SizedBox(height: 10),
 
                           _buildTextField(
+                            controller: controller.bankermobileController,
                             label: 'Banker Mobile',
                             prefixIcon: SvgPicture.asset(
                               'assets/images/phone.svg',
@@ -356,6 +436,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                           ),
 
                           _buildTextField(
+                              controller: controller.bankeremailController,
                               label: 'Banker Email',
                               prefixIcon: SvgPicture.asset(
                                 'assets/images/email.svg',
@@ -367,37 +448,57 @@ class _DataEntryFormState extends State<DataEntryForm> {
                               onChanged: (value) =>
                                   controller.bankerEmail.value = value),
 
-                          _buildTextField(
-                            label: 'Loan Amount',
-                            prefixIcon: SvgPicture.asset(
-                              'assets/images/rupees.svg',
-                              color: themeController.primaryColor.value,
-                              height: 20,
-                              width: 20,
-                            ),
-                            content: controller.loanAmount,
-                            formatAsCurrency: true,
-                            // CurrencyUtils.formatIndianCurrency(
-                            //     controller.loanAmount.value),
-                            onChanged: (value) {
-                              // Remove commas to get the numeric value before formatting
-                              String plainTextValue = value.replaceAll(',', '');
-                              controller.loanAmount.value = plainTextValue;
-
-                              // Format the numeric value back to the Indian format
-                              String formattedValue = NumberFormat.currency(
-                                      locale: 'en_IN',
-                                      symbol: '',
-                                      decimalDigits: 0)
-                                  .format(int.tryParse(plainTextValue) ?? 0);
-
-                              controller.loanAmount.value = formattedValue;
-                            },
-                            inputType: TextInputType.number,
-                            validator: _validateNumber,
+                          buildLoanAmountField(
+                            controller: controller.loanAmountController,
+                            value: controller.loanAmount,
                           ),
 
+                          // _buildTextField(
+                          //   label: 'Loan Amount',
+                          //   content: controller.loanAmount,
+                          //   inputType: TextInputType.number,
+                          //   formatAsCurrency: true,
+                          //   prefixIcon: SvgPicture.asset(
+                          //     'assets/images/rupees.svg',
+                          //     height: 20,
+                          //     width: 20,
+                          //   ),
+                          // ),
+
+                          // _buildTextField(
+                          //   label: 'Loan Amount',
+                          //   prefixIcon: SvgPicture.asset(
+                          //     'assets/images/rupees.svg',
+                          //     color: themeController.primaryColor.value,
+                          //     height: 20,
+                          //     width: 20,
+                          //   ),
+                          //   content: controller.loanAmountController.text
+                          //       .toString()
+                          //       .obs,
+                          //   formatAsCurrency: true,
+                          //   // CurrencyUtils.formatIndianCurrency(
+                          //   //     controller.loanAmount.value),
+                          //   // onChanged: (value) {
+                          //   //   // Remove commas to get the numeric value before formatting
+                          //   //   String plainTextValue = value.replaceAll(',', '');
+                          //   //   controller.loanAmount.value = plainTextValue;
+
+                          //   //   // Format the numeric value back to the Indian format
+                          //   //   String formattedValue = NumberFormat.currency(
+                          //   //           locale: 'en_IN',
+                          //   //           symbol: '',
+                          //   //           decimalDigits: 0)
+                          //   //       .format(int.tryParse(plainTextValue) ?? 0);
+
+                          //   //   controller.loanAmount.value = formattedValue;
+                          //   // },
+                          //   inputType: TextInputType.number,
+                          //   validator: _validateNumber,
+                          // ),
+
                           _buildTextField(
+                            controller: controller.losController,
                             label: 'LOS No.',
                             prefixIcon: SvgPicture.asset(
                               'assets/images/company_name.svg',
@@ -410,6 +511,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                                 controller.losNo.value = value,
                             // validator: _validateNotEmpty,
                           ),
+
                           const SizedBox(height: 10),
 
                           _buildStatusDropdown(),
@@ -420,6 +522,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                               iconPath: 'assets/images/comment-detail.svg'),
 
                           _buildTextField(
+                            controller: controller.caseStudyController,
                             label: 'Case Study ',
                             content: controller.caseStudy,
 
@@ -449,6 +552,8 @@ class _DataEntryFormState extends State<DataEntryForm> {
                                         children: [
                                           Expanded(
                                             child: _buildTextField(
+                                              controller:
+                                                  controller.commentController,
                                               content:
                                                   (comment.comment ?? '').obs,
                                               label: 'Comment',
@@ -641,21 +746,15 @@ class _DataEntryFormState extends State<DataEntryForm> {
   }
 
   Widget _buildTextField({
+    required TextEditingController controller, // ✅ MUST
     required RxString content,
     required String label,
-    required ValueChanged<String> onChanged,
+    ValueChanged<String>? onChanged,
     Widget? prefixIcon,
     TextInputType inputType = TextInputType.text,
     String? Function(String?)? validator,
-    bool formatAsCurrency = false, // optional flag
+    bool formatAsCurrency = false,
   }) {
-    final textController = TextEditingController(text: content.value);
-
-    // Keep the controller in sync with the content
-    textController.selection = TextSelection.fromPosition(
-      TextPosition(offset: textController.text.length),
-    );
-
     Widget? decoratedPrefixIcon;
 
     if (prefixIcon != null) {
@@ -663,70 +762,356 @@ class _DataEntryFormState extends State<DataEntryForm> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-              padding: const EdgeInsets.only(left: 10.0, right: 8.0),
-              child: prefixIcon),
+            padding: const EdgeInsets.only(left: 10.0, right: 8.0),
+            child: prefixIcon,
+          ),
           SizedBox(
             height: 50,
             width: 5,
-            child: VerticalDivider(
-                width: 1,
-                thickness: 1,
-                color: themeController.primaryColor.value),
+            child: VerticalDivider(thickness: 1),
           ),
         ],
       );
     }
-    return Obx(() {
-      final displayValue = formatAsCurrency
-          ? CurrencyUtils.formatIndianCurrency(content.value)
-          : content.value;
 
-      if (textController.text != displayValue) {
-        textController.text = displayValue;
-        textController.selection = TextSelection.fromPosition(
-          TextPosition(offset: textController.text.length),
-        );
-      }
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: AppColors.secondayColor)),
+          TextFormField(
+            controller: controller,
+            keyboardType: inputType,
+            maxLines: null,
+            readOnly: !this.controller.isEdit.value,
 
-      return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label,
-                  style: const TextStyle(color: AppColors.secondayColor)),
-              TextFormField(
-                keyboardType: inputType,
-                maxLines: null,
-                readOnly: !controller.isEdit.value,
-                controller: textController,
-                //  initialValue: content.isNotEmpty ? content : null,
-                decoration: InputDecoration(
-                  prefixIcon: decoratedPrefixIcon,
-                  hintText: "Enter $label",
-                  labelStyle: const TextStyle(color: AppColors.secondayColor),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0)),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide:
-                        BorderSide(color: themeController.primaryColor.value),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                          color: themeController.primaryColor.value, width: 2)),
-                  filled: true,
-                  fillColor: AppColors.backgroundColor,
-                ),
-                style: TextStyle(color: AppColors.secondayColor),
-                onChanged: onChanged,
-                validator: validator,
+            decoration: InputDecoration(
+              prefixIcon: decoratedPrefixIcon,
+              hintText: "Enter $label",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
               ),
-            ],
-          ));
-    });
+            ),
+
+            style: const TextStyle(color: AppColors.secondayColor),
+
+            onChanged: (value) {
+              content.value = value;
+              if (onChanged != null) onChanged(value);
+            },
+
+            // ✅ Currency formatting without breaking typing
+            onEditingComplete: () {
+              if (formatAsCurrency) {
+                final plain = controller.text.replaceAll(',', '');
+                final number = int.tryParse(plain);
+
+                if (number != null) {
+                  final formatted =
+                      CurrencyUtils.formatIndianCurrency(number.toString());
+
+                  controller.value = TextEditingValue(
+                    text: formatted,
+                    selection:
+                        TextSelection.collapsed(offset: formatted.length),
+                  );
+
+                  content.value = formatted;
+                }
+              }
+            },
+
+            validator: validator,
+          ),
+        ],
+      ),
+    );
   }
+  // Widget _buildTextField({
+  //   required RxString content,
+  //   required String label,
+  //   ValueChanged<String>? onChanged,
+  //   Widget? prefixIcon,
+  //   TextInputType inputType = TextInputType.text,
+  //   String? Function(String?)? validator,
+  //   bool formatAsCurrency = false,
+  // }) {
+  //   // ✅ Create controller ONCE using GetX
+  //   final textController = TextEditingController();
+
+  //   // ✅ Set initial value only once
+  //   textController.text = content.value;
+
+  //   Widget? decoratedPrefixIcon;
+
+  //   if (prefixIcon != null) {
+  //     decoratedPrefixIcon = Row(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         Padding(
+  //           padding: const EdgeInsets.only(left: 10.0, right: 8.0),
+  //           child: prefixIcon,
+  //         ),
+  //         SizedBox(
+  //           height: 50,
+  //           width: 5,
+  //           child: VerticalDivider(
+  //             thickness: 1,
+  //             color: themeController.primaryColor.value,
+  //           ),
+  //         ),
+  //       ],
+  //     );
+  //   }
+
+  //   return Padding(
+  //     padding: const EdgeInsets.all(8.0),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Text(label, style: const TextStyle(color: AppColors.secondayColor)),
+  //         TextFormField(
+  //           controller: textController,
+  //           keyboardType: inputType,
+  //           maxLines: null,
+  //           readOnly: !controller.isEdit.value,
+
+  //           decoration: InputDecoration(
+  //             prefixIcon: decoratedPrefixIcon,
+  //             hintText: "Enter $label",
+  //             border: OutlineInputBorder(
+  //               borderRadius: BorderRadius.circular(10.0),
+  //             ),
+  //           ),
+
+  //           style: const TextStyle(color: AppColors.secondayColor),
+
+  //           // ✅ DO NOT format here
+  //           onChanged: (value) {
+  //             content.value = value;
+  //             if (onChanged != null) onChanged(value);
+  //           },
+
+  //           // ✅ Format AFTER typing
+  //           onFieldSubmitted: (value) {
+  //             if (formatAsCurrency) {
+  //               final plain = value.replaceAll(',', '');
+  //               final number = int.tryParse(plain);
+
+  //               if (number != null) {
+  //                 final formatted =
+  //                     CurrencyUtils.formatIndianCurrency(number.toString());
+
+  //                 textController.value = TextEditingValue(
+  //                   text: formatted,
+  //                   selection: TextSelection.collapsed(
+  //                     offset: formatted.length,
+  //                   ),
+  //                 );
+
+  //                 content.value = formatted;
+  //               }
+  //             }
+  //           },
+
+  //           validator: validator,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  Widget buildLoanAmountField({
+    required TextEditingController controller,
+    required RxString value,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Loan Amount'),
+          TextFormField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+
+            decoration: InputDecoration(
+              prefixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10.0, right: 8.0),
+                    child: SvgPicture.asset(
+                      'assets/images/rupees.svg',
+                      height: 20,
+                      width: 20,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 50,
+                    width: 5,
+                    child: VerticalDivider(
+                      thickness: 1,
+                      color: themeController.primaryColor.value,
+                    ),
+                  ),
+                ],
+              ),
+              hintText: "Enter Loan Amount",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            ),
+
+            // InputDecoration(
+            //   prefixIcon: Row(
+            //     mainAxisSize: MainAxisSize.min,
+            //     children: [
+            //       SvgPicture.asset(
+            //         'assets/images/rupees.svg',
+            //         height: 20,
+            //         width: 20,
+            //       ),
+            //       SizedBox(
+            //         height: 50,
+            //         width: 5,
+            //         child: VerticalDivider(
+            //           thickness: 1,
+            //           color: themeController.primaryColor.value,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            //   hintText: "Enter Loan Amount",
+            //   border: OutlineInputBorder(
+            //     borderRadius: BorderRadius.circular(10),
+            //   ),
+            // ),
+
+            // ✅ Store raw value
+            onChanged: (text) {
+              value.value = text.replaceAll(',', '');
+            },
+
+            // ✅ Format AFTER typing
+            onFieldSubmitted: (text) {
+              final plain = text.replaceAll(',', '');
+              final number = int.tryParse(plain);
+
+              if (number != null) {
+                final formatted =
+                    CurrencyUtils.formatIndianCurrency(number.toString());
+
+                controller.value = TextEditingValue(
+                  text: formatted,
+                  selection: TextSelection.collapsed(
+                    offset: formatted.length,
+                  ),
+                );
+
+                value.value = formatted;
+              }
+            },
+
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Enter Loan Amount";
+              }
+              return null;
+            },
+          ),
+        ],
+      ),
+    );
+  }
+  // Widget _buildTextField({
+  //   required RxString content,
+  //   required String label,
+  //   ValueChanged<String>? onChanged,
+  //   Widget? prefixIcon,
+  //   TextInputType inputType = TextInputType.text,
+  //   String? Function(String?)? validator,
+  //   bool formatAsCurrency = false, // optional flag
+  // }) {
+  //   final textController = TextEditingController(text: content.value);
+
+  //   // Keep the controller in sync with the content
+  //   textController.selection = TextSelection.fromPosition(
+  //     TextPosition(offset: textController.text.length),
+  //   );
+
+  //   Widget? decoratedPrefixIcon;
+
+  //   if (prefixIcon != null) {
+  //     decoratedPrefixIcon = Row(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         Padding(
+  //             padding: const EdgeInsets.only(left: 10.0, right: 8.0),
+  //             child: prefixIcon),
+  //         SizedBox(
+  //           height: 50,
+  //           width: 5,
+  //           child: VerticalDivider(
+  //               width: 1,
+  //               thickness: 1,
+  //               color: themeController.primaryColor.value),
+  //         ),
+  //       ],
+  //     );
+  //   }
+  //   return Obx(() {
+  //     final displayValue = formatAsCurrency
+  //         ? CurrencyUtils.formatIndianCurrency(content.value)
+  //         : content.value;
+
+  //     if (textController.text != displayValue) {
+  //       textController.text = displayValue;
+  //       textController.selection = TextSelection.fromPosition(
+  //         TextPosition(offset: textController.text.length),
+  //       );
+  //     }
+
+  //     return Padding(
+  //         padding: const EdgeInsets.all(8.0),
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             Text(label,
+  //                 style: const TextStyle(color: AppColors.secondayColor)),
+  //             TextFormField(
+  //               keyboardType: inputType,
+  //               maxLines: null,
+  //               readOnly: !controller.isEdit.value,
+  //               controller: textController,
+  //               //  initialValue: content.isNotEmpty ? content : null,
+  //               decoration: InputDecoration(
+  //                 prefixIcon: decoratedPrefixIcon,
+  //                 hintText: "Enter $label",
+  //                 labelStyle: const TextStyle(color: AppColors.secondayColor),
+  //                 border: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(10.0)),
+  //                 enabledBorder: OutlineInputBorder(
+  //                   borderRadius: BorderRadius.circular(10.0),
+  //                   borderSide:
+  //                       BorderSide(color: themeController.primaryColor.value),
+  //                 ),
+  //                 focusedBorder: OutlineInputBorder(
+  //                     borderRadius: BorderRadius.circular(10.0),
+  //                     borderSide: BorderSide(
+  //                         color: themeController.primaryColor.value, width: 2)),
+  //                 filled: true,
+  //                 fillColor: AppColors.backgroundColor,
+  //               ),
+  //               style: const TextStyle(color: AppColors.secondayColor),
+  //               onChanged: onChanged,
+  //               validator: validator,
+  //             ),
+  //           ],
+  //         ));
+  //   });
+  // }
 
   // // Dynamic Remarks Section
   String? _validateNotEmpty(String? value) {
@@ -980,15 +1365,15 @@ class _DataEntryFormState extends State<DataEntryForm> {
                         controller.dsaName.value = newValue;
                         controller.selectedDsaId.value = newValue;
                         controller.caseType.clear();
-                        controller.producttypeList.clear();
+                        //  controller.producttypeList.clear();
                         controller.selectedBankName.value = '';
                         controller.dsaName.value = '';
                         controller.bankerNameList.clear();
                         controller.bankerMobile.value = '';
                         controller.bankerEmail.value = '';
-                        controller.telecaller.value = '';
-                        controller.teamleader.value = '';
-                        controller.status.value = '';
+                        //  controller.telecaller.value = '';
+                        // controller.teamleader.value = '';
+                        //  controller.status.value = '';
                         controller.getDsaBankList(newValue);
                       }
                     }

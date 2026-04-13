@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_solutions/constants/static_stored_data.dart';
@@ -26,6 +27,7 @@ class DataController extends GetxController {
   var dateRangeList = <DateTime?>[].obs;
   var isLoading = true.obs;
   var isDataEntryLoading = true.obs;
+  var isloginRequestDataEntryLoading = true.obs;
 
   var iseditLoading = true.obs;
   var dataList = <Data>[].obs;
@@ -40,9 +42,9 @@ class DataController extends GetxController {
 
   var allBankNamesList = <DataEntryBankList>[].obs;
 
-  var selectedBanktransactionType = 'No'.obs;
+  var selectedBanktransactionType = ''.obs;
 
-  var selectedDemandDraftStatus = 'Closed'.obs;
+  var selectedDemandDraftStatus = ''.obs;
 
   var dsaName = ''.obs;
   RxString tellecallerId = ''.obs;
@@ -75,6 +77,7 @@ class DataController extends GetxController {
   var caseType = ['BT & Topup', 'Fresh', 'OD'].obs;
   RxString selectedCaseType = ''.obs; // the selected value
   var loanAmount = ''.obs;
+  final loanAmountController = TextEditingController();
   var dob = ''.obs;
   var selectedDsaId = ''.obs;
   var selectedproductType = ''.obs;
@@ -117,17 +120,142 @@ class DataController extends GetxController {
   final CommonFilterController _commonFilterController =
       Get.find<CommonFilterController>();
 
+  final mobileController = TextEditingController();
+  final nameController = TextEditingController();
+  final companyController = TextEditingController();
+  final incomeController = TextEditingController();
+  final teamleaderController = TextEditingController();
+  final tealleaderController = TextEditingController();
+  final dobController = TextEditingController();
+  final dateController = TextEditingController();
+  final bankermobileController = TextEditingController();
+  final bankeremailController = TextEditingController();
+  final losController = TextEditingController();
+  final caseStudyController = TextEditingController();
+  final commentController = TextEditingController();
+
   @override
   void onInit() {
     super.onInit();
+
+    // ever(selectedBankName, (value) {
+    //   if (value != null && value.toString().isNotEmpty) {
+    //     getBankerNameByloginBank(dsaId.value, value.toString());
+    //   }
+    // });
+
+    // // 🔁 Rx → Controller (API update)
+    // ever(contactNumber, (value) {
+    //   if (mobileController.text != value) {
+    //     mobileController.text = value;
+    //   }
+    // });
+
+    // ever(customerName, (value) {
+    //   if (nameController.text != value) {
+    //     nameController.text = value;
+    //   }
+    // });
+
+    // ever(companyName, (value) {
+    //   if (companyController.text != value) {
+    //     companyController.text = value;
+    //   }
+    // });
+
+    // ever(income, (value) {
+    //   if (incomeController.text != value) {
+    //     incomeController.text = value;
+    //   }
+    // });
+
+    // ever(teamleader, (value) {
+    //   if (teamleaderController.text != value) {
+    //     teamleaderController.text = value;
+    //   }
+    // });
+
+    // ever(dob, (value) {
+    //   if (dobController.text != value) {
+    //     dobController.text = value;
+    //   }
+    // });
+
+    // ever(date, (value) {
+    //   if (dateController.text != value) {
+    //     dateController.text = value;
+    //   }
+    // });
+
+    // // 🔁 Controller → Rx (user typing)
+    // mobileController.addListener(() {
+    //   contactNumber.value = mobileController.text;
+    // });
+
+    // nameController.addListener(() {
+    //   customerName.value = nameController.text;
+    // });
+
+    // companyController.addListener(() {
+    //   companyName.value = companyController.text;
+    // });
+
+    // incomeController.addListener(() {
+    //   income.value = incomeController.text;
+    // });
+
+    // loanAmountController.addListener(() {
+    //   loanAmount.value = loanAmountController.text;
+    // });
+
+    // caseStudyController.addListener(() {
+    //   caseStudy.value = caseStudyController.text;
+    // });
+
+    // commentController.addListener(() {
+    //   comments.value = commentController.text;
+    // });
 
     ever(selectedBankName, (value) {
       if (value != null && value.toString().isNotEmpty) {
         getBankerNameByloginBank(dsaId.value, value.toString());
       }
     });
+    ever(selectedBankerName, (value) {
+      if (value != null && value.toString().isNotEmpty) {
+        getBankerDetailsName(value.toString());
+      }
+    });
 
+    /// 🔥 Bind all fields in ONE LINE each
+    bindController(mobileController, contactNumber);
+    bindController(nameController, customerName);
+    bindController(companyController, companyName);
+    bindController(incomeController, income);
+    bindController(teamleaderController, teamleader);
+    bindController(dobController, dob);
+    bindController(dateController, date);
+    bindController(bankermobileController, bankerMobile);
+    bindController(bankeremailController, bankerEmail);
+    bindController(losController, losNo);
+    bindController(caseStudyController, caseStudy);
+    bindController(loanAmountController, loanAmount);
     _loadAllData();
+  }
+
+  void bindController(TextEditingController controller, RxString rx) {
+    ever(rx, (value) {
+      if (controller.text != value) {
+        controller.text = value;
+      }
+    });
+
+    /// 🔁 Controller → Rx (User typing)
+    controller.addListener(() {
+      if (rx.value != controller.text) {
+        rx.value = controller.text;
+      }
+    });
   }
 
   void toggleSearch() {
@@ -359,25 +487,11 @@ class DataController extends GetxController {
     return existing?.dataEntryStatus;
   }
 
-  // String? _getProductNameFromId() {
-  //   final existing = producttypeList.firstWhereOrNull(
-  //     (e) => e.id == selectedproductType.value,
-  //   );
-  //   return existing?.name;
-  // }
-
-  // String? _getSourceNameFromId() {
-  //   final existing = sourcingList.firstWhereOrNull(
-  //     (e) => e.id == source.value,
-  //   );
-  //   return existing?.sourcingTitle;
-  // }
-
   // Save login request
   Future<bool> saveDataEntryForm() async {
     isSaveLoading(true);
 
-    final statusName = _getStatusNameFromId();
+    //  final statusName = _getStatusNameFromId();
 
     // final productTypeName = _getProductNameFromId();
 
@@ -400,7 +514,7 @@ class DataController extends GetxController {
         'case_study': caseStudy.value,
         'dob': dob.value,
         'loanAmount': loanAmount.value,
-        'loginBank': bankName.value,
+        'loginBank': selectedBankName.value,
         'bankerid': bankId.value,
         'bankerName': selectedBankerName.value,
         'bankerMobile': bankerMobile.value,
@@ -410,7 +524,7 @@ class DataController extends GetxController {
         'teamLeader': teamleaderId.value,
         'product_type': selectedproductType.value,
         'sourcing': source.value,
-        'status': statusName,
+        'status': selectedStatus.value,
         'balancetransfer':
             selectedBanktransactionType.value == 'Yes' ? "1" : "2",
         'demand_draft_status':
@@ -641,6 +755,10 @@ class DataController extends GetxController {
   }
 
   Future<void> fetchmoveToLoginData(String id) async {
+    DataController dataController = Get.find<DataController>();
+    dataController.editLoadData();
+    isloginRequestDataEntryLoading(true);
+
     try {
       Map<String, dynamic> data = {"login_id": id};
       var response =
@@ -652,17 +770,23 @@ class DataController extends GetxController {
 
         contactNumber.value = data.contactNumber;
         selectedSource.value = data.sourcing;
-        loanAmount.value = data.loanAmount;
-        tellecallerId.value = data.telecallerId;
+        loanAmountController.text = data.loanAmount;
+        selectTelecallerName.value = data.telecallerId;
         loginRequestId.value = data.loginRequestId;
 
         customerName.value = data.customerLoginModel.customerName;
         dob.value = data.customerLoginModel.dob;
         companyName.value = data.customerLoginModel.companyName;
         income.value = data.customerLoginModel.netIncome;
+
+        if (data.telecallerId != null && data.telecallerId.isNotEmpty) {
+          await getTeamLeadById(data.telecallerId);
+        }
       }
     } catch (e) {
       logOutput('An error occurred while fetching source list: $e');
+    } finally {
+      isloginRequestDataEntryLoading(false);
     }
   }
 

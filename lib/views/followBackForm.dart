@@ -186,8 +186,8 @@ class _FollowBackFormState extends State<FollowBackForm> {
                             ),
                             controller:
                                 _dialerController.customerNameController,
-                            onChanged: (value) =>
-                                _dialerController.customerName.value = value,
+                            // onChanged: (value) =>
+                            //     _dialerController.customerName.value = value,
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter customer name';
@@ -397,7 +397,7 @@ class _FollowBackFormState extends State<FollowBackForm> {
     String? value,
     TextEditingController? controller,
     bool? isRead,
-    required ValueChanged<String> onChanged,
+     ValueChanged<String>? onChanged,
     required String? Function(String?)? validator,
     Widget? prefixIcon,
     TextInputType inputType = TextInputType.text,

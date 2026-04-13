@@ -188,22 +188,24 @@ Widget _totalBadge(int total, String? duration) {
             ),
           ],
         ),
-        // duration!.isNotEmpty
-        //     ? Row(
-        //         children: [
-        //           const Icon(Icons.timer, color: Colors.white, size: 16),
-        //           const SizedBox(width: 6),
-        //           Text(
-        //             duration,
-        //             style: const TextStyle(
-        //                 fontSize: 14,
-        //                 fontWeight: FontWeight.w600,
-        //                 color: AppColors.appBarTextColor),
-        //           ),
-        //         ],
-        //       )
-        //     : const SizedBox.shrink()
+        duration!.isNotEmpty
+            ? Row(
+                children: [
+                  const Icon(Icons.timer, color: Colors.white, size: 16),
+                  const SizedBox(width: 6),
+                  Text(
+                    duration,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.appBarTextColor),
+                  ),
+                ],
+              )
+            : const SizedBox.shrink()
       ],
     ),
   );
+
+
 }

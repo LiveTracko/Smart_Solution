@@ -41,7 +41,7 @@ class DialerController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    ever(customerName, (name) => customerNameController.text = name);
+    // ever(customerName, (name) => customerNameController.text = name);
 
     checkAndRequestPermissions();
   }

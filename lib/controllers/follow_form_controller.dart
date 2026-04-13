@@ -11,6 +11,7 @@ import 'package:smart_solutions/models/FollowUpSubmittedList.dart';
 import 'package:smart_solutions/models/all_bank_names_model.dart';
 import 'package:smart_solutions/models/callBack_model.dart';
 import 'package:smart_solutions/models/call_log_model.dart';
+import 'package:smart_solutions/models/customerData_mobileNumber.dart';
 import 'package:smart_solutions/models/disbursement_model.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
 import 'package:smart_solutions/utils/scroll_utils.dart';
@@ -69,6 +70,7 @@ class FollowBackFormController extends GetxController
   double itemHeight = 45.h;
   double tellececalleritemHeight = 55.h;
   final customerNumberController = TextEditingController();
+  final customerNameController = TextEditingController();
 
   // Pagination variables
   RxInt currentPage = 1.obs;
@@ -104,6 +106,8 @@ class FollowBackFormController extends GetxController
     customerNumberController.addListener(() {
       mobile.value = customerNumberController.text;
     });
+
+  
 
     ever<String>(mobile, (number) {
       if (customerNumberController.text != number) {
@@ -731,7 +735,7 @@ class FollowBackFormController extends GetxController
 
       final Map<String, dynamic> formData = {
         'mobile': mobile.value,
-        'name': _dialerController.customerName.value,
+        'name': _dialerController.customerNameController.text.trim(),
         'data_type': dataType.value,
         'bank_name':
             bankName.value.isEmpty ? allBankNamesList.first.id : bankName.value,

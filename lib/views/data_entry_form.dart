@@ -168,7 +168,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                           SizedBox(height: 5.h),
                           titileWithIcon(
                               title: 'Customer Information',
-                              iconPath: 'assets/images/basic_info.svg'),
+                              iconPath: 'assets/images/user.svg'),
                           SizedBox(height: 10.h),
 
                           _buildTextField(
@@ -246,7 +246,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
 
                           titileWithIcon(
                               title: 'Sourcing Details',
-                              iconPath: 'assets/images/basic_info.svg'),
+                              iconPath: 'assets/images/data_type.svg'),
 
                           _buildDsaDropdown(),
 
@@ -282,7 +282,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
 
                           titileWithIcon(
                               title: 'Loan & Case Details',
-                              iconPath: 'assets/images/basic_info.svg'),
+                              iconPath: 'assets/images/rupees.svg'),
 
                           const SizedBox(height: 10),
 
@@ -331,7 +331,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
 
                           titileWithIcon(
                               title: 'Bank Information',
-                              iconPath: 'assets/images/basic_info.svg'),
+                              iconPath: 'assets/images/bank.svg'),
 
                           const SizedBox(height: 10),
 
@@ -417,7 +417,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
 
                           titileWithIcon(
                               title: 'Case Study & Comments',
-                              iconPath: 'assets/images/basic_info.svg'),
+                              iconPath: 'assets/images/comment-detail.svg'),
 
                           _buildTextField(
                             label: 'Case Study ',

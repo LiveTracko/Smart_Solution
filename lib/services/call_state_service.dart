@@ -133,6 +133,7 @@ class CallStateService {
               '';
 
       // Update common fields
+      
       dialerController.customerName.value = name;
 
       followController.mobile.value = number;

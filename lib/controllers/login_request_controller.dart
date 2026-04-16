@@ -282,7 +282,9 @@ class LoginRequestController extends GetxController {
   Future<void> getLoginRequestBanks() async {
     try {
       isLoading(true);
-      var body = {"": ""}; // You can define your request body as needed
+      var body = {
+        "telecaller_id": StaticStoredData.userId
+      }; // You can define your request body as needed
       var response = await ApiService()
           .postRequest(APIUrls.allLoginRequestBankNames, body);
 

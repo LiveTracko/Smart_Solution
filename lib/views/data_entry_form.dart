@@ -288,7 +288,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
                             content: controller.companyName,
                             onChanged: (value) =>
                                 controller.companyName.value = value,
-                            inputType: TextInputType.phone,
+                            inputType: TextInputType.text,
                             validator: _validateNotEmpty,
                           ),
 
@@ -552,13 +552,14 @@ class _DataEntryFormState extends State<DataEntryForm> {
                                         children: [
                                           Expanded(
                                             child: _buildTextField(
-                                              controller:
-                                                  controller.commentController,
+                                              controller: comment
+                                                  .controller, // ✅ REQUIRED
                                               content:
                                                   (comment.comment ?? '').obs,
                                               label: 'Comment',
-                                              onChanged: (value) =>
-                                                  comment.comment = value,
+                                              onChanged: (value) {
+                                                comment.comment = value;
+                                              },
                                             ),
                                           ),
 
@@ -747,6 +748,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
 
   Widget _buildTextField({
     required TextEditingController controller, // ✅ MUST
+
     required RxString content,
     required String label,
     ValueChanged<String>? onChanged,
@@ -797,7 +799,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
             style: const TextStyle(color: AppColors.secondayColor),
 
             onChanged: (value) {
-              content.value = value;
+              content!.value = value;
               if (onChanged != null) onChanged(value);
             },
 
@@ -828,6 +830,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
       ),
     );
   }
+
   // Widget _buildTextField({
   //   required RxString content,
   //   required String label,
@@ -2054,7 +2057,7 @@ class _DataEntryFormState extends State<DataEntryForm> {
 
   String? _getInitialloginBankValue() {
     final existing = controller.dsaBankList.firstWhereOrNull((e) =>
-        (e.bankName).toLowerCase().trim() ==
+        (e.bankId)?.toLowerCase().trim() ==
         controller.selectedBankName.value.toLowerCase().trim());
     return existing?.bankName;
   }

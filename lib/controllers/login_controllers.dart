@@ -173,13 +173,16 @@ class LoginViewModel extends GetxController {
         Get.snackbar('Error', 'Invalid username or password',
             backgroundColor: Colors.red, colorText: Colors.white);
       }
-    } catch (e) {
-      logOutput("$e");
+    } catch (e, stackTrace) {
+      logOutput("ERROR: $e");
+      logOutput("STACKTRACE: $stackTrace");
 
-      // AppSnackbar.error(
-      //   "Request Failed",
-      //   getErrorMessage(e),
-      // );
+      showErrorDialog(
+        "An error occurred during login. Please try again.",
+        onComplete: () {
+          // Optional: You can perform additional actions after the dialog is closed
+        },
+      );
     }
     // logOutput('$e');
     // Get.snackbar('Error', 'Something went wrong. Please try again.');
@@ -258,4 +261,88 @@ void showSuccessDialog(String message, {VoidCallback? onComplete}) {
       onComplete();
     }
   });
+}
+
+void showErrorDialog(
+  String message, {
+  VoidCallback? onComplete,
+  bool autoClose = true,
+}) {
+  showDialog(
+    context: Get.context!,
+    barrierDismissible: false,
+    builder: (context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+        ),
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// Error Animation
+              // Lottie.asset(
+              //   "assets/animations/error.json", // 🔴 add this
+              //   height: 120,
+              //   repeat: false,
+              // ),
+
+              const Icon(
+                Icons.error_outline,
+                size: 80,
+                color: Colors.red,
+              ),
+
+              const SizedBox(height: 15),
+
+              const Text(
+                "Error",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+
+  /// Auto close
+  if (autoClose) {
+    Future.delayed(const Duration(seconds: 2), () {
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+      if (onComplete != null) {
+        onComplete();
+      }
+    });
+  }
 }

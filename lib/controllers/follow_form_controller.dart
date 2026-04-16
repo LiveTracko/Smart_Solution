@@ -8,14 +8,13 @@ import 'package:smart_solutions/constants/static_stored_data.dart';
 import 'package:smart_solutions/controllers/common_filter_controller.dart';
 import 'package:smart_solutions/controllers/remark_status_controller.dart';
 import 'package:smart_solutions/models/FollowUpSubmittedList.dart';
-import 'package:smart_solutions/models/all_bank_names_model.dart';
 import 'package:smart_solutions/models/callBack_model.dart';
 import 'package:smart_solutions/models/call_log_model.dart';
-import 'package:smart_solutions/models/customerData_mobileNumber.dart';
 import 'package:smart_solutions/models/disbursement_model.dart';
 import 'package:smart_solutions/models/team_leader_model.dart';
 import 'package:smart_solutions/utils/scroll_utils.dart';
 import '../constants/services.dart';
+import '../models/login_request_bank_list_model';
 import '../services/api_service.dart';
 import '../constants/api_urls.dart';
 
@@ -26,7 +25,7 @@ class FollowBackFormController extends GetxController
   final ApiService _apiService = ApiService();
   final DialerController _dialerController = Get.put(DialerController());
 
-  var allBankNamesList = <AllBankNamesData>[].obs;
+  var allBankNamesList = <LoginRequestBankList>[].obs;
   var followBackList = <Data>[].obs;
 
   var startDate = Rxn<DateTime>();
@@ -106,8 +105,6 @@ class FollowBackFormController extends GetxController
     customerNumberController.addListener(() {
       mobile.value = customerNumberController.text;
     });
-
-  
 
     ever<String>(mobile, (number) {
       if (customerNumberController.text != number) {
@@ -793,20 +790,43 @@ class FollowBackFormController extends GetxController
   //   }
   // }
 
+  // Future<void> getAllBanks() async {
+  //   try {
+  //     var body = {'': ''};
+  //     var response = await ApiService().postRequest(APIUrls.allBankNames, body);
+
+  //     if (response.statusCode == 200) {
+  //       final remarkStatus = AllBankNames.fromJson(json.decode(response.body));
+  //       if (remarkStatus.data != null) {
+  //         allBankNamesList.assignAll(remarkStatus.data!);
+  //       }
+  //     }
+  //   } catch (e) {
+  //     log('an error occured while fetching banks $e');
+  //   } finally {}
+  // }
+
   Future<void> getAllBanks() async {
     try {
-      var body = {'': ''};
-      var response = await ApiService().postRequest(APIUrls.allBankNames, body);
+      isLoading(true);
+      var body = {
+        "telecaller_id": StaticStoredData.userId
+      }; // You can define your request body as needed
+      var response = await ApiService()
+          .postRequest(APIUrls.allLoginRequestBankNames, body);
 
       if (response.statusCode == 200) {
-        final remarkStatus = AllBankNames.fromJson(json.decode(response.body));
-        if (remarkStatus.data != null) {
-          allBankNamesList.assignAll(remarkStatus.data!);
+        final List<dynamic> responseData = json.decode(response.body)['data'];
+        final List<LoginRequestBankList> bankList = parseBankList(responseData);
+        if (bankList.isNotEmpty) {
+          allBankNamesList.assignAll(bankList);
         }
       }
+      isLoading(false);
     } catch (e) {
-      log('an error occured while fetching banks $e');
-    } finally {}
+      log('An error occurred while fetching banks: $e');
+      isLoading(false); // Ensure loading is set to false on error as well
+    }
   }
 
   // void clearForm() {

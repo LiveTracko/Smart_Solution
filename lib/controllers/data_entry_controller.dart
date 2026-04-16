@@ -272,16 +272,56 @@ class DataController extends GetxController {
     refreshData(); // 👈 reload without filter
   }
 
+  @override
+  void onClose() {
+    for (final comment in commentList) {
+      comment.dispose();
+    }
+    super.onClose();
+  }
+
+  // void addComment() {
+  //   final newItem = CommentData(
+  //       comment: newComment.value,
+  //       userId: StaticStoredData.userId,
+  //       date: DateTime.now().toString(),
+  //       isLocal: true);
+
+  //   commentList.add(newItem);
+
+  //   newComment.value = '';
+
+  //   // ✅ Move focus to newly added comment
+  //   Future.delayed(const Duration(milliseconds: 100), () {
+  //     newItem.focusNode.requestFocus();
+  //   });
+  // }
+
   void addComment() {
-    commentList.add(
-      CommentData(
-          comment: newComment.value,
-          userId: StaticStoredData.userId,
-          date: DateTime.now().toString(),
-          isLocal: true),
+    final text = newComment.value.trim();
+
+    // 🛑 Prevent empty comments
+    // if (text.isEmpty) return;
+
+    final newItem = CommentData(
+      comment: text,
+      userId: StaticStoredData.userId,
+      date: DateTime.now().toIso8601String(),
+      isLocal: true,
     );
 
+    // ✅ Add to list
+    commentList.add(newItem);
+
+    // ✅ Clear input
     newComment.value = '';
+
+    // ✅ Move focus to newly added field
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (newItem.focusNode.canRequestFocus) {
+        newItem.focusNode.requestFocus();
+      }
+    });
   }
 
   Future<void> _loadAllData() async {

@@ -397,7 +397,7 @@ class _FollowBackFormState extends State<FollowBackForm> {
     String? value,
     TextEditingController? controller,
     bool? isRead,
-     ValueChanged<String>? onChanged,
+    ValueChanged<String>? onChanged,
     required String? Function(String?)? validator,
     Widget? prefixIcon,
     TextInputType inputType = TextInputType.text,
@@ -985,8 +985,7 @@ class _FollowBackFormState extends State<FollowBackForm> {
     }
     final existingBank = _formController.allBankNamesList.firstWhereOrNull(
         (bank) => bank.bankName == _formController.bankName.value);
-    return existingBank
-        ?.bankName; // If found, return it; otherwise, return null
+    return existingBank?.bankName;
   }
 
   // Helper method to get the initial bank value

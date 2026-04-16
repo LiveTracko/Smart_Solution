@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class DataEntryModel {
   List<Data>? data;
 
@@ -208,8 +210,11 @@ class CommentData {
   String? date;
   String? name;
 
-  bool isLocal; 
-  
+  bool isLocal;
+
+  /// ✅ REQUIRED for editable list items
+  final TextEditingController controller;
+  final FocusNode focusNode;
 
   CommentData({
     this.id,
@@ -219,8 +224,9 @@ class CommentData {
     this.comment,
     this.date,
     this.name,
-     this.isLocal = false,
-  });
+    this.isLocal = false,
+  })  : controller = TextEditingController(text: comment ?? ''),
+        focusNode = FocusNode();
 
   factory CommentData.fromJson(Map<String, dynamic> json) {
     return CommentData(
@@ -231,7 +237,7 @@ class CommentData {
       comment: json['comment']?.toString(),
       date: json['date']?.toString(),
       name: json['name']?.toString(),
-            isLocal: false, 
+      isLocal: false,
     );
   }
 
@@ -245,5 +251,11 @@ class CommentData {
       'date': date,
       'name': name,
     };
+  }
+
+  /// ✅ IMPORTANT: cleanup
+  void dispose() {
+    controller.dispose();
+    focusNode.dispose();
   }
 }

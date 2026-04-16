@@ -12,12 +12,14 @@ class DsaBankList {
 
 class DsaBank {
   String bankName;
+  String? bankId;
 
-  DsaBank({required this.bankName});
+  DsaBank({required this.bankName, this.bankId});
 
   factory DsaBank.fromJson(Map<String, dynamic> json) {
     return DsaBank(
       bankName: json["bank_name"],
+      bankId: json["bank_id"],
     );
   }
 }
